@@ -67,9 +67,9 @@
         # 'templates/pos/pos_templates.xml',
         # 'templates/pos/pos_receipt.xml',
 
-        # # Templates mail (nécessite: mail)
-        # 'templates/mail/mail_notification_layout.xml',
-        # 'templates/mail/signature.xml',
+        # Templates mail (module mail installé)
+        'templates/mail/mail_notification_layout.xml',
+        'templates/mail/signature.xml',
     ],
     'assets': {
         # Backend Assets - Chargés dans l'interface backend
