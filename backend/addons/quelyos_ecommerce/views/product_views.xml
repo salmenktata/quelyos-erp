@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue formulaire produit e-commerce -->
+    <record id="view_product_template_ecommerce_form" model="ir.ui.view">
+        <field name="name">product.template.ecommerce.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Ajouter onglet E-commerce -->
+            <notebook position="inside">
+                <page string="E-commerce" name="ecommerce">
+                    <group>
+                        <group string="Visibilité">
+                            <field name="is_featured"/>
+                            <field name="featured_order" invisible="not is_featured"/>
+                            <field name="is_new"/>
+                            <field name="is_bestseller"/>
+                        </group>
+                        <group string="URL &amp; SEO">
+                            <field name="slug"/>
+                            <field name="meta_title"/>
+                            <field name="meta_description"/>
+                            <field name="meta_keywords"/>
+                        </group>
+                    </group>
+                    <group string="Contenu">
+                        <field name="technical_description" widget="html"/>
+                    </group>
+                    <group string="Relations">
+                        <field name="related_product_ids" widget="many2many_tags"/>
+                    </group>
+                    <group string="Statistiques" col="4">
+                        <field name="view_count"/>
+                        <field name="wishlist_count"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- Vue liste produits avec badges -->
+    <record id="view_product_template_ecommerce_tree" model="ir.ui.view">
+        <field name="name">product.template.ecommerce.tree</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="list_price" position="after">
+                <field name="is_featured" widget="boolean_toggle"/>
+                <field name="is_new" widget="boolean_toggle"/>
+                <field name="is_bestseller" widget="boolean_toggle"/>
+                <field name="qty_available" string="Stock"/>
+                <field name="view_count"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Vue kanban produits -->
+    <record id="view_product_template_ecommerce_kanban" model="ir.ui.view">
+        <field name="name">product.template.ecommerce.kanban</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="name"/>
+                <field name="list_price"/>
+                <field name="is_featured"/>
+                <field name="is_new"/>
+                <field name="qty_available"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('product.template', 'image_128', record.id.raw_value)" alt="Product"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong><field name="name"/></strong>
+                                <div>
+                                    <field name="list_price" widget="monetary"/>
+                                </div>
+                                <div>
+                                    <span t-if="record.is_featured.raw_value" class="badge badge-success">Featured</span>
+                                    <span t-if="record.is_new.raw_value" class="badge badge-info">New</span>
+                                    <span t-if="record.qty_available.raw_value == 0" class="badge badge-danger">Rupture</span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_product_ecommerce" model="ir.actions.act_window">
+        <field name="name">Produits E-commerce</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('sale_ok', '=', True)]</field>
+        <field name="context">{'default_sale_ok': True}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_product_template_ecommerce_kanban')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_product_template_ecommerce_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_product_template_ecommerce_form')})]"/>
+    </record>
+</odoo>

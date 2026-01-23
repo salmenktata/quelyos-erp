@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+{
+    'name': 'Quelyos E-commerce API',
+    'version': '19.0.1.0.0',
+    'category': 'Sales',
+    'summary': 'API REST pour e-commerce headless avec Next.js',
+    'description': """
+        Module e-commerce Quelyos
+        ========================
+
+        API REST complète pour frontend headless:
+        - Authentification Portal Odoo native
+        - Catalogue produits avec filtres avancés
+        - Gestion panier et checkout
+        - Espace client complet
+        - Wishlist et comparateur produits
+        - Webhooks temps réel
+        - Optimisations SEO (slugs, metadata)
+
+        Compatible avec frontend Next.js 14
+    """,
+    'author': 'Quelyos',
+    'website': 'https://www.quelyos.com',
+    'license': 'LGPL-3',
+    'depends': [
+        'base',
+        'web',
+        'sale',
+        'sale_management',
+        'stock',
+        'portal',
+        'payment',
+        'delivery',
+        'product',
+        'quelyos_branding',
+    ],
+    'data': [
+        'security/ir.model.access.csv',
+        'data/ecommerce_config.xml',
+        'views/product_views.xml',
+        'views/ecommerce_config_views.xml',
+        'views/menu.xml',
+    ],
+    'demo': [],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+}

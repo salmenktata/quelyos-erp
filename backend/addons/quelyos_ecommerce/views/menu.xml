@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menu principal E-commerce -->
+    <menuitem id="menu_ecommerce_root"
+              name="E-commerce"
+              sequence="50"
+              web_icon="quelyos_ecommerce,static/description/icon.png"/>
+
+    <!-- Catalogue -->
+    <menuitem id="menu_ecommerce_catalog"
+              name="Catalogue"
+              parent="menu_ecommerce_root"
+              sequence="10"/>
+
+    <menuitem id="menu_ecommerce_products"
+              name="Produits"
+              parent="menu_ecommerce_catalog"
+              action="quelyos_ecommerce.action_product_ecommerce"
+              sequence="10"/>
+
+    <menuitem id="menu_ecommerce_categories"
+              name="Catégories"
+              parent="menu_ecommerce_catalog"
+              action="product.product_category_action_form"
+              sequence="20"/>
+
+    <!-- Commandes (sera complété en Phase 2) -->
+    <menuitem id="menu_ecommerce_orders"
+              name="Commandes"
+              parent="menu_ecommerce_root"
+              sequence="20"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_ecommerce_config"
+              name="Configuration"
+              parent="menu_ecommerce_root"
+              action="quelyos_ecommerce.action_ecommerce_config"
+              sequence="90"/>
+</odoo>
