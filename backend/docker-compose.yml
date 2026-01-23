@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: quelyos-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-odoo}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-odoo}
+      POSTGRES_DB: ${DB_NAME:-quelyos}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-odoo}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - quelyos-network
+
+  # Odoo Backend
+  odoo:
+    image: odoo:19.0
+    container_name: quelyos-odoo
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      HOST: db
+      USER: ${DB_USER:-odoo}
+      PASSWORD: ${DB_PASSWORD:-odoo}
+    volumes:
+      - odoo_data:/var/lib/odoo
+      - odoo_config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+    ports:
+      - "8069:8069"
+    command: --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons -d ${DB_NAME:-quelyos} -i base --without-demo=all
+    networks:
+      - quelyos-network
+
+volumes:
+  postgres_data:
+  odoo_data:
+  odoo_config:
+
+networks:
+  quelyos-network:
+    driver: bridge
