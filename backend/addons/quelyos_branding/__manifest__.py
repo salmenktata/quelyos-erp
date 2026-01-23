@@ -85,6 +85,9 @@
     'assets': {
         # Backend Assets - Chargés dans l'interface backend
         'web.assets_backend': [
+            # JavaScript error handler (LOAD FIRST to catch ResizeObserver errors)
+            'quelyos_branding/static/src/js/error_handler.js',
+
             # Variables CSS en premier
             'quelyos_branding/static/src/scss/_variables.scss',
 
