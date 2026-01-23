@@ -135,7 +135,7 @@
 
                                     <div class="col-12 col-lg-12 o_setting_box">
                                         <div class="o_setting_right_pane">
-                                            <label string="Thèmes prédéfinis"/>
+                                            <span class="o_form_label">Thèmes prédéfinis</span>
                                             <div class="mt8">
                                                 <button name="action_set_blue_theme"
                                                         type="object"
@@ -321,10 +321,66 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <h2>Masquage des fonctionnalités Entreprise</h2>
+
+                                <div class="row mt16">
+                                    <div class="col-12 col-lg-12 o_setting_box">
+                                        <div class="o_setting_left_pane">
+                                            <field name="quelyos_branding_hide_enterprise_features"/>
+                                        </div>
+                                        <div class="o_setting_right_pane">
+                                            <label for="quelyos_branding_hide_enterprise_features" string="Masquer les fonctionnalités Entreprise"/>
+                                            <div class="text-muted">
+                                                Masquer tous les éléments liés à Odoo Enterprise (badges, promotions, etc.)
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="col-12 col-lg-12 o_setting_box">
+                                        <div class="o_setting_left_pane">
+                                            <field name="quelyos_branding_hide_studio"/>
+                                        </div>
                                         <div class="o_setting_right_pane">
-                                            <label string="Statistiques d'utilisation"/>
+                                            <label for="quelyos_branding_hide_studio" string="Masquer Odoo Studio"/>
+                                            <div class="text-muted">
+                                                Masquer tous les éléments Odoo Studio (boutons "Edit in Studio", menus, etc.)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-lg-12 o_setting_box">
+                                        <div class="o_setting_left_pane">
+                                            <field name="quelyos_branding_hide_upgrade_prompts"/>
+                                        </div>
+                                        <div class="o_setting_right_pane">
+                                            <label for="quelyos_branding_hide_upgrade_prompts" string="Masquer les invitations de mise à niveau"/>
+                                            <div class="text-muted">
+                                                Supprimer toutes les invitations de mise à niveau Enterprise
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-lg-12 o_setting_box">
+                                        <div class="o_setting_left_pane">
+                                            <field name="quelyos_branding_hide_enterprise_menus"/>
+                                        </div>
+                                        <div class="o_setting_right_pane">
+                                            <label for="quelyos_branding_hide_enterprise_menus" string="Désactiver les menus Entreprise"/>
+                                            <div class="text-muted">
+                                                Désactiver les menus des modules entreprise (Studio, Helpdesk, Planning, etc.)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h2>Statistiques</h2>
+
+                                <div class="row mt16">
+                                    <div class="col-12 col-lg-12 o_setting_box">
+                                        <div class="o_setting_right_pane">
+                                            <span class="o_form_label">Statistiques d'utilisation</span>
                                             <div class="mt8">
                                                 <div class="row">
                                                     <div class="col-md-4">
@@ -373,7 +429,7 @@
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.config.settings</field>
             <field name="view_mode">form</field>
-            <field name="target">inline</field>
+            <field name="target">current</field>
             <field name="context">{'module': 'quelyos_branding'}</field>
         </record>
 

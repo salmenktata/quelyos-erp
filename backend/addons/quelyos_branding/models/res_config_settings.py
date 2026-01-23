@@ -111,6 +111,34 @@ class ResConfigSettings(models.TransientModel):
         help='Remplacer automatiquement les textes "Odoo" par "Quelyos" dans l\'interface'
     )
 
+    quelyos_branding_hide_enterprise_features = fields.Boolean(
+        string='Masquer les fonctionnalités Entreprise',
+        config_parameter='quelyos.branding.hide_enterprise_features',
+        default=True,
+        help='Masquer tous les éléments liés à Odoo Enterprise (badges, promotions, etc.)'
+    )
+
+    quelyos_branding_hide_studio = fields.Boolean(
+        string='Masquer Odoo Studio',
+        config_parameter='quelyos.branding.hide_studio',
+        default=True,
+        help='Masquer tous les éléments Odoo Studio (boutons "Edit in Studio", menus, etc.)'
+    )
+
+    quelyos_branding_hide_upgrade_prompts = fields.Boolean(
+        string='Masquer les invitations de mise à niveau',
+        config_parameter='quelyos.branding.hide_upgrade_prompts',
+        default=True,
+        help='Supprimer toutes les invitations de mise à niveau Enterprise'
+    )
+
+    quelyos_branding_hide_enterprise_menus = fields.Boolean(
+        string='Désactiver les menus Entreprise',
+        config_parameter='quelyos.branding.hide_enterprise_menus',
+        default=True,
+        help='Désactiver les menus des modules entreprise (Studio, Helpdesk, Planning, etc.)'
+    )
+
     # Champs pour les chemins des assets
     quelyos_branding_favicon_path = fields.Char(
         string='Chemin du favicon',
@@ -392,6 +420,10 @@ class ResConfigSettings(models.TransientModel):
             'quelyos.branding.copyright_text': '© 2026 Quelyos - Tous droits réservés',
             'quelyos.branding.enable_full_debranding': 'True',
             'quelyos.branding.replace_odoo_text': 'True',
+            'quelyos.branding.hide_enterprise_features': 'True',
+            'quelyos.branding.hide_studio': 'True',
+            'quelyos.branding.hide_upgrade_prompts': 'True',
+            'quelyos.branding.hide_enterprise_menus': 'True',
         }
 
         for key, value in default_values.items():
@@ -466,6 +498,10 @@ class ResConfigSettings(models.TransientModel):
             quelyos_branding_copyright_text=params.get_param('quelyos.branding.copyright_text', '© 2026 Quelyos'),
             quelyos_branding_enable_full_debranding=params.get_param('quelyos.branding.enable_full_debranding', True),
             quelyos_branding_replace_odoo_text=params.get_param('quelyos.branding.replace_odoo_text', True),
+            quelyos_branding_hide_enterprise_features=params.get_param('quelyos.branding.hide_enterprise_features', True),
+            quelyos_branding_hide_studio=params.get_param('quelyos.branding.hide_studio', True),
+            quelyos_branding_hide_upgrade_prompts=params.get_param('quelyos.branding.hide_upgrade_prompts', True),
+            quelyos_branding_hide_enterprise_menus=params.get_param('quelyos.branding.hide_enterprise_menus', True),
             quelyos_branding_favicon_path=params.get_param('quelyos.branding.favicon_path', '/quelyos_branding/static/src/img/favicon/favicon.ico'),
             quelyos_branding_logo_navbar_path=params.get_param('quelyos.branding.logo_navbar_path', '/quelyos_branding/static/src/img/logo/quelyos_logo_white.png'),
             quelyos_branding_logo_email_path=params.get_param('quelyos.branding.logo_email_path', '/quelyos_branding/static/src/img/logo/quelyos_logo.png'),
@@ -495,6 +531,10 @@ class ResConfigSettings(models.TransientModel):
             'quelyos.branding.copyright_text': self.quelyos_branding_copyright_text or '© 2026 Quelyos',
             'quelyos.branding.enable_full_debranding': str(self.quelyos_branding_enable_full_debranding),
             'quelyos.branding.replace_odoo_text': str(self.quelyos_branding_replace_odoo_text),
+            'quelyos.branding.hide_enterprise_features': str(self.quelyos_branding_hide_enterprise_features),
+            'quelyos.branding.hide_studio': str(self.quelyos_branding_hide_studio),
+            'quelyos.branding.hide_upgrade_prompts': str(self.quelyos_branding_hide_upgrade_prompts),
+            'quelyos.branding.hide_enterprise_menus': str(self.quelyos_branding_hide_enterprise_menus),
             'quelyos.branding.favicon_path': self.quelyos_branding_favicon_path or '/quelyos_branding/static/src/img/favicon/favicon.ico',
             'quelyos.branding.logo_navbar_path': self.quelyos_branding_logo_navbar_path or '/quelyos_branding/static/src/img/logo/quelyos_logo_white.png',
             'quelyos.branding.logo_email_path': self.quelyos_branding_logo_email_path or '/quelyos_branding/static/src/img/logo/quelyos_logo.png',

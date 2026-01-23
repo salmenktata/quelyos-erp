@@ -1,0 +1,169 @@
+/**
+ * Quelyos Branding - Masquage des fonctionnalités Entreprise
+ * Ce module masque tous les éléments liés à Odoo Enterprise
+ */
+
+(function() {
+    'use strict';
+
+    // ========================================
+    // Fonction: Masquer les éléments entreprise
+    // ========================================
+    function hideEnterpriseElements() {
+        // Badges et labels entreprise
+        const badges = document.querySelectorAll(
+            '.o_enterprise_badge, .badge-enterprise, ' +
+            '.o_premium_feature, .o_enterprise_label'
+        );
+        badges.forEach(el => el.remove());
+
+        // Boutons de mise à niveau
+        const upgradeButtons = document.querySelectorAll(
+            'button[data-action*="upgrade"], ' +
+            'a[href*="odoo.com/buy"], ' +
+            'a[href*="/upgrade"], ' +
+            '.o_upgrade_cta'
+        );
+        upgradeButtons.forEach(el => {
+            el.style.display = 'none';
+        });
+    }
+
+    // ========================================
+    // Fonction: Masquer les boutons Studio
+    // ========================================
+    function hideStudioButtons() {
+        // Boutons "Edit in Studio"
+        const studioButtons = document.querySelectorAll(
+            'button[studio="true"], ' +
+            'button[data-action="studio"], ' +
+            'a[href*="/web_studio/"]'
+        );
+        studioButtons.forEach(el => el.remove());
+
+        // Éléments de la navbar Studio
+        const studioNavbar = document.querySelectorAll(
+            '.o_web_studio_navbar_item, ' +
+            '.o_studio_navbar_item'
+        );
+        studioNavbar.forEach(el => el.remove());
+    }
+
+    // ========================================
+    // Fonction: Masquer les dialogues entreprise
+    // ========================================
+    function hideEnterpriseDialogs() {
+        // Intercepter les dialogues de mise à niveau
+        const upgradeDialogs = document.querySelectorAll(
+            '.o_upgrade_content, ' +
+            '.o_technical_modal'
+        );
+
+        upgradeDialogs.forEach(dialog => {
+            // Trouver le modal parent
+            const modal = dialog.closest('.modal');
+            if (modal) {
+                modal.remove();
+            }
+        });
+
+        // Masquer aussi les bannières de trial
+        const trialBanners = document.querySelectorAll(
+            '.o_trial_banner, ' +
+            '.o_upgrade_banner'
+        );
+        trialBanners.forEach(banner => banner.remove());
+    }
+
+    // ========================================
+    // Fonction: Observer les changements du DOM
+    // ========================================
+    function observeAndHide() {
+        const observer = new MutationObserver(function(mutations) {
+            let shouldProcess = false;
+
+            mutations.forEach(mutation => {
+                if (mutation.addedNodes.length > 0) {
+                    shouldProcess = true;
+                }
+            });
+
+            if (shouldProcess) {
+                clearTimeout(window.quelyosEnterpriseTimer);
+                window.quelyosEnterpriseTimer = setTimeout(() => {
+                    hideEnterpriseElements();
+                    hideStudioButtons();
+                    hideEnterpriseDialogs();
+                }, 100); // Debounce de 100ms
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        console.log('👀 Quelyos: Observer du DOM pour entreprise activé');
+    }
+
+    // ========================================
+    // Fonction: Initialisation
+    // ========================================
+    function init() {
+        console.log('🚫 Quelyos: Masquage des fonctionnalités Entreprise activé');
+
+        hideEnterpriseElements();
+        hideStudioButtons();
+        hideEnterpriseDialogs();
+
+        if (document.body) {
+            observeAndHide();
+        }
+
+        console.log('✅ Quelyos: Masquage Entreprise initialisé avec succès');
+    }
+
+    // ========================================
+    // Démarrage
+    // ========================================
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    // Re-vérification après le chargement complet de la page
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            hideEnterpriseElements();
+            hideStudioButtons();
+            hideEnterpriseDialogs();
+        }, 500);
+    });
+
+    // Vérification périodique pour capturer les éléments chargés dynamiquement
+    // Intervalle de 3 secondes (moins agressif que le debranding général)
+    setInterval(function() {
+        hideEnterpriseElements();
+        hideStudioButtons();
+        hideEnterpriseDialogs();
+    }, 3000);
+
+    // Vérifier aussi lors d'événements utilisateur
+    ['click', 'focus', 'mouseenter'].forEach(eventType => {
+        document.addEventListener(eventType, function() {
+            setTimeout(function() {
+                hideEnterpriseElements();
+                hideStudioButtons();
+            }, 100);
+        }, true);
+    });
+
+    // Exposer certaines fonctions pour debug
+    window.quelyosEnterpriseHiding = {
+        hideEnterpriseElements: hideEnterpriseElements,
+        hideStudioButtons: hideStudioButtons,
+        hideEnterpriseDialogs: hideEnterpriseDialogs
+    };
+
+})();

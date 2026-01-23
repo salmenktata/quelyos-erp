@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--
+            Masquage des modules entreprise dans l'écran Apps
+            Filtre automatiquement les modules avec licence OEEL-1 (Odoo Enterprise Edition License)
+        -->
+
+        <!-- Action personnalisée pour l'écran Apps - Filtrer les modules Enterprise par défaut -->
+        <record id="open_module_tree_hide_enterprise" model="ir.actions.act_window">
+            <field name="name">Apps</field>
+            <field name="res_model">ir.module.module</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('license', '!=', 'OEEL-1')]</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- Remplacer le menu Apps par défaut pour utiliser notre action filtrée -->
+        <record id="base.menu_apps" model="ir.ui.menu">
+            <field name="action" ref="open_module_tree_hide_enterprise"/>
+        </record>
+
+    </data>
+</odoo>
