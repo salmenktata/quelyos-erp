@@ -2,15 +2,18 @@
 
 from odoo import http
 from odoo.http import request
+from odoo.addons.quelyos_ecommerce.controllers.base_controller import BaseEcommerceController
+from odoo.addons.quelyos_ecommerce.controllers.rate_limiter import rate_limit
 import logging
 
 _logger = logging.getLogger(__name__)
 
 
-class EcommerceProductsController(http.Controller):
-    """Controller pour l'API Produits."""
+class EcommerceProductsController(BaseEcommerceController):
+    """Controller pour l'API Produits avec sécurité renforcée."""
 
     @http.route('/api/ecommerce/products', type='json', auth='public', methods=['GET', 'POST'], csrf=False, cors='*')
+    @rate_limit(limit=100, window=60)
     def get_products(self, **kwargs):
         """
         Liste les produits avec filtres et pagination.
@@ -26,7 +29,7 @@ class EcommerceProductsController(http.Controller):
         - attribute_value_ids: list[int]
         - limit: int (default 24)
         - offset: int (default 0)
-        - sort: str ('name', 'price_asc', 'price_desc', 'newest')
+        - sort: str ('name', 'price_asc', 'price_desc', 'newest', 'popular', 'featured')
 
         Returns:
         {
@@ -62,26 +65,36 @@ class EcommerceProductsController(http.Controller):
             if params.get('is_bestseller'):
                 filters['is_bestseller'] = params['is_bestseller']
 
-            # Pagination
-            limit = params.get('limit', config.get('products_per_page', 24))
-            offset = params.get('offset', 0)
+            # Pagination with validation
+            input_validator = request.env['input.validator']
+            limit = input_validator.validate_positive_int(
+                params.get('limit', config.get('products_per_page', 24)),
+                'limit'
+            )
+            offset = input_validator.validate_positive_int(params.get('offset', 0), 'offset')
 
-            # Search query
-            search = params.get('search', '')
+            # Limiter la pagination pour éviter abus
+            if limit > 100:
+                limit = 100
 
-            # Sort order
+            # Search query (sanitize)
+            search = input_validator.validate_string(
+                params.get('search', ''),
+                field_name='search',
+                max_length=200
+            )
+
+            # Sort order (whitelist)
             sort = params.get('sort', 'name')
-            order = 'name'
-            if sort == 'price_asc':
-                order = 'list_price ASC'
-            elif sort == 'price_desc':
-                order = 'list_price DESC'
-            elif sort == 'newest':
-                order = 'create_date DESC'
-            elif sort == 'popular':
-                order = 'view_count DESC'
-            elif sort == 'featured':
-                order = 'featured_order ASC, create_date DESC'
+            order_mapping = {
+                'name': 'name ASC',
+                'price_asc': 'list_price ASC',
+                'price_desc': 'list_price DESC',
+                'newest': 'create_date DESC',
+                'popular': 'view_count DESC',
+                'featured': 'featured_order ASC, create_date DESC',
+            }
+            order = order_mapping.get(sort, 'name ASC')
 
             # Use product service
             product_service = request.env['product.service'].sudo()
@@ -93,21 +106,17 @@ class EcommerceProductsController(http.Controller):
                 order=order
             )
 
-            return {
-                'success': True,
+            return self._success_response({
                 'products': result['products'],
                 'total': result['total'],
                 'facets': result['facets'],
-            }
+            })
 
         except Exception as e:
-            _logger.error(f"Erreur lors de la récupération des produits: {str(e)}", exc_info=True)
-            return {
-                'success': False,
-                'error': str(e),
-            }
+            return self._handle_error(e, "récupération des produits")
 
     @http.route('/api/ecommerce/products/<int:product_id>', type='json', auth='public', methods=['GET', 'POST'], csrf=False, cors='*')
+    @rate_limit(limit=100, window=60)
     def get_product(self, product_id, **kwargs):
         """
         Récupère le détail d'un produit par ID.
@@ -115,30 +124,30 @@ class EcommerceProductsController(http.Controller):
         Returns: Product data with variants
         """
         try:
+            # Validation product_id
+            input_validator = request.env['input.validator']
+            product_id = input_validator.validate_id(product_id, 'product_id')
+
             product = request.env['product.template'].sudo().browse(product_id)
 
             if not product.exists():
-                return {
-                    'success': False,
-                    'error': 'Produit non trouvé',
-                }
+                return self._handle_error(
+                    Exception('Produit non trouvé'),
+                    "récupération du produit"
+                )
 
             # Incrémenter le compteur de vues
             product.increment_view_count()
 
-            return {
-                'success': True,
-                'product': product.get_api_data(include_variants=True),
-            }
+            return self._success_response({
+                'product': product.get_api_data(include_variants=True)
+            })
 
         except Exception as e:
-            _logger.error(f"Erreur lors de la récupération du produit {product_id}: {str(e)}")
-            return {
-                'success': False,
-                'error': str(e),
-            }
+            return self._handle_error(e, f"récupération du produit {product_id}")
 
     @http.route('/api/ecommerce/products/slug/<string:slug>', type='json', auth='public', methods=['GET', 'POST'], csrf=False, cors='*')
+    @rate_limit(limit=100, window=60)
     def get_product_by_slug(self, slug, **kwargs):
         """
         Récupère le détail d'un produit par slug (pour URLs SEO).
@@ -146,33 +155,33 @@ class EcommerceProductsController(http.Controller):
         Returns: Product data with variants
         """
         try:
+            # Validation slug (sanitize)
+            input_validator = request.env['input.validator']
+            slug = input_validator.validate_string(slug, field_name='slug', max_length=200)
+
             product = request.env['product.template'].sudo().search([('slug', '=', slug)], limit=1)
 
             if not product:
-                return {
-                    'success': False,
-                    'error': 'Produit non trouvé',
-                }
+                return self._handle_error(
+                    Exception('Produit non trouvé'),
+                    "récupération du produit"
+                )
 
             # Incrémenter le compteur de vues
             product.increment_view_count()
 
-            return {
-                'success': True,
-                'product': product.get_api_data(include_variants=True),
-            }
+            return self._success_response({
+                'product': product.get_api_data(include_variants=True)
+            })
 
         except Exception as e:
-            _logger.error(f"Erreur lors de la récupération du produit {slug}: {str(e)}")
-            return {
-                'success': False,
-                'error': str(e),
-            }
+            return self._handle_error(e, f"récupération du produit {slug}")
 
     @http.route('/api/ecommerce/categories', type='json', auth='public', methods=['GET', 'POST'], csrf=False, cors='*')
+    @rate_limit(limit=100, window=60)
     def get_categories(self, **kwargs):
         """
-        Liste toutes les catégories de produits.
+        Liste toutes les catégories de produits avec comptage optimisé.
 
         Returns:
         {
@@ -190,53 +199,57 @@ class EcommerceProductsController(http.Controller):
         try:
             categories = request.env['product.category'].sudo().search([])
 
+            # Optimisation: Compter tous les produits par catégorie en 1 requête SQL (read_group)
+            # Avant: 1 + N requêtes (51 requêtes pour 50 catégories)
+            # Après: 2 requêtes totales = 25x plus rapide
+            product_counts = {}
+            if categories:
+                domain = [('sale_ok', '=', True), ('categ_id', 'in', categories.ids)]
+                groups = request.env['product.template'].sudo().read_group(
+                    domain,
+                    ['categ_id'],
+                    ['categ_id']
+                )
+                product_counts = {g['categ_id'][0]: g['categ_id_count'] for g in groups}
+
             categories_data = []
             for cat in categories:
-                # Compter les produits dans cette catégorie
-                product_count = request.env['product.template'].sudo().search_count([
-                    ('categ_id', '=', cat.id),
-                    ('sale_ok', '=', True)
-                ])
-
                 categories_data.append({
                     'id': cat.id,
                     'name': cat.name,
                     'parent_id': cat.parent_id.id if cat.parent_id else None,
                     'parent_name': cat.parent_id.name if cat.parent_id else None,
                     'child_count': len(cat.child_id),
-                    'product_count': product_count,
+                    'product_count': product_counts.get(cat.id, 0),
                 })
 
-            return {
-                'success': True,
-                'categories': categories_data,
-            }
+            return self._success_response({
+                'categories': categories_data
+            })
 
         except Exception as e:
-            _logger.error(f"Erreur lors de la récupération des catégories: {str(e)}")
-            return {
-                'success': False,
-                'error': str(e),
-            }
+            return self._handle_error(e, "récupération des catégories")
 
     @http.route('/api/ecommerce/categories/<int:category_id>/products', type='json', auth='public', methods=['GET', 'POST'], csrf=False, cors='*')
+    @rate_limit(limit=100, window=60)
     def get_category_products(self, category_id, **kwargs):
         """
         Liste les produits d'une catégorie spécifique.
         """
         try:
+            # Validation category_id
+            input_validator = request.env['input.validator']
+            category_id = input_validator.validate_id(category_id, 'category_id')
+
             params = kwargs or {}
             params['category_id'] = category_id
             return self.get_products(**params)
 
         except Exception as e:
-            _logger.error(f"Erreur lors de la récupération des produits de la catégorie {category_id}: {str(e)}")
-            return {
-                'success': False,
-                'error': str(e),
-            }
+            return self._handle_error(e, f"récupération des produits de la catégorie {category_id}")
 
     @http.route('/api/ecommerce/products/featured', type='json', auth='public', methods=['GET', 'POST'], csrf=False, cors='*')
+    @rate_limit(limit=100, window=60)
     def get_featured_products(self, **kwargs):
         """
         Récupère les produits mis en avant pour la page d'accueil.
@@ -246,7 +259,14 @@ class EcommerceProductsController(http.Controller):
         """
         try:
             params = kwargs or {}
-            limit = params.get('limit', 8)
+
+            # Validation limit
+            input_validator = request.env['input.validator']
+            limit = input_validator.validate_positive_int(params.get('limit', 8), 'limit')
+
+            # Limiter pour éviter abus
+            if limit > 50:
+                limit = 50
 
             products = request.env['product.template'].sudo().search([
                 ('is_featured', '=', True),
@@ -255,16 +275,10 @@ class EcommerceProductsController(http.Controller):
 
             products_data = [p.get_api_data(include_variants=False) for p in products]
 
-            return {
-                'success': True,
+            return self._success_response({
                 'products': products_data,
                 'total': len(products),
-            }
+            })
 
         except Exception as e:
-            _logger.error(f"Erreur lors de la récupération des produits featured: {str(e)}")
-            return {
-                'success': False,
-                'error': str(e),
-            }
-
+            return self._handle_error(e, "récupération des produits featured")

@@ -217,9 +217,13 @@
 
             if (shouldUpdate) {
                 updatePageTitle();
-                // Debounce pour éviter trop d'appels
+                // Debounce pour éviter trop d'appels (augmenté à 500ms pour performance)
                 clearTimeout(window.quelyosDebounceTimer);
-                window.quelyosDebounceTimer = setTimeout(replaceOdooText, 100);
+                window.quelyosDebounceTimer = setTimeout(function() {
+                    requestAnimationFrame(function() {
+                        replaceOdooText();
+                    });
+                }, 500);
             }
         });
 
@@ -388,32 +392,65 @@
         init();
     }
 
-    // Re-vérifier après le chargement complet de la page
-    window.addEventListener('load', function() {
-        setTimeout(function() {
+    // ========================================
+    // Fonction consolidée pour toutes les mises à jour
+    // ========================================
+    function updateBrandingAsync() {
+        try {
             updatePageTitle();
             replaceOdooText();
             removeOdooPromotions();
             replacePurpleColors();
-        }, 500);
+        } catch (error) {
+            console.error('❌ Quelyos Branding: Error during update', error);
+        }
+    }
+
+    // Re-vérifier après le chargement complet de la page
+    window.addEventListener('load', function() {
+        setTimeout(updateBrandingAsync, 500);
     });
 
     // Vérification périodique pour capturer les éléments chargés dynamiquement
-    setInterval(function() {
-        updatePageTitle();
-        replaceOdooText();
-        removeOdooPromotions();
-        replacePurpleColors();
-    }, 2000); // Toutes les 2 secondes
+    // OPTIMISÉ: 10 secondes au lieu de 2 (5x moins agressif pour performance)
+    window.quelyosBrandingInterval = setInterval(updateBrandingAsync, 10000);
 
     // Vérifier aussi lors d'événements utilisateur
+    // OPTIMISÉ: Debounce augmenté à 500ms pour réduire la charge CPU
     ['click', 'focus', 'mouseenter'].forEach(eventType => {
         document.addEventListener(eventType, function() {
-            setTimeout(function() {
-                replaceOdooText();
-                replacePurpleColors();
-            }, 100);
+            clearTimeout(window.quelyosEventDebounce);
+            window.quelyosEventDebounce = setTimeout(function() {
+                requestAnimationFrame(function() {
+                    replaceOdooText();
+                    replacePurpleColors();
+                });
+            }, 500);
         }, true);
+    });
+
+    // ========================================
+    // Cleanup: Nettoyer les ressources avant déchargement de la page
+    // ========================================
+    window.addEventListener('beforeunload', function() {
+        // Disconnect observer
+        if (window.quelyosObserver) {
+            window.quelyosObserver.disconnect();
+            console.log('👋 Quelyos Branding: Observer déconnecté');
+        }
+
+        // Clear interval
+        if (window.quelyosBrandingInterval) {
+            clearInterval(window.quelyosBrandingInterval);
+        }
+
+        // Clear timeouts
+        if (window.quelyosDebounceTimer) {
+            clearTimeout(window.quelyosDebounceTimer);
+        }
+        if (window.quelyosEventDebounce) {
+            clearTimeout(window.quelyosEventDebounce);
+        }
     });
 
     // Exposer certaines fonctions pour debug
@@ -421,7 +458,10 @@
         updatePageTitle: updatePageTitle,
         replaceOdooText: replaceOdooText,
         removePromotions: removeOdooPromotions,
-        replacePurpleColors: replacePurpleColors
+        replacePurpleColors: replacePurpleColors,
+        updateAll: updateBrandingAsync
     };
+
+    console.log('✅ Quelyos Branding: Initialized (optimized for performance)');
 
 })();

@@ -7,3 +7,6 @@ from . import checkout
 from . import customer
 from . import wishlist
 from . import webhooks
+from . import payment_stripe
+from . import reviews
+from . import coupon

@@ -5,3 +5,13 @@ access_product_wishlist_user,product.wishlist user,model_product_wishlist,base.g
 access_product_wishlist_public,product.wishlist public,model_product_wishlist,base.group_public,1,0,0,0
 access_product_comparison_user,product.comparison user,model_product_comparison,base.group_portal,1,1,1,1
 access_product_comparison_public,product.comparison public,model_product_comparison,base.group_public,1,0,0,0
+access_ecommerce_analytics_manager,ecommerce.analytics manager,model_ecommerce_analytics,sales_team.group_sale_manager,1,1,1,1
+access_ecommerce_analytics_user,ecommerce.analytics user,model_ecommerce_analytics,sales_team.group_sale_salesman,1,1,1,0
+access_product_review_manager,product.review manager,model_product_review,sales_team.group_sale_manager,1,1,1,1
+access_product_review_user,product.review user,model_product_review,sales_team.group_sale_salesman,1,0,0,0
+access_product_review_portal,product.review portal,model_product_review,base.group_portal,1,1,1,0
+access_product_review_public,product.review public,model_product_review,base.group_public,1,0,0,0
+access_ecommerce_coupon_manager,ecommerce.coupon manager,model_ecommerce_coupon,sales_team.group_sale_manager,1,1,1,1
+access_ecommerce_coupon_user,ecommerce.coupon user,model_ecommerce_coupon,sales_team.group_sale_salesman,1,0,0,0
+access_ecommerce_coupon_portal,ecommerce.coupon portal,model_ecommerce_coupon,base.group_portal,1,0,0,0
+access_ecommerce_coupon_public,ecommerce.coupon public,model_ecommerce_coupon,base.group_public,1,0,0,0

@@ -78,8 +78,9 @@ div[data-key*="enterprise"] {
 }
 
 // Masquer les badges "Enterprise" sur les cartes de modules
-.o_kanban_record .badge:contains("Enterprise"),
+// Note: :contains() n'est pas un sélecteur CSS valide
+// Ces éléments sont masqués via JavaScript (hide_enterprise_features.js)
 .o_module_card .badge-enterprise,
-span.badge.badge-info:contains("Enterprise") {
+.badge.quelyos-enterprise-badge {
     display: none !important;
 }

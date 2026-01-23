@@ -108,7 +108,7 @@
 
             // Masquer les badges "Enterprise" dans les cartes
             const enterpriseBadges = card.querySelectorAll(
-                '.badge:contains("Enterprise"), ' +
+                '.badge, ' +
                 '.badge-enterprise, ' +
                 'span.badge.badge-info'
             );
@@ -147,11 +147,13 @@
             if (shouldProcess) {
                 clearTimeout(window.quelyosEnterpriseTimer);
                 window.quelyosEnterpriseTimer = setTimeout(() => {
-                    hideEnterpriseElements();
-                    hideStudioButtons();
-                    hideEnterpriseDialogs();
-                    hideUninstallableModules();
-                }, 100); // Debounce de 100ms
+                    requestAnimationFrame(() => {
+                        hideEnterpriseElements();
+                        hideStudioButtons();
+                        hideEnterpriseDialogs();
+                        hideUninstallableModules();
+                    });
+                }, 500); // OPTIMIZED: Debounce de 500ms (was 100ms)
             }
         });
 
@@ -190,42 +192,74 @@
         init();
     }
 
-    // Re-vérification après le chargement complet de la page
-    window.addEventListener('load', function() {
-        setTimeout(function() {
+    // ========================================
+    // Fonction consolidée pour mise à jour asynchrone
+    // ========================================
+    function hideEnterpriseAsync() {
+        try {
             hideEnterpriseElements();
             hideStudioButtons();
             hideEnterpriseDialogs();
             hideUninstallableModules();
-        }, 500);
+        } catch (error) {
+            console.error('❌ Quelyos Enterprise Hiding: Error during update', error);
+        }
+    }
+
+    // Re-vérification après le chargement complet de la page
+    window.addEventListener('load', function() {
+        setTimeout(hideEnterpriseAsync, 500);
     });
 
-    // Vérification périodique pour capturer les éléments chargés dynamiquement
-    // Intervalle de 3 secondes (moins agressif que le debranding général)
-    setInterval(function() {
-        hideEnterpriseElements();
-        hideStudioButtons();
-        hideEnterpriseDialogs();
-        hideUninstallableModules();
-    }, 3000);
+    // OPTIMIZED: Vérification périodique - intervalle de 10 secondes au lieu de 3 (3x moins agressif)
+    // Capturer les éléments chargés dynamiquement avec une fréquence raisonnable
+    window.quelyosEnterpriseInterval = setInterval(hideEnterpriseAsync, 10000);
 
-    // Vérifier aussi lors d'événements utilisateur
+    // OPTIMIZED: Vérifier aussi lors d'événements utilisateur avec debounce de 500ms
     ['click', 'focus', 'mouseenter'].forEach(eventType => {
         document.addEventListener(eventType, function() {
-            setTimeout(function() {
-                hideEnterpriseElements();
-                hideStudioButtons();
-                hideUninstallableModules();
-            }, 100);
+            clearTimeout(window.quelyosEnterpriseEventDebounce);
+            window.quelyosEnterpriseEventDebounce = setTimeout(function() {
+                requestAnimationFrame(function() {
+                    hideEnterpriseElements();
+                    hideStudioButtons();
+                    hideUninstallableModules();
+                });
+            }, 500); // OPTIMIZED: 500ms au lieu de 100ms
         }, true);
     });
 
+    // ========================================
+    // Nettoyage des ressources avant déchargement
+    // ========================================
+    window.addEventListener('beforeunload', function() {
+        // Nettoyer l'intervalle périodique
+        if (window.quelyosEnterpriseInterval) {
+            clearInterval(window.quelyosEnterpriseInterval);
+        }
+
+        // Nettoyer les timers de debounce
+        if (window.quelyosEnterpriseTimer) {
+            clearTimeout(window.quelyosEnterpriseTimer);
+        }
+
+        if (window.quelyosEnterpriseEventDebounce) {
+            clearTimeout(window.quelyosEnterpriseEventDebounce);
+        }
+
+        console.log('🧹 Quelyos: Cleanup Enterprise hiding resources');
+    });
+
+    // ========================================
     // Exposer certaines fonctions pour debug
+    // ========================================
     window.quelyosEnterpriseHiding = {
         hideEnterpriseElements: hideEnterpriseElements,
         hideStudioButtons: hideStudioButtons,
         hideEnterpriseDialogs: hideEnterpriseDialogs,
         hideUninstallableModules: hideUninstallableModules
     };
+
+    console.log('✅ Quelyos Enterprise Hiding: Initialized (optimized for performance)');
 
 })();

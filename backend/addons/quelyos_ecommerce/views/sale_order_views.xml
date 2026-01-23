@@ -22,7 +22,7 @@
                                 <field name="cart_last_update" readonly="1"/>
                                 <field name="session_id" readonly="1"/>
                             </group>
-                            <group string="Informations Client">
+                            <group string="Informations Client" name="customer_info">
                                 <field name="frontend_notes" readonly="1"/>
                                 <field name="is_gift"/>
                                 <field name="gift_message" invisible="not is_gift"/>
