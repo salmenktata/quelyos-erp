@@ -57,7 +57,7 @@
         'views/res_config_settings_views.xml',
 
         # Vues de masquage des fonctionnalités Enterprise
-        'views/hide_enterprise_views.xml',
+        # 'views/hide_enterprise_views.xml',  # DÉSACTIVÉ - Causait erreur "View types not defined tree"
 
         # Les templates ci-dessous sont commentés car ils dépendent de modules optionnels
         # Décommentez-les après avoir installé les modules correspondants

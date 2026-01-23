@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vue formulaire étendue avec onglet E-commerce -->
+        <record id="view_order_form_ecommerce" model="ir.ui.view">
+            <field name="name">sale.order.form.ecommerce</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <!-- Ajouter badge "Panier" sur les commandes draft -->
+                <field name="partner_id" position="after">
+                    <field name="is_cart" invisible="1"/>
+                    <field name="session_id" invisible="not is_cart"/>
+                </field>
+
+                <!-- Ajouter onglet E-commerce -->
+                <notebook position="inside">
+                    <page string="E-commerce" name="ecommerce">
+                        <group>
+                            <group string="Informations Panier">
+                                <field name="cart_created_date" readonly="1"/>
+                                <field name="cart_last_update" readonly="1"/>
+                                <field name="session_id" readonly="1"/>
+                            </group>
+                            <group string="Informations Client">
+                                <field name="frontend_notes" readonly="1"/>
+                                <field name="is_gift"/>
+                                <field name="gift_message" invisible="not is_gift"/>
+                            </group>
+                        </group>
+                        <group string="Statistiques">
+                            <group>
+                                <label for="id" string="ID Commande"/>
+                                <div>
+                                    <field name="id" readonly="1"/>
+                                </div>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <!-- Vue liste étendue avec informations e-commerce -->
+        <record id="view_order_tree_ecommerce" model="ir.ui.view">
+            <field name="name">sale.order.tree.ecommerce</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree"/>
+            <field name="arch" type="xml">
+                <field name="amount_total" position="after">
+                    <field name="is_cart" optional="show"/>
+                    <field name="cart_last_update" optional="hide"/>
+                    <field name="session_id" optional="hide"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Vue recherche étendue avec filtres e-commerce -->
+        <record id="view_sales_order_filter_ecommerce" model="ir.ui.view">
+            <field name="name">sale.order.search.ecommerce</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[1]" position="after">
+                    <!-- Filtres E-commerce -->
+                    <separator/>
+                    <filter string="Paniers (Draft)" name="carts"
+                            domain="[('state', '=', 'draft')]"/>
+                    <filter string="Invités" name="guest_orders"
+                            domain="[('session_id', '!=', False)]"/>
+                    <filter string="Avec Notes" name="with_notes"
+                            domain="[('frontend_notes', '!=', False)]"/>
+                    <filter string="Cadeaux" name="gifts"
+                            domain="[('is_gift', '=', True)]"/>
+                </xpath>
+
+                <group position="inside">
+                    <filter string="Type Client" name="group_by_customer_type"
+                            context="{'group_by': 'session_id'}"/>
+                    <filter string="Date Panier" name="group_by_cart_date"
+                            context="{'group_by': 'cart_created_date:day'}"/>
+                </group>
+            </field>
+        </record>
+
+        <!-- Action pour les paniers abandonnés -->
+        <record id="action_abandoned_carts" model="ir.actions.act_window">
+            <field name="name">Paniers Abandonnés</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('state', '=', 'draft')]</field>
+            <field name="context">{
+                'default_state': 'draft'
+            }</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Aucun panier abandonné
+                </p>
+                <p>
+                    Les paniers abandonnés sont des commandes en brouillon.
+                    Triez par "Dernière modification" pour voir les plus anciens.
+                </p>
+            </field>
+        </record>
+
+        <!-- Action pour les commandes e-commerce -->
+        <record id="action_ecommerce_orders" model="ir.actions.act_window">
+            <field name="name">Commandes E-commerce</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">list,form,pivot,graph</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Aucune commande e-commerce
+                </p>
+                <p>
+                    Les commandes passées via le frontend e-commerce
+                    apparaîtront ici.
+                </p>
+            </field>
+        </record>
+
+        <!-- Vue kanban pour les paniers -->
+        <record id="view_order_kanban_ecommerce" model="ir.ui.view">
+            <field name="name">sale.order.kanban.ecommerce</field>
+            <field name="model">sale.order</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="amount_total"/>
+                    <field name="state"/>
+                    <field name="is_cart"/>
+                    <field name="cart_last_update"/>
+                    <templates>
+                        <t t-name="card">
+                            <div class="oe_kanban_global_click">
+                                <div class="oe_kanban_details">
+                                    <strong><field name="name"/></strong>
+                                    <div>
+                                        <field name="partner_id"/>
+                                    </div>
+                                    <div>
+                                        <field name="amount_total" widget="monetary"/>
+                                    </div>
+                                    <div>
+                                        <span t-if="record.is_cart.raw_value" class="badge badge-info">Panier</span>
+                                        <span t-if="record.state.raw_value == 'sale'" class="badge badge-success">Confirmé</span>
+                                        <span t-if="record.state.raw_value == 'draft'" class="badge badge-secondary">Brouillon</span>
+                                    </div>
+                                    <div class="text-muted">
+                                        <small>Mis à jour: <field name="cart_last_update"/></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Menus E-commerce -->
+        <menuitem id="menu_ecommerce_orders_root"
+                  name="Commandes"
+                  parent="menu_ecommerce_root"
+                  sequence="20"/>
+
+        <menuitem id="menu_ecommerce_all_orders"
+                  name="Toutes les Commandes"
+                  parent="menu_ecommerce_orders_root"
+                  action="action_ecommerce_orders"
+                  sequence="10"/>
+
+        <menuitem id="menu_abandoned_carts"
+                  name="Paniers Abandonnés"
+                  parent="menu_ecommerce_orders_root"
+                  action="action_abandoned_carts"
+                  sequence="20"/>
+
+    </data>
+</odoo>
