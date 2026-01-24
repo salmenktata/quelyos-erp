@@ -328,10 +328,16 @@ class QuelyosAPI(http.Controller):
             total = ProductTemplate.search_count(domain)
 
             # Construire les données enrichies
+            StockQuant = request.env['stock.quant'].sudo()
             data = []
             for p in products:
-                # Calculer le statut de stock
-                qty = p.qty_available
+                # Calculer le statut de stock en allant directement dans stock.quant
+                # (plus fiable avec auth='public' car qty_available dépend du contexte)
+                quants = StockQuant.search([
+                    ('product_id', 'in', p.product_variant_ids.ids),
+                    ('location_id.usage', '=', 'internal')
+                ])
+                qty = sum(quants.mapped('quantity')) if quants else 0.0
                 if qty <= 0:
                     p_stock_status = 'out_of_stock'
                 elif qty <= 5:
@@ -381,6 +387,7 @@ class QuelyosAPI(http.Controller):
                     'qty_available': qty,
                     'virtual_available': p.virtual_available,
                     'stock_status': p_stock_status,
+                    'in_stock': qty > 0,
                     'weight': p.weight or 0,
                     'active': p.active,
                     'create_date': p.create_date.isoformat() if p.create_date else None,
@@ -1899,6 +1906,7 @@ class QuelyosAPI(http.Controller):
                     'attribute_id': line.attribute_id.id,
                     'attribute_name': line.attribute_id.name,
                     'display_type': line.attribute_id.display_type,
+                    'create_variant': line.attribute_id.create_variant,  # 'always', 'dynamic', 'no_variant'
                     'values': [{
                         'id': val.id,
                         'name': val.name,

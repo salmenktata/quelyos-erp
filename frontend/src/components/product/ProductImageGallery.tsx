@@ -47,6 +47,8 @@ interface ProductImageGalleryProps {
   productName: string;
   /** Callback quand l'image change */
   onImageChange?: (index: number) => void;
+  /** Image de preview temporaire (survol couleur) - surcharge l'image principale */
+  previewImageUrl?: string;
 }
 
 const swipeConfidenceThreshold = 10000;
@@ -58,6 +60,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
   images,
   productName,
   onImageChange,
+  previewImageUrl,
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -113,7 +116,10 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
     }
   };
 
-  const currentImage = safeImages[selectedIndex] || safeImages[0];
+  // Si previewImageUrl est défini (survol couleur), l'utiliser comme image principale
+  const currentImage = previewImageUrl
+    ? { url: previewImageUrl, alt: 'Aperçu couleur' }
+    : (safeImages[selectedIndex] || safeImages[0]);
 
   return (
     <div className="space-y-4">

@@ -204,6 +204,7 @@ export default function ProductDetailPage() {
             <ProductImageGallery
               images={galleryImages}
               productName={product.name}
+              previewImageUrl={hoveredImageUrl}
             />
           </div>
 
