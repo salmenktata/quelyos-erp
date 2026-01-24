@@ -43,3 +43,6 @@ export { CategoryTree } from './CategoryTree'
 
 export { AttributeFilter } from './AttributeFilter'
 export type { Attribute, AttributeValue, AttributeFilterProps } from './AttributeFilter'
+
+export { DataTable } from './DataTable'
+export type { DataTableProps, DataTableColumn, BulkAction, MobileCardConfig } from './DataTable'
