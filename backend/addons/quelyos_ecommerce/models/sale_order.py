@@ -91,7 +91,24 @@ class SaleOrder(models.Model):
             }
             if partner_id:
                 vals['partner_id'] = partner_id
-            if session_id:
+            elif session_id:
+                # For guest users, use the public user's partner
+                public_user = self.env.ref('base.public_user', raise_if_not_found=False)
+                if public_user and public_user.partner_id:
+                    vals['partner_id'] = public_user.partner_id.id
+                else:
+                    # Fallback: create or get a guest partner
+                    guest_partner = self.env['res.partner'].sudo().search([
+                        ('name', '=', 'Guest Customer'),
+                        ('is_company', '=', False),
+                    ], limit=1)
+                    if not guest_partner:
+                        guest_partner = self.env['res.partner'].sudo().create({
+                            'name': 'Guest Customer',
+                            'is_company': False,
+                            'customer_rank': 1,
+                        })
+                    vals['partner_id'] = guest_partner.id
                 vals['session_id'] = session_id
 
             cart = self.create(vals)
