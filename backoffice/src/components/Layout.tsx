@@ -49,14 +49,14 @@ function ThemeToggle({ compact }: { compact: boolean }) {
   return (
     <button
       onClick={toggleTheme}
-      className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 w-full group"
+      className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200 w-full group"
       aria-label={`Passer en mode ${theme === 'light' ? 'sombre' : 'clair'}`}
       title={compact ? (theme === 'light' ? 'Mode sombre' : 'Mode clair') : undefined}
     >
       {theme === 'light' ? (
-        <MoonIcon className="w-5 h-5 flex-shrink-0" />
+        <MoonIcon className="w-4 h-4 flex-shrink-0" />
       ) : (
-        <SunIcon className="w-5 h-5 flex-shrink-0" />
+        <SunIcon className="w-4 h-4 flex-shrink-0" />
       )}
       {!compact && (
         <span className="font-medium">{theme === 'light' ? 'Mode sombre' : 'Mode clair'}</span>
@@ -70,23 +70,16 @@ function NavGroupComponent({
   isActive,
   compact,
   onItemClick,
+  isOpen,
+  onToggle,
 }: {
   group: NavGroup
   isActive: (path: string) => boolean
   compact: boolean
   onItemClick?: () => void
+  isOpen: boolean
+  onToggle: () => void
 }) {
-  const [isOpen, setIsOpen] = useState(group.defaultOpen ?? true)
-  const location = useLocation()
-
-  // Auto-ouvrir le groupe si un item est actif
-  useEffect(() => {
-    const hasActiveItem = group.items.some((item) => isActive(item.path))
-    if (hasActiveItem && !isOpen) {
-      setIsOpen(true)
-    }
-  }, [location.pathname, group.items, isActive, isOpen])
-
   if (compact) {
     // Mode compact : afficher directement les items sans groupe
     return (
@@ -107,19 +100,19 @@ function NavGroupComponent({
   return (
     <div>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+        onClick={onToggle}
+        className="flex items-center justify-between w-full px-3 py-1.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
       >
         <span>{group.name}</span>
         {isOpen ? (
-          <ChevronDownIcon className="w-4 h-4" />
+          <ChevronDownIcon className="w-3.5 h-3.5" />
         ) : (
-          <ChevronRightIcon className="w-4 h-4" />
+          <ChevronRightIcon className="w-3.5 h-3.5" />
         )}
       </button>
       <div
-        className={`space-y-1 overflow-hidden transition-all duration-200 ${
-          isOpen ? 'max-h-[1000px] opacity-100 mb-4' : 'max-h-0 opacity-0'
+        className={`space-y-0.5 overflow-hidden transition-all duration-200 ${
+          isOpen ? 'max-h-[1000px] opacity-100 mb-2' : 'max-h-0 opacity-0'
         }`}
       >
         {group.items.map((item) => (
@@ -153,7 +146,7 @@ function NavItemComponent({
     <Link
       to={item.path}
       onClick={onClick}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative ${
+      className={`flex items-center gap-2.5 px-3 py-2 rounded-md transition-all duration-200 group relative text-sm ${
         isActive
           ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-medium'
           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -162,15 +155,15 @@ function NavItemComponent({
     >
       {/* Indicateur actif à gauche */}
       {isActive && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-600 dark:bg-indigo-400 rounded-r-full" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-indigo-600 dark:bg-indigo-400 rounded-r-full" />
       )}
 
-      <Icon className={`w-5 h-5 flex-shrink-0 ${compact ? 'mx-auto' : ''}`} />
+      <Icon className={`w-4 h-4 flex-shrink-0 ${compact ? 'mx-auto' : ''}`} />
       {!compact && (
         <span className="flex-1 truncate">{item.name}</span>
       )}
       {!compact && item.badge && (
-        <span className="flex items-center justify-center min-w-[20px] h-5 px-2 text-xs font-semibold text-white bg-red-500 rounded-full">
+        <span className="flex items-center justify-center min-w-[18px] h-4 px-1.5 text-[10px] font-semibold text-white bg-red-500 rounded-full">
           {item.badge}
         </span>
       )}
@@ -182,6 +175,7 @@ export function Layout({ children }: LayoutProps) {
   const location = useLocation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isCompact, setIsCompact] = useState(false)
+  const [openGroupName, setOpenGroupName] = useState<string | null>(null)
   const { data: analyticsData } = useAnalyticsStats()
 
   const isActive = (path: string) => {
@@ -312,7 +306,23 @@ export function Layout({ children }: LayoutProps) {
     setIsMobileMenuOpen(false)
   }, [location.pathname])
 
-  const sidebarWidth = isCompact ? 'w-20' : 'w-64'
+  // Ouvrir automatiquement le groupe contenant la page active
+  useEffect(() => {
+    const activeGroup = navGroups.find((group) =>
+      group.items.some((item) => isActive(item.path))
+    )
+    if (activeGroup) {
+      setOpenGroupName(activeGroup.name)
+    }
+  }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleGroupToggle = (groupName: string) => {
+    // Si on clique sur le groupe déjà ouvert, on le ferme
+    // Sinon on ouvre le nouveau groupe (et ferme l'ancien)
+    setOpenGroupName((prev) => (prev === groupName ? null : groupName))
+  }
+
+  const sidebarWidth = isCompact ? 'w-16' : 'w-56'
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex transition-colors">
@@ -331,19 +341,24 @@ export function Layout({ children }: LayoutProps) {
         }`}
       >
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           {!isCompact && (
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
-                Quelyos
-              </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Backoffice</p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0">
+                <span className="text-white font-bold text-sm">Q</span>
+              </div>
+              <div>
+                <h1 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent leading-tight">
+                  Quelyos
+                </h1>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 -mt-0.5">Backoffice</p>
+              </div>
             </div>
           )}
           {isCompact && (
             <div className="w-full flex justify-center">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">Q</span>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+                <span className="text-white font-bold text-sm">Q</span>
               </div>
             </div>
           )}
@@ -352,12 +367,12 @@ export function Layout({ children }: LayoutProps) {
             className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             aria-label="Fermer le menu"
           >
-            <XMarkIcon className="w-6 h-6" />
+            <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
 
         {/* Navigation avec scroll */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+        <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
           {navGroups.map((group) => (
             <NavGroupComponent
               key={group.name}
@@ -365,31 +380,33 @@ export function Layout({ children }: LayoutProps) {
               isActive={isActive}
               compact={isCompact}
               onItemClick={() => setIsMobileMenuOpen(false)}
+              isOpen={openGroupName === group.name}
+              onToggle={() => handleGroupToggle(group.name)}
             />
           ))}
         </nav>
 
         {/* Footer avec actions */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+        <div className="px-2 py-2 border-t border-gray-200 dark:border-gray-700 space-y-0.5">
           {/* Toggle compact mode (desktop uniquement) */}
           {!isCompact && (
             <button
               onClick={() => setIsCompact(!isCompact)}
-              className="hidden lg:flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 w-full group"
+              className="hidden lg:flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200 w-full group"
               aria-label="Mode compact"
             >
-              <Bars3Icon className="w-5 h-5 flex-shrink-0" />
-              <span className="font-medium">Mode compact</span>
+              <Bars3Icon className="w-4 h-4 flex-shrink-0" />
+              <span className="font-medium">Réduire</span>
             </button>
           )}
           {isCompact && (
             <button
               onClick={() => setIsCompact(!isCompact)}
-              className="hidden lg:flex items-center justify-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 w-full"
+              className="hidden lg:flex items-center justify-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200 w-full"
               aria-label="Mode étendu"
-              title="Mode étendu"
+              title="Agrandir"
             >
-              <Bars3Icon className="w-5 h-5" />
+              <Bars3Icon className="w-4 h-4" />
             </button>
           )}
 
@@ -397,10 +414,10 @@ export function Layout({ children }: LayoutProps) {
 
           <Link
             to="/login"
-            className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+            className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200"
             title={isCompact ? 'Déconnexion' : undefined}
           >
-            <ArrowLeftOnRectangleIcon className="w-5 h-5 flex-shrink-0" />
+            <ArrowLeftOnRectangleIcon className="w-4 h-4 flex-shrink-0" />
             {!isCompact && <span className="font-medium">Déconnexion</span>}
           </Link>
         </div>
@@ -424,7 +441,7 @@ export function Layout({ children }: LayoutProps) {
         </header>
 
         {/* Contenu principal */}
-        <main className={`flex-1 ${!isCompact ? 'lg:ml-64' : 'lg:ml-20'}`}>
+        <main className={`flex-1 ${!isCompact ? 'lg:ml-56' : 'lg:ml-16'}`}>
           {children}
         </main>
       </div>
