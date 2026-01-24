@@ -130,3 +130,11 @@ odoo_logs/
 backoffice/dist/
 *.sql
 *.sql.gz
+
+# ===========================================
+# Monitoring
+# ===========================================
+monitoring/grafana/data/
+monitoring/prometheus/data/
+monitoring/loki/data/
+monitoring/alertmanager/data/

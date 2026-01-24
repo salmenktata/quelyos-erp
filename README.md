@@ -152,6 +152,121 @@ crontab -e
 
 ---
 
+## CI/CD et Monitoring
+
+### GitHub Actions
+
+Le projet utilise GitHub Actions pour l'intégration et le déploiement continu :
+
+#### Workflow CI (tests automatiques)
+
+Déclenché sur chaque push et pull request :
+
+- **Frontend Tests** : Linting, tests unitaires, build Next.js
+- **Backoffice Tests** : Build Vite
+- **Python Validation** : Linting flake8 des modules Odoo
+- **Docker Build** : Validation des Dockerfiles
+
+#### Workflow CD (déploiement)
+
+Déclenché sur push vers `main` ou tags `v*` :
+
+- Build et push des images Docker vers GitHub Container Registry
+- Déploiement SSH vers le serveur de production
+- Healthcheck automatique post-déploiement
+- Notification Slack (optionnel)
+
+#### Configuration requise
+
+Secrets GitHub à configurer :
+
+```
+PRODUCTION_HOST       → IP ou domaine du serveur
+PRODUCTION_USER       → Utilisateur SSH
+PRODUCTION_SSH_KEY    → Clé privée SSH
+PRODUCTION_DOMAIN     → Domaine pour healthcheck
+SLACK_WEBHOOK         → Webhook Slack (optionnel)
+```
+
+### Monitoring Stack
+
+Stack complète de monitoring avec Prometheus, Grafana et Loki :
+
+```bash
+# Déployer le monitoring
+docker-compose -f docker-compose.prod.yml -f docker-compose.monitoring.yml up -d
+
+# Accès aux interfaces
+# Prometheus: http://localhost:9090
+# Grafana: http://localhost:3001 (admin/admin)
+# Alertmanager: http://localhost:9093
+```
+
+#### Services de monitoring
+
+| Service | Port | Description |
+|---------|------|-------------|
+| Prometheus | 9090 | Collecte de métriques |
+| Grafana | 3001 | Visualisation et dashboards |
+| Loki | 3100 | Agrégation de logs |
+| Promtail | - | Collecteur de logs |
+| Alertmanager | 9093 | Gestion des alertes |
+| cAdvisor | 8080 | Métriques conteneurs Docker |
+| Node Exporter | 9100 | Métriques système |
+| Postgres Exporter | 9187 | Métriques PostgreSQL |
+
+#### Métriques collectées
+
+- **Système** : CPU, RAM, Disque, Réseau
+- **Docker** : Utilisation par conteneur
+- **PostgreSQL** : Connexions, requêtes, performance
+- **Nginx** : Requêtes, status codes, latence
+- **Application** : Temps de réponse, erreurs HTTP
+
+#### Alertes configurées
+
+- **Système** : CPU élevé (>80%), RAM élevée (>85%), disque faible (<15%)
+- **Conteneurs** : Conteneur arrêté, mémoire conteneur élevée (>90%)
+- **PostgreSQL** : Service down, connexions élevées (>80%), requêtes lentes
+- **Application** : Taux d'erreurs élevé, service indisponible, latence élevée
+
+#### Logs centralisés
+
+Tous les logs sont collectés par Loki via Promtail :
+
+- Logs Nginx (access + error)
+- Logs Odoo
+- Logs système (syslog)
+- Logs conteneurs Docker
+
+Accès via Grafana : **Explore** → **Loki**
+
+### Healthcheck
+
+Script de vérification complet de l'infrastructure :
+
+```bash
+./healthcheck.sh
+
+# Vérifie :
+# - État des conteneurs Docker
+# - Ports réseau
+# - Connexion PostgreSQL
+# - Endpoints HTTP (frontend, backoffice, API)
+# - Services de monitoring (si déployés)
+```
+
+### Dashboards Grafana recommandés
+
+Importer ces dashboards via Grafana UI :
+
+- **Docker Monitoring** : ID `193`
+- **Node Exporter Full** : ID `1860`
+- **PostgreSQL Database** : ID `9628`
+- **Nginx** : ID `12708`
+
+---
+
 ## Plan de développement
 
 ### Phase 1 : E-commerce + Produits

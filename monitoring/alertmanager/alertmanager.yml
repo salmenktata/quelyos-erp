@@ -1,0 +1,103 @@
+global:
+  resolve_timeout: 5m
+  # Configuration SMTP pour les emails
+  smtp_smarthost: '${SMTP_HOST}:${SMTP_PORT}'
+  smtp_from: '${SMTP_FROM}'
+  smtp_auth_username: '${SMTP_USER}'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_require_tls: true
+
+# Templates pour les notifications
+templates:
+  - '/etc/alertmanager/*.tmpl'
+
+# Route principale
+route:
+  receiver: 'default'
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+
+  # Routes spécifiques par sévérité
+  routes:
+    # Alertes critiques -> Email + Slack + PagerDuty
+    - match:
+        severity: critical
+      receiver: critical
+      continue: false
+
+    # Alertes warning -> Slack uniquement
+    - match:
+        severity: warning
+      receiver: warning
+      continue: false
+
+# Receivers (destinations des alertes)
+receivers:
+  # Receiver par défaut (logs uniquement)
+  - name: 'default'
+    webhook_configs:
+      - url: 'http://localhost:5001/webhook'
+        send_resolved: true
+
+  # Alertes critiques
+  - name: 'critical'
+    # Email
+    email_configs:
+      - to: '${ALERT_EMAIL}'
+        headers:
+          Subject: '[CRITIQUE] Alerte Quelyos ERP - {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>Alerte Critique</h2>
+          <p><strong>Alert:</strong> {{ .GroupLabels.alertname }}</p>
+          <p><strong>Severity:</strong> {{ .CommonLabels.severity }}</p>
+          <p><strong>Summary:</strong> {{ .CommonAnnotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+          <p><a href="{{ .GeneratorURL }}">View in Prometheus</a></p>
+
+    # Slack
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK}'
+        channel: '#alerts-critical'
+        title: ':fire: Alerte Critique - {{ .GroupLabels.alertname }}'
+        text: |
+          *Summary:* {{ .CommonAnnotations.summary }}
+          *Description:* {{ .CommonAnnotations.description }}
+          *Severity:* {{ .CommonLabels.severity }}
+        send_resolved: true
+
+    # PagerDuty (optionnel)
+    # pagerduty_configs:
+    #   - service_key: '${PAGERDUTY_SERVICE_KEY}'
+    #     description: '{{ .CommonAnnotations.summary }}'
+
+  # Alertes warning
+  - name: 'warning'
+    # Slack uniquement pour les warnings
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK}'
+        channel: '#alerts-warning'
+        title: ':warning: Alerte - {{ .GroupLabels.alertname }}'
+        text: |
+          *Summary:* {{ .CommonAnnotations.summary }}
+          *Description:* {{ .CommonAnnotations.description }}
+          *Severity:* {{ .CommonLabels.severity }}
+        send_resolved: true
+
+# Inhibition rules (empêcher certaines alertes si d'autres sont actives)
+inhibit_rules:
+  # Si un service est down, ne pas alerter sur les métriques de ce service
+  - source_match:
+      severity: 'critical'
+      alertname: 'ServiceDown'
+    target_match:
+      severity: 'warning'
+    equal: ['service']
+
+  # Si PostgreSQL est down, ne pas alerter sur les requêtes lentes
+  - source_match:
+      alertname: 'PostgresDown'
+    target_match:
+      alertname: 'PostgresSlowQueries'
+    equal: ['instance']

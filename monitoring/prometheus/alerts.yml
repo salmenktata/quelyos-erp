@@ -1,0 +1,115 @@
+groups:
+  # Alertes système
+  - name: system_alerts
+    interval: 30s
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Utilisation CPU élevée (instance {{ $labels.instance }})"
+          description: "CPU utilisation est à {{ $value }}%"
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Utilisation mémoire élevée (instance {{ $labels.instance }})"
+          description: "Mémoire utilisation est à {{ $value }}%"
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 15
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Espace disque faible (instance {{ $labels.instance }})"
+          description: "Espace disque restant: {{ $value }}%"
+
+  # Alertes conteneurs Docker
+  - name: docker_alerts
+    interval: 30s
+    rules:
+      - alert: ContainerDown
+        expr: up{job="cadvisor"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Conteneur arrêté ({{ $labels.instance }})"
+          description: "Le conteneur {{ $labels.instance }} est down depuis 2 minutes"
+
+      - alert: ContainerHighMemory
+        expr: (container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Conteneur utilisation mémoire élevée ({{ $labels.name }})"
+          description: "Le conteneur {{ $labels.name }} utilise {{ $value }}% de sa limite mémoire"
+
+  # Alertes PostgreSQL
+  - name: postgres_alerts
+    interval: 30s
+    rules:
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL est down"
+          description: "PostgreSQL ne répond pas depuis 1 minute"
+
+      - alert: PostgresHighConnections
+        expr: (pg_stat_database_numbackends / pg_settings_max_connections) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PostgreSQL connexions élevées"
+          description: "{{ $value }}% des connexions max sont utilisées"
+
+      - alert: PostgresSlowQueries
+        expr: rate(pg_stat_statements_mean_time_seconds[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PostgreSQL requêtes lentes détectées"
+          description: "Temps moyen d'exécution: {{ $value }}s"
+
+  # Alertes application
+  - name: application_alerts
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Taux d'erreurs HTTP élevé"
+          description: "Taux d'erreurs 5xx: {{ $value }} req/s"
+
+      - alert: ServiceDown
+        expr: probe_success == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service indisponible ({{ $labels.instance }})"
+          description: "Le service {{ $labels.instance }} ne répond pas"
+
+      - alert: HighResponseTime
+        expr: http_request_duration_seconds{quantile="0.95"} > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Temps de réponse élevé"
+          description: "P95 latency: {{ $value }}s"
