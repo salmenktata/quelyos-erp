@@ -6,6 +6,7 @@ import type {
   Order,
   OrderDetail,
   Customer,
+  CustomerListItem,
   Address,
   Product,
   ProductDetail,
@@ -13,6 +14,9 @@ import type {
   Cart,
   Coupon,
   CouponCreate,
+  StockProduct,
+  DeliveryMethod,
+  AnalyticsStats,
 } from '../types'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8069'
@@ -196,6 +200,39 @@ class ApiClient {
 
   async getCustomerOrders(params?: { limit?: number; offset?: number }) {
     return this.request<PaginatedResponse<Order>>('/api/ecommerce/customer/orders', params)
+  }
+
+  // ==================== CUSTOMERS (ADMIN) ====================
+
+  async getCustomers(params?: { limit?: number; offset?: number; search?: string }) {
+    return this.request<PaginatedResponse<CustomerListItem>>('/api/ecommerce/customers', params)
+  }
+
+  // ==================== STOCK ====================
+
+  async getStockProducts(params?: { limit?: number; offset?: number; search?: string }) {
+    return this.request<PaginatedResponse<StockProduct>>('/api/ecommerce/stock/products', params)
+  }
+
+  async updateProductStock(productId: number, quantity: number) {
+    return this.request<ApiResponse<{ stock: { product_id: number; qty_available: number } }>>(
+      `/api/ecommerce/products/${productId}/stock/update`,
+      { quantity }
+    )
+  }
+
+  // ==================== DELIVERY ====================
+
+  async getDeliveryMethods() {
+    return this.request<ApiResponse<{ delivery_methods: DeliveryMethod[] }>>(
+      '/api/ecommerce/delivery/methods'
+    )
+  }
+
+  // ==================== ANALYTICS ====================
+
+  async getAnalyticsStats() {
+    return this.request<ApiResponse<AnalyticsStats>>('/api/ecommerce/analytics/stats')
   }
 
   // ==================== CART ====================

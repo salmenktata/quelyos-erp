@@ -13,6 +13,7 @@ import { CheckoutStepper } from '@/components/checkout/CheckoutStepper';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
 import { PaymentForm, PaymentMethod } from '@/components/checkout/PaymentForm';
 import { LoadingPage } from '@/components/common/Loading';
+import { odooClient } from '@/lib/odoo/client';
 
 // Méthodes de paiement disponibles
 const paymentMethods: PaymentMethod[] = [
@@ -44,7 +45,7 @@ const paymentMethods: PaymentMethod[] = [
 
 export default function CheckoutPaymentPage() {
   const router = useRouter();
-  const { cart, fetchCart, isLoading: cartLoading } = useCartStore();
+  const { cart, fetchCart, clearCart, isLoading: cartLoading } = useCartStore();
   const { isAuthenticated } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -90,23 +91,27 @@ export default function CheckoutPaymentPage() {
 
       const shipping = JSON.parse(shippingData);
 
-      // TODO: Appeler API pour confirmer la commande
-      // const result = await odooClient.confirmOrder({
-      //   shipping_address: shipping,
-      //   payment_method: methodId,
-      // });
+      // Confirmer la commande via l'API
+      const result = await odooClient.completeCheckout({
+        shipping_address: shipping,
+        payment_method: methodId,
+      });
 
-      // Simuler la confirmation
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (result.success && result.order) {
+        // Nettoyer le localStorage
+        localStorage.removeItem('checkout_shipping');
 
-      // Nettoyer le localStorage
-      localStorage.removeItem('checkout_shipping');
+        // Vider le panier
+        await clearCart();
 
-      // Rediriger vers la page de succès
-      router.push('/checkout/success');
-    } catch (error) {
+        // Rediriger vers la page de succès
+        router.push('/checkout/success');
+      } else {
+        throw new Error(result.error || 'Erreur confirmation commande');
+      }
+    } catch (error: any) {
       console.error('Erreur confirmation commande:', error);
-      alert('Une erreur est survenue. Veuillez réessayer.');
+      alert(error.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setIsSubmitting(false);
     }

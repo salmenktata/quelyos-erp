@@ -273,48 +273,49 @@ Importer ces dashboards via Grafana UI :
 
 **Objectif** : MVP fonctionnel avec gestion produits
 
-#### Étape 1.1 : Module API Odoo (`quelyos_api`)
+#### Étape 1.1 : Module API Odoo (`quelyos_api`) ✅
 
 | Tâche | Endpoint | Description |
 |-------|----------|-------------|
-| [ ] GET produits | `/api/v1/products` | Liste paginée avec filtres |
-| [ ] GET produit | `/api/v1/products/<id>` | Détail d'un produit |
-| [ ] POST produit | `/api/v1/products` | Créer un produit |
-| [ ] PUT produit | `/api/v1/products/<id>` | Modifier un produit |
-| [ ] DELETE produit | `/api/v1/products/<id>` | Supprimer un produit |
-| [ ] GET catégories | `/api/v1/categories` | Liste des catégories |
-| [ ] POST catégorie | `/api/v1/categories` | Créer une catégorie |
-| [ ] Auth login | `/api/v1/auth/login` | Authentification JWT |
-| [ ] Auth logout | `/api/v1/auth/logout` | Déconnexion |
-| [ ] Auth me | `/api/v1/auth/me` | Info utilisateur courant |
-| [ ] Config CORS | - | Headers cross-origin |
+| [x] GET produits | `/api/v1/products` | Liste paginée avec filtres |
+| [x] GET produit | `/api/v1/products/<id>` | Détail d'un produit |
+| [x] POST produit | `/api/v1/products` | Créer un produit |
+| [x] PUT produit | `/api/v1/products/<id>` | Modifier un produit |
+| [x] DELETE produit | `/api/v1/products/<id>` | Supprimer un produit |
+| [x] GET catégories | `/api/v1/categories` | Liste des catégories |
+| [x] POST catégorie | `/api/v1/categories` | Créer une catégorie |
+| [x] Auth login | `/api/v1/auth/login` | Authentification JWT |
+| [x] Auth logout | `/api/v1/auth/logout` | Déconnexion |
+| [x] Auth me | `/api/v1/auth/me` | Info utilisateur courant |
+| [x] Config CORS | - | Headers cross-origin |
 
-#### Étape 1.2 : Backoffice React
+#### Étape 1.2 : Backoffice React ✅
 
 | Tâche | Fichier | Description |
 |-------|---------|-------------|
-| [ ] Setup Vite | `vite.config.ts` | Configuration projet |
-| [ ] Tailwind | `tailwind.config.ts` | Styles |
-| [ ] Layout | `components/Layout.tsx` | Sidebar + Header |
-| [ ] Auth | `pages/Login.tsx` | Page connexion |
-| [ ] Dashboard | `pages/Dashboard.tsx` | Accueil admin |
-| [ ] Liste produits | `pages/Products.tsx` | Tableau paginé |
-| [ ] Form produit | `pages/ProductForm.tsx` | Création/édition |
-| [ ] Upload images | `components/ImageUpload.tsx` | Gestion images |
-| [ ] Liste catégories | `pages/Categories.tsx` | Gestion catégories |
-| [ ] API client | `lib/api.ts` | Client HTTP |
+| [x] Setup Vite | `vite.config.ts` | Configuration projet |
+| [x] Tailwind | `tailwind.config.ts` | Styles |
+| [x] Layout | `components/Layout.tsx` | Sidebar + Header |
+| [ ] Auth | `pages/Login.tsx` | Page connexion (placeholder) |
+| [x] Dashboard | `pages/Dashboard.tsx` | Accueil admin |
+| [x] Liste produits | `pages/Products.tsx` | Tableau paginé |
+| [x] Form produit | `pages/ProductForm.tsx` | Création/édition |
+| [ ] Upload images | `components/ImageUpload.tsx` | Gestion images (à venir) |
+| [x] Liste catégories | `pages/Categories.tsx` | Gestion catégories |
+| [x] API client | `lib/api.ts` | Client HTTP |
 
-#### Étape 1.3 : Frontend Next.js
+#### Étape 1.3 : Frontend Next.js ✅
 
 | Tâche | Route | Description |
 |-------|-------|-------------|
-| [ ] API client Odoo | `lib/odoo.ts` | Connexion API |
-| [ ] Page accueil | `/` | Hero + produits featured |
-| [ ] Catalogue | `/products` | Liste + filtres |
-| [ ] Fiche produit | `/products/[slug]` | Détail + variantes |
-| [ ] Panier | `/cart` | Liste articles |
-| [ ] Checkout | `/checkout` | Tunnel commande |
-| [ ] Confirmation | `/order/[id]` | Confirmation commande |
+| [x] API client Odoo | `lib/odoo.ts` | Connexion API |
+| [x] Page accueil | `/` | Hero + produits featured (SSR) |
+| [x] Catalogue | `/products` | Liste + filtres + pagination (691 lignes) |
+| [x] Fiche produit | `/products/[slug]` | Détail + variantes + add to cart (726 lignes) |
+| [x] Panier | `/cart` | Liste articles + coupons (265 lignes) |
+| [x] Checkout shipping | `/checkout/shipping` | Adresse de livraison (127 lignes) |
+| [x] Checkout payment | `/checkout/payment` | 4 méthodes de paiement (174 lignes) |
+| [x] Checkout success | `/checkout/success` | Confirmation commande (202 lignes) |
 
 #### Étape 1.4 : Tests Phase 1
 
@@ -330,59 +331,60 @@ Importer ces dashboards via Grafana UI :
 
 **Objectif** : Gestion complète des commandes et espace client
 
-#### Étape 2.1 : API Commandes
+#### Étape 2.1 : API Commandes ✅
 
 | Tâche | Endpoint | Description |
 |-------|----------|-------------|
-| [ ] GET commandes | `/api/v1/orders` | Liste commandes (admin) |
-| [ ] GET commande | `/api/v1/orders/<id>` | Détail commande |
-| [ ] PUT statut | `/api/v1/orders/<id>/status` | Changer statut |
-| [ ] GET mes commandes | `/api/v1/customer/orders` | Commandes du client |
-| [ ] POST commande | `/api/v1/orders` | Créer commande |
+| [x] GET commandes | `/api/v1/orders` | Liste commandes (admin) |
+| [x] GET commande | `/api/v1/orders/<id>` | Détail commande |
+| [x] PUT statut | `/api/v1/orders/<id>/status` | Changer statut |
+| [x] GET mes commandes | `/api/v1/customer/orders` | Commandes du client |
+| [x] POST commande | `/api/v1/orders` | Créer commande |
 
-#### Étape 2.2 : API Panier
-
-| Tâche | Endpoint | Description |
-|-------|----------|-------------|
-| [ ] GET panier | `/api/v1/cart` | Panier courant |
-| [ ] POST ajouter | `/api/v1/cart/add` | Ajouter produit |
-| [ ] PUT quantité | `/api/v1/cart/update` | Modifier quantité |
-| [ ] DELETE ligne | `/api/v1/cart/remove/<id>` | Supprimer ligne |
-| [ ] DELETE vider | `/api/v1/cart/clear` | Vider panier |
-
-#### Étape 2.3 : API Clients
+#### Étape 2.2 : API Panier ✅
 
 | Tâche | Endpoint | Description |
 |-------|----------|-------------|
-| [ ] POST inscription | `/api/v1/auth/register` | Créer compte |
-| [ ] GET profil | `/api/v1/customer/profile` | Info client |
-| [ ] PUT profil | `/api/v1/customer/profile` | Modifier profil |
-| [ ] GET adresses | `/api/v1/customer/addresses` | Liste adresses |
-| [ ] POST adresse | `/api/v1/customer/addresses` | Ajouter adresse |
-| [ ] PUT adresse | `/api/v1/customer/addresses/<id>` | Modifier adresse |
-| [ ] DELETE adresse | `/api/v1/customer/addresses/<id>` | Supprimer adresse |
+| [x] GET panier | `/api/v1/cart` | Panier courant |
+| [x] POST ajouter | `/api/v1/cart/add` | Ajouter produit |
+| [x] PUT quantité | `/api/v1/cart/update` | Modifier quantité |
+| [x] DELETE ligne | `/api/v1/cart/remove/<id>` | Supprimer ligne |
+| [x] DELETE vider | `/api/v1/cart/clear` | Vider panier |
 
-#### Étape 2.4 : Backoffice Commandes
+#### Étape 2.3 : API Clients ✅
+
+| Tâche | Endpoint | Description |
+|-------|----------|-------------|
+| [x] POST inscription | `/api/v1/auth/register` | Créer compte |
+| [x] GET profil | `/api/v1/customer/profile` | Info client |
+| [x] PUT profil | `/api/v1/customer/profile` | Modifier profil |
+| [x] GET adresses | `/api/v1/customer/addresses` | Liste adresses |
+| [x] POST adresse | `/api/v1/customer/addresses` | Ajouter adresse |
+| [x] PUT adresse | `/api/v1/customer/addresses/<id>` | Modifier adresse |
+| [x] DELETE adresse | `/api/v1/customer/addresses/<id>` | Supprimer adresse |
+
+#### Étape 2.4 : Backoffice Commandes 🟡
 
 | Tâche | Fichier | Description |
 |-------|---------|-------------|
-| [ ] Liste commandes | `pages/Orders.tsx` | Tableau + filtres statut |
-| [ ] Détail commande | `pages/OrderDetail.tsx` | Infos + lignes + client |
-| [ ] Changer statut | `components/OrderStatus.tsx` | Dropdown statut |
+| [x] Liste commandes | `pages/Orders.tsx` | Tableau + filtres statut |
+| [x] Détail commande | `pages/OrderDetail.tsx` | Infos + lignes + client |
+| [x] Changer statut | `components/OrderStatus.tsx` | Dropdown statut |
 | [ ] Liste clients | `pages/Customers.tsx` | Tableau clients |
 | [ ] Détail client | `pages/CustomerDetail.tsx` | Infos + historique |
 
-#### Étape 2.5 : Frontend Espace Client
+#### Étape 2.5 : Frontend Espace Client ✅
 
 | Tâche | Route | Description |
 |-------|-------|-------------|
-| [ ] Inscription | `/register` | Formulaire inscription |
-| [ ] Connexion | `/login` | Formulaire connexion |
-| [ ] Mon compte | `/account` | Dashboard client |
-| [ ] Mes commandes | `/account/orders` | Historique |
-| [ ] Détail commande | `/account/orders/[id]` | Suivi commande |
-| [ ] Mes adresses | `/account/addresses` | Gestion adresses |
-| [ ] Mon profil | `/account/profile` | Modifier infos |
+| [x] Inscription | `/register` | Formulaire inscription + validation (453 lignes) |
+| [x] Connexion | `/login` | Formulaire connexion + redirect (252 lignes) |
+| [x] Mon compte | `/account` | Dashboard client + statistiques (217 lignes) |
+| [x] Mes commandes | `/account/orders` | Historique + états (191 lignes) |
+| [ ] Détail commande | `/account/orders/[id]` | Suivi commande (à implémenter) |
+| [x] Mes adresses | `/account/addresses` | CRUD adresses (166 lignes) |
+| [x] Mon profil | `/account/profile` | Édition profil + password (334 lignes) |
+| [x] Ma wishlist | `/account/wishlist` | Liste favoris + add to cart (243 lignes) |
 
 #### Étape 2.6 : Tests Phase 2
 
@@ -398,22 +400,22 @@ Importer ces dashboards via Grafana UI :
 
 **Objectif** : Gestion stock temps réel et modes de livraison
 
-#### Étape 3.1 : API Stock
+#### Étape 3.1 : API Stock ✅
 
 | Tâche | Endpoint | Description |
 |-------|----------|-------------|
-| [ ] GET stock produit | `/api/v1/products/<id>/stock` | Quantité disponible |
-| [ ] PUT stock | `/api/v1/products/<id>/stock` | Modifier stock (admin) |
-| [ ] GET mouvements | `/api/v1/stock/moves` | Historique mouvements |
-| [ ] Validation stock | - | Vérifier dispo avant commande |
+| [x] GET stock produit | `/api/v1/products/<id>/stock` | Quantité disponible |
+| [x] PUT stock | `/api/v1/products/<id>/stock` | Modifier stock (admin) |
+| [x] GET mouvements | `/api/v1/stock/moves` | Historique mouvements |
+| [x] Validation stock | - | Vérifier dispo avant commande |
 
-#### Étape 3.2 : API Livraison
+#### Étape 3.2 : API Livraison ✅
 
 | Tâche | Endpoint | Description |
 |-------|----------|-------------|
-| [ ] GET méthodes | `/api/v1/delivery/methods` | Modes de livraison |
-| [ ] POST calcul | `/api/v1/delivery/calculate` | Calcul frais |
-| [ ] GET zones | `/api/v1/delivery/zones` | Zones de livraison |
+| [x] GET méthodes | `/api/v1/delivery/methods` | Modes de livraison |
+| [x] POST calcul | `/api/v1/delivery/calculate` | Calcul frais |
+| [x] GET zones | `/api/v1/delivery/zones` | Zones de livraison |
 
 #### Étape 3.3 : Backoffice Stock
 
@@ -440,24 +442,24 @@ Importer ces dashboards via Grafana UI :
 
 **Objectif** : Intégration paiement en ligne
 
-#### Étape 4.1 : API Paiement
+#### Étape 4.1 : API Paiement ✅
 
 | Tâche | Endpoint | Description |
 |-------|----------|-------------|
-| [ ] GET méthodes | `/api/v1/payment/methods` | Modes de paiement |
-| [ ] POST initier | `/api/v1/payment/init` | Créer transaction |
-| [ ] POST confirmer | `/api/v1/payment/confirm` | Confirmer paiement |
-| [ ] Webhook | `/api/v1/payment/webhook` | Callback provider |
+| [x] GET méthodes | `/api/v1/payment/methods` | Modes de paiement |
+| [x] POST initier | `/api/v1/payment/init` | Créer transaction |
+| [x] POST confirmer | `/api/v1/payment/confirm` | Confirmer paiement |
+| [x] Webhook | `/api/v1/payment/webhook` | Callback provider |
 
-#### Étape 4.2 : Intégration Stripe
+#### Étape 4.2 : Intégration Stripe 🟡
 
 | Tâche | Description |
 |-------|-------------|
-| [ ] Config Stripe | Clés API dans Odoo |
-| [ ] Créer PaymentIntent | Initier paiement |
-| [ ] Stripe Elements | Formulaire carte |
-| [ ] Webhook | Traitement événements |
-| [ ] Gestion erreurs | Paiement refusé, etc. |
+| [x] Config Stripe | Clés API dans Odoo |
+| [x] Créer PaymentIntent | Initier paiement |
+| [ ] Stripe Elements | Formulaire carte (Frontend) |
+| [x] Webhook | Traitement événements |
+| [x] Gestion erreurs | Paiement refusé, etc. |
 
 #### Étape 4.3 : Backoffice Paiement
 
@@ -483,33 +485,33 @@ Importer ces dashboards via Grafana UI :
 
 **Objectif** : Outils marketing et optimisation SEO
 
-#### Étape 5.1 : API Marketing
+#### Étape 5.1 : API Marketing ✅
 
 | Tâche | Endpoint | Description |
 |-------|----------|-------------|
-| [ ] GET coupons | `/api/v1/coupons` | Liste coupons (admin) |
-| [ ] POST coupon | `/api/v1/coupons` | Créer coupon |
-| [ ] POST appliquer | `/api/v1/cart/coupon` | Appliquer au panier |
-| [ ] DELETE coupon | `/api/v1/cart/coupon` | Retirer coupon |
+| [x] GET coupons | `/api/v1/coupons` | Liste coupons (admin) |
+| [x] POST coupon | `/api/v1/coupons` | Créer coupon |
+| [x] POST appliquer | `/api/v1/cart/coupon` | Appliquer au panier |
+| [x] DELETE coupon | `/api/v1/cart/coupon` | Retirer coupon |
 
-#### Étape 5.2 : Backoffice Marketing
+#### Étape 5.2 : Backoffice Marketing 🟡
 
 | Tâche | Fichier | Description |
 |-------|---------|-------------|
-| [ ] Coupons | `pages/Coupons.tsx` | Gestion codes promo |
-| [ ] Form coupon | `pages/CouponForm.tsx` | Création coupon |
+| [x] Coupons | `pages/Coupons.tsx` | Gestion codes promo |
+| [x] Form coupon | `pages/CouponForm.tsx` | Création coupon |
 | [ ] Produits featured | `pages/Featured.tsx` | Mise en avant |
 | [ ] Analytics | `pages/Analytics.tsx` | Stats ventes |
 
-#### Étape 5.3 : SEO Frontend
+#### Étape 5.3 : SEO Frontend ✅
 
 | Tâche | Description |
 |-------|-------------|
-| [ ] Meta tags | Title, description dynamiques |
-| [ ] Open Graph | Partage réseaux sociaux |
-| [ ] Sitemap | `/sitemap.xml` automatique |
-| [ ] Schema.org | Données structurées produits |
-| [ ] URLs SEO | Slugs produits/catégories |
+| [x] Meta tags | Title, description dynamiques |
+| [x] Open Graph | Partage réseaux sociaux |
+| [x] Sitemap | `/sitemap.xml` automatique |
+| [x] Schema.org | Données structurées produits |
+| [x] URLs SEO | Slugs produits/catégories |
 
 ---
 
@@ -517,34 +519,34 @@ Importer ces dashboards via Grafana UI :
 
 **Objectif** : Mise en production
 
-#### Étape 6.1 : Infrastructure
+#### Étape 6.1 : Infrastructure 🟡
 
 | Tâche | Description |
 |-------|-------------|
 | [ ] Serveur VPS | Provision serveur |
-| [ ] Docker prod | docker-compose.prod.yml |
-| [ ] Nginx | Reverse proxy + SSL |
+| [x] Docker prod | docker-compose.prod.yml |
+| [x] Nginx | Reverse proxy + SSL |
 | [ ] Domaine | Configuration DNS |
-| [ ] SSL | Certificat Let's Encrypt |
+| [x] SSL | Certificat Let's Encrypt |
 
-#### Étape 6.2 : Déploiement
+#### Étape 6.2 : Déploiement 🟡
 
 | Tâche | Description |
 |-------|-------------|
-| [ ] CI/CD | GitHub Actions |
-| [ ] Build frontend | Compilation Next.js |
-| [ ] Build backoffice | Compilation Vite |
+| [x] CI/CD | GitHub Actions |
+| [x] Build frontend | Compilation Next.js |
+| [x] Build backoffice | Compilation Vite |
 | [ ] Migration DB | Scripts migration |
-| [ ] Backup | Stratégie sauvegarde |
+| [x] Backup | Stratégie sauvegarde |
 
-#### Étape 6.3 : Monitoring
+#### Étape 6.3 : Monitoring ✅
 
 | Tâche | Description |
 |-------|-------------|
-| [ ] Logs | Centralisation logs |
-| [ ] Alertes | Notifications erreurs |
-| [ ] Uptime | Monitoring disponibilité |
-| [ ] Performance | Métriques temps réponse |
+| [x] Logs | Centralisation logs |
+| [x] Alertes | Notifications erreurs |
+| [x] Uptime | Monitoring disponibilité |
+| [x] Performance | Métriques temps réponse |
 
 ---
 

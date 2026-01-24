@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         siteConfig.brand.name,
       ].filter(Boolean),
       openGraph: {
-        type: 'product',
+        type: 'website',
         title,
         description,
         url,

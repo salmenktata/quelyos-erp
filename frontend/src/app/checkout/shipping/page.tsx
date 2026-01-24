@@ -43,10 +43,8 @@ export default function CheckoutShippingPage() {
 
     try {
       // Sauvegarder les informations de livraison dans le localStorage
+      // L'adresse sera envoyée à l'API lors de la confirmation de la commande
       localStorage.setItem('checkout_shipping', JSON.stringify(data));
-
-      // TODO: Appeler API pour mettre à jour l'adresse de livraison dans Odoo
-      // await odooClient.updateShippingAddress(data);
 
       // Rediriger vers le paiement
       router.push('/checkout/payment');

@@ -16,6 +16,8 @@ import { useToast } from '@/store/toastStore';
 import { Button } from '@/components/common/Button';
 import { ProductDetailSkeleton } from '@/components/common/Skeleton';
 import { ProductImageGallery } from '@/components/product/ProductImageGallery';
+import { ProductGrid } from '@/components/product/ProductGrid';
+import ProductCard from '@/components/product/ProductCard';
 import { generateProductSchema, generateBreadcrumbSchema } from '@/lib/utils/seo';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 
@@ -29,6 +31,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'shipping'>('description');
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   const { addToCart, isLoading: isAddingToCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
@@ -51,6 +54,9 @@ export default function ProductDetailPage() {
         if (response.product.variants && response.product.variants.length > 0) {
           setSelectedVariant(response.product.variants[0].id);
         }
+
+        // Charger les produits similaires
+        fetchRelatedProducts(response.product.id);
       } else {
         router.push('/products');
       }
@@ -59,6 +65,17 @@ export default function ProductDetailPage() {
       router.push('/products');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchRelatedProducts = async (productId: number) => {
+    try {
+      const response = await odooClient.getUpsellProducts(productId);
+      if (response.success && response.products) {
+        setRelatedProducts(response.products);
+      }
+    } catch (error) {
+      console.error('Erreur chargement produits similaires:', error);
     }
   };
 
@@ -712,10 +729,14 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Produits similaires */}
-        {product.related_products && product.related_products.length > 0 && (
-          <div className="mt-8">
+        {relatedProducts.length > 0 && (
+          <div className="mt-12">
             <h2 className="text-3xl font-bold mb-6 text-gray-900">Produits similaires</h2>
-            {/* TODO: Afficher les produits similaires avec ProductGrid */}
+            <ProductGrid>
+              {relatedProducts.map((relatedProduct) => (
+                <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              ))}
+            </ProductGrid>
           </div>
         )}
         </div>

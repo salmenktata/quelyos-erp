@@ -111,7 +111,7 @@ export default function CouponForm() {
           <div className="flex items-center mb-4">
             <button
               onClick={() => navigate('/coupons')}
-              className="mr-4 text-gray-600 hover:text-gray-900 transition-colors"
+              className="mr-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors"
             >
               <svg
                 className="w-6 h-6"
@@ -128,17 +128,17 @@ export default function CouponForm() {
               </svg>
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Nouveau coupon</h1>
-              <p className="text-gray-600 mt-2">Créer un code promo pour vos clients</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Nouveau coupon</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">Créer un code promo pour vos clients</p>
             </div>
           </div>
         </div>
 
         <div className="max-w-2xl">
-          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-6">
             {/* Nom */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nom du coupon *
               </label>
               <input
@@ -152,12 +152,12 @@ export default function CouponForm() {
                 }`}
                 placeholder="ex: Promotion été 2026"
               />
-              {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+              {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
             </div>
 
             {/* Code */}
             <div>
-              <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Code promo *
               </label>
               <input
@@ -171,15 +171,15 @@ export default function CouponForm() {
                 }`}
                 placeholder="ex: SUMMER2026"
               />
-              {errors.code && <p className="mt-1 text-sm text-red-600">{errors.code}</p>}
-              <p className="mt-1 text-sm text-gray-500">
+              {errors.code && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.code}</p>}
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">
                 Le code sera automatiquement converti en majuscules
               </p>
             </div>
 
             {/* Type de réduction */}
             <div>
-              <label htmlFor="discount_type" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="discount_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Type de réduction *
               </label>
               <select
@@ -187,7 +187,7 @@ export default function CouponForm() {
                 name="discount_type"
                 value={formData.discount_type}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="percent">Pourcentage (%)</option>
                 <option value="fixed">Montant fixe (€)</option>
@@ -196,7 +196,7 @@ export default function CouponForm() {
 
             {/* Valeur de la réduction */}
             <div>
-              <label htmlFor="discount_value" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="discount_value" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Valeur de la réduction *
               </label>
               <div className="relative">
@@ -215,19 +215,19 @@ export default function CouponForm() {
                   placeholder={formData.discount_type === 'percent' ? '10' : '5.00'}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <span className="text-gray-500 text-sm">
+                  <span className="text-gray-500 dark:text-gray-500 text-sm">
                     {formData.discount_type === 'percent' ? '%' : '€'}
                   </span>
                 </div>
               </div>
               {errors.discount_value && (
-                <p className="mt-1 text-sm text-red-600">{errors.discount_value}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.discount_value}</p>
               )}
             </div>
 
             {/* Date de début */}
             <div>
-              <label htmlFor="date_from" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="date_from" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Date de début
               </label>
               <input
@@ -236,16 +236,16 @@ export default function CouponForm() {
                 name="date_from"
                 value={formData.date_from}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">
                 Laisser vide pour activer immédiatement
               </p>
             </div>
 
             {/* Date de fin */}
             <div>
-              <label htmlFor="date_to" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="date_to" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Date de fin
               </label>
               <input
@@ -258,15 +258,15 @@ export default function CouponForm() {
                   errors.date_to ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
-              {errors.date_to && <p className="mt-1 text-sm text-red-600">{errors.date_to}</p>}
-              <p className="mt-1 text-sm text-gray-500">
+              {errors.date_to && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.date_to}</p>}
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">
                 Laisser vide pour une validité illimitée
               </p>
             </div>
 
             {/* Limite d'utilisation */}
             <div>
-              <label htmlFor="max_usage" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="max_usage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nombre maximum d'utilisations
               </label>
               <input
@@ -276,10 +276,10 @@ export default function CouponForm() {
                 value={formData.max_usage}
                 onChange={handleChange}
                 min="0"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="0 = illimité"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">
                 Laisser à 0 pour un nombre illimité d'utilisations
               </p>
             </div>
@@ -287,7 +287,7 @@ export default function CouponForm() {
             {/* Erreur de soumission */}
             {errors.submit && (
               <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">{errors.submit}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">{errors.submit}</p>
               </div>
             )}
 
@@ -296,7 +296,7 @@ export default function CouponForm() {
               <button
                 type="submit"
                 disabled={createCoupon.isPending}
-                className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-6 py-3 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {createCoupon.isPending ? (
                   <div className="flex items-center justify-center">
@@ -310,7 +310,7 @@ export default function CouponForm() {
               <button
                 type="button"
                 onClick={() => navigate('/coupons')}
-                className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors font-medium"
               >
                 Annuler
               </button>

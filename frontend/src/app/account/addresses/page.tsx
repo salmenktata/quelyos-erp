@@ -10,17 +10,8 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
-
-interface Address {
-  id: number;
-  name: string;
-  street: string;
-  street2?: string;
-  city: string;
-  zip: string;
-  country: string;
-  is_default: boolean;
-}
+import { odooClient } from '@/lib/odoo/client';
+import type { Address } from '@/types';
 
 export default function AccountAddressesPage() {
   const router = useRouter();
@@ -35,20 +26,23 @@ export default function AccountAddressesPage() {
   }, [isAuthenticated, router]);
 
   useEffect(() => {
-    // TODO: Charger les adresses depuis l'API
-    // const fetchAddresses = async () => {
-    //   const result = await odooClient.getAddresses();
-    //   setAddresses(result.addresses);
-    //   setIsLoading(false);
-    // };
-    // fetchAddresses();
+    const fetchAddresses = async () => {
+      try {
+        const result = await odooClient.getAddresses();
+        if (result.success && result.addresses) {
+          setAddresses(result.addresses);
+        }
+      } catch (error) {
+        console.error('Erreur chargement adresses:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // Simulation
-    setTimeout(() => {
-      setAddresses([]);
-      setIsLoading(false);
-    }, 500);
-  }, []);
+    if (isAuthenticated) {
+      fetchAddresses();
+    }
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return <LoadingPage />;
@@ -129,7 +123,7 @@ export default function AccountAddressesPage() {
             {addresses.map((address) => (
               <div key={address.id} className="bg-white rounded-lg shadow-sm p-6">
                 {/* Badge par défaut */}
-                {address.is_default && (
+                {address.is_main && (
                   <div className="inline-block bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
                     Adresse par défaut
                   </div>
@@ -143,7 +137,7 @@ export default function AccountAddressesPage() {
                   <p>
                     {address.zip} {address.city}
                   </p>
-                  <p>{address.country}</p>
+                  <p>{address.country_name || address.country_id}</p>
                 </div>
 
                 {/* Actions */}

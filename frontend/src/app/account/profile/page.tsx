@@ -11,6 +11,7 @@ import { useAuthStore } from '@/store/authStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
+import { odooClient } from '@/lib/odoo/client';
 
 export default function AccountProfilePage() {
   const router = useRouter();
@@ -92,25 +93,37 @@ export default function AccountProfilePage() {
     setIsSaving(true);
 
     try {
-      // TODO: Appeler API pour mettre à jour le profil
-      // await odooClient.updateProfile(formData);
+      const profileData: any = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+      };
 
-      // Simuler la sauvegarde
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Ajouter les champs de mot de passe si modifiés
+      if (formData.newPassword) {
+        profileData.current_password = formData.currentPassword;
+        profileData.new_password = formData.newPassword;
+      }
 
-      alert('Profil mis à jour avec succès');
-      setIsEditing(false);
+      const result = await odooClient.updateProfile(profileData);
 
-      // Réinitialiser les champs de mot de passe
-      setFormData((prev) => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      }));
-    } catch (error) {
+      if (result.success) {
+        alert('Profil mis à jour avec succès');
+        setIsEditing(false);
+
+        // Réinitialiser les champs de mot de passe
+        setFormData((prev) => ({
+          ...prev,
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        }));
+      } else {
+        throw new Error(result.error || 'Erreur mise à jour profil');
+      }
+    } catch (error: any) {
       console.error('Erreur mise à jour profil:', error);
-      alert('Une erreur est survenue. Veuillez réessayer.');
+      alert(error.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setIsSaving(false);
     }

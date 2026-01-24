@@ -44,8 +44,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     // Récupérer tous les produits
     const productsResponse = await odooClient.getProducts({ limit: 1000, offset: 0 })
-    const products = productsResponse.success && productsResponse.data?.products
-      ? productsResponse.data.products
+    const products = productsResponse.success && productsResponse.products
+      ? productsResponse.products
       : []
 
     const productRoutes: MetadataRoute.Sitemap = products.map((product) => ({
@@ -57,8 +57,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Récupérer toutes les catégories
     const categoriesResponse = await odooClient.getCategories({ limit: 100 })
-    const categories = categoriesResponse.success && categoriesResponse.data?.categories
-      ? categoriesResponse.data.categories
+    const categories = categoriesResponse.success && categoriesResponse.categories
+      ? categoriesResponse.categories
       : []
 
     const categoryRoutes: MetadataRoute.Sitemap = categories.map((category) => ({

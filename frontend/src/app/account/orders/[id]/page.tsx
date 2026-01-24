@@ -12,36 +12,8 @@ import { useAuthStore } from '@/store/authStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
-
-// Type pour une commande détaillée
-interface OrderLine {
-  id: number;
-  product_name: string;
-  product_image: string;
-  quantity: number;
-  price_unit: number;
-  price_total: number;
-}
-
-interface Order {
-  id: number;
-  name: string;
-  date: string;
-  state: 'draft' | 'sent' | 'sale' | 'done' | 'cancel';
-  amount_untaxed: number;
-  amount_tax: number;
-  amount_total: number;
-  currency_symbol: string;
-  lines: OrderLine[];
-  shipping_address?: {
-    name: string;
-    street: string;
-    street2?: string;
-    city: string;
-    zip: string;
-    country: string;
-  };
-}
+import { odooClient } from '@/lib/odoo/client';
+import type { Order } from '@/types';
 
 const orderStates = {
   draft: { label: 'Brouillon', color: 'gray' },
@@ -66,20 +38,26 @@ export default function OrderDetailPage() {
   }, [isAuthenticated, router, orderId]);
 
   useEffect(() => {
-    // TODO: Charger la commande depuis l'API
-    // const fetchOrder = async () => {
-    //   const result = await odooClient.getOrder(parseInt(orderId));
-    //   setOrder(result.order);
-    //   setIsLoading(false);
-    // };
-    // fetchOrder();
+    const fetchOrder = async () => {
+      try {
+        const result = await odooClient.getOrder(parseInt(orderId));
+        if (result.success && result.order) {
+          setOrder(result.order);
+        } else {
+          setOrder(null);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement de la commande:', error);
+        setOrder(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // Simulation - commande non trouvée
-    setTimeout(() => {
-      setOrder(null);
-      setIsLoading(false);
-    }, 500);
-  }, [orderId]);
+    if (isAuthenticated) {
+      fetchOrder();
+    }
+  }, [orderId, isAuthenticated]);
 
   if (!isAuthenticated) {
     return <LoadingPage />;
@@ -109,7 +87,7 @@ export default function OrderDetailPage() {
     );
   }
 
-  const state = orderStates[order.state];
+  const state = orderStates[order.state as keyof typeof orderStates] || orderStates.draft;
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -137,7 +115,7 @@ export default function OrderDetailPage() {
             <h1 className="text-3xl font-bold mb-2">Commande {order.name}</h1>
             <p className="text-gray-600">
               Passée le{' '}
-              {new Date(order.date).toLocaleDateString('fr-FR', {
+              {new Date(order.date_order).toLocaleDateString('fr-FR', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
@@ -174,12 +152,12 @@ export default function OrderDetailPage() {
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-bold mb-4">Articles commandés</h2>
               <div className="divide-y">
-                {order.lines.map((line) => (
+                {order.lines?.map((line) => (
                   <div key={line.id} className="py-4 first:pt-0 last:pb-0 flex gap-4">
                     {/* Image */}
-                    <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                    <div className="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden bg-gray-100">
                       <Image
-                        src={line.product_image}
+                        src={line.image_url}
                         alt={line.product_name}
                         fill
                         className="object-cover"
@@ -194,14 +172,14 @@ export default function OrderDetailPage() {
                       </h3>
                       <p className="text-sm text-gray-600">Quantité: {line.quantity}</p>
                       <p className="text-sm text-gray-600">
-                        Prix unitaire: {formatPrice(line.price_unit, order.currency_symbol)}
+                        Prix unitaire: {formatPrice(line.price_unit, order.currency.symbol)}
                       </p>
                     </div>
 
                     {/* Prix */}
                     <div className="text-right">
                       <p className="font-bold text-primary">
-                        {formatPrice(line.price_total, order.currency_symbol)}
+                        {formatPrice(line.price_total, order.currency.symbol)}
                       </p>
                     </div>
                   </div>
@@ -210,17 +188,17 @@ export default function OrderDetailPage() {
             </div>
 
             {/* Adresse de livraison */}
-            {order.shipping_address && (
+            {order.partner_shipping && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold mb-4">Adresse de livraison</h2>
                 <div className="text-gray-700">
-                  <p className="font-semibold">{order.shipping_address.name}</p>
-                  <p>{order.shipping_address.street}</p>
-                  {order.shipping_address.street2 && <p>{order.shipping_address.street2}</p>}
+                  <p className="font-semibold">{order.partner_shipping.name}</p>
+                  <p>{order.partner_shipping.street}</p>
+                  {order.partner_shipping.street2 && <p>{order.partner_shipping.street2}</p>}
                   <p>
-                    {order.shipping_address.zip} {order.shipping_address.city}
+                    {order.partner_shipping.zip} {order.partner_shipping.city}
                   </p>
-                  <p>{order.shipping_address.country}</p>
+                  <p>{order.partner_shipping.country_name || order.partner_shipping.country_id}</p>
                 </div>
               </div>
             )}
@@ -234,13 +212,13 @@ export default function OrderDetailPage() {
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between text-gray-600">
                   <span>Sous-total</span>
-                  <span>{formatPrice(order.amount_untaxed, order.currency_symbol)}</span>
+                  <span>{formatPrice(order.amount_untaxed, order.currency.symbol)}</span>
                 </div>
 
                 {order.amount_tax > 0 && (
                   <div className="flex justify-between text-gray-600">
                     <span>TVA</span>
-                    <span>{formatPrice(order.amount_tax, order.currency_symbol)}</span>
+                    <span>{formatPrice(order.amount_tax, order.currency.symbol)}</span>
                   </div>
                 )}
               </div>
@@ -249,7 +227,7 @@ export default function OrderDetailPage() {
                 <div className="flex justify-between items-baseline">
                   <span className="text-lg font-bold text-gray-900">Total</span>
                   <span className="text-2xl font-bold text-primary">
-                    {formatPrice(order.amount_total, order.currency_symbol)}
+                    {formatPrice(order.amount_total, order.currency.symbol)}
                   </span>
                 </div>
               </div>

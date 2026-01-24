@@ -106,6 +106,21 @@ export interface Customer {
   country_id: number | null
 }
 
+export interface CustomerListItem {
+  id: number
+  name: string
+  email: string
+  phone: string
+  mobile: string
+  street: string
+  city: string
+  zip: string
+  country: string
+  orders_count: number
+  total_spent: number
+  create_date: string | null
+}
+
 export interface Address {
   id: number
   name: string
@@ -168,6 +183,62 @@ export interface CouponCreate {
   date_from?: string
   date_to?: string
   max_usage?: number
+}
+
+// ==================== STOCK ====================
+
+export interface StockProduct {
+  id: number
+  name: string
+  sku: string
+  image: string
+  qty_available: number
+  virtual_available: number
+  incoming_qty: number
+  outgoing_qty: number
+  stock_status: 'in_stock' | 'low_stock' | 'out_of_stock'
+  category: string
+}
+
+// ==================== DELIVERY ====================
+
+export interface DeliveryMethod {
+  id: number
+  name: string
+  delivery_type: string
+  fixed_price: number
+  free_over: boolean | number
+}
+
+// ==================== ANALYTICS ====================
+
+export interface AnalyticsStats {
+  totals: {
+    products: number
+    customers: number
+    orders: number
+    confirmed_orders: number
+    pending_orders: number
+    out_of_stock_products: number
+    revenue: number
+  }
+  recent_orders: Array<{
+    id: number
+    name: string
+    date_order: string | null
+    state: string
+    amount_total: number
+    customer: {
+      id: number
+      name: string
+    } | null
+  }>
+  top_products: Array<{
+    id: number
+    name: string
+    qty_sold: number
+    revenue: number
+  }>
 }
 
 // ==================== PAGINATION ====================

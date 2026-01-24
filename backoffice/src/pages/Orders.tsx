@@ -17,17 +17,17 @@ export default function Orders() {
   const getStatusColor = (state: string) => {
     switch (state) {
       case 'draft':
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 dark:bg-gray-700 text-gray-800'
       case 'sent':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800'
       case 'sale':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 dark:bg-green-900/30 text-green-800'
       case 'done':
         return 'bg-indigo-100 text-indigo-800'
       case 'cancel':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 dark:bg-red-900/30 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 dark:bg-gray-700 text-gray-800'
     }
   }
 
@@ -68,21 +68,21 @@ export default function Orders() {
     <Layout>
       <div className="p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Commandes</h1>
-          <p className="text-gray-600 mt-2">Gérer et suivre toutes les commandes</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Commandes</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">Gérer et suivre toutes les commandes</p>
         </div>
 
         {/* Filtres */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
           <div className="flex items-center space-x-4">
-            <label className="text-sm font-medium text-gray-700">Statut:</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Statut:</label>
             <select
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value)
                 setPage(0)
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
             >
               <option value="">Tous</option>
               <option value="draft">Brouillon</option>
@@ -93,7 +93,7 @@ export default function Orders() {
             </select>
 
             {data?.data && (
-              <span className="text-sm text-gray-600 ml-auto">
+              <span className="text-sm text-gray-600 dark:text-gray-400 ml-auto">
                 {data.data.total} commande{data.data.total > 1 ? 's' : ''}
               </span>
             )}
@@ -101,64 +101,64 @@ export default function Orders() {
         </div>
 
         {/* Liste des commandes */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {isLoading ? (
             <div className="p-8 text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-              <p className="text-gray-600 mt-4">Chargement...</p>
+              <p className="text-gray-600 dark:text-gray-400 mt-4">Chargement...</p>
             </div>
           ) : error ? (
-            <div className="p-8 text-center text-red-600">
+            <div className="p-8 text-center text-red-600 dark:text-red-400">
               Erreur lors du chargement des commandes
             </div>
           ) : data?.data.orders && data.data.orders.length > 0 ? (
             <>
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wider">
                       N° Commande
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wider">
                       Client
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wider">
                       Montant
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wider">
                       Statut
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                   {data.data.orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={order.id} className="hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{order.name}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">{order.name}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{formatDate(order.date_order)}</div>
+                        <div className="text-sm text-gray-900 dark:text-white">{formatDate(order.date_order)}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {order.customer ? (
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
                               {order.customer.name}
                             </div>
-                            <div className="text-sm text-gray-500">{order.customer.email}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-500">{order.customer.email}</div>
                           </div>
                         ) : (
                           <span className="text-sm text-gray-400">-</span>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {formatPrice(order.amount_total)}
                         </div>
                       </td>
@@ -174,7 +174,7 @@ export default function Orders() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
                           to={`/orders/${order.id}`}
-                          className="text-indigo-600 hover:text-indigo-900 transition-colors"
+                          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 transition-colors"
                         >
                           Voir détails
                         </Link>
@@ -186,8 +186,8 @@ export default function Orders() {
 
               {/* Pagination */}
               {data.data.total > limit && (
-                <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-                  <div className="text-sm text-gray-700">
+                <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
                     Affichage {page * limit + 1} à {Math.min((page + 1) * limit, data.data.total)}{' '}
                     sur {data.data.total}
                   </div>
@@ -195,14 +195,14 @@ export default function Orders() {
                     <button
                       onClick={() => setPage(Math.max(0, page - 1))}
                       disabled={page === 0}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Précédent
                     </button>
                     <button
                       onClick={() => setPage(page + 1)}
                       disabled={(page + 1) * limit >= data.data.total}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Suivant
                     </button>
@@ -211,7 +211,7 @@ export default function Orders() {
               )}
             </>
           ) : (
-            <div className="p-8 text-center text-gray-600">Aucune commande trouvée</div>
+            <div className="p-8 text-center text-gray-600 dark:text-gray-400">Aucune commande trouvée</div>
           )}
         </div>
       </div>

@@ -11,17 +11,8 @@ import { useAuthStore } from '@/store/authStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
-
-// Type pour une commande (à synchroniser avec le backend plus tard)
-interface Order {
-  id: number;
-  name: string;
-  date: string;
-  state: 'draft' | 'sent' | 'sale' | 'done' | 'cancel';
-  amount_total: number;
-  currency_symbol: string;
-  line_count: number;
-}
+import { odooClient } from '@/lib/odoo/client';
+import type { Order } from '@/types';
 
 const orderStates = {
   draft: { label: 'Brouillon', color: 'gray' },
@@ -44,20 +35,23 @@ export default function AccountOrdersPage() {
   }, [isAuthenticated, router]);
 
   useEffect(() => {
-    // TODO: Charger les commandes depuis l'API
-    // const fetchOrders = async () => {
-    //   const result = await odooClient.getCustomerOrders();
-    //   setOrders(result.orders);
-    //   setIsLoading(false);
-    // };
-    // fetchOrders();
+    const fetchOrders = async () => {
+      try {
+        const result = await odooClient.getOrders();
+        if (result.success && result.orders) {
+          setOrders(result.orders);
+        }
+      } catch (error) {
+        console.error('Erreur chargement commandes:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // Simulation
-    setTimeout(() => {
-      setOrders([]);
-      setIsLoading(false);
-    }, 500);
-  }, []);
+    if (isAuthenticated) {
+      fetchOrders();
+    }
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return <LoadingPage />;
@@ -127,7 +121,7 @@ export default function AccountOrdersPage() {
           /* Liste des commandes */
           <div className="space-y-4">
             {orders.map((order) => {
-              const state = orderStates[order.state];
+              const state = orderStates[order.state as keyof typeof orderStates] || orderStates.draft;
               return (
                 <div key={order.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
                   <div className="p-6">
@@ -156,7 +150,7 @@ export default function AccountOrdersPage() {
                         </div>
                         <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                           <span>
-                            📅 {new Date(order.date).toLocaleDateString('fr-FR', {
+                            📅 {new Date(order.date_order).toLocaleDateString('fr-FR', {
                               day: 'numeric',
                               month: 'long',
                               year: 'numeric',
@@ -164,7 +158,7 @@ export default function AccountOrdersPage() {
                           </span>
                           <span>{order.line_count} article(s)</span>
                           <span className="font-semibold text-primary">
-                            {formatPrice(order.amount_total, order.currency_symbol)}
+                            {formatPrice(order.amount_total, order.currency.symbol)}
                           </span>
                         </div>
                       </div>

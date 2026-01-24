@@ -13,18 +13,8 @@ import { useCartStore } from '@/store/cartStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
-
-interface WishlistItem {
-  id: number;
-  product_id: number;
-  product_name: string;
-  product_slug: string;
-  product_image: string;
-  product_price: number;
-  currency_symbol: string;
-  in_stock: boolean;
-  date_added: string;
-}
+import { odooClient } from '@/lib/odoo/client';
+import type { WishlistItem } from '@/types';
 
 export default function AccountWishlistPage() {
   const router = useRouter();
@@ -41,20 +31,23 @@ export default function AccountWishlistPage() {
   }, [isAuthenticated, router]);
 
   useEffect(() => {
-    // TODO: Charger la wishlist depuis l'API
-    // const fetchWishlist = async () => {
-    //   const result = await odooClient.getWishlist();
-    //   setWishlist(result.items);
-    //   setIsLoading(false);
-    // };
-    // fetchWishlist();
+    const fetchWishlist = async () => {
+      try {
+        const result = await odooClient.getWishlist();
+        if (result.success && result.wishlist) {
+          setWishlist(result.wishlist);
+        }
+      } catch (error) {
+        console.error('Erreur chargement wishlist:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // Simulation
-    setTimeout(() => {
-      setWishlist([]);
-      setIsLoading(false);
-    }, 500);
-  }, []);
+    if (isAuthenticated) {
+      fetchWishlist();
+    }
+  }, [isAuthenticated]);
 
   const handleRemove = async (itemId: number) => {
     if (!confirm('Retirer ce produit de votre wishlist ?')) {
@@ -64,16 +57,16 @@ export default function AccountWishlistPage() {
     setRemovingId(itemId);
 
     try {
-      // TODO: Appeler API pour retirer de la wishlist
-      // await odooClient.removeFromWishlist(itemId);
+      const result = await odooClient.removeFromWishlist(itemId);
 
-      // Simuler la suppression
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      setWishlist((prev) => prev.filter((item) => item.id !== itemId));
-    } catch (error) {
+      if (result.success) {
+        setWishlist((prev) => prev.filter((item) => item.id !== itemId));
+      } else {
+        throw new Error(result.error || 'Erreur suppression wishlist');
+      }
+    } catch (error: any) {
       console.error('Erreur suppression wishlist:', error);
-      alert('Une erreur est survenue. Veuillez réessayer.');
+      alert(error.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setRemovingId(null);
     }
@@ -157,18 +150,20 @@ export default function AccountWishlistPage() {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {wishlist.map((item) => (
+              {wishlist.map((item) => {
+                const mainImage = item.product.images?.find(img => img.is_main)?.url || item.product.images?.[0]?.url || '/placeholder-product.svg';
+                return (
                 <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
                   {/* Image */}
-                  <Link href={`/products/${item.product_slug}`} className="block relative aspect-square">
+                  <Link href={`/products/${item.product.slug}`} className="block relative aspect-square">
                     <Image
-                      src={item.product_image}
-                      alt={item.product_name}
+                      src={mainImage}
+                      alt={item.product.name}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
-                    {!item.in_stock && (
+                    {!item.product.in_stock && (
                       <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                         <span className="bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-full">
                           Rupture de stock
@@ -180,14 +175,14 @@ export default function AccountWishlistPage() {
                   {/* Infos */}
                   <div className="p-4">
                     <Link
-                      href={`/products/${item.product_slug}`}
+                      href={`/products/${item.product.slug}`}
                       className="font-semibold text-gray-900 hover:text-primary line-clamp-2 mb-2 block"
                     >
-                      {item.product_name}
+                      {item.product.name}
                     </Link>
 
                     <p className="text-lg font-bold text-primary mb-3">
-                      {formatPrice(item.product_price, item.currency_symbol)}
+                      {formatPrice(item.product.list_price, item.product.currency.symbol)}
                     </p>
 
                     <p className="text-xs text-gray-500 mb-4">
@@ -204,11 +199,11 @@ export default function AccountWishlistPage() {
                       <Button
                         variant="primary"
                         size="sm"
-                        onClick={() => handleAddToCart(item.product_id)}
-                        disabled={!item.in_stock}
+                        onClick={() => handleAddToCart(item.product.id)}
+                        disabled={!item.product.in_stock}
                         className="flex-1 rounded-full"
                       >
-                        {item.in_stock ? 'Ajouter au panier' : 'Indisponible'}
+                        {item.product.in_stock ? 'Ajouter au panier' : 'Indisponible'}
                       </Button>
                       <button
                         onClick={() => handleRemove(item.id)}
@@ -232,7 +227,8 @@ export default function AccountWishlistPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           </div>
         )}

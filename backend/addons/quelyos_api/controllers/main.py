@@ -854,6 +854,92 @@ class QuelyosAPI(http.Controller):
                 'error': str(e)
             }
 
+    # ==================== CUSTOMERS (ADMIN) ====================
+
+    @http.route('/api/ecommerce/customers', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_customers_list(self, **kwargs):
+        """Liste de tous les clients (admin uniquement)"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            params = self._get_params()
+            limit = int(params.get('limit', 20))
+            offset = int(params.get('offset', 0))
+            search = params.get('search', '').strip()
+
+            # Construire le domaine de recherche
+            domain = [('customer_rank', '>', 0)]  # Uniquement les clients
+
+            if search:
+                domain = ['&'] + domain + [
+                    '|', ('name', 'ilike', search),
+                    '|', ('email', 'ilike', search),
+                    ('phone', 'ilike', search)
+                ]
+
+            # Rechercher les clients
+            partners = request.env['res.partner'].sudo().search(
+                domain,
+                limit=limit,
+                offset=offset,
+                order='name asc'
+            )
+
+            total = request.env['res.partner'].sudo().search_count(domain)
+
+            # Récupérer les statistiques pour chaque client
+            data = []
+            for partner in partners:
+                # Compter les commandes
+                orders_count = request.env['sale.order'].sudo().search_count([
+                    ('partner_id', '=', partner.id),
+                    ('state', 'in', ['sale', 'done'])
+                ])
+
+                # Calculer le total dépensé
+                orders = request.env['sale.order'].sudo().search([
+                    ('partner_id', '=', partner.id),
+                    ('state', 'in', ['sale', 'done'])
+                ])
+                total_spent = sum(orders.mapped('amount_total'))
+
+                data.append({
+                    'id': partner.id,
+                    'name': partner.name,
+                    'email': partner.email or '',
+                    'phone': partner.phone or '',
+                    'mobile': partner.mobile or '',
+                    'street': partner.street or '',
+                    'city': partner.city or '',
+                    'zip': partner.zip or '',
+                    'country': partner.country_id.name if partner.country_id else '',
+                    'orders_count': orders_count,
+                    'total_spent': total_spent,
+                    'create_date': partner.create_date.isoformat() if partner.create_date else None,
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'customers': data,
+                    'total': total,
+                    'limit': limit,
+                    'offset': offset,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get customers error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
     # ==================== CART ====================
 
     def _get_or_create_cart(self, partner_id):
@@ -1681,6 +1767,82 @@ class QuelyosAPI(http.Controller):
                 'error': str(e)
             }
 
+    @http.route('/api/ecommerce/stock/products', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_stock_products(self, **kwargs):
+        """Liste de tous les produits avec leur stock (admin uniquement)"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            params = self._get_params()
+            limit = int(params.get('limit', 20))
+            offset = int(params.get('offset', 0))
+            search = params.get('search', '').strip()
+
+            # Construire le domaine de recherche
+            domain = []
+
+            if search:
+                domain = [
+                    '|', ('name', 'ilike', search),
+                    ('default_code', 'ilike', search)  # SKU
+                ]
+
+            # Rechercher les produits
+            products = request.env['product.product'].sudo().search(
+                domain,
+                limit=limit,
+                offset=offset,
+                order='name asc'
+            )
+
+            total = request.env['product.product'].sudo().search_count(domain)
+
+            # Préparer les données
+            data = []
+            for product in products:
+                # Déterminer le statut stock
+                if product.qty_available <= 0:
+                    stock_status = 'out_of_stock'
+                elif product.qty_available < 10:  # Seuil d'alerte
+                    stock_status = 'low_stock'
+                else:
+                    stock_status = 'in_stock'
+
+                data.append({
+                    'id': product.id,
+                    'name': product.name,
+                    'sku': product.default_code or '',
+                    'image': f'/web/image/product.product/{product.id}/image_128',
+                    'qty_available': product.qty_available,
+                    'virtual_available': product.virtual_available,
+                    'incoming_qty': product.incoming_qty,
+                    'outgoing_qty': product.outgoing_qty,
+                    'stock_status': stock_status,
+                    'category': product.categ_id.name if product.categ_id else '',
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'products': data,
+                    'total': total,
+                    'limit': limit,
+                    'offset': offset,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get stock products error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
     # ==================== DELIVERY ====================
 
     @http.route('/api/ecommerce/delivery/methods', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
@@ -2333,6 +2495,118 @@ class QuelyosAPI(http.Controller):
 
         except Exception as e:
             _logger.error(f"Remove coupon error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    # ==================== ANALYTICS ====================
+
+    @http.route('/api/ecommerce/analytics/stats', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_analytics_stats(self, **kwargs):
+        """Statistiques globales (admin uniquement)"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            # Total produits
+            total_products = request.env['product.product'].sudo().search_count([])
+
+            # Total clients
+            total_customers = request.env['res.partner'].sudo().search_count([
+                ('customer_rank', '>', 0)
+            ])
+
+            # Commandes
+            total_orders = request.env['sale.order'].sudo().search_count([])
+            confirmed_orders = request.env['sale.order'].sudo().search_count([
+                ('state', 'in', ['sale', 'done'])
+            ])
+
+            # Chiffre d'affaires total
+            confirmed_orders_obj = request.env['sale.order'].sudo().search([
+                ('state', 'in', ['sale', 'done'])
+            ])
+            total_revenue = sum(confirmed_orders_obj.mapped('amount_total'))
+
+            # Commandes en attente
+            pending_orders = request.env['sale.order'].sudo().search_count([
+                ('state', '=', 'draft')
+            ])
+
+            # Produits en rupture de stock
+            out_of_stock_products = request.env['product.product'].sudo().search_count([
+                ('qty_available', '<=', 0)
+            ])
+
+            # Dernières commandes (5 dernières)
+            recent_orders = request.env['sale.order'].sudo().search(
+                [],
+                limit=5,
+                order='date_order desc'
+            )
+
+            recent_orders_data = [{
+                'id': o.id,
+                'name': o.name,
+                'date_order': o.date_order.isoformat() if o.date_order else None,
+                'state': o.state,
+                'amount_total': o.amount_total,
+                'customer': {
+                    'id': o.partner_id.id,
+                    'name': o.partner_id.name,
+                } if o.partner_id else None,
+            } for o in recent_orders]
+
+            # Top 5 produits les plus vendus
+            order_lines = request.env['sale.order.line'].sudo().search([
+                ('order_id.state', 'in', ['sale', 'done'])
+            ])
+
+            # Compter les ventes par produit
+            product_sales = {}
+            for line in order_lines:
+                product_id = line.product_id.id
+                if product_id not in product_sales:
+                    product_sales[product_id] = {
+                        'id': product_id,
+                        'name': line.product_id.name,
+                        'qty_sold': 0,
+                        'revenue': 0,
+                    }
+                product_sales[product_id]['qty_sold'] += line.product_uom_qty
+                product_sales[product_id]['revenue'] += line.price_total
+
+            # Trier et prendre les 5 meilleurs
+            top_products = sorted(
+                product_sales.values(),
+                key=lambda x: x['qty_sold'],
+                reverse=True
+            )[:5]
+
+            return {
+                'success': True,
+                'data': {
+                    'totals': {
+                        'products': total_products,
+                        'customers': total_customers,
+                        'orders': total_orders,
+                        'confirmed_orders': confirmed_orders,
+                        'pending_orders': pending_orders,
+                        'out_of_stock_products': out_of_stock_products,
+                        'revenue': total_revenue,
+                    },
+                    'recent_orders': recent_orders_data,
+                    'top_products': top_products,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get analytics stats error: {e}")
             return {
                 'success': False,
                 'error': str(e)
