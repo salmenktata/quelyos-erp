@@ -1365,6 +1365,26 @@ class ApiClient {
     }>(`/api/ecommerce/stock/low-stock-alerts`, params)
   }
 
+  async getHighStockAlerts(params?: { limit?: number; offset?: number }) {
+    return this.request<{
+      success: boolean
+      data: {
+        alerts: Array<{
+          id: number
+          name: string
+          sku: string
+          current_stock: number
+          threshold: number
+          diff: number
+          image_url: string | null
+          list_price: number
+          category: string
+        }>
+        total: number
+      }
+    }>(`/api/ecommerce/stock/high-stock-alerts`, params)
+  }
+
 
   // ==================== INVOICES ====================
 
@@ -1460,6 +1480,40 @@ class ApiClient {
     }
 
     return response.blob()
+  }
+
+  // ==================== SUBSCRIPTIONS ====================
+
+  async getSubscriptionPlans() {
+    return this.request<ApiResponse<import('../types').SubscriptionPlan[]>>('/api/ecommerce/subscription/plans')
+  }
+
+  async getCurrentSubscription() {
+    return this.request<ApiResponse<import('../types').Subscription>>('/api/ecommerce/subscription/current')
+  }
+
+  async createSubscription(data: import('../types').SubscriptionCreateData) {
+    return this.request<ApiResponse<import('../types').Subscription>>('/api/ecommerce/subscription/create', data)
+  }
+
+  async upgradeSubscription(planId: number) {
+    return this.request<ApiResponse<{ message: string }>>('/api/ecommerce/subscription/upgrade', { plan_id: planId })
+  }
+
+  async cancelSubscription() {
+    return this.request<ApiResponse<{ message: string }>>('/api/ecommerce/subscription/cancel')
+  }
+
+  async checkQuota(resourceType: 'users' | 'products' | 'orders') {
+    return this.request<ApiResponse<import('../types').SubscriptionUsage>>('/api/ecommerce/subscription/check-quota', { resource_type: resourceType })
+  }
+
+  async getSubscriptions(params?: { limit?: number; offset?: number }) {
+    return this.request<{
+      success: boolean
+      data: import('../types').SubscriptionListItem[]
+      total: number
+    }>('/api/ecommerce/subscription/admin/list', params)
   }
 }
 

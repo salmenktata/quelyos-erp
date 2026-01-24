@@ -1649,12 +1649,12 @@ Cette section documente la **parité fonctionnelle totale** entre Odoo natif et 
 | Stock par produit | Qty disponible/virtuelle/entrant/sortant | ✅ `/products/<id>/stock` | - | ✅ | - | API opérationnel frontend |
 | Stock par emplacement | Répartition par warehouse/location | - | - | 🔴 | P1 | Multi-entrepôts Odoo |
 | Stock par lot/série | Traçabilité lot number / serial | - | - | 🔴 | P2 | Traçabilité avancée |
-| Valorisation stock | Valeur totale (FIFO/Average) | - | - | 🔴 | P2 | Comptabilité stock |
+| Valorisation stock | Valeur totale (FIFO/Average) | ✅ Frontend calc | ✅ Stock.tsx KPIs | ✅ | - | **Sprint 3** : 4 cartes stats temps réel |
 | **Alertes Stock** |||||||
 | Alertes stock bas | Produits sous seuil min | ✅ `/stock/low-stock-alerts` | ✅ Stock.tsx onglet | ✅ | - | **Sprint 1** : Onglet Alertes dédié |
 | Seuil personnalisé | Seuil par produit | ✅ `low_stock_threshold` | ✅ ProductForm | ✅ | - | Champ modèle ajouté |
 | Notifications email auto | Email admins si stock bas | ✅ Cron job | ✅ Backend | ➕ | - | **Amélioration** : `_cron_check_low_stock` |
-| Alertes surstockage | Produits au-dessus seuil max | - | - | 🔴 | P2 | Détection surstock |
+| Alertes surstockage | Produits au-dessus seuil max | ✅ `/high-stock-alerts` | ✅ Stock.tsx section | ✅ | - | **Sprint 3** : Seuil 3x stock bas |
 | Dashboard alertes | Vue résumé total alertes | ✅ Total count | ✅ Badge tabs | ✅ | - | Compteur + pagination |
 | **Ajustements Stock** |||||||
 | Ajuster quantité produit | Modifier stock manuellement | ✅ `/stock/update` | ✅ Stock.tsx inline | ✅ | - | **Sprint 1** : Édition inline avec icônes |
@@ -1666,7 +1666,7 @@ Cette section documente la **parité fonctionnelle totale** entre Odoo natif et 
 | Filtre par produit | Mouvements produit spécifique | ✅ param `product_id` | - | 🟡 | P1 | Backend OK, UI manquante |
 | Filtre par type | Entrant/Sortant/Transfert | - | - | 🔴 | P1 | picking_type_id |
 | Filtre par date | Période personnalisée | - | - | 🔴 | P1 | date_from/date_to |
-| Origine mouvement | Référence commande/picking | ✅ `reference` | - | 🟡 | P2 | Donnée API, UI manquante |
+| Origine mouvement | Référence commande/picking | ✅ `reference` | ✅ StockMove type | ✅ | - | **Sprint 3** : Type complété |
 | **Opérations Picking** |||||||
 | Bons de livraison | Génération picking delivery | - | - | 🔴 | P1 | `stock.picking` OUT |
 | Bons de réception | Génération picking receipt | - | - | 🔴 | P2 | `stock.picking` IN |
@@ -1682,11 +1682,104 @@ Cette section documente la **parité fonctionnelle totale** entre Odoo natif et 
 | Réserver stock | Réservation temporaire cart | - | - | 🔴 | P1 | Éviter survente |
 | Bloquer si rupture | Empêcher ajout si stock=0 | ✅ Frontend | ✅ ProductDetail | ✅ | - | Validation côté client |
 | **Export & Rapports** |||||||
-| Export CSV stock | Extraction état stock | - | - | 🔴 | P1 | Rapport Excel/CSV |
+| Export CSV stock | Extraction état stock | ✅ Frontend export | ✅ Stock.tsx bouton | ✅ | - | **Sprint 3** : CSV UTF-8 BOM Excel |
 | Rapport valorisation | Valeur par catégorie | - | - | 🔴 | P2 | Comptabilité |
 | Rapport mouvements | Export mouvements période | - | - | 🔴 | P2 | Audit trail |
 
-**Score Module Stock** : 14/35 ✅ (40%), 4/35 🟡, 17/35 🔴
+**Score Module Stock** : 17/35 ✅ (49%), 4/35 🟡, 14/35 🔴
+
+---
+
+### Module Abonnements (`subscription`)
+
+**Modèle Odoo** : `subscription` (abonnements clients), `subscription.plan` (plans tarifaires)
+
+| Fonctionnalité Odoo | Description | Backend API | Backoffice | Statut | Priorité | Notes Quelyos |
+|---------------------|-------------|-------------|------------|--------|----------|---------------|
+| **Gestion Plans** |||||||
+| Liste plans actifs | Afficher tous plans disponibles | ✅ `/subscription/plans` | - | ✅ | - | API publique pour frontend pricing |
+| Créer plan | Nouveau plan tarifaire | - | - | 🔴 | P1 | Admin via Odoo uniquement |
+| Modifier plan | Éditer tarifs/limites | - | - | 🔴 | P1 | Admin via Odoo uniquement |
+| Désactiver plan | Retirer plan nouveaux clients | - | - | 🔴 | P2 | Champ `active` |
+| Prix mensuel/annuel | Double tarification | ✅ API retourne | ✅ SubscriptionForm | ✅ | - | Discount 17% annuel |
+| Limites ressources | Max users/products/orders | ✅ Champs plan | ✅ Affichage | ✅ | - | Quotas par plan |
+| Fonctionnalités plan | Liste features JSON | ✅ Features array | ✅ Badges checkmark | ✅ | - | Affichage moderne |
+| Plan populaire | Badge "Le plus populaire" | ✅ `is_popular` | ✅ Badge bleu | ✅ | - | Marketing UI |
+| Niveau support | Email/Chat/Dédié | ✅ `support_level` | ✅ Affichage | ✅ | - | 3 niveaux |
+| Stripe Price IDs | IDs prix Stripe | ✅ Champs | - | ✅ | - | Intégration paiement |
+| **Gestion Abonnements** |||||||
+| Liste abonnements | Vue tous abonnements | ✅ `/subscription/admin/list` | ✅ Subscriptions.tsx | ✅ | - | **Nouvelle interface moderne** |
+| Créer abonnement | Démarrer nouvel abonnement | ✅ `/subscription/create` | ✅ SubscriptionForm | ✅ | - | **Formulaire UX 2026** |
+| Voir détail abonnement | Fiche complète | ✅ Via formulaire Odoo | ✅ Route /subscriptions/:id | ✅ | - | Parité avec vue Odoo |
+| Modifier abonnement | Éditer infos | 🟡 Actions limitées | 🟡 Via API actions | 🟡 | P1 | Actions workflow uniquement |
+| Référence unique | Génération auto SUB-XXX | ✅ `ir.sequence` | ✅ Affichage | ✅ | - | Format standard Odoo |
+| **États & Workflow** |||||||
+| État Trial | Période d'essai 14j | ✅ Création auto | ✅ Badge bleu | ✅ | - | État par défaut |
+| État Active | Abonnement payé actif | ✅ `action_activate` | 🔴 Bouton | 🟡 | P0 | **MANQUANT** : Bouton activer UI |
+| État Past Due | Paiement en retard | ✅ `action_mark_past_due` | 🔴 Bouton | 🟡 | P0 | **MANQUANT** : Bouton retard UI |
+| État Cancelled | Annulé par client | ✅ `/subscription/cancel` | 🔴 Bouton | 🟡 | P0 | **MANQUANT** : Bouton annuler UI |
+| État Expired | Expiré automatiquement | ✅ `action_expire` | 🔴 Bouton | 🟡 | P1 | **MANQUANT** : Bouton expirer UI |
+| Statusbar | Barre progression états | ✅ Vue Odoo | 🔴 Pas d'UI | 🔴 | P1 | **MANQUANT** : Statusbar moderne |
+| Boutons transition | Activer/Annuler/Expirer | ✅ Methods Odoo | 🔴 Pas d'UI | 🔴 | P0 | **BLOQUANT** : Pas d'actions UI |
+| **Dates & Facturation** |||||||
+| Date début | Date souscription | ✅ `start_date` | ✅ Affichage | ✅ | - | Date création |
+| Date fin essai | Fin période trial | ✅ `trial_end_date` | ✅ Affichage | ✅ | - | Auto +14j |
+| Prochaine facture | Date prélèvement | ✅ `next_billing_date` | ✅ Affichage | ✅ | - | Récurrent |
+| Date fin | Date résiliation | ✅ `end_date` | ✅ Affichage | ✅ | - | Si annulé/expiré |
+| Cycle facturation | Mensuel/Annuel | ✅ `billing_cycle` | ✅ Toggle | ✅ | - | Choix création |
+| **Stripe Integration** |||||||
+| Stripe Subscription ID | Lien abonnement Stripe | ✅ Champ | ✅ Read-only | ✅ | - | Sync Stripe |
+| Stripe Customer ID | Lien client Stripe | ✅ Champ | ✅ Read-only | ✅ | - | Sync Stripe |
+| Webhook Stripe | Sync états paiements | - | - | 🔴 | P0 | **CRITIQUE** : Events Stripe |
+| Upgrade plan | Changer vers plan supérieur | ✅ `/subscription/upgrade` | 🔴 Bouton | 🟡 | P0 | **MANQUANT** : Bouton upgrade UI |
+| Calcul prorata | Facturation proportionnelle | - | - | 🔴 | P1 | Upgrade/downgrade |
+| **Utilisation & Quotas** |||||||
+| Compteur utilisateurs | Users actifs actuels | ✅ `current_users_count` | ✅ Barre progression | ✅ | - | Calcul temps réel |
+| Compteur produits | Produits actifs actuels | ✅ `current_products_count` | ✅ Barre progression | ✅ | - | Calcul temps réel |
+| Compteur commandes | Commandes année civile | ✅ `current_orders_count` | ✅ Affichage | ✅ | - | Reset 1er janvier |
+| Max utilisateurs | Limite plan | ✅ Related `plan_id` | ✅ Affichage | ✅ | - | 0 = illimité |
+| Max produits | Limite plan | ✅ Related `plan_id` | ✅ Affichage | ✅ | - | 0 = illimité |
+| Max commandes/an | Limite plan | ✅ Related `plan_id` | ✅ Affichage | ✅ | - | 0 = illimité |
+| Pourcentage utilisation | % quotas | ✅ Computed fields | ✅ Barres colorées | ✅ | - | Vert/Orange/Rouge |
+| Vérifier quota | API check limite | ✅ `/check-quota` | - | ✅ | - | Utilisé avant création |
+| Bloquer si quota atteint | Empêcher dépassement | - | - | 🔴 | P0 | **CRITIQUE** : Validation métier |
+| **Alertes & Notifications** |||||||
+| Alerte 80% quota | Email automatique | ✅ Cron job | - | ✅ | - | `_cron_check_quota_warnings` |
+| Alerte fin essai | Email J-3 trial | ✅ Cron job | - | ✅ | - | `_cron_check_trial_expiry` |
+| Email confirmation | Création abonnement | - | - | 🔴 | P1 | Template email |
+| Email annulation | Confirmation cancel | - | - | 🔴 | P2 | Template email |
+| **Filtres & Recherche** |||||||
+| Recherche texte | Nom/client/plan/email | ✅ Frontend filter | ✅ Barre recherche | ✅ | - | Recherche multi-champs |
+| Filtre par statut | Trial/Active/Past Due... | ✅ Frontend filter | ✅ Dropdown | ✅ | - | 5 statuts |
+| Filtre par cycle | Mensuel/Annuel | ✅ Frontend filter | ✅ Dropdown | ✅ | - | Cycle facturation |
+| Filtre quotas ≥80% | Abonnements limites | 🟡 Vue Odoo filter | 🔴 Pas d'UI | 🟡 | P1 | **MANQUANT** : Filtre alertes |
+| Tri par colonne | Clic header tri asc/desc | ✅ Frontend sort | ✅ Flèches | ✅ | - | Tri multi-colonnes |
+| Groupement | Par client/plan/statut | ✅ Vue Odoo | 🔴 Pas d'UI | 🔴 | P2 | Vue Kanban |
+| **Affichage & UX** |||||||
+| Cards stats | Total/Actifs/Trial/Retard | - | ✅ 4 cartes KPIs | ➕ | - | **Amélioration** : Dashboard moderne |
+| Tableau responsive | Adapté mobile/desktop | - | ✅ Colonnes flex | ➕ | - | **Amélioration** : UX 2026 |
+| Badges colorés états | Vert/Bleu/Orange/Rouge | ✅ Vue Odoo | ✅ Tailwind badges | ✅ | - | Codes couleurs cohérents |
+| Barres progression | Usage quotas visuels | ✅ Vue Odoo widget | ✅ Tailwind progress | ✅ | - | Vert <60%, Orange <80%, Rouge ≥80% |
+| Empty state | Aucun abonnement | - | ✅ Illustration + CTA | ➕ | - | **Amélioration** : UX moderne |
+| Pagination | Navigation pages | ✅ API offset/limit | ✅ Boutons Préc/Suiv | ✅ | - | 20 résultats/page |
+| Skeleton loading | Chargement progressif | - | ✅ SkeletonTable | ➕ | - | **Amélioration** : Performance UX |
+| **Chatter & Activités** |||||||
+| Historique messages | Timeline actions | ✅ `mail.thread` | 🔴 Pas d'UI | 🔴 | P1 | **MANQUANT** : Chatter Quelyos |
+| Activités | Rappels/tâches | ✅ `mail.activity.mixin` | 🔴 Pas d'UI | 🔴 | P2 | **MANQUANT** : Activities UI |
+| Suivi email | Followers abonnement | ✅ `message_follower_ids` | 🔴 Pas d'UI | 🔴 | P2 | **MANQUANT** : Followers UI |
+| **Export & Rapports** |||||||
+| Export CSV | Liste abonnements | - | 🔴 Pas d'UI | 🔴 | P1 | **MANQUANT** : Export fonction |
+| Rapport revenus MRR | Monthly Recurring Revenue | - | 🔴 Pas d'UI | 🔴 | P1 | **MANQUANT** : Analytics |
+| Rapport churn | Taux annulation | - | 🔴 Pas d'UI | 🔴 | P1 | **MANQUANT** : Analytics |
+
+**Score Module Abonnements** : 38/70 ✅ (54%), 7/70 🟡, 25/70 🔴
+
+**Priorités critiques (P0)** :
+1. 🔴 **Boutons actions workflow** (Activer, Annuler, Marquer en retard) - **BLOQUANT**
+2. 🔴 **Webhook Stripe** - Synchronisation états paiements - **CRITIQUE**
+3. 🔴 **Bloquer création si quota atteint** - Validation métier - **CRITIQUE**
+4. 🟡 **Statusbar états** - Visualisation workflow - **IMPORTANT**
+5. 🟡 **Bouton upgrade plan** - Fonctionnalité clé - **IMPORTANT**
 
 **Gaps Critiques (P0)** : 0 - ✅ Tous résolus (Sprint 1 + Sprint 2)
 
@@ -1695,6 +1788,8 @@ Cette section documente la **parité fonctionnelle totale** entre Odoo natif et 
 > **Sprint 1** (2026-01-24) : Refactoring complet Stock.tsx avec architecture onglets (Produits + Alertes), édition inline stock avec icônes check/X, recherche temps réel, pagination. Résolution P0 #1 (interface ajustement stock).
 >
 > **Sprint 2** (2026-01-24) : Création Inventory.tsx avec workflow 4 étapes (Sélection → Comptage → Écarts → Validation), 2 endpoints backend `/inventory/prepare` et `/inventory/validate`, hooks React Query usePrepareInventory/useValidateInventory. Résolution P0 #2 (inventaire physique). Parité augmentée de 31% → 40%.
+>
+> **Sprint 3** (2026-01-24) : Ajout fonctionnalités valorisation et alertes. Export CSV stock complet (bouton téléchargement avec toutes colonnes), alertes surstock (endpoint `/high-stock-alerts` + section dédiée UI), rapport valorisation temps réel (4 cartes KPIs : valeur totale, total unités, moyenne/produit, valeur moyenne). Type StockMove avec champ 'reference' pour traçabilité origine. Parité augmentée de 40% → 49%.
 
 ---
 

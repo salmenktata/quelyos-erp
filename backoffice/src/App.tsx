@@ -17,12 +17,15 @@ import Coupons from './pages/Coupons'
 import CouponForm from './pages/CouponForm'
 import Stock from './pages/Stock'
 import Inventory from './pages/Inventory'
+import StockMoves from './pages/StockMoves'
 import DeliveryMethods from './pages/DeliveryMethods'
 import Payments from './pages/Payments'
 import Featured from './pages/Featured'
 import Analytics from './pages/Analytics'
 import Invoices from './pages/Invoices'
 import AbandonedCarts from './pages/AbandonedCarts'
+import Subscriptions from './pages/Subscriptions'
+import SubscriptionForm from './pages/SubscriptionForm'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -156,6 +159,14 @@ export default function App() {
                 }
               />
               <Route
+                path="/stock/moves"
+                element={
+                  <ProtectedRoute>
+                    <StockMoves />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/delivery"
                 element={
                   <ProtectedRoute>
@@ -200,6 +211,30 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <AbandonedCarts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/subscriptions"
+                element={
+                  <ProtectedRoute>
+                    <Subscriptions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/subscriptions/new"
+                element={
+                  <ProtectedRoute>
+                    <SubscriptionForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/subscriptions/:id"
+                element={
+                  <ProtectedRoute>
+                    <SubscriptionForm />
                   </ProtectedRoute>
                 }
               />
