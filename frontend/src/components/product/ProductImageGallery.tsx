@@ -16,6 +16,30 @@ interface Image {
   is_main?: boolean;
 }
 
+/**
+ * Helper function to proxy Odoo images through Next.js API to avoid CORS issues
+ */
+function getProxiedImageUrl(url: string | undefined): string {
+  if (!url) return '/placeholder-product.svg';
+
+  // Already proxied, return as-is
+  if (url.startsWith('/api/image')) return url;
+
+  // Local public asset (placeholder, etc.), return as-is
+  if (url.startsWith('/') && !url.includes('/web/image')) return url;
+
+  // Proxy Odoo images through our API to avoid CORS issues
+  const isOdooImage = url.includes('/web/image') ||
+                      url.includes('localhost:8069') ||
+                      url.includes('odoo:8069');
+
+  if (isOdooImage) {
+    return `/api/image?url=${encodeURIComponent(url)}`;
+  }
+
+  return url;
+}
+
 interface ProductImageGalleryProps {
   /** Images du produit */
   images: Image[];
@@ -101,7 +125,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
         <AnimatePresence initial={false} custom={direction}>
           <motion.img
             key={selectedIndex}
-            src={currentImage.url}
+            src={getProxiedImageUrl(currentImage.url)}
             alt={currentImage.alt || productName}
             custom={direction}
             variants={carouselItem}
@@ -205,7 +229,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
               aria-label={`Voir l'image ${index + 1}`}
             >
               <img
-                src={image.url}
+                src={getProxiedImageUrl(image.url)}
                 alt={image.alt || `${productName} - Image ${index + 1}`}
                 className="w-full h-full object-cover"
               />
@@ -235,7 +259,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
             </button>
 
             <motion.img
-              src={currentImage.url}
+              src={getProxiedImageUrl(currentImage.url)}
               alt={currentImage.alt || productName}
               className="max-w-full max-h-full object-contain"
               initial={{ scale: 0.8 }}

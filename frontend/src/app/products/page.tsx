@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { odooClient } from '@/lib/odoo/client';
@@ -22,7 +22,29 @@ const RecentlyViewedCarousel = dynamic(
   { ssr: false }
 );
 
-export default function ProductsPage() {
+// Helper function to proxy Odoo images through Next.js API
+function getProxiedImageUrl(url: string | undefined): string {
+  if (!url) return '';
+
+  // If already proxied, return as-is
+  if (url.startsWith('/api/image')) return url;
+
+  // If it's a local public asset (not Odoo), return as-is
+  if (url.startsWith('/') && !url.includes('/web/image')) return url;
+
+  // Proxy Odoo images through our API to avoid CORS issues
+  const isOdooImage = url.includes('/web/image') ||
+                      url.includes('localhost:8069') ||
+                      url.includes('odoo:8069');
+
+  if (isOdooImage) {
+    return `/api/image?url=${encodeURIComponent(url)}`;
+  }
+
+  return url;
+}
+
+function ProductsContent() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -399,14 +421,50 @@ export default function ProductsPage() {
   );
 }
 
+function ProductsLoading() {
+  return (
+    <div className="bg-gray-50 min-h-screen">
+      <div className="container mx-auto px-4 max-w-7xl py-6">
+        <div className="animate-pulse">
+          <div className="h-4 bg-gray-200 rounded w-32 mb-6"></div>
+          <div className="flex gap-6">
+            <aside className="hidden lg:block w-64 flex-shrink-0">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-4">
+                <div className="h-6 bg-gray-200 rounded w-24"></div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+            </aside>
+            <div className="flex-1">
+              <ProductGridSkeleton count={12} viewMode="grid" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<ProductsLoading />}>
+      <ProductsContent />
+    </Suspense>
+  );
+}
+
 // Carte produit style Le Sportif Premium
 function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMode: 'grid' | 'list' }) {
   // State pour le variant sélectionné
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
 
-  // Get main image URL from images array
+  // Get main image URL - prioritize image_url, then images array, and proxy through our API
   const mainImage = product.images?.find(img => img.is_main) || product.images?.[0];
-  const imageUrl = mainImage?.url || '';
+  const rawImageUrl = product.image_url || mainImage?.url || '';
+  const imageUrl = getProxiedImageUrl(rawImageUrl);
 
   // Variant sélectionné ou produit par défaut
   const hasVariants = product.variants && product.variants.length > 0;
@@ -544,8 +602,8 @@ function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMod
             )}
           </div>
 
-          {/* Button Ajouter au panier - Toujours visible sur mobile, hover sur desktop */}
-          <div className="absolute bottom-3 left-3 right-3 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+          {/* Button Ajouter au panier - Uniquement visible au hover sur desktop */}
+          <div className="absolute bottom-3 left-3 right-3 hidden lg:block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <button
               className="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark flex items-center justify-center gap-2 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all"
               disabled={!displayInStock}
