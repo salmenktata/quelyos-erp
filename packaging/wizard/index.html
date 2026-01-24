@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Quelyos ERP - Wizard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="wizard-container">
+        <!-- Header -->
+        <header class="wizard-header">
+            <div class="logo">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="48" height="48" rx="12" fill="#4F46E5"/>
+                    <path d="M24 12L12 20V32L24 40L36 32V20L24 12Z" fill="white"/>
+                    <path d="M24 20V32M18 24L24 20L30 24" stroke="#4F46E5" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <h1>Quelyos ERP</h1>
+            </div>
+            <div class="wizard-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p class="progress-text">Étape <span id="currentStep">1</span> sur <span id="totalSteps">5</span></p>
+            </div>
+        </header>
+
+        <!-- Steps Container -->
+        <main class="wizard-content">
+            <!-- Step 1: Bienvenue -->
+            <div class="step active" id="step1">
+                <h2>👋 Bienvenue dans Quelyos ERP</h2>
+                <p class="step-description">
+                    Configurons votre instance en quelques étapes simples.
+                    Ce wizard vous guidera dans la configuration initiale de votre boutique e-commerce.
+                </p>
+                <div class="welcome-features">
+                    <div class="feature">
+                        <div class="feature-icon">🛍️</div>
+                        <h3>E-commerce Moderne</h3>
+                        <p>Boutique en ligne performante avec Next.js</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📊</div>
+                        <h3>Backoffice Complet</h3>
+                        <p>Gestion produits, commandes, clients</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Prêt en 5 minutes</h3>
+                        <p>Installation clé en main</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Informations Entreprise -->
+            <div class="step" id="step2">
+                <h2>🏢 Informations de votre entreprise</h2>
+                <p class="step-description">Ces informations apparaîtront sur votre boutique</p>
+
+                <div class="form-group">
+                    <label for="companyName">Nom de l'entreprise *</label>
+                    <input type="text" id="companyName" placeholder="Ex: Ma Boutique" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="companyEmail">Email de contact *</label>
+                    <input type="email" id="companyEmail" placeholder="contact@maboutique.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="companyPhone">Téléphone</label>
+                    <input type="tel" id="companyPhone" placeholder="+33 1 23 45 67 89">
+                </div>
+
+                <div class="form-group">
+                    <label for="companyAddress">Adresse</label>
+                    <textarea id="companyAddress" rows="3" placeholder="123 Rue de la Boutique&#10;75001 Paris, France"></textarea>
+                </div>
+            </div>
+
+            <!-- Step 3: Compte Administrateur -->
+            <div class="step" id="step3">
+                <h2>👤 Compte administrateur</h2>
+                <p class="step-description">Créez votre compte pour accéder au backoffice</p>
+
+                <div class="form-group">
+                    <label for="adminName">Nom complet *</label>
+                    <input type="text" id="adminName" placeholder="Jean Dupont" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="adminEmail">Email *</label>
+                    <input type="email" id="adminEmail" placeholder="admin@maboutique.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword">Mot de passe *</label>
+                    <input type="password" id="adminPassword" placeholder="Minimum 8 caractères" required>
+                    <div class="password-strength" id="passwordStrength"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPasswordConfirm">Confirmer le mot de passe *</label>
+                    <input type="password" id="adminPasswordConfirm" placeholder="Retapez votre mot de passe" required>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+            </div>
+
+            <!-- Step 4: Configuration Email -->
+            <div class="step" id="step4">
+                <h2>📧 Configuration Email (SMTP)</h2>
+                <p class="step-description">Optionnel - Configurez l'envoi d'emails pour les notifications</p>
+
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="enableSmtp">
+                        <span>Activer l'envoi d'emails</span>
+                    </label>
+                </div>
+
+                <div id="smtpConfig" class="hidden">
+                    <div class="form-group">
+                        <label for="smtpHost">Serveur SMTP</label>
+                        <input type="text" id="smtpHost" placeholder="smtp.gmail.com">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="smtpPort">Port</label>
+                            <input type="number" id="smtpPort" placeholder="587" value="587">
+                        </div>
+                        <div class="form-group">
+                            <label for="smtpEncryption">Chiffrement</label>
+                            <select id="smtpEncryption">
+                                <option value="tls">TLS</option>
+                                <option value="ssl">SSL</option>
+                                <option value="none">Aucun</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="smtpUser">Utilisateur</label>
+                        <input type="text" id="smtpUser" placeholder="noreply@maboutique.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="smtpPassword">Mot de passe</label>
+                        <input type="password" id="smtpPassword" placeholder="Mot de passe SMTP">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Finalisation -->
+            <div class="step" id="step5">
+                <h2>✅ Récapitulatif</h2>
+                <p class="step-description">Vérifiez vos informations avant de lancer la configuration</p>
+
+                <div class="summary-card">
+                    <h3>🏢 Entreprise</h3>
+                    <div class="summary-item">
+                        <span class="label">Nom:</span>
+                        <span class="value" id="summaryCompanyName"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Email:</span>
+                        <span class="value" id="summaryCompanyEmail"></span>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>👤 Administrateur</h3>
+                    <div class="summary-item">
+                        <span class="label">Nom:</span>
+                        <span class="value" id="summaryAdminName"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Email:</span>
+                        <span class="value" id="summaryAdminEmail"></span>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h3>📧 Email</h3>
+                    <div class="summary-item">
+                        <span class="label">SMTP:</span>
+                        <span class="value" id="summarySmtp"></span>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>Note:</strong> La configuration prendra environ 2-3 minutes.
+                    Vous pourrez modifier ces paramètres ultérieurement dans le backoffice.
+                </div>
+            </div>
+
+            <!-- Step 6: Chargement -->
+            <div class="step" id="step6">
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <h2>⚙️ Configuration en cours...</h2>
+                    <p class="loading-message" id="loadingMessage">Initialisation de la base de données...</p>
+                    <div class="loading-progress">
+                        <div class="loading-bar" id="loadingBar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 7: Succès -->
+            <div class="step" id="step7">
+                <div class="success-container">
+                    <div class="success-icon">✅</div>
+                    <h2>Félicitations ! 🎉</h2>
+                    <p class="step-description">Votre instance Quelyos ERP est prête à l'emploi</p>
+
+                    <div class="access-links">
+                        <a href="/" class="btn btn-primary btn-large">
+                            🛍️ Accéder à la boutique
+                        </a>
+                        <a href="/admin" class="btn btn-secondary btn-large">
+                            📊 Accéder au backoffice
+                        </a>
+                    </div>
+
+                    <div class="credentials-card">
+                        <h3>🔑 Vos identifiants administrateur</h3>
+                        <div class="credential-item">
+                            <strong>Email:</strong> <span id="finalAdminEmail"></span>
+                        </div>
+                        <div class="credential-item">
+                            <strong>Mot de passe:</strong> <span>••••••••</span>
+                        </div>
+                        <p class="credential-note">⚠️ Conservez ces informations en lieu sûr</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Navigation -->
+        <footer class="wizard-footer">
+            <button class="btn btn-secondary" id="btnPrev" disabled>← Précédent</button>
+            <button class="btn btn-primary" id="btnNext">Suivant →</button>
+            <button class="btn btn-primary hidden" id="btnFinish">Lancer la configuration</button>
+        </footer>
+    </div>
+
+    <script src="wizard.js"></script>
+</body>
+</html>
