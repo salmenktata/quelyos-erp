@@ -156,13 +156,14 @@ export default function Subscriptions() {
   return (
     <Layout>
       <div className="p-4 md:p-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs
-          items={[{ label: 'Tableau de bord', href: '/dashboard' }, { label: 'Abonnements' }]}
-        />
+        <div className="max-w-7xl mx-auto">
+          {/* Breadcrumbs */}
+          <Breadcrumbs
+            items={[{ label: 'Tableau de bord', href: '/dashboard' }, { label: 'Abonnements' }]}
+          />
 
-        {/* Header */}
-        <div className="mb-6 md:mb-8">
+          {/* Header */}
+          <div className="mb-6 md:mb-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
@@ -485,6 +486,7 @@ export default function Subscriptions() {
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
     </Layout>
