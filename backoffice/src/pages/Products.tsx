@@ -3,11 +3,17 @@ import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useProducts, useDeleteProduct } from '../hooks/useProducts'
 import { useCategories } from '../hooks/useCategories'
+import { Button, Badge, Modal, Breadcrumbs, SkeletonTable } from '../components/common'
+import { useToast } from '../hooks/useToast'
+import { ToastContainer } from '../components/common/Toast'
 
 export default function Products() {
   const [page, setPage] = useState(0)
   const [categoryFilter, setCategoryFilter] = useState<number | undefined>()
+  const [deleteModal, setDeleteModal] = useState<{ id: number; name: string } | null>(null)
   const limit = 20
+
+  const toast = useToast()
 
   const { data: productsData, isLoading, error } = useProducts({
     limit,
@@ -24,19 +30,29 @@ export default function Products() {
 
   const categories = categoriesData?.data?.categories || []
 
-  const handleDelete = async (id: number, name: string) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le produit "${name}" ?`)) {
-      try {
-        await deleteProductMutation.mutateAsync(id)
-      } catch (error) {
-        alert('Erreur lors de la suppression du produit')
-      }
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal) return
+
+    try {
+      await deleteProductMutation.mutateAsync(deleteModal.id)
+      toast.success(`Le produit "${deleteModal.name}" a été supprimé avec succès`)
+      setDeleteModal(null)
+    } catch (error) {
+      toast.error('Erreur lors de la suppression du produit')
     }
   }
 
   return (
     <Layout>
       <div className="p-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Produits' },
+          ]}
+        />
+
         {/* En-tête */}
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -45,14 +61,22 @@ export default function Products() {
               {total} produit{total > 1 ? 's' : ''} au total
             </p>
           </div>
-          <Link
-            to="/products/create"
-            className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Nouveau produit
+          <Link to="/products/create">
+            <Button
+              variant="primary"
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              }
+            >
+              Nouveau produit
+            </Button>
           </Link>
         </div>
 
@@ -60,7 +84,10 @@ export default function Products() {
         <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <div className="flex items-center gap-4">
             <div className="flex-1">
-              <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="category-filter"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Filtrer par catégorie
               </label>
               <select
@@ -81,15 +108,17 @@ export default function Products() {
               </select>
             </div>
             {categoryFilter && (
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => {
                   setCategoryFilter(undefined)
                   setPage(0)
                 }}
-                className="mt-7 text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm font-medium"
+                className="mt-7"
               >
                 Réinitialiser
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -97,13 +126,12 @@ export default function Products() {
         {/* Tableau */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {isLoading ? (
-            <div className="p-8 text-center">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-400">Chargement des produits...</p>
-            </div>
+            <SkeletonTable rows={5} columns={4} />
           ) : error ? (
             <div className="p-8 text-center">
-              <p className="text-red-600">Erreur lors du chargement des produits</p>
+              <p className="text-red-600 dark:text-red-400">
+                Erreur lors du chargement des produits
+              </p>
             </div>
           ) : products.length === 0 ? (
             <div className="p-8 text-center">
@@ -126,11 +154,8 @@ export default function Products() {
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 Commencez par créer votre premier produit
               </p>
-              <Link
-                to="/products/create"
-                className="inline-block bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
-              >
-                Créer un produit
+              <Link to="/products/create">
+                <Button variant="primary">Créer un produit</Button>
               </Link>
             </div>
           ) : (
@@ -155,7 +180,10 @@ export default function Products() {
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                     {products.map((product) => (
-                      <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                      <tr
+                        key={product.id}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="h-10 w-10 flex-shrink-0">
@@ -167,44 +195,62 @@ export default function Products() {
                                 />
                               ) : (
                                 <div className="h-10 w-10 rounded bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  <svg
+                                    className="w-6 h-6 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    />
                                   </svg>
                                 </div>
                               )}
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white">{product.name}</div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">{product.slug}</div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                {product.name}
+                              </div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                {product.slug}
+                              </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {product.category ? (
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300">
-                              {product.category.name}
-                            </span>
+                            <Badge variant="info">{product.category.name}</Badge>
                           ) : (
-                            <span className="text-sm text-gray-400 dark:text-gray-500">Sans catégorie</span>
+                            <span className="text-sm text-gray-400 dark:text-gray-500">
+                              Sans catégorie
+                            </span>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                           {product.price.toFixed(2)} €
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <Link
-                            to={`/products/${product.id}/edit`}
-                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-4"
-                          >
-                            Modifier
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(product.id, product.name)}
-                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                            disabled={deleteProductMutation.isPending}
-                          >
-                            Supprimer
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <Link to={`/products/${product.id}/edit`}>
+                              <Button variant="ghost" size="sm">
+                                Modifier
+                              </Button>
+                            </Link>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() =>
+                                setDeleteModal({ id: product.id, name: product.name })
+                              }
+                              disabled={deleteProductMutation.isPending}
+                            >
+                              Supprimer
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -220,26 +266,44 @@ export default function Products() {
                     <span className="font-medium">{totalPages}</span>
                   </div>
                   <div className="flex gap-2">
-                    <button
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => setPage(Math.max(0, page - 1))}
                       disabled={page === 0}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Précédent
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
                       disabled={page >= totalPages - 1}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Suivant
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
             </>
           )}
         </div>
+
+        {/* Modal de confirmation de suppression */}
+        <Modal
+          isOpen={!!deleteModal}
+          onClose={() => setDeleteModal(null)}
+          onConfirm={handleDeleteConfirm}
+          title="Supprimer le produit"
+          description={`Êtes-vous sûr de vouloir supprimer le produit "${deleteModal?.name}" ? Cette action est irréversible.`}
+          confirmText="Supprimer"
+          cancelText="Annuler"
+          variant="danger"
+          loading={deleteProductMutation.isPending}
+        />
+
+        {/* ToastContainer */}
+        <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} position="top-right" />
       </div>
     </Layout>
   )

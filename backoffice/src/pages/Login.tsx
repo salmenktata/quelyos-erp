@@ -1,16 +1,33 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { api } from '../lib/api'
 
 export default function Login() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implémenter l'authentification avec l'API Odoo
-    console.log('Login attempt:', { email, password })
-    navigate('/dashboard')
+    setError('')
+    setLoading(true)
+
+    try {
+      const result = await api.login(email, password)
+
+      if (result.success) {
+        navigate('/dashboard')
+      } else {
+        setError(result.error || 'Échec de la connexion')
+      }
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('Erreur de connexion. Vérifiez vos identifiants.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -23,6 +40,12 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email
@@ -33,7 +56,8 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition"
+                disabled={loading}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="admin@quelyos.com"
               />
             </div>
@@ -48,7 +72,8 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition"
+                disabled={loading}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="••••••••"
               />
             </div>
@@ -68,15 +93,29 @@ export default function Login() {
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors font-medium"
+              disabled={loading}
+              className="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              Se connecter
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Connexion en cours...
+                </>
+              ) : (
+                'Se connecter'
+              )}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Version 0.0.1 - En développement
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+              Identifiants par défaut : admin@quelyos.com
             </p>
           </div>
         </div>

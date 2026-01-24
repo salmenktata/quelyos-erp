@@ -138,3 +138,8 @@ monitoring/grafana/data/
 monitoring/prometheus/data/
 monitoring/loki/data/
 monitoring/alertmanager/data/
+
+# Build artifacts
+backoffice/tsconfig*.tsbuildinfo
+backoffice/vite.config.js
+backoffice/vite.config.d.ts
