@@ -55,12 +55,12 @@ nginx/             → Config production
 
 | Métrique | Valeur | Évolution |
 |----------|--------|-----------|
-| Parité fonctionnelle Odoo | **~82%** | ⬆️ +34% (vs audit précédent à 48%) |
-| Endpoints API Backend | **98** | ⬆️ +51 (vs 47 documentés) |
-| Pages Backoffice | **16** | ⬆️ +1 (toutes opérationnelles) |
+| Parité fonctionnelle Odoo | **~85%** | ⬆️ +3% (vs 82% avant Sprint 1) |
+| Endpoints API Backend | **102** | ⬆️ +4 (Analytics charts) |
+| Pages Backoffice | **17** | ⬆️ +1 (Invoices.tsx) |
 | Pages Frontend | **33+** | ⬆️ +19 (boutique + espace client complets) |
 | Gaps P0 (Bloquants) | **0** | ✅ TOUS RÉSOLUS |
-| Gaps P1 (Importants) | **10** | ⬇️ Majorité résolue |
+| Gaps P1 (Importants) | **8** | ⬇️ -2 (Factures + Analytics résolus) |
 | Composants UI modernes | **17** | Mode sombre, WCAG 2.1 AA |
 | Hooks React Query | **16** | State management optimisé |
 
@@ -90,17 +90,17 @@ Parité     Packaging  Légal          Commercial  Lancement
 |--------|-------------|--------|---------------|
 | **Produits** | **100%** ✅ | ✅ COMPLÉTÉ | 0 P0, 0 P1, 7 P2 optionnels |
 | **Catégories** | **95%** ✅ | ✅ COMPLÉTÉ | 0 P0, 0 P1 |
+| **Analytics** | **95%** ✅ | ✅ COMPLÉTÉ | 0 P0, 0 P1 (graphiques Recharts) |
 | **Coupons** | **95%** ✅ | ✅ COMPLÉTÉ | 0 P0, 0 P1 |
 | **Livraison** | **90%** ✅ | ✅ COMPLÉTÉ | 0 P0, 0 P1 |
 | **Panier** | **90%** ✅ | 🟡 1 P1 (panier abandonné) | |
+| **Factures** | **85%** ✅ | ✅ COMPLÉTÉ | 0 P0, 0 P1 (UI backoffice) |
 | **Clients** | **85%** | 🟡 1 P1 (export CSV) | |
 | **Stock** | **85%** | 🟡 1 P1 (alertes auto) | |
 | **Commandes** | **75%** | 🟡 3 P1 (bon livraison, tracking, historique) | |
-| **Analytics** | **70%** | 🟡 1 P1 (graphiques temporels) | |
 | **Paiement** | **65%** | 🟡 2 P1 (Stripe Elements, remboursements UI) | |
-| **Factures** | **40%** | 🔴 1 P1 (UI backoffice manquante) | Backend 100% prêt |
 
-**Score global** : **82%** (vs 48% début de journée)
+**Score global** : **85%** (vs 82% avant Sprint 1, +3%)
 **Production-ready** : ✅ Oui pour e-commerce complet (tous gaps P0 résolus)
 
 ### Phase 2 : Packaging Produit (3-4 semaines)

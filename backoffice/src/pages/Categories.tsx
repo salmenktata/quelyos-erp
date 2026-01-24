@@ -21,7 +21,24 @@ import { useToast } from '../hooks/useToast'
 import { ToastContainer } from '../components/common/Toast'
 import { Category } from '../types'
 
-// Debounce hook
+/**
+ * Hook personnalisé pour débouncer une valeur
+ *
+ * Retarde la mise à jour d'une valeur jusqu'à ce qu'un délai se soit écoulé
+ * sans changement. Utile pour optimiser les recherches en temps réel.
+ *
+ * @template T - Type de la valeur à débouncer
+ * @param {T} value - La valeur à débouncer
+ * @param {number} delay - Délai en millisecondes avant mise à jour (ex: 300)
+ * @returns {T} La valeur débouncée, mise à jour après le délai
+ *
+ * @example
+ * ```tsx
+ * const [search, setSearch] = useState('')
+ * const debouncedSearch = useDebounce(search, 300)
+ * // debouncedSearch se met à jour 300ms après le dernier changement de search
+ * ```
+ */
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState(value)
 
@@ -255,7 +272,7 @@ export default function Categories() {
 
   return (
     <Layout>
-      <div className="p-8">
+      <main role="main" className="p-8">
         {/* Breadcrumbs */}
         <Breadcrumbs
           items={[
@@ -289,7 +306,7 @@ export default function Categories() {
         </div>
 
         {/* Statistiques */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <section aria-label="Statistiques des catégories" className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="text-2xl font-bold text-gray-900 dark:text-white">
               {stats.totalCategories}
@@ -322,10 +339,10 @@ export default function Categories() {
               Catégories vides
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Barre de recherche et contrôles */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+        <section aria-label="Gestion des catégories" className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
           <div className="p-4 flex flex-col sm:flex-row gap-4 items-center justify-between border-b border-gray-200 dark:border-gray-700">
             {/* Recherche */}
             <div className="relative w-full sm:w-80">
@@ -412,7 +429,7 @@ export default function Categories() {
           {isLoading ? (
             <SkeletonTable rows={8} columns={4} />
           ) : error ? (
-            <div className="p-8 text-center text-red-600 dark:text-red-400">
+            <div className="p-8 text-center text-red-600 dark:text-red-400 animate-fadeIn">
               <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
@@ -428,7 +445,7 @@ export default function Categories() {
             />
           ) : (
             /* Vue liste simple */
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="divide-y divide-gray-200 dark:divide-gray-700 animate-fadeIn">
               {displayCategories.length === 0 ? (
                 <div className="p-8 text-center">
                   <svg
@@ -515,7 +532,7 @@ export default function Categories() {
               Glissez-déposez les catégories pour réorganiser la hiérarchie
             </div>
           )}
-        </div>
+        </section>
 
         {/* Modal de création/édition */}
         <Modal
@@ -631,7 +648,7 @@ export default function Categories() {
 
         {/* ToastContainer */}
         <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} position="top-right" />
-      </div>
+      </main>
     </Layout>
   )
 }
