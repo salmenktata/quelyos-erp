@@ -1,0 +1,80 @@
+Quelyos ERP - Licence Mixte
+================================
+
+Copyright (c) 2026 Quelyos. Tous droits réservés.
+
+Le code source de ce projet est divisé en deux parties avec des licences différentes :
+
+## 1. Code Propriétaire (Frontend et Backoffice)
+
+Les répertoires suivants sont sous licence propriétaire :
+- frontend/ (Application e-commerce Next.js)
+- backoffice/ (Application d'administration React)
+
+### Conditions d'utilisation :
+
+Tous droits réservés. Ce logiciel et le code source associé sont la propriété
+exclusive de Quelyos.
+
+Toute utilisation, reproduction, distribution, modification, ou création d'œuvre
+dérivée sans autorisation écrite préalable de Quelyos est strictement interdite.
+
+Pour toute demande de licence commerciale ou d'utilisation, veuillez contacter :
+contact@quelyos.com
+
+
+## 2. Code Open Source (Module API Odoo)
+
+Le répertoire suivant est sous licence LGPL v3 :
+- backend/addons/quelyos_api/ (Module API REST pour Odoo)
+
+Ce module est distribué sous GNU Lesser General Public License v3 (LGPL v3)
+en conformité avec Odoo Community Edition.
+
+Voir le fichier backend/addons/quelyos_api/LICENSE pour les détails complets.
+
+
+## 3. Odoo Community Edition
+
+Le framework Odoo (backend/odoo/) est distribué par Odoo S.A. sous licence
+LGPL v3. Quelyos ne revendique aucun droit sur le code d'Odoo Community Edition.
+
+Pour plus d'informations : https://github.com/odoo/odoo/blob/19.0/LICENSE
+
+
+## 4. Bibliothèques Tierces
+
+Ce projet utilise diverses bibliothèques open-source tierces, chacune sous
+sa propre licence. Consultez le fichier ATTRIBUTIONS.md pour la liste complète
+des dépendances et leurs licences respectives.
+
+
+## 5. Utilisation Commerciale
+
+Quelyos ERP peut être utilisé commercialement uniquement avec l'une des options
+suivantes :
+
+1. **Quelyos Cloud (SaaS)** : Abonnement sur quelyos.com
+2. **Licence On-Premise** : Licence commerciale dédiée (nous contacter)
+3. **Édition Community** : Module quelyos_api utilisable librement sous LGPL v3
+   (nécessite développement Frontend/Backoffice propre)
+
+
+## 6. Garanties et Responsabilité
+
+CE LOGICIEL EST FOURNI "TEL QUEL", SANS GARANTIE D'AUCUNE SORTE, EXPRESSE OU
+IMPLICITE, Y COMPRIS, MAIS SANS S'Y LIMITER, LES GARANTIES DE QUALITÉ MARCHANDE,
+D'ADAPTATION À UN USAGE PARTICULIER ET D'ABSENCE DE CONTREFAÇON.
+
+EN AUCUN CAS LES AUTEURS OU TITULAIRES DU COPYRIGHT NE POURRONT ÊTRE TENUS
+RESPONSABLES DE TOUTE RÉCLAMATION, DOMMAGES OU AUTRE RESPONSABILITÉ, QUE CE SOIT
+DANS LE CADRE D'UN CONTRAT, D'UN DÉLIT OU AUTRE, RÉSULTANT DE, OU EN RELATION
+AVEC LE LOGICIEL OU SON UTILISATION.
+
+
+## 7. Contact
+
+Pour toute question concernant les licences :
+- Email : legal@quelyos.com
+- Site web : https://quelyos.com
+- Adresse : [À compléter lors de l'immatriculation]

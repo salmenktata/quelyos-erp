@@ -1,0 +1,118 @@
+GNU LESSER GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+
+Copyright (c) 2026 Quelyos
+Copyright (c) 2004-2024 Odoo S.A.
+
+Ce module Odoo est distribué sous licence GNU Lesser General Public License v3
+(LGPL v3) en conformité avec Odoo Community Edition.
+
+
+========================================
+MODULE QUELYOS API - INFORMATIONS
+========================================
+
+Nom du module : quelyos_api
+Version : 19.0.1.0.0
+Auteur : Quelyos
+Mainteneur : Quelyos <support@quelyos.com>
+Site web : https://quelyos.com
+
+Ce module fournit une API REST JSON-RPC pour Odoo 19 Community Edition,
+permettant une intégration avec des frontends e-commerce modernes.
+
+
+========================================
+LICENCE COMPLÈTE LGPL v3
+========================================
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
+
+
+========================================
+UTILISATION AVEC CODE PROPRIÉTAIRE
+========================================
+
+Conformément à la LGPL v3, ce module peut être utilisé avec du code propriétaire
+via des appels API (sans linkage dynamique). C'est exactement ce que fait Quelyos :
+
+- Le module quelyos_api (ce module) : LGPL v3
+- Le frontend Next.js : Licence propriétaire (communication via API REST)
+- Le backoffice React : Licence propriétaire (communication via API REST)
+
+Cette architecture est explicitement autorisée par la LGPL v3.
+
+
+========================================
+CODE SOURCE ET MODIFICATIONS
+========================================
+
+Le code source de ce module est disponible sur :
+https://github.com/quelyos/quelyos-api
+
+Si vous modifiez ce module et distribuez une version modifiée, vous devez :
+1. Publier le code source modifié sous LGPL v3
+2. Documenter clairement les modifications effectuées
+3. Conserver les mentions de copyright originales
+
+
+========================================
+DÉPENDANCES ODOO
+========================================
+
+Ce module dépend de modules Odoo Community Edition suivants (tous LGPL v3) :
+- base
+- product
+- sale_management
+- stock
+- delivery
+- payment
+- loyalty (pour coupons/promotions)
+
+Pour plus d'informations sur Odoo Community Edition :
+https://github.com/odoo/odoo/tree/19.0
+
+
+========================================
+CONTACT
+========================================
+
+Pour toute question concernant ce module ou sa licence :
+- Email : support@quelyos.com
+- GitHub Issues : https://github.com/quelyos/quelyos-api/issues
+- Documentation : https://docs.quelyos.com
+
+
+========================================
+TEXTE COMPLET DE LA LGPL v3
+========================================
+
+GNU LESSER GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+
+Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+
+This version of the GNU Lesser General Public License incorporates
+the terms and conditions of version 3 of the GNU General Public
+License, supplemented by the additional permissions listed below.
+
+[Le texte complet de la LGPL v3 est disponible sur :]
+https://www.gnu.org/licenses/lgpl-3.0.html
+https://www.gnu.org/licenses/lgpl-3.0.txt
+
+Pour des raisons de lisibilité, seul le lien est fourni ici.
+Une copie complète doit être consultée sur le site officiel GNU.

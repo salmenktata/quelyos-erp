@@ -1,0 +1,113 @@
+Quelyos ERP - Frontend E-commerce
+Licence Propriétaire
+
+Copyright (c) 2026 Quelyos. Tous droits réservés.
+
+========================================
+PROPRIÉTÉ INTELLECTUELLE
+========================================
+
+Ce logiciel (frontend e-commerce Next.js de Quelyos ERP) et le code source
+associé sont la propriété exclusive de Quelyos.
+
+Tous les droits de propriété intellectuelle, y compris mais sans s'y limiter,
+les droits d'auteur, les marques déposées, les brevets et les secrets commerciaux,
+sont et resteront la propriété de Quelyos.
+
+
+========================================
+RESTRICTIONS D'UTILISATION
+========================================
+
+Sans autorisation écrite préalable de Quelyos, vous n'êtes PAS autorisé à :
+
+1. Utiliser ce logiciel à des fins commerciales ou non commerciales
+2. Reproduire, copier ou dupliquer ce logiciel
+3. Modifier, adapter ou créer des œuvres dérivées
+4. Distribuer, vendre, louer, prêter ou transférer ce logiciel
+5. Décompiler, désassembler ou procéder à l'ingénierie inverse
+6. Retirer ou modifier toute mention de copyright ou de propriété
+7. Utiliser ce code source pour créer des produits concurrents
+
+
+========================================
+UTILISATION AUTORISÉE
+========================================
+
+Les seules utilisations autorisées de ce logiciel sont :
+
+1. **Quelyos Cloud (SaaS)** : Utilisation via abonnement sur quelyos.com
+2. **Licence On-Premise** : Avec licence commerciale dédiée (nous contacter)
+3. **Évaluation** : Période d'essai gratuite de 14 jours sur quelyos.com
+4. **Développement** : Uniquement pour les employés et contractants de Quelyos
+
+
+========================================
+SANCTIONS
+========================================
+
+Toute violation de cette licence peut entraîner :
+- Résiliation immédiate de tout droit d'utilisation
+- Poursuites judiciaires civiles et pénales
+- Demande de dommages et intérêts
+
+
+========================================
+GARANTIES ET RESPONSABILITÉ
+========================================
+
+CE LOGICIEL EST FOURNI "TEL QUEL", SANS GARANTIE D'AUCUNE SORTE, EXPRESSE
+OU IMPLICITE, Y COMPRIS, MAIS SANS S'Y LIMITER :
+
+- Garantie de qualité marchande
+- Garantie d'adaptation à un usage particulier
+- Garantie d'absence de contrefaçon
+- Garantie de disponibilité ou de performance
+
+EN AUCUN CAS QUELYOS OU SES FOURNISSEURS NE POURRONT ÊTRE TENUS RESPONSABLES
+DE TOUT DOMMAGE (Y COMPRIS, SANS S'Y LIMITER, LES DOMMAGES POUR PERTE DE
+BÉNÉFICES, INTERRUPTION D'ACTIVITÉ, PERTE D'INFORMATIONS) RÉSULTANT DE
+L'UTILISATION OU DE L'IMPOSSIBILITÉ D'UTILISER CE LOGICIEL.
+
+
+========================================
+LOI APPLICABLE ET JURIDICTION
+========================================
+
+Cette licence est régie par le droit français.
+
+Tout litige relatif à l'interprétation ou à l'exécution de cette licence
+sera soumis à la compétence exclusive des tribunaux de [Ville, France].
+
+
+========================================
+DEMANDE DE LICENCE
+========================================
+
+Pour obtenir une licence d'utilisation commerciale, veuillez contacter :
+
+Quelyos
+Email : sales@quelyos.com
+Site web : https://quelyos.com/pricing
+Téléphone : [À compléter]
+
+Nous proposons des licences flexibles adaptées à vos besoins :
+- Licence SaaS (multi-tenant)
+- Licence On-Premise (serveur dédié)
+- Licence OEM (revendeurs)
+- Licence Entreprise (personnalisations)
+
+
+========================================
+INFORMATIONS COMPLÉMENTAIRES
+========================================
+
+Nom du produit : Quelyos ERP - Frontend E-commerce
+Version : 1.0.0
+Technologies : Next.js 16, React 19, TypeScript, Tailwind CSS
+Date de publication : 2026-01-24
+
+Pour plus d'informations :
+- Documentation : https://docs.quelyos.com
+- Support : https://support.quelyos.com
+- Site web : https://quelyos.com
