@@ -119,3 +119,14 @@ credentials/
 # ===========================================
 a/
 backups/
+
+# ===========================================
+# Production
+# ===========================================
+.env.production
+nginx/ssl/
+nginx/certbot/
+odoo_logs/
+backoffice/dist/
+*.sql
+*.sql.gz

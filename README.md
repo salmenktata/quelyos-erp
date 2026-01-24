@@ -65,6 +65,93 @@ cd backoffice && npm install && npm run dev
 
 ---
 
+## Déploiement Production
+
+### Prérequis
+
+- Serveur Linux (Ubuntu 22.04 recommandé)
+- Docker et Docker Compose installés
+- Nom de domaine pointant vers le serveur
+- Ports 80 et 443 ouverts
+
+### Étapes de déploiement
+
+```bash
+# 1. Cloner le projet
+git clone https://github.com/votre-compte/QuelyosERP.git
+cd QuelyosERP
+
+# 2. Configurer les variables d'environnement
+cp .env.production.example .env.production
+nano .env.production  # Remplir les valeurs
+
+# 3. Déployer l'application
+./deploy.sh
+
+# 4. Configurer SSL (Let's Encrypt)
+./ssl-init.sh
+
+# 5. Vérifier que tout fonctionne
+docker-compose -f docker-compose.prod.yml ps
+docker-compose -f docker-compose.prod.yml logs -f
+```
+
+### Scripts de gestion
+
+| Script | Description |
+|--------|-------------|
+| `./deploy.sh` | Déploie l'application (build + start) |
+| `./ssl-init.sh` | Configure les certificats SSL |
+| `./backup.sh` | Sauvegarde la base de données |
+
+### Commandes utiles
+
+```bash
+# Voir les logs
+docker-compose -f docker-compose.prod.yml logs -f
+
+# Redémarrer un service
+docker-compose -f docker-compose.prod.yml restart frontend
+
+# Arrêter l'application
+docker-compose -f docker-compose.prod.yml down
+
+# Mise à jour (après un git pull)
+docker-compose -f docker-compose.prod.yml build
+docker-compose -f docker-compose.prod.yml up -d
+
+# Backup manuel
+./backup.sh
+
+# Restaurer un backup
+gunzip < backups/quelyos_backup_YYYYMMDD_HHMMSS.sql.gz | \
+  docker exec -i quelyos-db-prod psql -U odoo quelyos_prod
+```
+
+### Monitoring
+
+Vérifier la santé des services :
+
+```bash
+# Status global
+docker-compose -f docker-compose.prod.yml ps
+
+# Healthcheck manuel
+curl https://votre-domaine.com/health
+```
+
+### Backup automatique
+
+Ajouter au crontab pour backup quotidien à 2h du matin :
+
+```bash
+crontab -e
+# Ajouter :
+0 2 * * * cd /path/to/QuelyosERP && ./backup.sh >> /var/log/quelyos-backup.log 2>&1
+```
+
+---
+
 ## Plan de développement
 
 ### Phase 1 : E-commerce + Produits

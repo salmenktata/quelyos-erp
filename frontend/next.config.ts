@@ -49,6 +49,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true, // Compression gzip
+  output: 'standalone', // Build autonome pour Docker
 
   // Compiler options
   compiler: {
