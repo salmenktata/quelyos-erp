@@ -22,7 +22,7 @@ export function DarkModeDebug() {
     return () => observer.disconnect()
   }, [])
 
-  if (process.env.NODE_ENV === 'production') return null
+  if (import.meta.env.MODE === 'production') return null
 
   return (
     <div className="fixed bottom-4 right-4 bg-black/80 text-white text-xs p-3 rounded-lg shadow-lg z-50 font-mono">
