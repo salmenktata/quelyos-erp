@@ -397,7 +397,7 @@ class QuelyosAPI(http.Controller):
                 'product_length': getattr(product, 'product_length', 0) or 0,
                 'product_width': getattr(product, 'product_width', 0) or 0,
                 'product_height': getattr(product, 'product_height', 0) or 0,
-                'detailed_type': product.detailed_type or 'consu',
+                'type': product.type or 'consu',
                 'uom_id': product.uom_id.id if product.uom_id else None,
                 'uom_name': product.uom_id.name if product.uom_id else None,
                 'product_tag_ids': [{'id': tag.id, 'name': tag.name, 'color': tag.color if hasattr(tag, 'color') else 0} for tag in product.product_tag_ids] if product.product_tag_ids else [],
@@ -484,8 +484,8 @@ class QuelyosAPI(http.Controller):
                 product_data['product_height'] = float(params['product_height'])
 
             # Type de produit (consu, service, product)
-            if params.get('detailed_type'):
-                product_data['detailed_type'] = params['detailed_type']
+            if params.get('type'):
+                product_data['type'] = params['type']
 
             # Unité de mesure
             if params.get('uom_id'):
@@ -588,8 +588,8 @@ class QuelyosAPI(http.Controller):
                 update_data['active'] = bool(params['active'])
 
             # Type de produit (consu, service, product)
-            if 'detailed_type' in params:
-                update_data['detailed_type'] = params['detailed_type']
+            if 'type' in params:
+                update_data['type'] = params['type']
 
             # Unité de mesure
             if 'uom_id' in params:

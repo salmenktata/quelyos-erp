@@ -313,6 +313,11 @@ cd frontend && npm run test:e2e
 - Oublier les règles de sécurité (`security/ir.model.access.csv`)
 - Créer des boucles de recherche dans des boucles (N+1 queries)
 - Utiliser `search()` sans limite sur de grandes tables
+- **Utiliser des noms de champs Odoo sans vérification** : Les champs peuvent changer entre versions (ex: `detailed_type` → `type` entre Odoo 17 et 19). Toujours vérifier l'existence des champs via `docker exec quelyos-db psql -U odoo -d quelyos -c "\d <table_name>"` avant utilisation
+
+**⚠️ Compatibilité Odoo 19 - Champs renommés :**
+- `detailed_type` → `type` (sur product.template)
+- Toujours utiliser `getattr(model, 'field', default)` pour les champs optionnels
 
 ### API / Intégration
 
