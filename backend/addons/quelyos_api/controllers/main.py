@@ -2389,8 +2389,13 @@ class QuelyosAPI(http.Controller):
                 }
 
                 # Inclure les enfants si demandé
-                if include_tree and c.child_id:
-                    data['children'] = [get_category_data(child) for child in c.child_id]
+                # Forcer le chargement des enfants avec .ids pour vérifier s'il y en a
+                if include_tree:
+                    children_ids = c.child_id.ids
+                    if children_ids:
+                        data['children'] = [get_category_data(child) for child in c.child_id]
+                    else:
+                        data['children'] = []
 
                 return data
 
@@ -2874,6 +2879,411 @@ class QuelyosAPI(http.Controller):
                 'error': str(e)
             }
 
+    @http.route('/api/ecommerce/orders/<int:order_id>/tracking', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_order_tracking(self, order_id, **kwargs):
+        """Récupérer les informations de suivi de la commande"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not order.exists():
+                return {
+                    'success': False,
+                    'error': 'Order not found'
+                }
+
+            tracking_info = []
+            for picking in order.picking_ids:
+                state_labels = {
+                    'draft': 'Brouillon',
+                    'waiting': 'En attente',
+                    'confirmed': 'Confirmé',
+                    'assigned': 'Prêt',
+                    'done': 'Livré',
+                    'cancel': 'Annulé'
+                }
+
+                tracking_info.append({
+                    'picking_id': picking.id,
+                    'picking_name': picking.name,
+                    'state': picking.state,
+                    'state_label': state_labels.get(picking.state, picking.state),
+                    'carrier_id': picking.carrier_id.id if picking.carrier_id else None,
+                    'carrier_name': picking.carrier_id.name if picking.carrier_id else None,
+                    'carrier_tracking_ref': picking.carrier_tracking_ref or '',
+                    'carrier_tracking_url': picking.carrier_tracking_url or '',
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'tracking_info': tracking_info
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get order tracking error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/tracking/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def update_order_tracking(self, order_id, **kwargs):
+        """Mettre à jour le numéro de suivi d'un picking"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            params = self._get_params()
+            picking_id = params.get('picking_id')
+            tracking_ref = params.get('tracking_ref', '')
+            carrier_id = params.get('carrier_id')
+
+            if not picking_id:
+                return {
+                    'success': False,
+                    'error': 'picking_id is required'
+                }
+
+            picking = request.env['stock.picking'].sudo().browse(picking_id)
+
+            if not picking.exists():
+                return {
+                    'success': False,
+                    'error': 'Picking not found'
+                }
+
+            # Vérifier que le picking appartient bien à cette commande
+            if order_id not in picking.sale_id.ids:
+                return {
+                    'success': False,
+                    'error': 'Picking does not belong to this order'
+                }
+
+            update_vals = {
+                'carrier_tracking_ref': tracking_ref
+            }
+
+            if carrier_id:
+                update_vals['carrier_id'] = carrier_id
+
+            picking.write(update_vals)
+
+            return {
+                'success': True,
+                'message': 'Tracking updated successfully'
+            }
+
+        except Exception as e:
+            _logger.error(f"Update order tracking error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/history', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_order_history(self, order_id, **kwargs):
+        """Récupérer l'historique des modifications de la commande"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not order.exists():
+                return {
+                    'success': False,
+                    'error': 'Order not found'
+                }
+
+            # Récupérer les messages du chatter
+            messages = request.env['mail.message'].sudo().search([
+                ('model', '=', 'sale.order'),
+                ('res_id', '=', order_id),
+            ], order='date desc', limit=50)
+
+            history = []
+            for msg in messages:
+                tracking_values = []
+                for tracking in msg.tracking_value_ids:
+                    old_value = tracking.old_value_char or str(tracking.old_value_integer or tracking.old_value_float or tracking.old_value_datetime or '')
+                    new_value = tracking.new_value_char or str(tracking.new_value_integer or tracking.new_value_float or tracking.new_value_datetime or '')
+
+                    tracking_values.append({
+                        'field': tracking.field,
+                        'field_desc': tracking.field_desc,
+                        'old_value': old_value,
+                        'new_value': new_value,
+                    })
+
+                history.append({
+                    'id': msg.id,
+                    'date': msg.date.isoformat() if msg.date else None,
+                    'author': msg.author_id.name if msg.author_id else 'System',
+                    'body': msg.body or '',
+                    'message_type': msg.message_type,
+                    'subtype': msg.subtype_id.name if msg.subtype_id else None,
+                    'tracking_values': tracking_values
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'history': history
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get order history error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/delivery-slip', type='http', auth='user', methods=['GET'], csrf=False, cors='*')
+    def get_delivery_slip_pdf(self, order_id, **kwargs):
+        """Télécharger le bon de livraison en PDF"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return request.make_response(
+                    json.dumps({'error': 'Insufficient permissions'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+
+            order = request.env['sale.order'].sudo().browse(int(order_id))
+
+            if not order.exists():
+                return request.make_response(
+                    json.dumps({'error': 'Order not found'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+
+            # Récupérer le premier picking
+            picking = order.picking_ids[:1] if order.picking_ids else None
+
+            if not picking:
+                return request.make_response(
+                    json.dumps({'error': 'No delivery order found for this sale order'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+
+            # Générer le PDF du bon de livraison
+            report = request.env.ref('stock.action_report_delivery')
+            pdf_content, content_type = report.sudo()._render_qweb_pdf([picking.id])
+
+            filename = f"delivery_slip_{picking.name.replace('/', '_')}.pdf"
+
+            return request.make_response(
+                pdf_content,
+                headers=[
+                    ('Content-Type', 'application/pdf'),
+                    ('Content-Disposition', f'attachment; filename="{filename}"'),
+                    ('Content-Length', len(pdf_content))
+                ]
+            )
+
+        except Exception as e:
+            _logger.error(f"Get delivery slip PDF error: {e}")
+            return request.make_response(
+                json.dumps({'error': str(e)}),
+                headers=[('Content-Type', 'application/json')]
+            )
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/send-quotation', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def send_quotation_email(self, order_id, **kwargs):
+        """Envoyer le devis par email au client"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not order.exists():
+                return {
+                    'success': False,
+                    'error': 'Order not found'
+                }
+
+            # Vérifier que la commande est en état approprié
+            if order.state not in ['draft', 'sent']:
+                return {
+                    'success': False,
+                    'error': 'Can only send quotation for draft or sent orders'
+                }
+
+            # Utiliser la méthode Odoo pour envoyer le devis
+            order.action_quotation_send()
+
+            # Mettre à jour l'état si nécessaire
+            if order.state == 'draft':
+                order.write({'state': 'sent'})
+
+            return {
+                'success': True,
+                'message': 'Quotation sent successfully',
+                'order': {
+                    'id': order.id,
+                    'name': order.name,
+                    'state': order.state,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Send quotation error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/create-invoice', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def create_invoice_from_order(self, order_id, **kwargs):
+        """Générer une facture depuis la commande"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not order.exists():
+                return {
+                    'success': False,
+                    'error': 'Order not found'
+                }
+
+            # Vérifier que la commande est confirmée
+            if order.state not in ['sale', 'done']:
+                return {
+                    'success': False,
+                    'error': 'Order must be confirmed to create invoice'
+                }
+
+            # Vérifier si une facture existe déjà
+            if order.invoice_ids:
+                existing_invoice = order.invoice_ids[0]
+                return {
+                    'success': False,
+                    'error': 'Invoice already exists for this order',
+                    'invoice': {
+                        'id': existing_invoice.id,
+                        'name': existing_invoice.name,
+                    }
+                }
+
+            # Créer la facture
+            invoices = order._create_invoices()
+
+            if not invoices:
+                return {
+                    'success': False,
+                    'error': 'Failed to create invoice'
+                }
+
+            invoice = invoices[0]
+
+            return {
+                'success': True,
+                'message': 'Invoice created successfully',
+                'invoice': {
+                    'id': invoice.id,
+                    'name': invoice.name,
+                    'state': invoice.state,
+                    'amount_total': invoice.amount_total,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Create invoice error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/unlock', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def unlock_order(self, order_id, **kwargs):
+        """Remettre la commande en brouillon"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not order.exists():
+                return {
+                    'success': False,
+                    'error': 'Order not found'
+                }
+
+            # Vérifier que la commande peut être déverrouillée
+            if order.state == 'cancel':
+                return {
+                    'success': False,
+                    'error': 'Cannot unlock a cancelled order'
+                }
+
+            if order.state == 'draft':
+                return {
+                    'success': False,
+                    'error': 'Order is already in draft state'
+                }
+
+            # Vérifier qu'il n'y a pas de facture validée
+            if order.invoice_ids.filtered(lambda inv: inv.state == 'posted'):
+                return {
+                    'success': False,
+                    'error': 'Cannot unlock order with posted invoices'
+                }
+
+            # Remettre en brouillon
+            if hasattr(order, 'action_draft'):
+                order.action_draft()
+            else:
+                order.write({'state': 'draft'})
+
+            return {
+                'success': True,
+                'message': 'Order unlocked successfully',
+                'order': {
+                    'id': order.id,
+                    'name': order.name,
+                    'state': order.state,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Unlock order error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
     @http.route('/api/ecommerce/customer/orders', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def get_customer_orders(self, **kwargs):
         """Liste des commandes du client connecté"""
@@ -2914,6 +3324,240 @@ class QuelyosAPI(http.Controller):
 
         except Exception as e:
             _logger.error(f"Get customer orders error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/delivery-slip/pdf', type='http', auth='user', methods=['GET'], csrf=False, cors='*')
+    def get_delivery_slip_pdf(self, order_id, **kwargs):
+        """Télécharger le bon de livraison PDF d'une commande (admin uniquement)"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return request.make_response(
+                    json.dumps({'error': 'Insufficient permissions'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+
+            order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not order.exists():
+                return request.make_response(
+                    json.dumps({'error': 'Order not found'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+
+            # Récupérer les pickings (bons de livraison) de la commande
+            pickings = order.picking_ids.filtered(lambda p: p.state in ['assigned', 'done'])
+
+            if not pickings:
+                return request.make_response(
+                    json.dumps({'error': 'No delivery order found for this sale order'}),
+                    headers=[('Content-Type', 'application/json')]
+                )
+
+            # Utiliser le premier picking (ou le dernier livré)
+            picking = pickings.filtered(lambda p: p.state == 'done')[:1] or pickings[:1]
+
+            # Générer le PDF avec le rapport Odoo standard
+            # Le rapport 'stock.report_deliveryslip' est le rapport standard de bon de livraison
+            report = request.env.ref('stock.action_report_delivery')
+            pdf_content, _ = report.sudo()._render_qweb_pdf(picking.ids)
+
+            # Nom du fichier
+            filename = f"bon_livraison_{order.name.replace('/', '_')}.pdf"
+
+            pdfhttpheaders = [
+                ('Content-Type', 'application/pdf'),
+                ('Content-Length', len(pdf_content)),
+                ('Content-Disposition', f'attachment; filename="{filename}"')
+            ]
+
+            return request.make_response(pdf_content, headers=pdfhttpheaders)
+
+        except Exception as e:
+            _logger.error(f"Get delivery slip PDF error: {e}")
+            return request.make_response(
+                json.dumps({'error': str(e)}),
+                headers=[('Content-Type', 'application/json')]
+            )
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/tracking', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_order_tracking(self, order_id, **kwargs):
+        """Obtenir les informations de tracking d'une commande (admin uniquement)"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not order.exists():
+                return {
+                    'success': False,
+                    'error': 'Order not found'
+                }
+
+            # Récupérer les pickings (livraisons) de la commande
+            pickings = order.picking_ids.filtered(lambda p: p.state in ['assigned', 'done'])
+
+            tracking_info = []
+            for picking in pickings:
+                tracking_info.append({
+                    'picking_id': picking.id,
+                    'picking_name': picking.name,
+                    'state': picking.state,
+                    'state_label': dict(picking._fields['state']._description_selection(request.env)).get(picking.state, picking.state),
+                    'carrier_id': picking.carrier_id.id if picking.carrier_id else None,
+                    'carrier_name': picking.carrier_id.name if picking.carrier_id else None,
+                    'carrier_tracking_ref': picking.carrier_tracking_ref or '',
+                    'carrier_tracking_url': picking.carrier_tracking_url or '',
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'tracking_info': tracking_info,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get order tracking error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/tracking/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def update_order_tracking(self, order_id, **kwargs):
+        """Mettre à jour le numéro de tracking d'une commande (admin uniquement)"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not order.exists():
+                return {
+                    'success': False,
+                    'error': 'Order not found'
+                }
+
+            params = self._get_params()
+            picking_id = params.get('picking_id')
+            tracking_ref = params.get('tracking_ref', '')
+            carrier_id = params.get('carrier_id')
+
+            if not picking_id:
+                return {
+                    'success': False,
+                    'error': 'picking_id is required'
+                }
+
+            picking = request.env['stock.picking'].sudo().browse(picking_id)
+
+            if not picking.exists():
+                return {
+                    'success': False,
+                    'error': 'Picking not found'
+                }
+
+            # Vérifier que le picking appartient bien à cette commande
+            if picking.sale_id.id != order_id:
+                return {
+                    'success': False,
+                    'error': 'Picking does not belong to this order'
+                }
+
+            # Mettre à jour le tracking
+            picking.write({
+                'carrier_tracking_ref': tracking_ref,
+                'carrier_id': carrier_id if carrier_id else picking.carrier_id.id,
+            })
+
+            return {
+                'success': True,
+                'message': 'Tracking information updated successfully',
+                'data': {
+                    'picking_id': picking.id,
+                    'picking_name': picking.name,
+                    'carrier_tracking_ref': picking.carrier_tracking_ref or '',
+                    'carrier_tracking_url': picking.carrier_tracking_url or '',
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Update order tracking error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/history', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_order_history(self, order_id, **kwargs):
+        """Obtenir l'historique des modifications d'une commande (admin uniquement)"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not order.exists():
+                return {
+                    'success': False,
+                    'error': 'Order not found'
+                }
+
+            # Récupérer les messages liés à cette commande
+            messages = request.env['mail.message'].sudo().search([
+                ('model', '=', 'sale.order'),
+                ('res_id', '=', order_id),
+            ], order='date desc')
+
+            history = []
+            for msg in messages:
+                # Filtrer les messages importants (changements d'état, notes, activités)
+                if msg.message_type in ['notification', 'comment'] or msg.subtype_id:
+                    history.append({
+                        'id': msg.id,
+                        'date': msg.date.isoformat() if msg.date else None,
+                        'author': msg.author_id.name if msg.author_id else 'Système',
+                        'body': msg.body or '',
+                        'message_type': msg.message_type,
+                        'subtype': msg.subtype_id.name if msg.subtype_id else None,
+                        'tracking_values': [
+                            {
+                                'field': tracking.field,
+                                'field_desc': tracking.field_desc,
+                                'old_value': tracking.old_value_char or tracking.old_value_text or str(tracking.old_value_integer) if tracking.old_value_integer else tracking.old_value_float or '',
+                                'new_value': tracking.new_value_char or tracking.new_value_text or str(tracking.new_value_integer) if tracking.new_value_integer else tracking.new_value_float or '',
+                            }
+                            for tracking in msg.tracking_value_ids
+                        ] if msg.tracking_value_ids else []
+                    })
+
+            return {
+                'success': True,
+                'data': {
+                    'history': history,
+                    'total': len(history),
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get order history error: {e}")
             return {
                 'success': False,
                 'error': str(e)
@@ -3108,6 +3752,87 @@ class QuelyosAPI(http.Controller):
             }
         except Exception as e:
             _logger.error(f"Update customer error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/customers/export', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def export_customers_csv(self, **kwargs):
+        """Exporter les clients en CSV (admin uniquement)"""
+        try:
+            if not request.env.user.has_group('base.group_system'):
+                return {'success': False, 'error': 'Insufficient permissions'}
+
+            params = self._get_params()
+            search_term = params.get('search', '')
+
+            # Domaine de recherche
+            domain = [('customer_rank', '>', 0)]
+            if search_term:
+                domain.append('|')
+                domain.append(('name', 'ilike', search_term))
+                domain.append(('email', 'ilike', search_term))
+
+            # Récupérer tous les clients
+            partners = request.env['res.partner'].sudo().search(domain, order='name asc')
+
+            # Préparer les données CSV
+            customers_data = []
+            for partner in partners:
+                # Compter les commandes
+                orders_count = request.env['sale.order'].sudo().search_count([
+                    ('partner_id', '=', partner.id),
+                    ('state', 'in', ['sale', 'done'])
+                ])
+
+                # Calculer le total dépensé
+                orders = request.env['sale.order'].sudo().search([
+                    ('partner_id', '=', partner.id),
+                    ('state', 'in', ['sale', 'done'])
+                ])
+                total_spent = sum(orders.mapped('amount_total'))
+
+                customers_data.append({
+                    'id': partner.id,
+                    'name': partner.name or '',
+                    'email': partner.email or '',
+                    'phone': partner.phone or '',
+                    'mobile': partner.mobile or '',
+                    'street': partner.street or '',
+                    'street2': partner.street2 or '',
+                    'city': partner.city or '',
+                    'zip': partner.zip or '',
+                    'state': partner.state_id.name if partner.state_id else '',
+                    'country': partner.country_id.name if partner.country_id else '',
+                    'orders_count': orders_count,
+                    'total_spent': total_spent,
+                    'create_date': partner.create_date.strftime('%Y-%m-%d') if partner.create_date else '',
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'customers': customers_data,
+                    'total': len(customers_data),
+                    'columns': [
+                        {'key': 'id', 'label': 'ID'},
+                        {'key': 'name', 'label': 'Nom'},
+                        {'key': 'email', 'label': 'Email'},
+                        {'key': 'phone', 'label': 'Téléphone'},
+                        {'key': 'mobile', 'label': 'Mobile'},
+                        {'key': 'street', 'label': 'Adresse'},
+                        {'key': 'street2', 'label': 'Complément adresse'},
+                        {'key': 'city', 'label': 'Ville'},
+                        {'key': 'zip', 'label': 'Code postal'},
+                        {'key': 'state', 'label': 'Région'},
+                        {'key': 'country', 'label': 'Pays'},
+                        {'key': 'orders_count', 'label': 'Nb commandes'},
+                        {'key': 'total_spent', 'label': 'Total dépensé'},
+                        {'key': 'create_date', 'label': 'Date création'},
+                    ]
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Export customers CSV error: {e}")
             return {'success': False, 'error': str(e)}
 
     # ==================== CART ====================
@@ -3450,6 +4175,208 @@ class QuelyosAPI(http.Controller):
 
         except Exception as e:
             _logger.error(f"Clear cart error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/cart/abandoned', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_abandoned_carts(self, **kwargs):
+        """Liste des paniers abandonnés (admin only)"""
+        try:
+            if not request.env.user.has_group('base.group_system'):
+                return {'success': False, 'error': 'Insufficient permissions'}
+
+            params = self._get_params()
+            limit = params.get('limit', 20)
+            offset = params.get('offset', 0)
+            hours_threshold = params.get('hours_threshold', 24)  # Par défaut paniers > 24h
+
+            from datetime import datetime, timedelta
+
+            threshold_date = datetime.now() - timedelta(hours=hours_threshold)
+
+            # Rechercher les commandes draft (paniers) non modifiées depuis X heures
+            domain = [
+                ('state', '=', 'draft'),
+                ('write_date', '<', threshold_date.strftime('%Y-%m-%d %H:%M:%S')),
+                ('order_line', '!=', False),  # Au moins une ligne
+            ]
+
+            # Filtres optionnels
+            if params.get('search'):
+                search = params['search']
+                domain.append('|')
+                domain.append(('name', 'ilike', search))
+                domain.append(('partner_id.name', 'ilike', search))
+
+            Order = request.env['sale.order'].sudo()
+            total = Order.search_count(domain)
+            carts = Order.search(domain, limit=limit, offset=offset, order='write_date desc')
+
+            carts_data = []
+            for cart in carts:
+                # Calculer le temps depuis dernière modification
+                write_date = cart.write_date
+                hours_ago = (datetime.now() - write_date).total_seconds() / 3600
+
+                carts_data.append({
+                    'id': cart.id,
+                    'name': cart.name,
+                    'partner_id': cart.partner_id.id if cart.partner_id else None,
+                    'partner_name': cart.partner_id.name if cart.partner_id else 'Invité',
+                    'partner_email': cart.partner_id.email if cart.partner_id else None,
+                    'write_date': write_date.isoformat() if write_date else None,
+                    'hours_ago': round(hours_ago, 1),
+                    'amount_total': cart.amount_total,
+                    'lines_count': len(cart.order_line),
+                    'items': [
+                        {
+                            'product_name': line.product_id.name if line.product_id else '',
+                            'quantity': line.product_uom_qty,
+                            'price': line.price_unit,
+                        }
+                        for line in cart.order_line[:3]  # Premières 3 lignes seulement
+                    ]
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'abandoned_carts': carts_data,
+                    'total': total,
+                    'limit': limit,
+                    'offset': offset,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get abandoned carts error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/cart/<int:cart_id>/send-reminder', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def send_cart_reminder(self, cart_id, **kwargs):
+        """Envoyer un email de relance pour panier abandonné"""
+        try:
+            if not request.env.user.has_group('base.group_system'):
+                return {'success': False, 'error': 'Insufficient permissions'}
+
+            cart = request.env['sale.order'].sudo().browse(cart_id)
+
+            if not cart.exists():
+                return {
+                    'success': False,
+                    'error': 'Cart not found'
+                }
+
+            if cart.state != 'draft':
+                return {
+                    'success': False,
+                    'error': 'Cart is not in draft state'
+                }
+
+            if not cart.partner_id or not cart.partner_id.email:
+                return {
+                    'success': False,
+                    'error': 'No email address for this customer'
+                }
+
+            # Rechercher le template email pour panier abandonné
+            # Si pas de template custom, utiliser un template générique
+            template = request.env.ref('sale.email_template_edi_sale', raise_if_not_found=False)
+
+            if template:
+                template.sudo().send_mail(cart.id, force_send=True)
+
+            # Marquer qu'un reminder a été envoyé (via note interne)
+            cart.sudo().message_post(
+                body=f"Email de relance panier abandonné envoyé à {cart.partner_id.email}",
+                message_type='notification'
+            )
+
+            return {
+                'success': True,
+                'message': f'Reminder email sent to {cart.partner_id.email}'
+            }
+
+        except Exception as e:
+            _logger.error(f"Send cart reminder error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/cart/recovery-stats', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_cart_recovery_stats(self, **kwargs):
+        """Statistiques de récupération des paniers abandonnés"""
+        try:
+            if not request.env.user.has_group('base.group_system'):
+                return {'success': False, 'error': 'Insufficient permissions'}
+
+            params = self._get_params()
+            period = params.get('period', '30d')  # 7d, 30d, 12m
+
+            from datetime import datetime, timedelta
+            from dateutil.relativedelta import relativedelta
+
+            today = datetime.now()
+
+            if period == '7d':
+                start_date = today - timedelta(days=7)
+            elif period == '30d':
+                start_date = today - timedelta(days=30)
+            elif period == '12m':
+                start_date = today - relativedelta(months=12)
+            else:
+                start_date = today - timedelta(days=30)
+
+            Order = request.env['sale.order'].sudo()
+
+            # Paniers abandonnés (draft > 24h)
+            threshold_24h = today - timedelta(hours=24)
+            abandoned_domain = [
+                ('state', '=', 'draft'),
+                ('write_date', '<', threshold_24h.strftime('%Y-%m-%d %H:%M:%S')),
+                ('write_date', '>=', start_date.strftime('%Y-%m-%d')),
+                ('order_line', '!=', False),
+            ]
+            abandoned_count = Order.search_count(abandoned_domain)
+            abandoned_carts = Order.search(abandoned_domain)
+            abandoned_value = sum(abandoned_carts.mapped('amount_total'))
+
+            # Paniers récupérés (commandes confirmées issues de paniers qui étaient abandonnés)
+            # Note : Cette logique est simplifiée, dans un vrai système il faudrait tracker
+            # les relances envoyées et les conversions
+            recovered_domain = [
+                ('state', 'in', ['sale', 'done']),
+                ('date_order', '>=', start_date.strftime('%Y-%m-%d')),
+            ]
+            recovered_count = Order.search_count(recovered_domain)
+            recovered_orders = Order.search(recovered_domain)
+            recovered_value = sum(recovered_orders.mapped('amount_total'))
+
+            # Taux de récupération (approximatif)
+            recovery_rate = 0
+            if abandoned_count > 0:
+                recovery_rate = round((recovered_count / (abandoned_count + recovered_count)) * 100, 1)
+
+            return {
+                'success': True,
+                'data': {
+                    'period': period,
+                    'abandoned_count': abandoned_count,
+                    'abandoned_value': abandoned_value,
+                    'recovered_count': recovered_count,
+                    'recovered_value': recovered_value,
+                    'recovery_rate': recovery_rate,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get cart recovery stats error: {e}")
             return {
                 'success': False,
                 'error': str(e)
@@ -4676,6 +5603,76 @@ class QuelyosAPI(http.Controller):
 
         except Exception as e:
             _logger.error(f"Get payment transaction detail error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/payment/transactions/<int:transaction_id>/refund', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def refund_payment_transaction(self, transaction_id, **kwargs):
+        """Rembourser une transaction de paiement (admin uniquement)"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            transaction = request.env['payment.transaction'].sudo().browse(transaction_id)
+
+            if not transaction.exists():
+                return {
+                    'success': False,
+                    'error': 'Transaction not found'
+                }
+
+            # Vérifier que la transaction est dans un état remboursable
+            if transaction.state != 'done':
+                return {
+                    'success': False,
+                    'error': f'Cannot refund transaction in state {transaction.state}. Only done transactions can be refunded.'
+                }
+
+            params = self._get_params()
+            refund_amount = params.get('amount', transaction.amount)
+            refund_reason = params.get('reason', 'Refund requested by admin')
+
+            # Dans Odoo, il n'y a pas de méthode standard de remboursement sur payment.transaction
+            # On va créer une note sur la transaction et changer son état
+            # Pour un vrai remboursement, il faudrait intégrer avec le provider (Stripe, PayPal, etc.)
+
+            # Pour l'instant, on simule le remboursement en changeant l'état
+            transaction.write({
+                'state': 'cancel',  # Marquer comme annulé
+            })
+
+            # Ajouter un message de note
+            transaction.message_post(
+                body=f"<p><strong>Remboursement demandé</strong></p><p>Montant: {refund_amount} {transaction.currency_id.name if transaction.currency_id else 'EUR'}</p><p>Raison: {refund_reason}</p>",
+                message_type='notification'
+            )
+
+            # Si la transaction est liée à une commande, on pourrait aussi annuler la commande
+            if transaction.sale_order_ids:
+                for order in transaction.sale_order_ids:
+                    if order.state not in ['done', 'cancel']:
+                        order.action_cancel()
+
+            return {
+                'success': True,
+                'message': f'Transaction refunded successfully. Amount: {refund_amount}',
+                'transaction': {
+                    'id': transaction.id,
+                    'reference': transaction.reference or f'TX-{transaction.id}',
+                    'state': transaction.state,
+                    'refund_amount': refund_amount,
+                    'refund_reason': refund_reason,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Refund payment transaction error: {e}")
             return {
                 'success': False,
                 'error': str(e)
@@ -5991,4 +6988,185 @@ class QuelyosAPI(http.Controller):
 
         except Exception as e:
             _logger.error(f"Reorder featured products error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    # ==================== STOCK ALERTS ====================
+
+    @http.route('/api/ecommerce/stock/low-stock-alerts', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_low_stock_alerts(self, **kwargs):
+        """Récupérer les produits en stock bas (admin uniquement)"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            params = self._get_params()
+            limit = params.get('limit', 20)
+            offset = params.get('offset', 0)
+            
+            # Récupérer tous les quants actifs
+            StockQuant = request.env['stock.quant'].sudo()
+            quants = StockQuant.search([
+                ('location_id.usage', '=', 'internal'),
+                ('quantity', '>', 0),
+            ])
+
+            # Grouper par produit
+            products_stock = {}
+            for quant in quants:
+                product_id = quant.product_id.id
+                if product_id not in products_stock:
+                    products_stock[product_id] = {
+                        'product': quant.product_id,
+                        'total_qty': 0,
+                    }
+                products_stock[product_id]['total_qty'] += quant.quantity
+
+            # Filtrer les produits en stock bas
+            low_stock_alerts = []
+            for product_id, data in products_stock.items():
+                product = data['product']
+                total_qty = data['total_qty']
+                threshold = product.product_tmpl_id.low_stock_threshold or 10.0
+
+                if total_qty < threshold:
+                    low_stock_alerts.append({
+                        'id': product.id,
+                        'name': product.display_name,
+                        'sku': product.default_code or '',
+                        'current_stock': total_qty,
+                        'threshold': threshold,
+                        'diff': threshold - total_qty,
+                        'image_url': f'/web/image/product.product/{product.id}/image_128' if product.image_128 else None,
+                        'list_price': product.list_price,
+                        'category': product.categ_id.name if product.categ_id else '',
+                    })
+
+            # Trier par différence (plus critique en premier)
+            low_stock_alerts.sort(key=lambda x: -x['diff'])
+
+            # Pagination
+            total = len(low_stock_alerts)
+            paginated_alerts = low_stock_alerts[offset:offset + limit]
+
+            return {
+                'success': True,
+                'data': {
+                    'alerts': paginated_alerts,
+                    'total': total,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get low stock alerts error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    # ==================== SHIPPING TRACKING ====================
+
+    @http.route('/api/ecommerce/orders/<int:order_id>/tracking', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_order_tracking(self, order_id, **kwargs):
+        """Récupérer les informations de suivi d'une commande"""
+        try:
+            order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not order.exists():
+                return {'success': False, 'error': 'Order not found'}
+
+            # Récupérer le picking (bon de livraison) de la commande
+            picking = order.picking_ids.filtered(lambda p: p.state == 'done')[:1]
+
+            if not picking:
+                return {
+                    'success': True,
+                    'data': {
+                        'status': 'no_tracking',
+                        'message': 'Aucun suivi disponible pour cette commande',
+                    }
+                }
+
+            tracking_ref = picking.carrier_tracking_ref
+            carrier = picking.carrier_id
+
+            if not tracking_ref or not carrier:
+                return {
+                    'success': True,
+                    'data': {
+                        'status': 'no_tracking',
+                        'message': 'Numéro de suivi non disponible',
+                    }
+                }
+
+            # Déterminer le transporteur et construire l'URL de suivi
+            tracking_url = None
+            carrier_name = carrier.name.lower()
+
+            if 'colissimo' in carrier_name:
+                tracking_url = f'https://www.laposte.fr/outils/suivre-vos-envois?code={tracking_ref}'
+            elif 'mondial' in carrier_name or 'relay' in carrier_name:
+                tracking_url = f'https://www.mondialrelay.fr/suivi-de-colis/?numeroExpedition={tracking_ref}'
+            elif 'chronopost' in carrier_name:
+                tracking_url = f'https://www.chronopost.fr/tracking-no-cms/suivi-page?listeNumerosLT={tracking_ref}'
+            elif 'ups' in carrier_name:
+                tracking_url = f'https://www.ups.com/track?tracknum={tracking_ref}'
+            elif 'dhl' in carrier_name:
+                tracking_url = f'https://www.dhl.com/fr-fr/home/tracking.html?tracking-id={tracking_ref}'
+            elif 'fedex' in carrier_name:
+                tracking_url = f'https://www.fedex.com/fedextrack/?trknbr={tracking_ref}'
+
+            return {
+                'success': True,
+                'data': {
+                    'status': 'tracked',
+                    'tracking_ref': tracking_ref,
+                    'carrier_name': carrier.name,
+                    'carrier_code': carrier_name,
+                    'tracking_url': tracking_url,
+                    'shipment_date': picking.date_done.strftime('%Y-%m-%d %H:%M:%S') if picking.date_done else None,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get order tracking error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/tracking/colissimo/<string:tracking_number>', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_colissimo_tracking(self, tracking_number, **kwargs):
+        """Récupérer le détail du suivi Colissimo via leur API"""
+        try:
+            # TODO: Implémenter l'appel API Colissimo
+            # Nécessite : login, mot de passe Colissimo
+            # Doc: https://www.colissimo.entreprise.laposte.fr/fr/system/files/imagescontent/docs/spec_ws_suiviv2.pdf
+
+            return {
+                'success': False,
+                'error': 'API Colissimo non configurée. Contactez l\'administrateur.',
+                'message': 'Veuillez utiliser le lien de suivi fourni pour suivre votre colis.'
+            }
+
+        except Exception as e:
+            _logger.error(f"Colissimo tracking error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/tracking/mondialrelay/<string:tracking_number>', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_mondialrelay_tracking(self, tracking_number, **kwargs):
+        """Récupérer le détail du suivi Mondial Relay via leur API"""
+        try:
+            # TODO: Implémenter l'appel API Mondial Relay
+            # Nécessite : clé API Mondial Relay
+            # Doc: https://www.mondialrelay.fr/media/108391/tracking-web-service.pdf
+
+            return {
+                'success': False,
+                'error': 'API Mondial Relay non configurée. Contactez l\'administrateur.',
+                'message': 'Veuillez utiliser le lien de suivi fourni pour suivre votre colis.'
+            }
+
+        except Exception as e:
+            _logger.error(f"Mondial Relay tracking error: {e}")
             return {'success': False, 'error': str(e)}

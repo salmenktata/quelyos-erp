@@ -35,3 +35,88 @@ export function useUpdateOrderStatus() {
     },
   })
 }
+
+export function useOrderTracking(orderId: number) {
+  return useQuery({
+    queryKey: ['order-tracking', orderId],
+    queryFn: () => api.getOrderTrackingInfo(orderId),
+    enabled: !!orderId,
+  })
+}
+
+export function useUpdateOrderTracking() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      orderId,
+      pickingId,
+      trackingRef,
+      carrierId,
+    }: {
+      orderId: number
+      pickingId: number
+      trackingRef: string
+      carrierId?: number
+    }) =>
+      api.updateOrderTracking(orderId, {
+        picking_id: pickingId,
+        tracking_ref: trackingRef,
+        carrier_id: carrierId,
+      }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['order-tracking', variables.orderId] })
+    },
+  })
+}
+
+export function useOrderHistory(orderId: number) {
+  return useQuery({
+    queryKey: ['order-history', orderId],
+    queryFn: () => api.getOrderHistory(orderId),
+    enabled: !!orderId,
+  })
+}
+
+export function useSendQuotation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (orderId: number) => api.sendQuotationEmail(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] })
+      queryClient.invalidateQueries({ queryKey: ['order'] })
+    },
+  })
+}
+
+export function useCreateInvoice() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (orderId: number) => api.createInvoiceFromOrder(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['order'] })
+    },
+  })
+}
+
+export function useUnlockOrder() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (orderId: number) => api.unlockOrder(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] })
+      queryClient.invalidateQueries({ queryKey: ['order'] })
+    },
+  })
+}
+
+export function useOrderTrackingInfo(orderId: number) {
+  return useQuery({
+    queryKey: ['order-tracking-info', orderId],
+    queryFn: () => api.getOrderTrackingInfo(orderId),
+    enabled: !!orderId,
+  })
+}
