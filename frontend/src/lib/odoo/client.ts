@@ -63,8 +63,11 @@ export class OdooClient {
    */
   private async jsonrpc<T = any>(
     endpoint: string,
-    params: Record<string, any> = {}
+    params: Record<string, any> = {},
+    options: { throwOn404?: boolean } = {}
   ): Promise<T> {
+    const { throwOn404 = false } = options;
+
     try {
       // The Next.js proxy handles JSON-RPC wrapping, so we send just params
       const response = await this.api.post(endpoint, params);
@@ -72,6 +75,13 @@ export class OdooClient {
       // The proxy returns the result directly
       return response.data;
     } catch (error: any) {
+      // Gestion gracieuse des 404 pour les endpoints non implémentés
+      if (error.response?.status === 404 && !throwOn404) {
+        console.warn(`API endpoint not implemented: ${endpoint}`);
+        // Retourner une structure par défaut selon le type de réponse attendu
+        return { success: false, error: 'Not implemented' } as T;
+      }
+
       console.error(`Odoo API Error [${endpoint}]:`, error);
 
       // Extract error message from various possible formats
@@ -200,7 +210,16 @@ export class OdooClient {
   }
 
   async getPopularSearches(limit: number = 5): Promise<APIResponse & { data?: { popular_searches: Array<{ query: string; type: string; count: number; category_id?: number }> } }> {
-    return this.jsonrpc('/search/popular', { limit });
+    const response = await this.jsonrpc<APIResponse & { data?: { popular_searches: Array<{ query: string; type: string; count: number; category_id?: number }> } }>(
+      '/search/popular',
+      { limit },
+      { throwOn404: false }
+    );
+    // Si l'endpoint n'est pas implémenté, retourner un résultat vide
+    if (!response.success) {
+      return { success: true, data: { popular_searches: [] } };
+    }
+    return response;
   }
 
   // ========================================
@@ -430,15 +449,42 @@ export class OdooClient {
 
   // Site configuration
   async getSiteConfig(): Promise<APIResponse & { data?: { config: any } }> {
-    return this.jsonrpc('/site-config');
+    const response = await this.jsonrpc<APIResponse & { data?: { config: any } }>(
+      '/site-config',
+      {},
+      { throwOn404: false }
+    );
+    // Si l'endpoint n'est pas implémenté, retourner un résultat vide
+    if (!response.success) {
+      return { success: true, data: { config: {} } };
+    }
+    return response;
   }
 
   async getBrandConfig(): Promise<APIResponse & { data?: { brand: any; social: any } }> {
-    return this.jsonrpc('/site-config/brand');
+    const response = await this.jsonrpc<APIResponse & { data?: { brand: any; social: any } }>(
+      '/site-config/brand',
+      {},
+      { throwOn404: false }
+    );
+    // Si l'endpoint n'est pas implémenté, retourner un résultat vide
+    if (!response.success) {
+      return { success: true, data: { brand: {}, social: {} } };
+    }
+    return response;
   }
 
   async getShippingConfig(): Promise<APIResponse & { data?: { shipping: any; returns: any } }> {
-    return this.jsonrpc('/site-config/shipping');
+    const response = await this.jsonrpc<APIResponse & { data?: { shipping: any; returns: any } }>(
+      '/site-config/shipping',
+      {},
+      { throwOn404: false }
+    );
+    // Si l'endpoint n'est pas implémenté, retourner un résultat vide
+    if (!response.success) {
+      return { success: true, data: { shipping: {}, returns: {} } };
+    }
+    return response;
   }
 
   // ========================================

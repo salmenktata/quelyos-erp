@@ -29,15 +29,25 @@ const getApiBase = () => {
  */
 async function jsonrpc<T = any>(
   endpoint: string,
-  params: Record<string, any> = {}
+  params: Record<string, any> = {},
+  options: { throwOn404?: boolean } = {}
 ): Promise<T> {
   const apiBase = getApiBase();
+  const { throwOn404 = false } = options;
+
   try {
     const response = await axios.post(`${apiBase}${endpoint}`, params, {
       headers: { 'Content-Type': 'application/json' },
     });
     return response.data;
   } catch (error: any) {
+    // Gestion gracieuse des 404 pour les endpoints CMS non implémentés
+    if (error.response?.status === 404 && !throwOn404) {
+      console.warn(`CMS endpoint not implemented: ${endpoint}`);
+      // Retourner une structure par défaut selon le type de réponse attendu
+      return { success: false, error: 'Not implemented' } as T;
+    }
+
     console.error(`CMS API Error [${endpoint}]:`, error);
     const errorMessage =
       error.response?.data?.error ||
@@ -72,15 +82,17 @@ export const cmsService = {
    * Récupère un menu spécifique par son code
    * @param code - Code du menu (ex: 'header')
    */
-  async getMenu(code: string): Promise<Menu> {
+  async getMenu(code: string): Promise<Menu | null> {
     const response = await jsonrpc<{ success: boolean; menu: Menu; error?: string }>(
       `/menus/${code}`,
-      {}
+      {},
+      { throwOn404: false }
     );
-    if (response.success) {
+    if (response.success && response.menu) {
       return response.menu;
     }
-    throw new Error(response.error || `Menu ${code} not found`);
+    // Retourner null si le menu n'existe pas (permet au composant de gérer gracieusement)
+    return null;
   },
 
   /**

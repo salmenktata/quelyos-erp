@@ -182,7 +182,7 @@ export default function AccountWishlistPage() {
                     </Link>
 
                     <p className="text-lg font-bold text-primary mb-3">
-                      {formatPrice(item.product.list_price, item.product.currency.symbol)}
+                      {formatPrice(item.product.list_price ?? item.product.price ?? 0, item.product.currency?.symbol ?? 'TND')}
                     </p>
 
                     <p className="text-xs text-gray-500 mb-4">

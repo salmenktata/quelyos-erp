@@ -100,7 +100,7 @@ export default function ProductDetailPage() {
 
   // Get the selected variant's data (or default to product data)
   const selectedVariantData = product.variants?.find(v => v.id === selectedVariant);
-  const currentPrice = selectedVariantData?.price ?? product.list_price;
+  const currentPrice = selectedVariantData?.price ?? product.list_price ?? product.price ?? 0;
   const currentStock = selectedVariantData?.in_stock ?? product.in_stock;
   const currentStockQty = selectedVariantData?.stock_qty ?? product.stock_qty;
 
@@ -120,8 +120,8 @@ export default function ProductDetailPage() {
     name: product.name,
     description: product.description || '',
     image: mainImage,
-    price: product.list_price,
-    currency: product.currency.name,
+    price: product.list_price ?? product.price ?? 0,
+    currency: product.currency?.name ?? 'TND',
     availability: currentStock ? 'InStock' : 'OutOfStock',
     sku: product.id.toString(),
     url: `/products/${product.slug}`,
@@ -242,11 +242,11 @@ export default function ProductDetailPage() {
             <div className="flex flex-wrap items-baseline gap-3 mb-3 bg-gray-50 rounded-xl p-4">
               {hasDiscount && (
                 <span className="text-xl text-gray-400 line-through">
-                  {formatPrice(originalPrice, product.currency.symbol)}
+                  {formatPrice(originalPrice, product.currency?.symbol ?? 'TND')}
                 </span>
               )}
               <span className="text-4xl md:text-5xl font-bold text-primary transition-all duration-300">
-                {formatPrice(currentPrice, product.currency.symbol)}
+                {formatPrice(currentPrice, product.currency?.symbol ?? 'TND')}
               </span>
               {hasDiscount && (
                 <span className="bg-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-md">
@@ -282,7 +282,7 @@ export default function ProductDetailPage() {
                     En stock
                   </span>
                   <span className="ml-2 text-sm text-gray-600">
-                    ({Math.floor(currentStockQty)} disponibles)
+                    ({Math.floor(currentStockQty ?? 0)} disponibles)
                   </span>
                 </div>
               ) : (
@@ -347,7 +347,7 @@ export default function ProductDetailPage() {
                         {/* Prix si différent */}
                         {priceDifference && variant.in_stock && (
                           <span className={`text-xs mt-1 ${isSelected ? 'text-white/90' : 'text-gray-600'}`}>
-                            {formatPrice(variant.price, product.currency.symbol)}
+                            {formatPrice(variant.price, product.currency?.symbol ?? 'TND')}
                           </span>
                         )}
                       </button>

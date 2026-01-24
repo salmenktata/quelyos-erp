@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const url = `${SITE_URL}/products/${product.slug}`;
 
     // Prix pour Open Graph
-    const price = product.list_price.toString();
+    const price = (product.list_price ?? product.price ?? 0).toString();
     const currency = product.currency?.name || 'TND';
 
     return {
