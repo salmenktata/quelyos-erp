@@ -15,8 +15,19 @@ const nextConfig: NextConfig = {
         hostname: '*.odoo.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
     ],
-    unoptimized: process.env.NODE_ENV === 'development', // Désactive l'optimisation en dev pour debug
+    // Allow local API image proxy
+    localPatterns: [
+      {
+        pathname: '/api/**',
+      },
+    ],
+    // Enable optimization in all environments for better performance
     formats: ['image/avif', 'image/webp'], // Formats modernes optimisés
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],

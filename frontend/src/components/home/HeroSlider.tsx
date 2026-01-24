@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Slide {
   id: number;
@@ -154,11 +155,19 @@ export function HeroSlider() {
         >
           {/* Background Image with Ken Burns effect */}
           <div
-            className={`absolute inset-0 bg-cover bg-center transition-transform duration-[8000ms] ease-out ${
+            className={`absolute inset-0 transition-transform duration-[8000ms] ease-out ${
               index === currentSlide ? 'scale-110' : 'scale-100'
             }`}
-            style={{ backgroundImage: `url(${slide.image})` }}
           >
+            <Image
+              src={slide.image}
+              alt={slide.title}
+              fill
+              sizes="100vw"
+              className="object-cover"
+              priority={index === 0}
+              loading={index === 0 ? 'eager' : 'lazy'}
+            />
             {/* Multi-layer gradient overlay for better text readability */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>

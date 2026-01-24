@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   keywords: ["e-commerce", "boutique", "produits"],
 };
 
+// Preload hero image for LCP optimization
+const heroImageUrl = "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=600&fit=crop";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,6 +29,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning>
+      <head>
+        {/* Preload LCP hero image */}
+        <link
+          rel="preload"
+          as="image"
+          href={heroImageUrl}
+          fetchPriority="high"
+        />
+        {/* DNS prefetch for external resources */}
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+      </head>
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
         <SiteConfigProvider>
           <ThemeProvider>

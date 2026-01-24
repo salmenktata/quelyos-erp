@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Banner {
   id: number;
@@ -56,10 +57,16 @@ export function PromoBanners() {
           <Link key={banner.id} href={banner.link}>
             <div className="relative h-[300px] rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
               {/* Image de fond */}
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                style={{ backgroundImage: `url(${banner.image})` }}
-              />
+              <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-110">
+                <Image
+                  src={banner.image}
+                  alt={banner.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
+                  loading="lazy"
+                />
+              </div>
 
               {/* Overlay gradient */}
               <div className={`absolute inset-0 bg-gradient-to-br ${banner.gradient}`} />
