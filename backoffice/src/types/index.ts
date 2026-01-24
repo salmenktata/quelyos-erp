@@ -515,6 +515,73 @@ export interface InvoiceStats {
   overdue_count: number
 }
 
+// ==================== ABANDONED CARTS ====================
+
+export interface AbandonedCartItem {
+  product_name: string
+  quantity: number
+  price: number
+}
+
+export interface AbandonedCart {
+  id: number
+  name: string
+  partner_id: number | null
+  partner_name: string
+  partner_email: string | null
+  write_date: string | null
+  hours_ago: number
+  amount_total: number
+  lines_count: number
+  items: AbandonedCartItem[]
+}
+
+export interface AbandonedCartsQueryParams {
+  limit?: number
+  offset?: number
+  hours_threshold?: number
+  search?: string
+}
+
+export interface CartRecoveryStats {
+  period: string
+  abandoned_count: number
+  abandoned_value: number
+  recovered_count: number
+  recovered_value: number
+  recovery_rate: number
+}
+
+// ==================== ORDER TRACKING ====================
+
+export interface OrderTracking {
+  picking_id: number
+  picking_name: string
+  state: string
+  state_label: string
+  carrier_id: number | null
+  carrier_name: string | null
+  carrier_tracking_ref: string
+  carrier_tracking_url: string
+}
+
+export interface OrderHistoryTrackingValue {
+  field: string
+  field_desc: string
+  old_value: string
+  new_value: string
+}
+
+export interface OrderHistoryItem {
+  id: number
+  date: string | null
+  author: string
+  body: string
+  message_type: string
+  subtype: string | null
+  tracking_values: OrderHistoryTrackingValue[]
+}
+
 // ==================== PAGINATION ====================
 
 export interface PaginatedData<T> {
@@ -528,4 +595,15 @@ export interface PaginatedResponse<T> {
   success: boolean
   data: PaginatedData<T>
   error?: string
+}
+
+export interface ShippingTrackingInfo {
+  status: 'tracked' | 'no_tracking'
+  message?: string
+  tracking_ref?: string
+  carrier_name?: string
+  carrier_code?: string
+  tracking_url?: string
+  shipment_date?: string
+  tracking_info?: OrderTracking[]
 }

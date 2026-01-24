@@ -21,6 +21,11 @@ import type {
   StockMove,
   DeliveryMethod,
   AnalyticsStats,
+  AbandonedCart,
+  AbandonedCartsQueryParams,
+  CartRecoveryStats,
+  OrderHistoryItem,
+  ShippingTrackingInfo,
 } from '../types'
 
 // En développement, utiliser le proxy Vite (pas de CORS)
@@ -62,13 +67,40 @@ class ApiClient {
     })
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Session expirée, nettoyer et rediriger
+        this.sessionId = null
+        localStorage.removeItem('session_id')
+        localStorage.removeItem('user')
+        window.location.href = '/login'
+        throw new Error('Session expirée')
+      }
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     const json = await response.json()
 
     if (json.error) {
-      throw new Error(json.error.data?.message || 'API Error')
+      // Vérifier si c'est une erreur d'authentification
+      const errorMessage = json.error.data?.message || json.error.message || 'API Error'
+      if (errorMessage.toLowerCase().includes('session') || errorMessage.toLowerCase().includes('authentication')) {
+        this.sessionId = null
+        localStorage.removeItem('session_id')
+        localStorage.removeItem('user')
+        window.location.href = '/login'
+        throw new Error('Session expirée')
+      }
+      throw new Error(errorMessage)
+    }
+
+    // Vérifier si le résultat est null (peut indiquer session expirée)
+    if (json.result === null && !endpoint.includes('/logout')) {
+      // Si le résultat est null et que ce n'est pas un logout, c'est probablement une session expirée
+      this.sessionId = null
+      localStorage.removeItem('session_id')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+      throw new Error('Session expirée')
     }
 
     return json.result as T
@@ -649,6 +681,96 @@ class ApiClient {
     return this.request<PaginatedResponse<Order>>('/api/ecommerce/customer/orders', params)
   }
 
+  async getDeliverySlipPDF(orderId: number): Promise<Blob> {
+    const url = `${this.baseUrl}/api/ecommerce/orders/${orderId}/delivery-slip`
+
+    const headers: HeadersInit = {}
+    if (this.sessionId) {
+      headers['X-Session-Id'] = this.sessionId
+    }
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      credentials: 'include',
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return response.blob()
+  }
+
+  async getShippingTracking(orderId: number) {
+    return this.request<ApiResponse<ShippingTrackingInfo>>(
+      `/api/ecommerce/orders/${orderId}/tracking`
+    )
+  }
+
+  async updateOrderTracking(
+    orderId: number,
+    data: { picking_id: number; tracking_ref: string; carrier_id?: number }
+  ) {
+    return this.request<
+      ApiResponse<{
+        message: string
+        data: {
+          picking_id: number
+          picking_name: string
+          carrier_tracking_ref: string
+          carrier_tracking_url: string
+        }
+      }>
+    >(`/api/ecommerce/orders/${orderId}/tracking/update`, data)
+  }
+
+  async getOrderHistory(orderId: number) {
+    return this.request<ApiResponse<{ history: OrderHistoryItem[] }>>(
+      `/api/ecommerce/orders/${orderId}/history`
+    )
+  }
+
+  async sendQuotationEmail(orderId: number) {
+    return this.request<
+      ApiResponse<{
+        message: string
+        order: {
+          id: number
+          name: string
+          state: string
+        }
+      }>
+    >(`/api/ecommerce/orders/${orderId}/send-quotation`)
+  }
+
+  async createInvoiceFromOrder(orderId: number) {
+    return this.request<
+      ApiResponse<{
+        message: string
+        invoice: {
+          id: number
+          name: string
+          state: string
+          amount_total: number
+        }
+      }>
+    >(`/api/ecommerce/orders/${orderId}/create-invoice`)
+  }
+
+  async unlockOrder(orderId: number) {
+    return this.request<
+      ApiResponse<{
+        message: string
+        order: {
+          id: number
+          name: string
+          state: string
+        }
+      }>
+    >(`/api/ecommerce/orders/${orderId}/unlock`)
+  }
+
   // ==================== CUSTOMERS (ADMIN) ====================
 
   async getCustomers(params?: { limit?: number; offset?: number; search?: string }) {
@@ -715,6 +837,31 @@ class ApiClient {
       }
       message: string
     }>(`/api/ecommerce/customers/${id}/update`, data)
+  }
+
+  async exportCustomersCSV(params?: { search?: string }) {
+    return this.request<
+      ApiResponse<{
+        customers: Array<{
+          id: number
+          name: string
+          email: string
+          phone: string
+          mobile: string
+          street: string
+          street2: string
+          city: string
+          zip: string
+          state: string
+          country: string
+          orders_count: number
+          total_spent: number
+          create_date: string
+        }>
+        total: number
+        columns: Array<{ key: string; label: string }>
+      }>
+    >('/api/ecommerce/customers/export', params)
   }
 
   // ==================== STOCK ====================
@@ -941,6 +1088,32 @@ class ApiClient {
     )
   }
 
+  // ==================== ABANDONED CARTS (ADMIN) ====================
+
+  async getAbandonedCarts(params?: AbandonedCartsQueryParams) {
+    return this.request<
+      ApiResponse<{
+        abandoned_carts: AbandonedCart[]
+        total: number
+        limit: number
+        offset: number
+      }>
+    >('/api/ecommerce/cart/abandoned', params)
+  }
+
+  async sendCartReminder(cartId: number) {
+    return this.request<ApiResponse<{ message: string }>>(
+      `/api/ecommerce/cart/${cartId}/send-reminder`
+    )
+  }
+
+  async getCartRecoveryStats(params?: { period?: string }) {
+    return this.request<ApiResponse<CartRecoveryStats>>(
+      '/api/ecommerce/cart/recovery-stats',
+      params
+    )
+  }
+
   // ==================== CUSTOMER PROFILE ====================
 
   async getCustomerProfile() {
@@ -1117,6 +1290,46 @@ class ApiClient {
     }>(`/api/ecommerce/payment/transactions/${id}`)
   }
 
+  async refundTransaction(
+    transactionId: number,
+    data: { amount?: number; reason?: string }
+  ) {
+    return this.request<{
+      success: boolean
+      message: string
+      transaction: {
+        id: number
+        reference: string
+        state: string
+        refund_amount: number
+        refund_reason: string
+      }
+    }>(`/api/ecommerce/payment/transactions/${transactionId}/refund`, data)
+  }
+
+  // ==================== STOCK ALERTS ====================
+
+  async getLowStockAlerts(params?: { limit?: number; offset?: number }) {
+    return this.request<{
+      success: boolean
+      data: {
+        alerts: Array<{
+          id: number
+          name: string
+          sku: string
+          current_stock: number
+          threshold: number
+          diff: number
+          image_url: string | null
+          list_price: number
+          category: string
+        }>
+        total: number
+      }
+    }>(`/api/ecommerce/stock/low-stock-alerts`, params)
+  }
+
+
   // ==================== INVOICES ====================
 
   async getInvoices(params?: { limit?: number; offset?: number; state?: string; search?: string }) {
@@ -1175,14 +1388,6 @@ class ApiClient {
         }>
       }
     }>(`/api/ecommerce/invoices/${id}`)
-  }
-
-  async createInvoiceFromOrder(orderId: number) {
-    return this.request<{
-      success: boolean
-      invoice: { id: number; name: string; amount_total: number }
-      message: string
-    }>(`/api/ecommerce/orders/${orderId}/create-invoice`)
   }
 
   async postInvoice(invoiceId: number) {
