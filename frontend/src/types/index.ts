@@ -59,6 +59,47 @@ export interface ProductImage {
   url: string;
   alt: string;
   is_main?: boolean;
+  sequence?: number;
+}
+
+// Types pour l'API /variants enrichie
+export interface AttributeLine {
+  id: number;
+  attribute_id: number;
+  attribute_name: string;
+  display_type: 'color' | 'pills' | 'select' | 'radio';
+  values: AttributeValue[];
+}
+
+export interface AttributeValue {
+  id: number;
+  name: string;
+  html_color?: string; // Pour display_type='color'
+  sequence?: number;
+}
+
+export interface ExtendedProductVariant extends ProductVariant {
+  display_name?: string;
+  list_price?: number;
+  default_code?: string;
+  barcode?: string;
+  qty_available?: number;
+  attribute_values?: Array<{
+    id: number;
+    attribute_id: number;
+    attribute_name: string;
+    value_id?: number;
+    name: string;
+  }>;
+}
+
+export interface VariantsResponse {
+  success: boolean;
+  data: {
+    attribute_lines: AttributeLine[];
+    variants: ExtendedProductVariant[];
+    variant_count: number;
+  };
 }
 
 export interface Category {

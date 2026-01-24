@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
-import type { Product } from '@/types';
+import type { Product, VariantsResponse, ExtendedProductVariant } from '@/types';
 import { formatPrice } from '@/lib/utils/formatting';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
@@ -20,6 +20,7 @@ import { ProductGrid } from '@/components/product/ProductGrid';
 import ProductCard from '@/components/product/ProductCard';
 import { generateProductSchema, generateBreadcrumbSchema } from '@/lib/utils/seo';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { VariantSelector } from '@/components/product/VariantSelector';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -28,6 +29,7 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<number | null>(null);
+  const [variantsData, setVariantsData] = useState<VariantsResponse | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'shipping'>('description');
@@ -50,8 +52,12 @@ export default function ProductDetailPage() {
       const response = await odooClient.getProductBySlug(slug);
       if (response.success && response.product) {
         setProduct(response.product);
-        // Sélectionner le premier variant par défaut
-        if (response.product.variants && response.product.variants.length > 0) {
+
+        // Charger les variantes enrichies si le produit a des variantes
+        if (response.product.variant_count && response.product.variant_count > 1) {
+          fetchVariants(response.product.id);
+        } else if (response.product.variants && response.product.variants.length > 0) {
+          // Fallback: sélectionner le premier variant par défaut
           setSelectedVariant(response.product.variants[0].id);
         }
 
@@ -65,6 +71,17 @@ export default function ProductDetailPage() {
       router.push('/products');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchVariants = async (productId: number) => {
+    try {
+      const response = await odooClient.jsonrpc(`/products/${productId}/variants`, {});
+      if (response.success) {
+        setVariantsData(response);
+      }
+    } catch (error) {
+      console.error('Erreur chargement variantes:', error);
     }
   };
 
@@ -293,67 +310,15 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            {/* Variants (tailles, couleurs, etc.) - Version améliorée touch-friendly */}
-            {product.variants && product.variants.length > 1 && (
+            {/* Sélecteur de variantes intelligent */}
+            {variantsData && variantsData.data.variants.length > 1 && (
               <div className="mb-6">
-                <h3 className="font-bold text-lg mb-3 text-gray-900">Sélectionnez une option:</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {product.variants.map((variant) => {
-                    const isSelected = selectedVariant === variant.id;
-                    const variantLabel = variant.attributes.map((attr) => attr.value).join(' - ');
-                    const priceDifference = variant.price !== product.list_price;
-
-                    return (
-                      <button
-                        key={variant.id}
-                        onClick={() => setSelectedVariant(variant.id)}
-                        disabled={!variant.in_stock}
-                        className={`
-                          relative px-4 py-4 min-h-15
-                          border-2 rounded-xl font-semibold
-                          transition-all duration-300
-                          flex flex-col items-start justify-center
-                          ${
-                            isSelected
-                              ? 'border-primary bg-primary text-white shadow-lg scale-[1.02]'
-                              : variant.in_stock
-                              ? 'border-gray-300 text-gray-900 hover:border-primary hover:shadow-md active:scale-95 bg-white'
-                              : 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50'
-                          }
-                        `}
-                        aria-label={`${variantLabel}${!variant.in_stock ? ' - Indisponible' : ''}`}
-                      >
-                        {/* Checkmark pour variant sélectionné */}
-                        {isSelected && (
-                          <div className="absolute top-2 right-2">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        )}
-
-                        {/* Badge "Épuisé" pour variants indisponibles */}
-                        {!variant.in_stock && (
-                          <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
-                            Épuisé
-                          </div>
-                        )}
-
-                        {/* Label du variant */}
-                        <span className={`text-sm ${isSelected ? 'font-bold' : 'font-semibold'}`}>
-                          {variantLabel}
-                        </span>
-
-                        {/* Prix si différent */}
-                        {priceDifference && variant.in_stock && (
-                          <span className={`text-xs mt-1 ${isSelected ? 'text-white/90' : 'text-gray-600'}`}>
-                            {formatPrice(variant.price, product.currency?.symbol ?? 'TND')}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
+                <VariantSelector
+                  productId={product.id}
+                  variantsData={variantsData}
+                  selectedVariant={selectedVariantData as ExtendedProductVariant}
+                  onVariantChange={(variant) => setSelectedVariant(variant.id)}
+                />
               </div>
             )}
 

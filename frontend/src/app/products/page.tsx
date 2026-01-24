@@ -15,6 +15,7 @@ import { ProductGrid } from '@/components/product/ProductGrid';
 import { ActiveFilterChips } from '@/components/filters/ActiveFilterChips';
 import { Pagination, PaginationInfo } from '@/components/common/Pagination';
 import { useFilterSync } from '@/hooks/useFilterSync';
+import { VariantSwatches } from '@/components/product/VariantSwatches';
 
 // Lazy load du carousel (non critique pour le premier affichage)
 const RecentlyViewedCarousel = dynamic(
@@ -460,10 +461,11 @@ export default function ProductsPage() {
 function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMode: 'grid' | 'list' }) {
   // State pour le variant sélectionné
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
+  const [previewImageUrl, setPreviewImageUrl] = useState<string>('');
 
-  // Get main image URL - prioritize image_url, then images array, and proxy through our API
+  // Get main image URL - prioritize preview, then image_url, then images array
   const mainImage = product.images?.find(img => img.is_main) || product.images?.[0];
-  const rawImageUrl = product.image_url || mainImage?.url || '';
+  const rawImageUrl = previewImageUrl || product.image_url || mainImage?.url || '';
   const imageUrl = getProxiedImageUrl(rawImageUrl);
 
   // Variant sélectionné ou produit par défaut
@@ -472,11 +474,11 @@ function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMod
     ? product.variants?.find(v => v.id === selectedVariantId) || product.variants?.[0]
     : null;
 
-  const displayPrice = selectedVariant ? selectedVariant.price : product.list_price;
+  const displayPrice = selectedVariant ? selectedVariant.price : (product.list_price ?? product.price ?? 0);
   const displayInStock = selectedVariant ? selectedVariant.in_stock : product.in_stock;
 
-  const discountPercent = product.compare_at_price
-    ? Math.round((1 - product.list_price / product.compare_at_price) * 100)
+  const discountPercent = product.compare_at_price && displayPrice
+    ? Math.round((1 - displayPrice / product.compare_at_price) * 100)
     : 0;
 
   const inStock = product.in_stock;
@@ -632,30 +634,16 @@ function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMod
             {product.name}
           </h3>
 
-          {/* Variants selector */}
-          {hasVariants && (
-            <div className="mb-2 flex flex-wrap gap-1">
-              {product.variants?.map((variant) => (
-                <button
-                  key={variant.id}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setSelectedVariantId(variant.id);
-                  }}
-                  disabled={!variant.in_stock}
-                  className={`px-2 py-1 text-xs border rounded transition-all ${
-                    selectedVariantId === variant.id || (!selectedVariantId && variant === product.variants?.[0])
-                      ? 'border-primary bg-primary text-white'
-                      : variant.in_stock
-                      ? 'border-gray-300 text-gray-900 hover:border-primary'
-                      : 'border-gray-200 text-gray-400 line-through cursor-not-allowed'
-                  }`}
-                  title={!variant.in_stock ? 'Rupture de stock' : variant.attributes.map(a => `${a.name}: ${a.value}`).join(', ')}
-                >
-                  {variant.attributes.map(a => a.value).join(' / ')}
-                </button>
-              ))}
-            </div>
+          {/* Color Swatches - Affichage intelligent des variantes */}
+          {product.variant_count && product.variant_count > 1 && (
+            <VariantSwatches
+              productId={product.id}
+              onVariantSelect={(variantId) => setSelectedVariantId(variantId)}
+              onImagePreview={(url) => setPreviewImageUrl(url)}
+              size="sm"
+              maxVisible={5}
+              className="mb-3"
+            />
           )}
 
           <div className="flex items-baseline gap-2">
