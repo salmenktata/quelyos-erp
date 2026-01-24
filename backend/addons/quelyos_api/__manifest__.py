@@ -8,7 +8,11 @@
     'website': 'https://quelyos.com',
     'license': 'LGPL-3',
     'depends': [
-        'quelyos_core',
+        'base',
+        'sale_management',
+        'stock',
+        'website',
+        'website_sale',
     ],
     'data': [
         'security/ir.model.access.csv',

@@ -7,15 +7,24 @@ import { Badge, Button, Breadcrumbs, SkeletonTable } from '../components/common'
 export default function Orders() {
   const [page, setPage] = useState(0)
   const [statusFilter, setStatusFilter] = useState<string>('')
+  const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
   const limit = 20
 
   const { data, isLoading, error } = useOrders({
     limit,
     offset: page * limit,
     status: statusFilter || undefined,
+    search: search || undefined,
+    date_from: dateFrom || undefined,
+    date_to: dateTo || undefined,
   })
 
-  const getStatusVariant = (state: string): 'success' | 'warning' | 'error' | 'info' | 'neutral' => {
+  const getStatusVariant = (
+    state: string
+  ): 'success' | 'warning' | 'error' | 'info' | 'neutral' => {
     switch (state) {
       case 'sale':
         return 'success'
@@ -64,13 +73,29 @@ export default function Orders() {
     }).format(price)
   }
 
-  const orders = data?.data?.orders || []
-  const total = data?.data?.total || 0
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    setSearch(searchInput)
+    setPage(0)
+  }
+
+  const handleResetFilters = () => {
+    setStatusFilter('')
+    setSearch('')
+    setSearchInput('')
+    setDateFrom('')
+    setDateTo('')
+    setPage(0)
+  }
+
+  const hasActiveFilters = statusFilter || search || dateFrom || dateTo
+
+  const orders = (data?.data?.orders || []) as import('../types').Order[]
+  const total = (data?.data?.total || 0) as number
 
   return (
     <Layout>
       <div className="p-8">
-        {/* Breadcrumbs */}
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
@@ -80,48 +105,161 @@ export default function Orders() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Commandes</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Gérer et suivre toutes les commandes</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Gérer et suivre toutes les commandes
+          </p>
         </div>
 
-        {/* Filtres */}
+        {/* Filtres avancés */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Statut :</label>
-              <select
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value)
-                  setPage(0)
-                }}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition-all"
-              >
-                <option value="">Tous</option>
-                <option value="draft">Brouillon</option>
-                <option value="sent">Envoyé</option>
-                <option value="sale">Confirmé</option>
-                <option value="done">Terminé</option>
-                <option value="cancel">Annulé</option>
-              </select>
+          <div className="space-y-4">
+            {/* Ligne 1 : Recherche */}
+            <form onSubmit={handleSearch} className="flex items-center gap-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Rechercher par numéro de commande ou nom client..."
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                />
+              </div>
+              <Button type="submit" variant="primary">
+                Rechercher
+              </Button>
+            </form>
 
-              {statusFilter && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setStatusFilter('')
+            {/* Ligne 2 : Filtres */}
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Filtre par statut */}
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Statut :
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => {
+                    setStatusFilter(e.target.value)
                     setPage(0)
                   }}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                 >
+                  <option value="">Tous</option>
+                  <option value="draft">Brouillon</option>
+                  <option value="sent">Envoyé</option>
+                  <option value="sale">Confirmé</option>
+                  <option value="done">Terminé</option>
+                  <option value="cancel">Annulé</option>
+                </select>
+              </div>
+
+              {/* Filtre par date */}
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Du :
+                </label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => {
+                    setDateFrom(e.target.value)
+                    setPage(0)
+                  }}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Au :
+                </label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => {
+                    setDateTo(e.target.value)
+                    setPage(0)
+                  }}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                />
+              </div>
+
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={handleResetFilters}>
                   Réinitialiser
                 </Button>
               )}
+
+              <div className="ml-auto">
+                {total > 0 && (
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {total} commande{total > 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
             </div>
 
-            {total > 0 && (
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {total} commande{total > 1 ? 's' : ''}
-              </span>
+            {/* Résumé des filtres actifs */}
+            {hasActiveFilters && (
+              <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                {search && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm">
+                    Recherche : "{search}"
+                    <button
+                      onClick={() => {
+                        setSearch('')
+                        setSearchInput('')
+                        setPage(0)
+                      }}
+                      className="ml-1 hover:text-indigo-900 dark:hover:text-indigo-100"
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+                {statusFilter && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm">
+                    Statut : {getStatusLabel(statusFilter)}
+                    <button
+                      onClick={() => {
+                        setStatusFilter('')
+                        setPage(0)
+                      }}
+                      className="ml-1 hover:text-indigo-900 dark:hover:text-indigo-100"
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+                {dateFrom && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm">
+                    À partir du : {formatDate(dateFrom)}
+                    <button
+                      onClick={() => {
+                        setDateFrom('')
+                        setPage(0)
+                      }}
+                      className="ml-1 hover:text-indigo-900 dark:hover:text-indigo-100"
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+                {dateTo && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm">
+                    Jusqu'au : {formatDate(dateTo)}
+                    <button
+                      onClick={() => {
+                        setDateTo('')
+                        setPage(0)
+                      }}
+                      className="ml-1 hover:text-indigo-900 dark:hover:text-indigo-100"
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -179,9 +317,12 @@ export default function Orders() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           {order.customer ? (
                             <div>
-                              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              <Link
+                                to={`/customers/${order.customer.id}`}
+                                className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                              >
                                 {order.customer.name}
-                              </div>
+                              </Link>
                               <div className="text-sm text-gray-500 dark:text-gray-400">
                                 {order.customer.email}
                               </div>
@@ -260,10 +401,15 @@ export default function Orders() {
                 Aucune commande
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                {statusFilter
-                  ? `Aucune commande avec le statut "${getStatusLabel(statusFilter)}"`
-                  : 'Aucune commande trouvée'}
+                {hasActiveFilters
+                  ? 'Aucune commande ne correspond à vos critères de recherche.'
+                  : 'Aucune commande trouvée.'}
               </p>
+              {hasActiveFilters && (
+                <Button variant="secondary" className="mt-4" onClick={handleResetFilters}>
+                  Réinitialiser les filtres
+                </Button>
+              )}
             </div>
           )}
         </div>

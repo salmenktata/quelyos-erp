@@ -8,6 +8,13 @@ export function useStockProducts(params?: { limit?: number; offset?: number; sea
   })
 }
 
+export function useStockMoves(params?: { limit?: number; offset?: number; product_id?: number }) {
+  return useQuery({
+    queryKey: ['stock-moves', params],
+    queryFn: () => api.getStockMoves(params),
+  })
+}
+
 export function useUpdateProductStock() {
   const queryClient = useQueryClient()
 
@@ -16,6 +23,7 @@ export function useUpdateProductStock() {
       api.updateProductStock(productId, quantity),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stock-products'] })
+      queryClient.invalidateQueries({ queryKey: ['stock-moves'] })
     },
   })
 }

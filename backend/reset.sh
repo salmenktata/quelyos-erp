@@ -1,5 +1,5 @@
 #!/bin/bash
-# Reset Odoo 19 - Installation vierge + quelyos_core
+# Reset Odoo 19 - Installation vierge + quelyos_api
 # Usage: ./reset.sh
 
 set -e
@@ -25,10 +25,10 @@ docker-compose up -d
 echo "Attente du démarrage (15s)..."
 sleep 15
 
-# Installer quelyos_core
+# Installer quelyos_api
 echo ""
-echo "=== Installation quelyos_core ==="
-docker-compose exec -T odoo odoo -d quelyos -i quelyos_core --db_host=db --db_user=odoo --db_password=odoo --stop-after-init
+echo "=== Installation quelyos_api ==="
+docker-compose exec -T odoo odoo -d quelyos -i quelyos_api --db_host=db --db_user=odoo --db_password=odoo --stop-after-init
 
 # Redémarrer Odoo
 echo ""

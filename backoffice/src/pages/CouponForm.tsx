@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useCreateCoupon } from '../hooks/useCoupons'
 import type { CouponCreate } from '../types'
+import { Button, Input, Breadcrumbs } from '../components/common'
+import { useToast } from '../hooks/useToast'
+import { ToastContainer } from '../components/common/Toast'
 
 export default function CouponForm() {
   const navigate = useNavigate()
   const createCoupon = useCreateCoupon()
+  const toast = useToast()
 
   const [formData, setFormData] = useState<CouponCreate>({
     name: '',
@@ -73,6 +77,7 @@ export default function CouponForm() {
     e.preventDefault()
 
     if (!validateForm()) {
+      toast.error('Veuillez corriger les erreurs du formulaire')
       return
     }
 
@@ -97,82 +102,59 @@ export default function CouponForm() {
       }
 
       await createCoupon.mutateAsync(data)
+      toast.success(`Le coupon "${formData.code.toUpperCase()}" a été créé avec succès`)
       navigate('/coupons')
     } catch (error) {
       console.error('Erreur lors de la création du coupon:', error)
-      setErrors({ submit: 'Erreur lors de la création du coupon. Veuillez réessayer.' })
+      toast.error('Erreur lors de la création du coupon. Veuillez réessayer.')
     }
   }
 
   return (
     <Layout>
       <div className="p-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Codes Promo', href: '/coupons' },
+            { label: 'Nouveau coupon' },
+          ]}
+        />
+
         <div className="mb-8">
-          <div className="flex items-center mb-4">
-            <button
-              onClick={() => navigate('/coupons')}
-              className="mr-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Nouveau coupon</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">Créer un code promo pour vos clients</p>
-            </div>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Nouveau coupon</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">Créer un code promo pour vos clients</p>
         </div>
 
         <div className="max-w-2xl">
           <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-6">
             {/* Nom */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nom du coupon *
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                  errors.name ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="ex: Promotion été 2026"
-              />
-              {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
-            </div>
+            <Input
+              label="Nom du coupon"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              error={errors.name}
+              required
+              placeholder="ex: Promotion été 2026"
+            />
 
             {/* Code */}
             <div>
-              <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Code promo *
-              </label>
-              <input
-                type="text"
+              <Input
+                label="Code promo"
                 id="code"
                 name="code"
                 value={formData.code}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent uppercase ${
-                  errors.code ? 'border-red-500' : 'border-gray-300'
-                }`}
+                error={errors.code}
+                required
                 placeholder="ex: SUMMER2026"
+                className="uppercase"
               />
-              {errors.code && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.code}</p>}
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Le code sera automatiquement converti en majuscules
               </p>
             </div>
@@ -195,35 +177,26 @@ export default function CouponForm() {
             </div>
 
             {/* Valeur de la réduction */}
-            <div>
-              <label htmlFor="discount_value" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Valeur de la réduction *
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  id="discount_value"
-                  name="discount_value"
-                  value={formData.discount_value}
-                  onChange={handleChange}
-                  min="0"
-                  max={formData.discount_type === 'percent' ? '100' : undefined}
-                  step={formData.discount_type === 'percent' ? '1' : '0.01'}
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    errors.discount_value ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder={formData.discount_type === 'percent' ? '10' : '5.00'}
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <span className="text-gray-500 dark:text-gray-500 text-sm">
-                    {formData.discount_type === 'percent' ? '%' : '€'}
-                  </span>
-                </div>
-              </div>
-              {errors.discount_value && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.discount_value}</p>
-              )}
-            </div>
+            <Input
+              label="Valeur de la réduction"
+              type="number"
+              id="discount_value"
+              name="discount_value"
+              value={formData.discount_value.toString()}
+              onChange={handleChange}
+              error={errors.discount_value}
+              required
+              min="0"
+              max={formData.discount_type === 'percent' ? '100' : undefined}
+              step={formData.discount_type === 'percent' ? '1' : '0.01'}
+              placeholder={formData.discount_type === 'percent' ? '10' : '5.00'}
+              helperText={formData.discount_type === 'percent' ? 'Pourcentage de réduction' : 'Montant fixe en euros'}
+              icon={
+                <span className="text-sm">
+                  {formData.discount_type === 'percent' ? '%' : '€'}
+                </span>
+              }
+            />
 
             {/* Date de début */}
             <div>
@@ -284,39 +257,29 @@ export default function CouponForm() {
               </p>
             </div>
 
-            {/* Erreur de soumission */}
-            {errors.submit && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600 dark:text-red-400">{errors.submit}</p>
-              </div>
-            )}
-
             {/* Boutons */}
-            <div className="flex space-x-4 pt-4">
-              <button
-                type="submit"
-                disabled={createCoupon.isPending}
-                className="flex-1 px-6 py-3 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {createCoupon.isPending ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Création...
-                  </div>
-                ) : (
-                  'Créer le coupon'
-                )}
-              </button>
-              <button
+            <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={() => navigate('/coupons')}
-                className="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors font-medium"
               >
                 Annuler
-              </button>
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                loading={createCoupon.isPending}
+                disabled={createCoupon.isPending}
+              >
+                Créer le coupon
+              </Button>
             </div>
           </form>
         </div>
+
+        {/* ToastContainer */}
+        <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} position="top-right" />
       </div>
     </Layout>
   )

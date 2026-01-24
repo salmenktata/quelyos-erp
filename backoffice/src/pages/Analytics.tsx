@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useAnalyticsStats } from '../hooks/useAnalytics'
+import { Breadcrumbs, Skeleton } from '../components/common'
 
 export default function Analytics() {
   const { data, isLoading, error } = useAnalyticsStats()
@@ -41,17 +42,26 @@ export default function Analytics() {
   return (
     <Layout>
       <div className="p-8">
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Analytiques' },
+          ]}
+        />
+
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tableau de bord</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analytiques</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
             Vue d'ensemble des statistiques de votre boutique
           </p>
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            <p className="text-gray-600 dark:text-gray-400 mt-4">Chargement des statistiques...</p>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Skeleton count={4} height={120} />
+            </div>
+            <Skeleton height={300} />
           </div>
         ) : error ? (
           <div className="p-8 text-center text-red-600 dark:text-red-400">

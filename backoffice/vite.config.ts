@@ -12,6 +12,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/web': {
+        target: 'http://localhost:8069',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })

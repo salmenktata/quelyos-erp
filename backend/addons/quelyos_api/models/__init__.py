@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-# Models will be added here as needed
+from . import product_image

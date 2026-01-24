@@ -1,6 +1,9 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useCustomers } from '../hooks/useCustomers'
+import type { CustomerListItem } from '../types'
+import { Button, Badge, Breadcrumbs, SkeletonTable } from '../components/common'
 
 export default function Customers() {
   const [page, setPage] = useState(0)
@@ -39,6 +42,14 @@ export default function Customers() {
   return (
     <Layout>
       <div className="p-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Clients' },
+          ]}
+        />
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Clients</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">Gérer les comptes clients</p>
@@ -56,24 +67,21 @@ export default function Customers() {
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
               />
             </div>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-            >
+            <Button type="submit" variant="primary">
               Rechercher
-            </button>
+            </Button>
             {search && (
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={() => {
                   setSearch('')
                   setSearchInput('')
                   setPage(0)
                 }}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 Réinitialiser
-              </button>
+              </Button>
             )}
           </form>
 
@@ -88,15 +96,12 @@ export default function Customers() {
         {/* Liste des clients */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {isLoading ? (
-            <div className="p-8 text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-              <p className="text-gray-600 dark:text-gray-400 mt-4">Chargement...</p>
-            </div>
+            <SkeletonTable rows={5} columns={6} />
           ) : error ? (
             <div className="p-8 text-center text-red-600 dark:text-red-400">
               Erreur lors du chargement des clients
             </div>
-          ) : data?.data.customers && data.data.customers.length > 0 ? (
+          ) : data?.data.customers && (data.data.customers as CustomerListItem[]).length > 0 ? (
             <>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -123,15 +128,18 @@ export default function Customers() {
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {data.data.customers.map((customer) => (
+                    {(data.data.customers as CustomerListItem[]).map((customer) => (
                       <tr
                         key={customer.id}
                         className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          <Link
+                            to={`/customers/${customer.id}`}
+                            className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                          >
                             {customer.name}
-                          </div>
+                          </Link>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
@@ -159,9 +167,7 @@ export default function Customers() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900 dark:text-white">
                             {customer.orders_count > 0 ? (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300">
-                                {customer.orders_count}
-                              </span>
+                              <Badge variant="info">{customer.orders_count}</Badge>
                             ) : (
                               <span className="text-gray-400">0</span>
                             )}
@@ -194,21 +200,23 @@ export default function Customers() {
                     Affichage {page * limit + 1} à {Math.min((page + 1) * limit, data.data.total)}{' '}
                     sur {data.data.total}
                   </div>
-                  <div className="flex space-x-2">
-                    <button
+                  <div className="flex gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => setPage(Math.max(0, page - 1))}
                       disabled={page === 0}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Précédent
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => setPage(page + 1)}
                       disabled={(page + 1) * limit >= data.data.total}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Suivant
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}

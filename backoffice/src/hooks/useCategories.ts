@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
-import type { Category } from '../types'
 
 export function useCategories(params?: { limit?: number; offset?: number }) {
   return useQuery({

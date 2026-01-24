@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Orders from './pages/Orders'
 import OrderDetail from './pages/OrderDetail'
 import Customers from './pages/Customers'
+import CustomerDetail from './pages/CustomerDetail'
 import Products from './pages/Products'
 import ProductForm from './pages/ProductForm'
 import Categories from './pages/Categories'
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="/orders" element={<Orders />} />
             <Route path="/orders/:id" element={<OrderDetail />} />
             <Route path="/customers" element={<Customers />} />
+            <Route path="/customers/:id" element={<CustomerDetail />} />
             <Route path="/products" element={<Products />} />
             <Route path="/products/create" element={<ProductForm />} />
             <Route path="/products/:id/edit" element={<ProductForm />} />

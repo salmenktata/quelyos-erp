@@ -827,6 +827,344 @@ interface ButtonProps {
 
 ---
 
+## 🎯 Principe Fondamental : Parité Fonctionnelle Totale avec Odoo
+
+**ENJEU CRITIQUE DU PROJET** : Quelyos ERP doit offrir **100% des fonctionnalités Odoo** avec une expérience utilisateur **exceptionnellement meilleure**, SANS modifier le modèle ou la base de données Odoo.
+
+### Objectifs Stratégiques
+
+1. **Parité fonctionnelle totale** : Aucune fonctionnalité Odoo ne doit manquer
+2. **Amélioration UX radicale** : Interface moderne qui surpasse largement Odoo
+3. **Approche "surcouche intelligente"** : Utiliser Odoo comme backend robuste, ne jamais le modifier
+4. **Valeur ajoutée frontend** : Proposer des fonctionnalités supplémentaires côté interface
+5. **Zéro régression** : L'utilisateur ne doit jamais se sentir limité vs Odoo natif
+
+---
+
+### Règle 1 : Audit et Documentation de Parité Obligatoires
+
+**AVANT de déclarer un module "terminé", TOUJOURS** :
+
+1. ✅ **Auditer Odoo** : Lister TOUTES les fonctionnalités du module Odoo correspondant
+   - Consulter documentation Odoo officielle
+   - Inspecter les modèles Odoo (`product.template`, `sale.order`, etc.)
+   - Lister tous les champs, méthodes, workflows, états
+
+2. ✅ **Comparer** : Vérifier que chaque fonctionnalité a son équivalent dans Quelyos
+   - Vérifier existence endpoint API backend
+   - Vérifier interface frontend/backoffice
+   - Identifier les gaps (fonctionnalités manquantes)
+
+3. ✅ **Documenter** : Créer/mettre à jour tableau de correspondance dans README.md
+   - Format standardisé (voir section suivante)
+   - Marquer statut : ✅ Implémenté, 🟡 Partiel, 🔴 Manquant
+   - Prioriser gaps : P0 (Bloquant), P1 (Important), P2 (Nice-to-have)
+
+4. ✅ **Tester** : Valider avec tests de parité automatisés
+   - Tests backend (pytest) : Vérifier que API === Odoo DB
+   - Tests E2E (Playwright) : Vérifier que Frontend === Backend === Odoo
+
+5. ✅ **Valider** : Aucune régression ou limitation vs Odoo identifiée
+   - Aucun gap P0 ou P1 non documenté
+   - Tous les tests passent
+   - Documentation à jour
+
+#### Format du Tableau de Correspondance
+
+**À ajouter dans README.md pour chaque module** :
+
+```markdown
+### Module [Nom] - Correspondance Odoo ↔ Quelyos
+
+| Fonctionnalité Odoo | Quelyos Backend | Quelyos Frontend | Quelyos Backoffice | Statut | Priorité | Notes |
+|---------------------|-----------------|------------------|---------------------|--------|----------|-------|
+| Créer produit | POST /api/products/create | - | ProductForm.tsx | ✅ | - | Validation Zod |
+| Modifier produit | POST /api/products/<id>/update | - | ProductForm.tsx | ✅ | - | Formulaire réutilisé |
+| Supprimer produit | POST /api/products/<id>/delete | - | Products.tsx | ✅ | - | Modal confirmation |
+| Dupliquer produit | - | - | - | 🔴 | P1 | Utile création variantes |
+| Variantes (attributs) | POST /api/products/create | - | ProductForm.tsx | 🟡 | P0 | Création OK, édition limitée |
+| Images multiples | - | - | - | 🔴 | P0 | **BLOQUANT e-commerce** |
+| ... | ... | ... | ... | ... | ... | ... |
+```
+
+**Légende** :
+- ✅ **Implémenté** : Fonctionnalité disponible et testée
+- 🟡 **Partiel** : Disponible mais incomplet (détailler les limitations exactes)
+- 🔴 **Manquant** : Non implémenté (CRITIQUE si P0 ou P1)
+- ➕ **Amélioré** : Fonctionnalité Odoo présente + valeur ajoutée Quelyos
+
+#### Gestion des Gaps Fonctionnels
+
+**Si une fonctionnalité Odoo est identifiée comme manquante** :
+
+1. 🚨 **ALERTER immédiatement** avec AskUserQuestion
+   - Expliquer quelle fonctionnalité manque
+   - Proposer approches d'implémentation (sans modifier Odoo)
+   - Indiquer l'impact utilisateur
+
+2. **Documenter** dans README avec statut 🔴 et priorité
+   - P0 (BLOQUANT) : Fonctionnalité critique sans alternative
+   - P1 (IMPORTANT) : Fonctionnalité courante, impacte productivité
+   - P2 (NICE-TO-HAVE) : Fonctionnalité avancée, peu utilisée
+
+3. **Ne JAMAIS** :
+   - ❌ Dire "cette fonctionnalité n'est pas importante" sans validation utilisateur
+   - ❌ Ignorer une fonctionnalité Odoo sous prétexte qu'elle est "avancée"
+   - ❌ Considérer un module "terminé" si gaps P0 ou P1 existent
+   - ❌ Se contenter d'une version "simplifiée" sans justification et accord utilisateur explicite
+
+---
+
+### Règle 2 : Approche "Surcouche" - NE JAMAIS Modifier Odoo
+
+**PRINCIPE SACRÉ** : Odoo est le backend robuste et éprouvé. Quelyos ERP est une surcouche UI moderne qui l'exploite intelligemment, **sans jamais le modifier**.
+
+#### Ce qui est STRICTEMENT INTERDIT ❌
+
+**Ne JAMAIS** :
+- ❌ Modifier le schéma de base de données Odoo
+- ❌ Ajouter des champs custom aux modèles Odoo standards (sauf héritage explicitement documenté et validé)
+- ❌ Modifier les méthodes core Odoo
+- ❌ Créer des tables SQL en dehors de l'ORM Odoo
+- ❌ Contourner l'API Odoo avec des requêtes SQL directes
+- ❌ Modifier les workflows Odoo standards (`sale.order`, `stock.picking`, etc.)
+- ❌ Supprimer ou renommer des champs Odoo existants
+- ❌ Désactiver des fonctionnalités Odoo natives
+
+#### Ce qui est AUTORISÉ et ENCOURAGÉ ✅
+
+**Utiliser pleinement** :
+- ✅ **API JSON-RPC Odoo** : Consommer TOUS les endpoints disponibles
+- ✅ **Modèles Odoo existants** : Exploiter `product.template`, `sale.order`, `res.partner`, `stock.quant`, etc.
+- ✅ **ORM Odoo via API** : `search()`, `read()`, `write()`, `create()`, `unlink()`
+- ✅ **Champs calculés Odoo** : `qty_available`, `virtual_available`, `amount_total`, etc.
+- ✅ **Relations Odoo** : `many2one`, `one2many`, `many2many`
+- ✅ **Workflows Odoo** : Suivre les états (`draft`, `confirmed`, `done`) sans les modifier
+- ✅ **Droits d'accès Odoo** : Respecter les security groups et `ir.model.access`
+- ✅ **Multi-société Odoo** : Supporter si configuré côté Odoo
+
+**Côté Frontend uniquement** (sans toucher Odoo) :
+- ✅ **State management** : Zustand, React Query pour cache client et optimistic UI
+- ✅ **Calculs UI** : Agrégations, filtres, tri côté frontend pour performance
+- ✅ **Préférences utilisateur** : Sauvegarder dans localStorage (thème, vues, etc.)
+- ✅ **Vues alternatives** : Kanban, calendrier, graphiques générés côté client
+- ✅ **Raccourcis clavier** : Améliorer productivité sans API
+- ✅ **Thème dark/light** : Préférence visuelle côté client
+
+#### Stratégie d'Extension Sans Modification Odoo
+
+**Pour ajouter une fonctionnalité, privilégier dans l'ordre** :
+
+1. **Frontend-only** (idéal) :
+   ```tsx
+   // ✅ CORRECT : Calcul statistiques côté frontend
+   const totalRevenue = orders
+     .filter(o => o.state === 'sale')
+     .reduce((sum, o) => sum + o.amount_total, 0);
+   ```
+
+2. **Nouvel endpoint API exploitant modèles existants** :
+   ```python
+   # ✅ CORRECT : Endpoint qui agrège sans modifier DB
+   @http.route('/api/ecommerce/analytics/stats', auth='user', methods=['GET'])
+   def get_analytics(self):
+       Product = request.env['product.template']
+       Order = request.env['sale.order']
+
+       # Calculs sur modèles existants, aucun nouveau champ
+       products_count = Product.search_count([])
+       orders_total = sum(Order.search([]).mapped('amount_total'))
+
+       return {'products_count': products_count, 'revenue': orders_total}
+   ```
+
+3. **Héritage Odoo** (seulement si absolument nécessaire, avec validation utilisateur) :
+   ```python
+   # ⚠️ CAS EXCEPTIONNEL validé : héritage propre
+   class ProductTemplateExtended(models.Model):
+       _inherit = 'product.template'
+
+       # Nouveau champ calculé (ne modifie pas la DB si store=False)
+       display_name_custom = fields.Char(
+           compute='_compute_display_name_custom',
+           store=False
+       )
+   ```
+
+**Ce qui est INTERDIT** :
+```python
+# ❌ INTERDIT : Nouveau modèle custom
+class CustomAnalytics(models.Model):
+    _name = 'quelyos.analytics'  # NON ! Modifie la DB
+
+# ❌ INTERDIT : Ajout champ stocké sans héritage
+class ProductBad(models.Model):
+    _inherit = 'product.template'
+    custom_field = fields.Char(store=True)  # NON ! Modifie le schéma
+```
+
+---
+
+### Règle 3 : Tests de Parité Automatisés Obligatoires
+
+**AVANT chaque release majeure** :
+
+#### Tests Backend (Pytest)
+
+```bash
+cd backend
+pytest tests/ -v
+# Expected: 60+ tests passent, 0 failed
+```
+
+**Structure** :
+```
+backend/tests/
+├── conftest.py                    # Fixtures Pytest Odoo
+├── test_api_products.py           # Tests CRUD produits + parité
+├── test_api_orders.py             # Tests commandes + workflows
+├── test_api_parity.py             # Tests de parité (API === Odoo DB)
+└── ...
+```
+
+**Exemple test de parité** :
+```python
+def test_create_product_via_api_creates_in_odoo(self):
+    """Vérifier que créer produit via API le crée bien dans Odoo DB"""
+    # 1. Créer via API
+    response = self.url_open('/api/ecommerce/products/create', ...)
+    product_id = json.loads(response.content)['data']['id']
+
+    # 2. Vérifier dans DB Odoo
+    product = self.env['product.template'].browse(product_id)
+    self.assertEqual(product.name, 'Test Product')
+```
+
+#### Tests E2E de Parité (Playwright)
+
+```bash
+cd frontend
+npx playwright test e2e/parity/
+# Expected: 15+ tests passent
+```
+
+**Structure** :
+```
+frontend/e2e/parity/
+├── product-parity.spec.ts         # Frontend affiche données Odoo
+├── cart-parity.spec.ts            # Panier sync avec sale.order Odoo
+└── ...
+```
+
+**Exemple test E2E de parité** :
+```typescript
+test('should sync cart between frontend and Odoo database', async ({ page }) => {
+  // 1. Add product via UI
+  await page.goto('/products');
+  await page.click('button:has-text("Ajouter au panier")');
+
+  // 2. Verify in Odoo DB via RPC
+  const odooCart = await odooRpcCall('sale.order', 'search_read', ...);
+  expect(odooCart[0].order_line).toHaveLength(expectedCount);
+});
+```
+
+#### Checklist de Validation
+
+- [ ] Tests backend API (pytest) : 60+ tests passent
+- [ ] Tests E2E parité (Playwright) : 15+ tests passent
+- [ ] Tests backoffice (Playwright) : 25+ tests passent
+- [ ] Rapport parité généré : Aucun gap P0
+- [ ] Tableaux correspondance à jour dans README.md
+- [ ] LOGME.md mis à jour
+
+---
+
+### Règle 4 : Alertes Immédiates (Red Flags)
+
+**Situations nécessitant alerte utilisateur AVANT de procéder** :
+
+#### 🚨 Alertes CRITIQUES (bloquant)
+
+- Modification schéma de base de données Odoo
+- Création d'un nouveau modèle Odoo custom (`_name = 'quelyos.*'`)
+- Ajout de champ stocké (`store=True`) à un modèle standard Odoo
+- Changement d'API breaking (modification signature endpoint existant)
+- Dépendance à un module Odoo payant/enterprise non disponible
+- Fonctionnalité Odoo identifiée mais **impossible** à implémenter sans modif DB
+
+#### ⚠️ Alertes IMPORTANTES (nécessite validation)
+
+- Fonctionnalité Odoo identifiée mais non implémentée dans Quelyos
+- Écart fonctionnel vs Odoo natif (limitation utilisateur)
+- Performance dégradée (> 3s chargement page, > 1s action)
+- Besoin d'héritage Odoo (`_inherit` avec nouveaux champs)
+
+#### Procédure d'Alerte
+
+**Utiliser AskUserQuestion** en présentant :
+1. Le contexte et la fonctionnalité concernée
+2. Les approches possibles avec avantages/inconvénients
+3. Les impacts de chaque approche (DB, API, UX, migration)
+4. La recommandation (approche sans modification Odoo privilégiée)
+
+**Exemple** :
+```typescript
+await AskUserQuestion({
+  questions: [{
+    question: "La fonctionnalité 'Upload images multiples produit' nécessite stockage. Quelle approche privilégier ?",
+    header: "Décision Technique",
+    options: [
+      {
+        label: "Approche A : Utiliser champs Odoo existants (Recommandé)",
+        description: "Exploiter image_1920, image_1024, image_512 déjà présents. Pas de modification DB."
+      },
+      {
+        label: "Approche B : Nouveau champ Odoo",
+        description: "Ajouter champ 'extra_images' via héritage. RISQUÉ : modifie DB, migration nécessaire."
+      }
+    ]
+  }]
+});
+```
+
+---
+
+### Règle 5 : Process de Validation Complet
+
+**Workflow obligatoire pour toute nouvelle fonctionnalité** :
+
+1. **Identifier fonctionnalité Odoo** à implémenter
+   - Consulter documentation Odoo
+   - Lister champs, méthodes, workflows
+
+2. **Concevoir approche "surcouche"** (API + Frontend, SANS modif DB)
+   - Privilégier frontend-only si possible
+   - Sinon, nouvel endpoint API exploitant modèles existants
+   - En dernier recours : héritage Odoo (avec validation utilisateur)
+
+3. **Implémenter** (Backend endpoint + Frontend/Backoffice page)
+   - Créer endpoint API dans `backend/addons/quelyos_api/controllers/`
+   - Créer/modifier page frontend ou backoffice
+   - Tester manuellement
+
+4. **Tester** (unit + E2E + parité)
+   - Tests backend (pytest) : Vérifier API === Odoo DB
+   - Tests E2E (Playwright) : Vérifier Frontend === Backend
+   - Valider parité : Aucune régression vs Odoo
+
+5. **Documenter** (tableau correspondance + LOGME.md)
+   - Mettre à jour tableau dans README.md (✅ Implémenté)
+   - Ajouter ligne dans LOGME.md
+   - Documenter dans code (docstrings, commentaires si nécessaire)
+
+6. **Valider** (tests passent, aucun gap introduit)
+   - Tous les tests passent
+   - Aucun gap P0 ou P1 non documenté
+   - Documentation à jour
+
+---
+
 ## Règles pour Claude
 
 1. **Au début de chaque nouvelle session, lire obligatoirement les fichiers `README.md` et `LOGME.md`** pour comprendre le contexte du projet, son architecture et l'historique récent des étapes réalisées
@@ -838,3 +1176,4 @@ interface ButtonProps {
 7. Si une dépendance est nécessaire, vérifier qu'elle n'existe pas déjà
 8. **⚠️ CRITIQUE : TOUJOURS alerter l'utilisateur avec AskUserQuestion avant toute modification du schéma de base de données Odoo, des modèles, ou des endpoints API** (voir section "ALERTE : Modifications structurelles Odoo")
 9. **🎨 UX/UI : Appliquer systématiquement les principes de la section "Principes UX/UI Modernes (2026)" lors du développement d'interfaces** - L'objectif est de créer une expérience utilisateur exceptionnelle qui surpasse largement l'interface Odoo standard
+10. **🎯 PARITÉ FONCTIONNELLE : Avant toute déclaration de "module terminé", TOUJOURS effectuer un audit complet des fonctionnalités Odoo correspondantes et créer/mettre à jour le tableau de correspondance dans README.md** - Suivre les 5 règles de la section "Principe Fondamental : Parité Fonctionnelle Totale avec Odoo" pour garantir 100% de parité fonctionnelle sans modifier le modèle Odoo

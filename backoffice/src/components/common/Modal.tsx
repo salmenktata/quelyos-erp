@@ -12,6 +12,14 @@ export interface ModalProps {
   cancelText?: string
   variant?: 'default' | 'danger'
   loading?: boolean
+  size?: 'sm' | 'md' | 'lg' | 'xl'
+}
+
+const sizeClasses = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
 }
 
 export function Modal({
@@ -25,6 +33,7 @@ export function Modal({
   cancelText = 'Annuler',
   variant = 'default',
   loading = false,
+  size = 'md',
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
 
@@ -72,7 +81,7 @@ export function Modal({
     >
       <div
         ref={modalRef}
-        className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-full max-w-md transform transition-all duration-200 animate-slideUp"
+        className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-full ${sizeClasses[size]} transform transition-all duration-200 animate-slideUp`}
       >
         <div className="p-6">
           <div className="flex items-start gap-4">

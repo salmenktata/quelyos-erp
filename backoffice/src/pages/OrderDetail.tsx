@@ -1,50 +1,56 @@
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { useOrder, useUpdateOrderStatus } from '../hooks/useOrders'
+import { Badge, Button, Breadcrumbs, Skeleton, Modal } from '../components/common'
+import { useToast } from '../hooks/useToast'
+import { ToastContainer } from '../components/common/Toast'
 
 export default function OrderDetail() {
   const { id } = useParams<{ id: string }>()
   const orderId = parseInt(id || '0', 10)
   const { data, isLoading, error } = useOrder(orderId)
   const updateStatus = useUpdateOrderStatus()
+  const toast = useToast()
 
-  const handleUpdateStatus = async (action: 'confirm' | 'cancel' | 'done') => {
-    if (!orderId) return
+  const [actionModal, setActionModal] = useState<{ action: 'confirm' | 'cancel' | 'done'; message: string } | null>(
+    null
+  )
 
-    if (
-      window.confirm(
-        `Êtes-vous sûr de vouloir ${
-          action === 'confirm'
-            ? 'confirmer'
-            : action === 'cancel'
-            ? 'annuler'
-            : 'marquer comme terminée'
-        } cette commande ?`
-      )
-    ) {
-      try {
-        await updateStatus.mutateAsync({ id: orderId, action })
-        alert('Statut mis à jour avec succès')
-      } catch (err) {
-        alert('Erreur lors de la mise à jour du statut')
-      }
+  const handleUpdateStatusConfirm = async () => {
+    if (!orderId || !actionModal) return
+
+    try {
+      await updateStatus.mutateAsync({ id: orderId, action: actionModal.action })
+      toast.success('Statut mis à jour avec succès')
+      setActionModal(null)
+    } catch (err) {
+      toast.error('Erreur lors de la mise à jour du statut')
     }
   }
 
-  const getStatusColor = (state: string) => {
+  const openActionModal = (action: 'confirm' | 'cancel' | 'done') => {
+    const message =
+      action === 'confirm'
+        ? 'confirmer'
+        : action === 'cancel'
+        ? 'annuler'
+        : 'marquer comme terminée'
+    setActionModal({ action, message })
+  }
+
+  const getStatusVariant = (state: string): 'success' | 'warning' | 'error' | 'info' | 'neutral' => {
     switch (state) {
-      case 'draft':
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800'
-      case 'sent':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800'
       case 'sale':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800'
       case 'done':
-        return 'bg-indigo-100 text-indigo-800'
+        return 'success'
+      case 'sent':
+        return 'info'
       case 'cancel':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800'
+        return 'error'
+      case 'draft':
       default:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800'
+        return 'neutral'
     }
   }
 
@@ -87,16 +93,31 @@ export default function OrderDetail() {
     return (
       <Layout>
         <div className="p-8">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            <p className="text-gray-600 dark:text-gray-400 mt-4">Chargement...</p>
+          <Breadcrumbs
+            items={[
+              { label: 'Tableau de bord', href: '/dashboard' },
+              { label: 'Commandes', href: '/orders' },
+              { label: 'Chargement...' },
+            ]}
+          />
+          <div className="space-y-4 mt-8">
+            <Skeleton variant="text" width="40%" height={36} />
+            <Skeleton variant="text" width="60%" height={20} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+              <div className="lg:col-span-2">
+                <Skeleton height={300} />
+              </div>
+              <div>
+                <Skeleton height={200} />
+              </div>
+            </div>
           </div>
         </div>
       </Layout>
     )
   }
 
-  if (error || !data?.order) {
+  if (error || !data?.data?.order) {
     return (
       <Layout>
         <div className="p-8">
@@ -108,41 +129,31 @@ export default function OrderDetail() {
     )
   }
 
-  const order = data.order
+  const order = data.data.order
 
   return (
     <Layout>
       <div className="p-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Commandes', href: '/orders' },
+            { label: order.name },
+          ]}
+        />
+
         {/* Header */}
         <div className="mb-8">
-          <Link
-            to="/orders"
-            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 flex items-center mb-4 transition-colors"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Retour aux commandes
-          </Link>
-
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Commande {order.name}</h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">Passée le {formatDate(order.date_order)}</p>
             </div>
 
-            <span
-              className={`px-4 py-2 inline-flex text-sm font-semibold rounded-full ${getStatusColor(
-                order.state
-              )}`}
-            >
+            <Badge variant={getStatusVariant(order.state)} size="lg">
               {getStatusLabel(order.state)}
-            </span>
+            </Badge>
           </div>
         </div>
 
@@ -282,38 +293,57 @@ export default function OrderDetail() {
 
               <div className="space-y-3">
                 {order.state === 'draft' && (
-                  <button
-                    onClick={() => handleUpdateStatus('confirm')}
+                  <Button
+                    variant="primary"
+                    className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700"
+                    onClick={() => openActionModal('confirm')}
                     disabled={updateStatus.isPending}
-                    className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Confirmer la commande
-                  </button>
+                  </Button>
                 )}
 
                 {(order.state === 'draft' || order.state === 'sent' || order.state === 'sale') && (
-                  <button
-                    onClick={() => handleUpdateStatus('cancel')}
+                  <Button
+                    variant="danger"
+                    className="w-full"
+                    onClick={() => openActionModal('cancel')}
                     disabled={updateStatus.isPending}
-                    className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Annuler la commande
-                  </button>
+                  </Button>
                 )}
 
                 {order.state === 'sale' && (
-                  <button
-                    onClick={() => handleUpdateStatus('done')}
+                  <Button
+                    variant="primary"
+                    className="w-full"
+                    onClick={() => openActionModal('done')}
                     disabled={updateStatus.isPending}
-                    className="w-full px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Marquer comme terminée
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Modal de confirmation */}
+        <Modal
+          isOpen={!!actionModal}
+          onClose={() => setActionModal(null)}
+          onConfirm={handleUpdateStatusConfirm}
+          title="Confirmer l'action"
+          description={`Êtes-vous sûr de vouloir ${actionModal?.message} cette commande ?`}
+          confirmText="Confirmer"
+          cancelText="Annuler"
+          variant={actionModal?.action === 'cancel' ? 'danger' : 'default'}
+          loading={updateStatus.isPending}
+        />
+
+        {/* ToastContainer */}
+        <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} position="top-right" />
       </div>
     </Layout>
   )
