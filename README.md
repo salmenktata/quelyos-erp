@@ -1,448 +1,424 @@
-# 🛒 Quelyos ERP - Module E-commerce Headless
+# Quelyos
 
-Plateforme e-commerce headless complète basée sur Odoo 19 (backend) et Next.js 14 (frontend).
+Frontend e-commerce + Backoffice admin modernes pour Odoo 19 Community.
 
-![Status](https://img.shields.io/badge/status-production--ready-success)
-![Odoo](https://img.shields.io/badge/Odoo-19.0-blue)
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+## Vision
 
-## 🌟 Caractéristiques
-
-### Backend (Odoo 19)
-- ✅ **API REST complète** - 40+ endpoints JSON-RPC
-- ✅ **Authentification Portal** - Session sécurisée avec cookies httpOnly
-- ✅ **Gestion Produits** - Catalogue avec variants, images, SEO
-- ✅ **Panier & Checkout** - Gestion panier invité + authentifié
-- ✅ **Coupons de réduction** - Système complet avec validations
-- ✅ **Avis Produits** - Modération, réponses vendeur
-- ✅ **Analytics E-commerce** - Dashboard temps réel
-- ✅ **Wishlist & Comparateur** - Features avancées
-- ✅ **Sécurité** - Rate limiting, validation input, CORS
-- ✅ **Branding Quelyos** - Personnalisation complète interface
-
-### Frontend (Next.js 14)
-- ✅ **App Router** - Architecture moderne Next.js 14
-- ✅ **TypeScript strict** - Types complets API/UI
-- ✅ **Zustand** - State management performant
-- ✅ **Tailwind CSS 4** - Design system responsive
-- ✅ **React Hook Form + Zod** - Validation formulaires
-- ✅ **SEO Optimisé** - Metadata dynamique, sitemap, ISR
-- ✅ **Tests** - Jest (unit) + Playwright (E2E)
-
-## 📋 Prérequis
-
-- Docker & Docker Compose
-- Node.js 20+ (pour développement frontend)
-- Git
-
-## 🚀 Installation Rapide
-
-### 1. Cloner le projet
-
-```bash
-git clone https://github.com/votre-org/QuelyosERP.git
-cd QuelyosERP
-```
-
-### 2. Démarrer le Backend Odoo
-
-```bash
-cd backend
-docker-compose up -d
-```
-
-Odoo sera accessible sur http://localhost:8069
-
-**Première connexion:**
-- Email: `admin`
-- Mot de passe: `admin`
-
-### 3. Installer les modules Odoo
-
-1. Aller sur http://localhost:8069
-2. Se connecter avec admin/admin
-3. Aller dans **Apps**
-4. Cliquer sur **Update Apps List**
-5. Rechercher "Quelyos"
-6. Installer:
-   - **Quelyos Branding**
-   - **Quelyos E-commerce API**
-
-### 4. Démarrer le Frontend Next.js
-
-```bash
-cd ../frontend
-npm install
-npm run dev
-```
-
-Frontend accessible sur http://localhost:3000
-
-## 📖 Documentation Complète
-
-### Structure du Projet
+Remplacer les interfaces Odoo (site e-commerce, gestion produits) par des vues modernes tout en gardant le cœur Odoo (modèles, ORM, base de données).
 
 ```
-QuelyosERP/
-├── backend/
-│   ├── addons/
-│   │   ├── quelyos_branding/        # Module branding Quelyos
-│   │   └── quelyos_ecommerce/       # Module e-commerce
-│   │       ├── controllers/         # API REST endpoints
-│   │       ├── models/              # Modèles ORM Odoo
-│   │       ├── views/               # Interfaces backoffice
-│   │       ├── data/                # Données initiales
-│   │       ├── security/            # Droits d'accès
-│   │       └── tests/               # Tests Python
-│   └── docker-compose.yml
-│
-├── frontend/
-│   ├── src/
-│   │   ├── app/                     # Pages Next.js (App Router)
-│   │   ├── components/              # Composants React
-│   │   ├── lib/                     # Utilitaires (client Odoo, etc.)
-│   │   ├── store/                   # State Zustand (cart, auth)
-│   │   └── types/                   # Types TypeScript
-│   ├── public/                      # Assets statiques
-│   └── package.json
-│
-└── README.md
+┌─────────────────────────────────────────────────────────┐
+│              FRONTEND (Next.js)                          │
+│              Boutique e-commerce                         │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────┴───────────────────────────────────┐
+│              BACKOFFICE (React)                          │
+│              Gestion produits, commandes                 │
+└─────────────────────┬───────────────────────────────────┘
+                      │ API REST
+┌─────────────────────┴───────────────────────────────────┐
+│              ODOO 19 Community                           │
+│              Modèles, ORM, Base de données               │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### Architecture
+## Structure
 
 ```
-┌─────────────┐         HTTP/JSON-RPC          ┌──────────────┐
-│             │  ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← │              │
-│  Next.js 14 │                                 │   Odoo 19    │
-│  (Frontend) │  → → → → → → → → → → → → → → → │  (Backend)   │
-│             │    Session Cookies              │              │
-└─────────────┘                                 └──────────────┘
-      ↓                                                 ↓
-  Zustand State                                 PostgreSQL 15
-   (cart, auth)                                  (Persistence)
+frontend/          → Next.js (boutique e-commerce)
+backoffice/        → React + Vite (administration)
+backend/
+  ├── addons/
+  │   └── quelyos_api/  → Module Odoo (API REST)
+  ├── docker-compose.yml
+  └── reset.sh          → Script reset installation
+config/            → Configuration Odoo
+nginx/             → Config production
 ```
 
-## 🎯 Utilisation
-
-### Créer un Produit E-commerce
-
-1. **Backend Odoo:**
-   - Aller dans **E-commerce → Catalogue → Produits**
-   - Cliquer **Créer**
-   - Remplir les champs de base (nom, prix, image)
-   - Onglet **E-commerce**: cocher "Produit mis en avant"
-   - Remplir SEO (meta title, description)
-   - Enregistrer
-
-2. **Le produit sera automatiquement disponible sur le frontend** avec:
-   - URL SEO-friendly (slug généré automatiquement)
-   - Metadata pour référencement
-   - Images optimisées
-
-### Créer un Coupon de Réduction
-
-1. **Backend Odoo:**
-   - Aller dans **E-commerce → Marketing → Coupons**
-   - Créer un coupon:
-     - Code: `SUMMER2024`
-     - Type: Pourcentage
-     - Valeur: 10%
-     - Validité: définir dates
-
-2. **Frontend:**
-   - Le coupon est appliqué via l'API `/api/ecommerce/coupon/validate`
-   - Validation automatique des conditions (montant min, usage, dates)
-
-### Gérer les Avis Produits
-
-1. **Backend Odoo:**
-   - **E-commerce → Marketing → Avis Produits**
-   - Approuver/Rejeter les avis clients
-   - Répondre aux avis (réponse vendeur)
-
-## 🔐 API E-commerce
-
-### Endpoints Principaux
-
-#### Authentification
-```bash
-# Login
-POST /api/ecommerce/auth/login
-{
-  "email": "client@example.com",
-  "password": "password123"
-}
-
-# Logout
-POST /api/ecommerce/auth/logout
-
-# Inscription
-POST /api/ecommerce/auth/register
-{
-  "name": "Jean Dupont",
-  "email": "jean@example.com",
-  "password": "secure123",
-  "phone": "+33612345678"
-}
-```
-
-#### Produits
-```bash
-# Liste produits
-POST /api/ecommerce/products
-{
-  "limit": 20,
-  "offset": 0,
-  "category_id": 1,
-  "price_min": 10,
-  "price_max": 100
-}
-
-# Détail produit
-POST /api/ecommerce/products/<id>
-
-# Produit par slug (SEO)
-POST /api/ecommerce/products/slug/<slug>
-```
-
-#### Panier
-```bash
-# Ajouter au panier
-POST /api/ecommerce/cart/add
-{
-  "product_id": 1,
-  "quantity": 2
-}
-
-# Modifier quantité
-POST /api/ecommerce/cart/update/<line_id>
-{
-  "quantity": 3
-}
-
-# Supprimer ligne
-POST /api/ecommerce/cart/remove/<line_id>
-
-# Vider panier
-POST /api/ecommerce/cart/clear
-```
-
-#### Checkout
-```bash
-# Valider panier (stock disponible)
-POST /api/ecommerce/checkout/validate
-
-# Calculer frais livraison
-POST /api/ecommerce/checkout/shipping
-{
-  "delivery_method_id": 1
-}
-
-# Confirmer commande
-POST /api/ecommerce/checkout/confirm
-{
-  "shipping_address_id": 1,
-  "billing_address_id": 1,
-  "delivery_method_id": 1,
-  "payment_method_id": 1
-}
-```
-
-#### Coupons
-```bash
-# Appliquer coupon
-POST /api/ecommerce/coupon/validate
-{
-  "code": "SUMMER2024"
-}
-
-# Retirer coupon
-POST /api/ecommerce/coupon/remove
-```
-
-## 🧪 Tests
-
-### Backend (Python)
-
-```bash
-cd backend
-docker-compose run --rm odoo odoo -d quelyos --test-enable --stop-after-init
-```
-
-### Frontend (Jest + Playwright)
-
-```bash
-cd frontend
-
-# Tests unitaires
-npm run test
-
-# Tests E2E
-npm run test:e2e
-
-# Tous les tests
-npm run test:all
-```
-
-## 📊 Dashboard Analytics
-
-Le module e-commerce inclut un dashboard analytics temps réel accessible via **E-commerce → Analytics → Dashboard**.
-
-**Métriques disponibles:**
-- Revenus (jour/semaine/mois)
-- Nombre de commandes
-- Valeur moyenne panier
-- Taux de conversion
-- Top produits vendus
-- Paniers abandonnés
-
-## 🔒 Sécurité
-
-### Rate Limiting
-
-Tous les endpoints critiques sont protégés:
-- Login: 5 tentatives / 5 minutes
-- Coupons: 10 tentatives / 5 minutes
-- API générale: Configurable par endpoint
-
-### Validation Input
-
-- Sanitization XSS automatique
-- Validation types (Zod côté frontend, Odoo validators côté backend)
-- Protection SQL injection (ORM Odoo)
-
-### CORS
-
-- Configuration CORS stricte
-- Whitelist des origines autorisées
-- Headers sécurisés
-
-## 🚢 Déploiement Production
-
-### Option 1: Docker Compose (VPS)
-
-```bash
-# 1. Cloner sur le serveur
-git clone https://github.com/votre-org/QuelyosERP.git
-cd QuelyosERP
-
-# 2. Créer .env.production
-cp .env.production.example .env.production
-# Éditer avec vos valeurs (DB passwords, secrets, etc.)
-
-# 3. Démarrer avec docker-compose
-docker-compose -f docker-compose.prod.yml up -d
-
-# 4. Installer modules Odoo
-docker-compose exec odoo odoo -d quelyos -i quelyos_branding,quelyos_ecommerce --stop-after-init
-
-# 5. Redémarrer
-docker-compose restart
-```
-
-### Option 2: Kubernetes (Scalable)
-
-Voir [DEPLOYMENT.md](./DEPLOYMENT.md) pour configuration Kubernetes complète.
-
-### SSL/TLS
-
-Utiliser **Let's Encrypt** avec Nginx reverse proxy:
-
-```bash
-# Installer certbot
-sudo apt install certbot python3-certbot-nginx
-
-# Obtenir certificat
-sudo certbot --nginx -d votredomaine.com -d www.votredomaine.com
-```
-
-## 🎨 Branding Quelyos
-
-Le module `quelyos_branding` personnalise l'interface Odoo:
-- Logo Quelyos
-- Couleurs purple → blue
-- Masquage éléments Enterprise
-- Templates email personnalisés
-- Favicon custom
-
-**Configuration:**
-- **Paramètres → Branding Quelyos**
-- Modifier couleurs, logo, slogan, etc.
-
-## 📈 Performance
-
-### Backend
-- ✅ Cache ORM Odoo
-- ✅ Index PostgreSQL optimisés
-- ✅ Computed fields avec store=True
-
-### Frontend
-- ✅ ISR (Incremental Static Regeneration)
-- ✅ Image optimization (next/image)
-- ✅ Code splitting automatique
-- ✅ Font optimization
-
-**Benchmarks:**
-- Temps de réponse API: < 200ms (p95)
-- Time to First Byte: < 500ms
-- Lighthouse Score: > 90
-
-## 🐛 Dépannage
-
-### Problème: Module non visible dans Apps
-
-**Solution:**
-```bash
-docker-compose exec odoo odoo -d quelyos --update=quelyos_ecommerce --stop-after-init
-docker-compose restart odoo
-```
-
-### Problème: Erreur 415 sur API
-
-**Cause:** Content-Type incorrect
-
-**Solution:** S'assurer d'envoyer `Content-Type: application/json` avec body JSON-RPC valide.
-
-### Problème: Frontend ne se connecte pas à Odoo
-
-**Vérifier:**
-1. Odoo est accessible sur localhost:8069
-2. `.env.local` a la bonne URL: `NEXT_PUBLIC_ODOO_URL=http://localhost:8069`
-3. CORS configuré côté Odoo
-
-## 🤝 Contribution
-
-Les contributions sont bienvenues!
-
-1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/amazing-feature`)
-3. Commit (`git commit -m 'Add amazing feature'`)
-4. Push (`git push origin feature/amazing-feature`)
-5. Ouvrir une Pull Request
-
-## 📄 Licence
-
-Ce projet est sous licence LGPL-3 (comme Odoo Community).
-
-## 📞 Support
-
-- 📧 Email: support@quelyos.com
-- 🐛 Issues: https://github.com/votre-org/QuelyosERP/issues
-- 📖 Documentation: https://docs.quelyos.com
-
-## 🎉 Crédits
-
-Développé avec ❤️ par l'équipe Quelyos.
-
-Technologies utilisées:
-- [Odoo](https://www.odoo.com/) - Framework ERP
-- [Next.js](https://nextjs.org/) - Framework React
-- [Tailwind CSS](https://tailwindcss.com/) - Framework CSS
-- [Zustand](https://github.com/pmndrs/zustand) - State management
-- [PostgreSQL](https://www.postgresql.org/) - Database
+## Stack
+
+| Composant | Technologies |
+|-----------|-------------|
+| Frontend | Next.js 14, Tailwind CSS, TypeScript |
+| Backoffice | React 18, Vite, Tailwind CSS, React Query |
+| Backend | Odoo 19 Community, Python 3.12, PostgreSQL 15 |
 
 ---
 
-**Version:** 1.0.0 | **Date:** Janvier 2026
+## Commandes
+
+```bash
+# Reset Odoo (installation vierge)
+cd backend && ./reset.sh
+
+# Démarrer Odoo
+cd backend && docker-compose up -d
+
+# Démarrer Frontend
+cd frontend && npm install && npm run dev
+
+# Démarrer Backoffice
+cd backoffice && npm install && npm run dev
+```
+
+---
+
+## Plan de développement
+
+### Phase 1 : E-commerce + Produits
+
+**Objectif** : MVP fonctionnel avec gestion produits
+
+#### Étape 1.1 : Module API Odoo (`quelyos_api`)
+
+| Tâche | Endpoint | Description |
+|-------|----------|-------------|
+| [ ] GET produits | `/api/v1/products` | Liste paginée avec filtres |
+| [ ] GET produit | `/api/v1/products/<id>` | Détail d'un produit |
+| [ ] POST produit | `/api/v1/products` | Créer un produit |
+| [ ] PUT produit | `/api/v1/products/<id>` | Modifier un produit |
+| [ ] DELETE produit | `/api/v1/products/<id>` | Supprimer un produit |
+| [ ] GET catégories | `/api/v1/categories` | Liste des catégories |
+| [ ] POST catégorie | `/api/v1/categories` | Créer une catégorie |
+| [ ] Auth login | `/api/v1/auth/login` | Authentification JWT |
+| [ ] Auth logout | `/api/v1/auth/logout` | Déconnexion |
+| [ ] Auth me | `/api/v1/auth/me` | Info utilisateur courant |
+| [ ] Config CORS | - | Headers cross-origin |
+
+#### Étape 1.2 : Backoffice React
+
+| Tâche | Fichier | Description |
+|-------|---------|-------------|
+| [ ] Setup Vite | `vite.config.ts` | Configuration projet |
+| [ ] Tailwind | `tailwind.config.ts` | Styles |
+| [ ] Layout | `components/Layout.tsx` | Sidebar + Header |
+| [ ] Auth | `pages/Login.tsx` | Page connexion |
+| [ ] Dashboard | `pages/Dashboard.tsx` | Accueil admin |
+| [ ] Liste produits | `pages/Products.tsx` | Tableau paginé |
+| [ ] Form produit | `pages/ProductForm.tsx` | Création/édition |
+| [ ] Upload images | `components/ImageUpload.tsx` | Gestion images |
+| [ ] Liste catégories | `pages/Categories.tsx` | Gestion catégories |
+| [ ] API client | `lib/api.ts` | Client HTTP |
+
+#### Étape 1.3 : Frontend Next.js
+
+| Tâche | Route | Description |
+|-------|-------|-------------|
+| [ ] API client Odoo | `lib/odoo.ts` | Connexion API |
+| [ ] Page accueil | `/` | Hero + produits featured |
+| [ ] Catalogue | `/products` | Liste + filtres |
+| [ ] Fiche produit | `/products/[slug]` | Détail + variantes |
+| [ ] Panier | `/cart` | Liste articles |
+| [ ] Checkout | `/checkout` | Tunnel commande |
+| [ ] Confirmation | `/order/[id]` | Confirmation commande |
+
+#### Étape 1.4 : Tests Phase 1
+
+| Tâche | Type | Description |
+|-------|------|-------------|
+| [ ] Tests API | Postman | Collection endpoints |
+| [ ] Tests unitaires | Jest | Composants React |
+| [ ] Tests E2E | Playwright | Parcours utilisateur |
+
+---
+
+### Phase 2 : Commandes + Clients
+
+**Objectif** : Gestion complète des commandes et espace client
+
+#### Étape 2.1 : API Commandes
+
+| Tâche | Endpoint | Description |
+|-------|----------|-------------|
+| [ ] GET commandes | `/api/v1/orders` | Liste commandes (admin) |
+| [ ] GET commande | `/api/v1/orders/<id>` | Détail commande |
+| [ ] PUT statut | `/api/v1/orders/<id>/status` | Changer statut |
+| [ ] GET mes commandes | `/api/v1/customer/orders` | Commandes du client |
+| [ ] POST commande | `/api/v1/orders` | Créer commande |
+
+#### Étape 2.2 : API Panier
+
+| Tâche | Endpoint | Description |
+|-------|----------|-------------|
+| [ ] GET panier | `/api/v1/cart` | Panier courant |
+| [ ] POST ajouter | `/api/v1/cart/add` | Ajouter produit |
+| [ ] PUT quantité | `/api/v1/cart/update` | Modifier quantité |
+| [ ] DELETE ligne | `/api/v1/cart/remove/<id>` | Supprimer ligne |
+| [ ] DELETE vider | `/api/v1/cart/clear` | Vider panier |
+
+#### Étape 2.3 : API Clients
+
+| Tâche | Endpoint | Description |
+|-------|----------|-------------|
+| [ ] POST inscription | `/api/v1/auth/register` | Créer compte |
+| [ ] GET profil | `/api/v1/customer/profile` | Info client |
+| [ ] PUT profil | `/api/v1/customer/profile` | Modifier profil |
+| [ ] GET adresses | `/api/v1/customer/addresses` | Liste adresses |
+| [ ] POST adresse | `/api/v1/customer/addresses` | Ajouter adresse |
+| [ ] PUT adresse | `/api/v1/customer/addresses/<id>` | Modifier adresse |
+| [ ] DELETE adresse | `/api/v1/customer/addresses/<id>` | Supprimer adresse |
+
+#### Étape 2.4 : Backoffice Commandes
+
+| Tâche | Fichier | Description |
+|-------|---------|-------------|
+| [ ] Liste commandes | `pages/Orders.tsx` | Tableau + filtres statut |
+| [ ] Détail commande | `pages/OrderDetail.tsx` | Infos + lignes + client |
+| [ ] Changer statut | `components/OrderStatus.tsx` | Dropdown statut |
+| [ ] Liste clients | `pages/Customers.tsx` | Tableau clients |
+| [ ] Détail client | `pages/CustomerDetail.tsx` | Infos + historique |
+
+#### Étape 2.5 : Frontend Espace Client
+
+| Tâche | Route | Description |
+|-------|-------|-------------|
+| [ ] Inscription | `/register` | Formulaire inscription |
+| [ ] Connexion | `/login` | Formulaire connexion |
+| [ ] Mon compte | `/account` | Dashboard client |
+| [ ] Mes commandes | `/account/orders` | Historique |
+| [ ] Détail commande | `/account/orders/[id]` | Suivi commande |
+| [ ] Mes adresses | `/account/addresses` | Gestion adresses |
+| [ ] Mon profil | `/account/profile` | Modifier infos |
+
+#### Étape 2.6 : Tests Phase 2
+
+| Tâche | Type | Description |
+|-------|------|-------------|
+| [ ] Tests API commandes | Postman | Endpoints commandes |
+| [ ] Tests E2E inscription | Playwright | Parcours inscription |
+| [ ] Tests E2E commande | Playwright | Parcours achat complet |
+
+---
+
+### Phase 3 : Stock + Livraison
+
+**Objectif** : Gestion stock temps réel et modes de livraison
+
+#### Étape 3.1 : API Stock
+
+| Tâche | Endpoint | Description |
+|-------|----------|-------------|
+| [ ] GET stock produit | `/api/v1/products/<id>/stock` | Quantité disponible |
+| [ ] PUT stock | `/api/v1/products/<id>/stock` | Modifier stock (admin) |
+| [ ] GET mouvements | `/api/v1/stock/moves` | Historique mouvements |
+| [ ] Validation stock | - | Vérifier dispo avant commande |
+
+#### Étape 3.2 : API Livraison
+
+| Tâche | Endpoint | Description |
+|-------|----------|-------------|
+| [ ] GET méthodes | `/api/v1/delivery/methods` | Modes de livraison |
+| [ ] POST calcul | `/api/v1/delivery/calculate` | Calcul frais |
+| [ ] GET zones | `/api/v1/delivery/zones` | Zones de livraison |
+
+#### Étape 3.3 : Backoffice Stock
+
+| Tâche | Fichier | Description |
+|-------|---------|-------------|
+| [ ] Stock produits | `pages/Stock.tsx` | Vue stock global |
+| [ ] Ajustement | `components/StockAdjust.tsx` | Modifier quantités |
+| [ ] Alertes rupture | `components/StockAlerts.tsx` | Produits en rupture |
+| [ ] Méthodes livraison | `pages/DeliveryMethods.tsx` | Config livraison |
+
+#### Étape 3.4 : Frontend Stock
+
+| Tâche | Description |
+|-------|-------------|
+| [ ] Affichage stock | Badge disponibilité sur fiche produit |
+| [ ] Alerte rupture | Message si stock faible |
+| [ ] Blocage panier | Empêcher ajout si rupture |
+| [ ] Choix livraison | Sélection mode au checkout |
+| [ ] Calcul frais | Affichage frais temps réel |
+
+---
+
+### Phase 4 : Paiement
+
+**Objectif** : Intégration paiement en ligne
+
+#### Étape 4.1 : API Paiement
+
+| Tâche | Endpoint | Description |
+|-------|----------|-------------|
+| [ ] GET méthodes | `/api/v1/payment/methods` | Modes de paiement |
+| [ ] POST initier | `/api/v1/payment/init` | Créer transaction |
+| [ ] POST confirmer | `/api/v1/payment/confirm` | Confirmer paiement |
+| [ ] Webhook | `/api/v1/payment/webhook` | Callback provider |
+
+#### Étape 4.2 : Intégration Stripe
+
+| Tâche | Description |
+|-------|-------------|
+| [ ] Config Stripe | Clés API dans Odoo |
+| [ ] Créer PaymentIntent | Initier paiement |
+| [ ] Stripe Elements | Formulaire carte |
+| [ ] Webhook | Traitement événements |
+| [ ] Gestion erreurs | Paiement refusé, etc. |
+
+#### Étape 4.3 : Backoffice Paiement
+
+| Tâche | Fichier | Description |
+|-------|---------|-------------|
+| [ ] Transactions | `pages/Payments.tsx` | Liste paiements |
+| [ ] Détail | `pages/PaymentDetail.tsx` | Infos transaction |
+| [ ] Remboursement | `components/Refund.tsx` | Initier remboursement |
+| [ ] Config | `pages/PaymentConfig.tsx` | Paramètres Stripe |
+
+#### Étape 4.4 : Frontend Paiement
+
+| Tâche | Description |
+|-------|-------------|
+| [ ] Formulaire Stripe | Composant Stripe Elements |
+| [ ] Page paiement | `/checkout/payment` |
+| [ ] Confirmation | Affichage succès/échec |
+| [ ] Facture | Téléchargement PDF |
+
+---
+
+### Phase 5 : Marketing + SEO
+
+**Objectif** : Outils marketing et optimisation SEO
+
+#### Étape 5.1 : API Marketing
+
+| Tâche | Endpoint | Description |
+|-------|----------|-------------|
+| [ ] GET coupons | `/api/v1/coupons` | Liste coupons (admin) |
+| [ ] POST coupon | `/api/v1/coupons` | Créer coupon |
+| [ ] POST appliquer | `/api/v1/cart/coupon` | Appliquer au panier |
+| [ ] DELETE coupon | `/api/v1/cart/coupon` | Retirer coupon |
+
+#### Étape 5.2 : Backoffice Marketing
+
+| Tâche | Fichier | Description |
+|-------|---------|-------------|
+| [ ] Coupons | `pages/Coupons.tsx` | Gestion codes promo |
+| [ ] Form coupon | `pages/CouponForm.tsx` | Création coupon |
+| [ ] Produits featured | `pages/Featured.tsx` | Mise en avant |
+| [ ] Analytics | `pages/Analytics.tsx` | Stats ventes |
+
+#### Étape 5.3 : SEO Frontend
+
+| Tâche | Description |
+|-------|-------------|
+| [ ] Meta tags | Title, description dynamiques |
+| [ ] Open Graph | Partage réseaux sociaux |
+| [ ] Sitemap | `/sitemap.xml` automatique |
+| [ ] Schema.org | Données structurées produits |
+| [ ] URLs SEO | Slugs produits/catégories |
+
+---
+
+### Phase 6 : Production
+
+**Objectif** : Mise en production
+
+#### Étape 6.1 : Infrastructure
+
+| Tâche | Description |
+|-------|-------------|
+| [ ] Serveur VPS | Provision serveur |
+| [ ] Docker prod | docker-compose.prod.yml |
+| [ ] Nginx | Reverse proxy + SSL |
+| [ ] Domaine | Configuration DNS |
+| [ ] SSL | Certificat Let's Encrypt |
+
+#### Étape 6.2 : Déploiement
+
+| Tâche | Description |
+|-------|-------------|
+| [ ] CI/CD | GitHub Actions |
+| [ ] Build frontend | Compilation Next.js |
+| [ ] Build backoffice | Compilation Vite |
+| [ ] Migration DB | Scripts migration |
+| [ ] Backup | Stratégie sauvegarde |
+
+#### Étape 6.3 : Monitoring
+
+| Tâche | Description |
+|-------|-------------|
+| [ ] Logs | Centralisation logs |
+| [ ] Alertes | Notifications erreurs |
+| [ ] Uptime | Monitoring disponibilité |
+| [ ] Performance | Métriques temps réponse |
+
+---
+
+## API Reference
+
+### Authentification
+
+```
+POST   /api/v1/auth/login          { email, password } → { token }
+POST   /api/v1/auth/logout         → { success }
+POST   /api/v1/auth/register       { name, email, password } → { user }
+GET    /api/v1/auth/me             → { user }
+```
+
+### Produits
+
+```
+GET    /api/v1/products            ?limit=20&offset=0&category_id=1
+GET    /api/v1/products/<id>       → { product }
+POST   /api/v1/products            { name, price, ... } → { product }
+PUT    /api/v1/products/<id>       { name, price, ... } → { product }
+DELETE /api/v1/products/<id>       → { success }
+```
+
+### Catégories
+
+```
+GET    /api/v1/categories          → { categories }
+POST   /api/v1/categories          { name, parent_id } → { category }
+PUT    /api/v1/categories/<id>     { name } → { category }
+DELETE /api/v1/categories/<id>     → { success }
+```
+
+### Panier
+
+```
+GET    /api/v1/cart                → { cart, lines, total }
+POST   /api/v1/cart/add            { product_id, qty } → { cart }
+PUT    /api/v1/cart/update         { line_id, qty } → { cart }
+DELETE /api/v1/cart/remove/<id>    → { cart }
+DELETE /api/v1/cart/clear          → { success }
+```
+
+### Commandes
+
+```
+GET    /api/v1/orders              → { orders } (admin)
+GET    /api/v1/orders/<id>         → { order, lines }
+POST   /api/v1/orders              { address_id, delivery_id } → { order }
+PUT    /api/v1/orders/<id>/status  { status } → { order }
+GET    /api/v1/customer/orders     → { orders } (client)
+```
+
+### Client
+
+```
+GET    /api/v1/customer/profile    → { customer }
+PUT    /api/v1/customer/profile    { name, phone } → { customer }
+GET    /api/v1/customer/addresses  → { addresses }
+POST   /api/v1/customer/addresses  { street, city, ... } → { address }
+PUT    /api/v1/customer/addresses/<id>  → { address }
+DELETE /api/v1/customer/addresses/<id>  → { success }
+```
+
+---
+
+## Modèles Odoo utilisés
+
+| Modèle | Usage |
+|--------|-------|
+| `product.template` | Produits |
+| `product.product` | Variantes |
+| `product.category` | Catégories |
+| `sale.order` | Commandes |
+| `sale.order.line` | Lignes commande |
+| `res.partner` | Clients |
+| `stock.quant` | Stock |
+| `delivery.carrier` | Modes livraison |
+| `payment.provider` | Paiement |

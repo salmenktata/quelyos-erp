@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   db:
@@ -40,7 +38,7 @@ services:
       - ./addons:/mnt/extra-addons
     ports:
       - "8069:8069"
-    command: --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons -d ${DB_NAME:-quelyos}
+    command: --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons -d quelyos --db-filter=^quelyos$
     networks:
       - quelyos-network
 

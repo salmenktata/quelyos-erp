@@ -2,44 +2,36 @@
 {
     'name': 'Quelyos Core',
     'version': '19.0.1.0.0',
-    'category': 'Hidden',
-    'summary': 'Quelyos ERP Core Infrastructure',
+    'category': 'Quelyos',
+    'summary': 'Module de base Quelyos - Installe les prérequis',
     'description': """
-        Quelyos Core Module
-        ===================
-        Module fondamental fournissant l'infrastructure commune pour tous
-        les modules Quelyos:
+        Quelyos Core
+        ============
+        Module fondamental qui installe automatiquement tous les prérequis
+        nécessaires pour le projet Quelyos :
 
-        Fonctionnalités:
-        ----------------
-        - Catégorie de module Quelyos
-        - Configuration organisationnelle centralisée
-        - Paramètres d'identité de l'entreprise
-        - Infrastructure partagée pour tous les modules Quelyos
+        - Gestion des ventes (sale_management)
+        - Gestion du stock (stock)
+        - Gestion des contacts (contacts)
+        - Gestion des livraisons (delivery)
 
-        Ce module doit être installé en premier avant tout autre module Quelyos.
-
-        Compatible avec Odoo 19.0 Community et Enterprise.
+        Ce module doit être installé en premier avant quelyos_api.
     """,
     'author': 'Quelyos',
     'website': 'https://quelyos.com',
     'license': 'LGPL-3',
     'depends': [
         'base',
-        'web',
+        'sale_management',
+        'stock',
+        'contacts',
+        'delivery',
     ],
     'data': [
-        # 1. Module Category (FIRST - noupdate=0 for foundational data)
-        'data/module_category.xml',
-
-        # 2. Core Configuration (noupdate=1 for defaults)
-        'data/core_config.xml',
-
-        # 3. Views
-        'views/res_config_settings_views.xml',
+        'data/config_data.xml',
     ],
     'installable': True,
-    'application': False,
+    'application': True,
     'auto_install': False,
-    'sequence': 0,  # Load FIRST (before all other Quelyos modules)
+    'sequence': 1,
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Configuration par défaut Quelyos -->
+
+        <!-- Activer la gestion des variantes de produits -->
+        <record id="base.res_partner_rule" model="ir.rule">
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Paramètres de vente par défaut -->
+        <function model="ir.config_parameter" name="set_param">
+            <value>sale.use_quotation_validity_days</value>
+            <value>True</value>
+        </function>
+
+    </data>
+</odoo>
