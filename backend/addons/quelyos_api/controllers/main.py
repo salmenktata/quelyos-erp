@@ -7188,3 +7188,101 @@ class QuelyosAPI(http.Controller):
         except Exception as e:
             _logger.error(f"Mondial Relay tracking error: {e}")
             return {'success': False, 'error': str(e)}
+
+    # ===== CART RECOVERY =====
+
+    @http.route('/api/ecommerce/cart/recover', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def recover_abandoned_cart(self, token, **kwargs):
+        """
+        Récupérer un panier abandonné via le token sécurisé envoyé par email
+
+        Args:
+            token (str): Token de récupération sécurisé
+
+        Returns:
+            dict: {
+                'success': bool,
+                'cart': {...},  # Détails du panier si trouvé
+                'error': str    # Message d'erreur si échec
+            }
+        """
+        try:
+            _logger.info(f"Tentative de récupération panier avec token: {token[:10]}...")
+
+            # Rechercher le panier avec ce token
+            order = request.env['sale.order'].sudo().search([
+                ('recovery_token', '=', token),
+                ('state', '=', 'draft'),  # Seulement les paniers non confirmés
+            ], limit=1)
+
+            if not order:
+                _logger.warning(f"Aucun panier trouvé avec le token: {token[:10]}")
+                return {
+                    'success': False,
+                    'error': 'Panier non trouvé ou déjà confirmé'
+                }
+
+            # Vérifier que le token n'est pas expiré (7 jours max)
+            from datetime import datetime, timedelta
+            if order.recovery_email_sent_date:
+                expiry_date = order.recovery_email_sent_date + timedelta(days=7)
+                if datetime.now() > expiry_date:
+                    _logger.warning(f"Token expiré pour le panier #{order.id}")
+                    return {
+                        'success': False,
+                        'error': 'Le lien de récupération a expiré. Veuillez créer un nouveau panier.'
+                    }
+
+            # Formater les lignes de commande
+            lines = []
+            for line in order.order_line:
+                product = line.product_id
+
+                # Image du produit
+                image_url = f'/web/image/product.product/{product.id}/image_512' if product.image_128 else None
+
+                lines.append({
+                    'id': line.id,
+                    'product_id': product.id,
+                    'product_name': product.name,
+                    'product_sku': product.default_code or '',
+                    'product_image': image_url,
+                    'quantity': line.product_uom_qty,
+                    'price_unit': line.price_unit,
+                    'price_subtotal': line.price_subtotal,
+                    'price_total': line.price_total,
+                })
+
+            # Retourner les détails du panier
+            cart_data = {
+                'id': order.id,
+                'name': order.name,
+                'partner_id': order.partner_id.id,
+                'partner_name': order.partner_id.name,
+                'partner_email': order.partner_id.email,
+                'date_order': order.date_order.isoformat() if order.date_order else None,
+                'create_date': order.create_date.isoformat() if order.create_date else None,
+                'amount_untaxed': order.amount_untaxed,
+                'amount_tax': order.amount_tax,
+                'amount_total': order.amount_total,
+                'currency': {
+                    'id': order.currency_id.id,
+                    'name': order.currency_id.name,
+                    'symbol': order.currency_id.symbol,
+                },
+                'state': order.state,
+                'lines': lines,
+                'lines_count': len(lines),
+            }
+
+            _logger.info(f"Panier #{order.id} récupéré avec succès ({len(lines)} produits)")
+
+            return {
+                'success': True,
+                'cart': cart_data,
+                'message': f'Panier récupéré avec succès ! {len(lines)} produit(s) vous attendent.'
+            }
+
+        except Exception as e:
+            _logger.error(f"Cart recovery error: {e}")
+            return {'success': False, 'error': str(e)}
