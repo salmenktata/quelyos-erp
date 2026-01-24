@@ -354,11 +354,13 @@ class QuelyosAPI(http.Controller):
 
             return {
                 'success': True,
-                'data': {
-                    'products': data,
-                    'total': total,
-                    'limit': limit,
-                    'offset': offset,
+                'products': data,
+                'total': total,
+                'limit': limit,
+                'offset': offset,
+                'facets': {
+                    'categories': [],
+                    'price_range': {'min': 0, 'max': 1000}
                 }
             }
 
@@ -4943,11 +4945,13 @@ class QuelyosAPI(http.Controller):
 
             return {
                 'success': True,
-                'data': {
-                    'products': data,
-                    'total': total,
-                    'limit': limit,
-                    'offset': offset,
+                'products': data,
+                'total': total,
+                'limit': limit,
+                'offset': offset,
+                'facets': {
+                    'categories': [],
+                    'price_range': {'min': 0, 'max': 1000}
                 }
             }
 
@@ -6830,11 +6834,13 @@ class QuelyosAPI(http.Controller):
 
             return {
                 'success': True,
-                'data': {
-                    'products': data,
-                    'total': total,
-                    'limit': limit,
-                    'offset': offset,
+                'products': data,
+                'total': total,
+                'limit': limit,
+                'offset': offset,
+                'facets': {
+                    'categories': [],
+                    'price_range': {'min': 0, 'max': 1000}
                 }
             }
 
@@ -7246,6 +7252,85 @@ class QuelyosAPI(http.Controller):
 
         except Exception as e:
             _logger.error(f"Get low stock alerts error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/stock/high-stock-alerts', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_high_stock_alerts(self, **kwargs):
+        """Récupérer les produits en surstock (admin uniquement)"""
+        try:
+            # Vérifier les permissions admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Insufficient permissions'
+                }
+
+            params = self._get_params()
+            limit = params.get('limit', 20)
+            offset = params.get('offset', 0)
+
+            # Seuil de surstock par défaut (peut être configuré par produit ultérieurement)
+            HIGH_STOCK_THRESHOLD_MULTIPLIER = 3  # 3x le seuil bas = seuil haut
+
+            # Récupérer tous les quants actifs
+            StockQuant = request.env['stock.quant'].sudo()
+            quants = StockQuant.search([
+                ('location_id.usage', '=', 'internal'),
+                ('quantity', '>', 0),
+            ])
+
+            # Grouper par produit
+            products_stock = {}
+            for quant in quants:
+                product_id = quant.product_id.id
+                if product_id not in products_stock:
+                    products_stock[product_id] = {
+                        'product': quant.product_id,
+                        'total_qty': 0,
+                    }
+                products_stock[product_id]['total_qty'] += quant.quantity
+
+            # Filtrer les produits en surstock
+            high_stock_alerts = []
+            for product_id, data in products_stock.items():
+                product = data['product']
+                total_qty = data['total_qty']
+                threshold_low = product.product_tmpl_id.low_stock_threshold or 10.0
+                threshold_high = threshold_low * HIGH_STOCK_THRESHOLD_MULTIPLIER
+
+                if total_qty > threshold_high:
+                    high_stock_alerts.append({
+                        'id': product.id,
+                        'name': product.display_name,
+                        'sku': product.default_code or '',
+                        'current_stock': total_qty,
+                        'threshold': threshold_high,
+                        'diff': total_qty - threshold_high,
+                        'image_url': f'/web/image/product.product/{product.id}/image_128' if product.image_128 else None,
+                        'list_price': product.list_price,
+                        'category': product.categ_id.name if product.categ_id else '',
+                    })
+
+            # Trier par différence (plus critique en premier)
+            high_stock_alerts.sort(key=lambda x: -x['diff'])
+
+            # Pagination
+            total = len(high_stock_alerts)
+            paginated_alerts = high_stock_alerts[offset:offset + limit]
+
+            return {
+                'success': True,
+                'data': {
+                    'alerts': paginated_alerts,
+                    'total': total,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get high stock alerts error: {e}")
             return {
                 'success': False,
                 'error': str(e)
