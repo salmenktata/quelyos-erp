@@ -1645,21 +1645,21 @@ Cette section documente la **parité fonctionnelle totale** entre Odoo natif et 
 | Fonctionnalité Odoo | Description | Backend API | Backoffice | Statut | Priorité | Notes Quelyos |
 |---------------------|-------------|-------------|------------|--------|----------|---------------|
 | **Visualisation Stock** |||||||
-| Liste produits + stock | Vue globale tous produits | ✅ `/stock/products` | 🔴 UI obsolète | 🔴 | P0 | **BLOQUANT** : Ancienne UI supprimée |
+| Liste produits + stock | Vue globale tous produits | ✅ `/stock/products` | ✅ Stock.tsx onglet | ✅ | - | **Sprint 1** : Onglet Produits avec recherche |
 | Stock par produit | Qty disponible/virtuelle/entrant/sortant | ✅ `/products/<id>/stock` | - | ✅ | - | API opérationnel frontend |
 | Stock par emplacement | Répartition par warehouse/location | - | - | 🔴 | P1 | Multi-entrepôts Odoo |
 | Stock par lot/série | Traçabilité lot number / serial | - | - | 🔴 | P2 | Traçabilité avancée |
 | Valorisation stock | Valeur totale (FIFO/Average) | - | - | 🔴 | P2 | Comptabilité stock |
 | **Alertes Stock** |||||||
-| Alertes stock bas | Produits sous seuil min | ✅ `/stock/low-stock-alerts` | ✅ Stock.tsx | ✅ | - | Page dédiée alertes |
+| Alertes stock bas | Produits sous seuil min | ✅ `/stock/low-stock-alerts` | ✅ Stock.tsx onglet | ✅ | - | **Sprint 1** : Onglet Alertes dédié |
 | Seuil personnalisé | Seuil par produit | ✅ `low_stock_threshold` | ✅ ProductForm | ✅ | - | Champ modèle ajouté |
 | Notifications email auto | Email admins si stock bas | ✅ Cron job | ✅ Backend | ➕ | - | **Amélioration** : `_cron_check_low_stock` |
 | Alertes surstockage | Produits au-dessus seuil max | - | - | 🔴 | P2 | Détection surstock |
-| Dashboard alertes | Vue résumé total alertes | ✅ Total count | ✅ Badge | ✅ | - | Compteur + pagination |
+| Dashboard alertes | Vue résumé total alertes | ✅ Total count | ✅ Badge tabs | ✅ | - | Compteur + pagination |
 | **Ajustements Stock** |||||||
-| Ajuster quantité produit | Modifier stock manuellement | ✅ `/stock/update` | 🔴 UI manquante | 🔴 | P0 | **BLOQUANT** : Pas d'interface |
+| Ajuster quantité produit | Modifier stock manuellement | ✅ `/stock/update` | ✅ Stock.tsx inline | ✅ | - | **Sprint 1** : Édition inline avec icônes |
 | Ajuster stock variante | Modifier stock par variante | ✅ `/variants/<id>/stock/update` | 🟡 VariantManager | 🟡 | P1 | API existe, UI à améliorer |
-| Inventaire physique | Comptage physique + ajustement | - | - | 🔴 | P0 | **BLOQUANT** : Workflow manquant |
+| Inventaire physique | Comptage physique + ajustement | ✅ `/inventory/prepare+validate` | ✅ Inventory.tsx | ✅ | - | **Sprint 2** : Workflow 4 étapes complet |
 | Historique ajustements | Liste ajustements passés | 🟡 Via stock.move | - | 🔴 | P1 | API partielle, UI manquante |
 | **Mouvements Stock** |||||||
 | Liste mouvements | Historique entrées/sorties/transferts | ✅ `/stock/moves` | 🔴 Pas d'UI | 🟡 | P1 | API existe, UI manquante |
