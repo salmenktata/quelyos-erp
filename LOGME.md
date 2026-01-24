@@ -116,3 +116,4 @@
 - **2026-01-24 : Sprint 3 terminé** - Bon de livraison PDF (endpoint génération via rapport Odoo + download Blob) + Historique timeline commandes (tracking_values avec ancien/nouveau colorés) + Tracking livraison multi-transporteurs (6 providers : Colissimo, Mondial Relay, Chronopost, UPS, DHL, FedEx) avec URLs automatiques
 
 - **2026-01-24 : Tests de parité automatiques créés** - **Backend pytest** : 8 tests vérifiant API REST ↔ Odoo DB (produits, clients, stock, commandes) avec fixtures auto-cleanup. **E2E Playwright** : 6 tests backoffice vérifiant UI ↔ Backend ↔ Odoo (stock, clients, recherche, export). Scripts lanceurs : `backend/run_parity_tests.sh` + config Playwright. Documentation complète dans READMEs.
+- 2026-01-24 : Intégration API complète Frontend ↔ Backend opérationnelle (module quelyos_api activé, format API corrigé, 44 produits accessibles)
