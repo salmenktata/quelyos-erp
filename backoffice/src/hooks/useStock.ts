@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 
 export interface LowStockAlert {
@@ -13,10 +13,35 @@ export interface LowStockAlert {
   category: string
 }
 
+// Hook pour les alertes de stock bas
 export function useLowStockAlerts(params?: { limit?: number; offset?: number }) {
   return useQuery({
     queryKey: ['low-stock-alerts', params],
     queryFn: () => api.getLowStockAlerts(params),
     refetchInterval: 60000, // Rafraîchir toutes les minutes
+  })
+}
+
+// Hook pour lister tous les produits avec leur stock
+export function useStockProducts(params?: { limit?: number; offset?: number; search?: string }) {
+  return useQuery({
+    queryKey: ['stock-products', params],
+    queryFn: () => api.getStockProducts(params),
+  })
+}
+
+// Hook pour mettre à jour le stock d'un produit
+export function useUpdateProductStock() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ productId, quantity }: { productId: number; quantity: number }) =>
+      api.updateProductStock(productId, quantity),
+    onSuccess: () => {
+      // Invalider les requêtes liées au stock pour rafraîchir les données
+      queryClient.invalidateQueries({ queryKey: ['stock-products'] })
+      queryClient.invalidateQueries({ queryKey: ['low-stock-alerts'] })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+    },
   })
 }

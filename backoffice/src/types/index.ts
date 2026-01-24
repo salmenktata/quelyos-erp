@@ -356,14 +356,16 @@ export interface CouponCreate {
 export interface StockProduct {
   id: number
   name: string
-  sku: string
+  sku: string | null
   image: string
+  image_url?: string | null  // Alias pour image
+  category: string
+  list_price?: number  // Prix de vente
   qty_available: number
   virtual_available: number
   incoming_qty: number
   outgoing_qty: number
   stock_status: 'in_stock' | 'low_stock' | 'out_of_stock'
-  category: string
 }
 
 export interface StockMove {

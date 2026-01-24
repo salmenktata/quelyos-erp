@@ -4931,6 +4931,8 @@ class QuelyosAPI(http.Controller):
                     'name': product.name,
                     'sku': product.default_code or '',
                     'image': f'/web/image/product.product/{product.id}/image_128',
+                    'image_url': f'/web/image/product.product/{product.id}/image_128',  # Alias
+                    'list_price': product.list_price,
                     'qty_available': product.qty_available,
                     'virtual_available': product.virtual_available,
                     'incoming_qty': product.incoming_qty,
