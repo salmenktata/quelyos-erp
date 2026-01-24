@@ -377,7 +377,7 @@ export default function ProductDetailPage() {
                 />
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  disabled={!currentStock || quantity >= currentStockQty}
+                  disabled={!currentStock || quantity >= (currentStockQty ?? 0)}
                   className="w-12 h-12 border-2 border-gray-300 rounded-xl text-gray-700 hover:border-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold text-lg transition-all duration-300"
                 >
                   +
@@ -536,12 +536,12 @@ export default function ProductDetailPage() {
                 </svg>
                 <span className="font-medium">{product.view_count} vues</span>
               </div>
-              {product.wishlist_count > 0 && (
+              {(product.wishlist_count ?? 0) > 0 && (
                 <div className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                   </svg>
-                  <span className="font-medium">{product.wishlist_count} favoris</span>
+                  <span className="font-medium">{product.wishlist_count ?? 0} favoris</span>
                 </div>
               )}
             </div>
@@ -635,7 +635,7 @@ export default function ProductDetailPage() {
                     </div>
                     <div className="flex items-center justify-between py-3">
                       <span className="text-gray-600 font-medium">Stock:</span>
-                      <span className="text-gray-900 font-bold">{Math.floor(currentStockQty)} unités</span>
+                      <span className="text-gray-900 font-bold">{Math.floor(currentStockQty ?? 0)} unités</span>
                     </div>
                   </div>
                 )}
