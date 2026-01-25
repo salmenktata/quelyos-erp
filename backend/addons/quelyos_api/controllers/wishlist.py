@@ -82,6 +82,9 @@ class QuelyosWishlist(http.Controller):
             Wishlist = request.env['product.wishlist'].sudo()
             wishlist_items = Wishlist.search([('partner_id', '=', partner.id)])
 
+            # Prefetch products pour éviter N+1 queries
+            wishlist_items.mapped('product_id')
+
             items = []
             for item in wishlist_items:
                 product = item.product_id
@@ -119,7 +122,7 @@ class QuelyosWishlist(http.Controller):
             _logger.error(f"Get wishlist error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e)
+                'error': 'Une erreur est survenue'
             }
 
     @http.route('/api/ecommerce/wishlist/add', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
@@ -209,7 +212,7 @@ class QuelyosWishlist(http.Controller):
             _logger.error(f"Add to wishlist error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e)
+                'error': 'Une erreur est survenue'
             }
 
     @http.route('/api/ecommerce/wishlist/remove/<int:product_id>', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
@@ -274,7 +277,7 @@ class QuelyosWishlist(http.Controller):
             _logger.error(f"Remove from wishlist error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e)
+                'error': 'Une erreur est survenue'
             }
 
     @http.route('/api/ecommerce/wishlist/public/<string:token>', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
@@ -318,5 +321,5 @@ class QuelyosWishlist(http.Controller):
             _logger.error(f"Get public wishlist error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e)
+                'error': 'Une erreur est survenue'
             }

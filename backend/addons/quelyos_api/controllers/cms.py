@@ -65,7 +65,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get menu error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     def _get_static_menu_fallback(self, code):
         """Fallback menus statiques si aucune donnée en DB"""
@@ -225,7 +225,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"List menus error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/menus/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def create_menu(self, **kwargs):
@@ -260,7 +260,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Create menu error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/menus/<int:menu_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_menu(self, menu_id, **kwargs):
@@ -288,7 +288,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Update menu error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/menus/<int:menu_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def delete_menu(self, menu_id, **kwargs):
@@ -311,7 +311,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Delete menu error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/menus/reorder', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def reorder_menus(self, **kwargs):
@@ -328,8 +328,9 @@ class QuelyCMS(BaseController):
             params = self._get_params()
             menu_ids = params.get('menu_ids', [])
 
-            for index, menu_id in enumerate(menu_ids):
-                menu = request.env['quelyos.menu'].sudo().browse(menu_id)
+            # Batch browse pour éviter N+1 queries
+            menus = request.env['quelyos.menu'].sudo().browse(menu_ids)
+            for index, menu in enumerate(menus):
                 if menu.exists():
                     menu.write({'sequence': index * 10})
 
@@ -337,7 +338,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Reorder menus error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/menus/<int:menu_id>/tree', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_menu_tree(self, menu_id, **kwargs):
@@ -354,7 +355,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get menu tree error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ==================== RECHERCHES POPULAIRES ====================
 
@@ -392,14 +393,26 @@ class QuelyCMS(BaseController):
             Category = request.env['product.public.category'].sudo()
             Product = request.env['product.template'].sudo()
 
-            # Récupérer les catégories et compter les produits pour chacune
-            categories = Category.search([], limit=limit * 2)  # Récupérer plus pour filtrer
+            # Récupérer catégories avec comptage produits via read_group (1 requête au lieu de N)
+            categories = Category.search([], limit=limit * 2)
+            category_ids = categories.ids
+
+            # Comptage groupé par catégorie (évite N+1 queries)
+            product_counts = {}
+            if category_ids:
+                grouped = Product.read_group(
+                    [('public_categ_ids', 'in', category_ids)],
+                    ['public_categ_ids'],
+                    ['public_categ_ids']
+                )
+                for g in grouped:
+                    if g.get('public_categ_ids'):
+                        cat_id = g['public_categ_ids'][0]
+                        product_counts[cat_id] = g.get('public_categ_ids_count', 0)
 
             popular_searches = []
             for category in categories:
-                # Compter les produits dans cette catégorie
-                product_count = Product.search_count([('public_categ_ids', 'in', category.id)])
-
+                product_count = product_counts.get(category.id, 0)
                 if product_count > 0:
                     popular_searches.append({
                         'query': category.name,
@@ -433,7 +446,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get popular searches error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ==================== CONFIGURATION DU SITE ====================
 
@@ -547,7 +560,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get site config error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/site-config/update', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
     def update_site_config(self, **kwargs):
@@ -674,7 +687,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Update site config error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ==================== HERO SLIDES ====================
 
@@ -741,7 +754,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Create hero slide error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/hero-slides/<int:slide_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_hero_slide(self, slide_id, **kwargs):
@@ -771,7 +784,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Update hero slide error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/hero-slides/<int:slide_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def delete_hero_slide(self, slide_id, **kwargs):
@@ -794,7 +807,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Delete hero slide error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/hero-slides/reorder', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def reorder_hero_slides(self, **kwargs):
@@ -811,8 +824,9 @@ class QuelyCMS(BaseController):
             params = self._get_params()
             slide_ids = params.get('slide_ids', [])
 
-            for index, slide_id in enumerate(slide_ids):
-                slide = request.env['quelyos.hero.slide'].sudo().browse(slide_id)
+            # Batch browse pour éviter N+1 queries
+            slides = request.env['quelyos.hero.slide'].sudo().browse(slide_ids)
+            for index, slide in enumerate(slides):
                 if slide.exists():
                     slide.write({'sequence': index * 10})
 
@@ -820,7 +834,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Reorder hero slides error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ==================== PROMO BANNERS ====================
 
@@ -888,7 +902,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Create promo banner error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/promo-banners/<int:banner_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_promo_banner(self, banner_id, **kwargs):
@@ -917,7 +931,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Update promo banner error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/promo-banners/<int:banner_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def delete_promo_banner(self, banner_id, **kwargs):
@@ -940,7 +954,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Delete promo banner error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/promo-banners/reorder', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def reorder_promo_banners(self, **kwargs):
@@ -957,8 +971,9 @@ class QuelyCMS(BaseController):
             params = self._get_params()
             banner_ids = params.get('banner_ids', [])
 
-            for index, banner_id in enumerate(banner_ids):
-                banner = request.env['quelyos.promo.banner'].sudo().browse(banner_id)
+            # Batch browse pour éviter N+1 queries
+            banners = request.env['quelyos.promo.banner'].sudo().browse(banner_ids)
+            for index, banner in enumerate(banners):
                 if banner.exists():
                     banner.write({'sequence': index * 10})
 
@@ -966,7 +981,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Reorder promo banners error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ==================== PROMO MESSAGES ====================
 
@@ -1021,7 +1036,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Create promo message error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/promo-messages/<int:message_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_promo_message(self, message_id, **kwargs):
@@ -1048,7 +1063,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Update promo message error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/promo-messages/<int:message_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def delete_promo_message(self, message_id, **kwargs):
@@ -1071,7 +1086,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Delete promo message error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/promo-messages/reorder', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def reorder_promo_messages(self, **kwargs):
@@ -1097,7 +1112,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Reorder promo messages error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ==================== TRUST BADGES ====================
 
@@ -1149,7 +1164,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Create trust badge error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/trust-badges/<int:badge_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_trust_badge(self, badge_id, **kwargs):
@@ -1176,7 +1191,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Update trust badge error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/trust-badges/<int:badge_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def delete_trust_badge(self, badge_id, **kwargs):
@@ -1199,7 +1214,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Delete trust badge error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/trust-badges/reorder', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def reorder_trust_badges(self, **kwargs):
@@ -1225,7 +1240,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Reorder trust badges error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ==================== IMAGE UPLOADS ====================
 
@@ -1264,7 +1279,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Upload hero slide image error: {e}")
-            return request.make_json_response({'success': False, 'error': str(e)})
+            return request.make_json_response({'success': False, 'error': 'Une erreur est survenue'})
 
     @http.route('/api/ecommerce/promo-banners/<int:banner_id>/upload-image', type='http', auth='user', methods=['POST'], csrf=False, cors='*')
     def upload_promo_banner_image(self, banner_id, **kwargs):
@@ -1298,7 +1313,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Upload promo banner image error: {e}")
-            return request.make_json_response({'success': False, 'error': str(e)})
+            return request.make_json_response({'success': False, 'error': 'Une erreur est survenue'})
 
     @http.route('/api/ecommerce/categories/<int:category_id>/upload-image', type='http', auth='user', methods=['POST'], csrf=False, cors='*')
     def upload_category_image(self, category_id, **kwargs):
@@ -1336,7 +1351,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Upload category image error: {e}")
-            return request.make_json_response({'success': False, 'error': str(e)})
+            return request.make_json_response({'success': False, 'error': 'Une erreur est survenue'})
 
     # ==================== TENANT THEME ====================
 
@@ -1381,7 +1396,7 @@ class QuelyCMS(BaseController):
             }
         except Exception as e:
             _logger.error(f"Get tenant theme error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/tenants/<int:tenant_id>/theme/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_tenant_theme(self, tenant_id, **kwargs):
@@ -1438,7 +1453,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Update tenant theme error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/tenants/<int:tenant_id>/upload-logo', type='http', auth='user', methods=['POST'], csrf=False, cors='*')
     def upload_tenant_logo(self, tenant_id, **kwargs):
@@ -1466,7 +1481,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Upload tenant logo error: {e}")
-            return request.make_json_response({'success': False, 'error': str(e)})
+            return request.make_json_response({'success': False, 'error': 'Une erreur est survenue'})
 
     @http.route('/api/ecommerce/tenants/<int:tenant_id>/upload-favicon', type='http', auth='user', methods=['POST'], csrf=False, cors='*')
     def upload_tenant_favicon(self, tenant_id, **kwargs):
@@ -1494,7 +1509,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Upload tenant favicon error: {e}")
-            return request.make_json_response({'success': False, 'error': str(e)})
+            return request.make_json_response({'success': False, 'error': 'Une erreur est survenue'})
 
     # ============================================
     # SEO METADATA
@@ -1528,7 +1543,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get SEO metadata list error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/seo-metadata/<string:slug>', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_seo_metadata_by_slug(self, slug, **kwargs):
@@ -1544,7 +1559,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get SEO metadata by slug error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/seo-metadata/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def create_seo_metadata(self, **kwargs):
@@ -1584,7 +1599,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Create SEO metadata error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/seo-metadata/<int:metadata_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_seo_metadata(self, metadata_id, **kwargs):
@@ -1621,7 +1636,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Update SEO metadata error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/seo-metadata/<int:metadata_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def delete_seo_metadata(self, metadata_id, **kwargs):
@@ -1643,7 +1658,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Delete SEO metadata error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ============================================
     # MARKETING POPUPS
@@ -1660,7 +1675,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get active popups error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/popups', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def get_popups_list(self, **kwargs):
@@ -1692,7 +1707,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get popups list error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/popups/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def create_popup(self, **kwargs):
@@ -1740,7 +1755,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Create popup error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/popups/<int:popup_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_popup(self, popup_id, **kwargs):
@@ -1779,7 +1794,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Update popup error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/popups/<int:popup_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def delete_popup(self, popup_id, **kwargs):
@@ -1801,7 +1816,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Delete popup error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/popups/<int:popup_id>/track-view', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
     def track_popup_view(self, popup_id, **kwargs):
@@ -1815,7 +1830,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Track popup view error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/popups/<int:popup_id>/track-click', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
     def track_popup_click(self, popup_id, **kwargs):
@@ -1829,7 +1844,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Track popup click error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ============================================
     # STATIC PAGES
@@ -1849,7 +1864,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get static page by slug error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/pages', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def get_static_pages_list(self, **kwargs):
@@ -1881,7 +1896,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get static pages list error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/pages/footer-links', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_footer_links(self, **kwargs):
@@ -1894,7 +1909,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Get footer links error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/pages/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def create_static_page(self, **kwargs):
@@ -1931,7 +1946,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Create static page error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/pages/<int:page_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_static_page(self, page_id, **kwargs):
@@ -1967,7 +1982,7 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Update static page error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     @http.route('/api/ecommerce/pages/<int:page_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
     def delete_static_page(self, page_id, **kwargs):
@@ -1989,4 +2004,4 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Delete static page error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Une erreur est survenue'}
