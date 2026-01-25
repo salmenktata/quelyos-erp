@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { logger } from '@/lib/logger'
 
 export interface TrustBadge {
   id: number
@@ -17,7 +18,7 @@ export function useTrustBadges() {
       .then((data) => {
         if (data.success) setBadges(data.badges)
       })
-      .catch((err) => console.error('Failed to load trust badges:', err))
+      .catch((err) => logger.error('Failed to load trust badges:', err))
       .finally(() => setLoading(false))
   }, [])
 

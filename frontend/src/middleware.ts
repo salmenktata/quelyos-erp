@@ -11,6 +11,7 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { logger } from '@/lib/logger';
 
 // Cache en mémoire pour éviter des appels API répétés
 // Note: Ce cache est par instance de serveur, pas partagé en serverless
@@ -57,7 +58,7 @@ async function lookupTenant(
     }
   } catch (error) {
     // En cas d'erreur réseau, continuer sans tenant
-    console.error('[Middleware] Tenant lookup error:', error);
+    logger.error('[Middleware] Tenant lookup error:', error);
   }
 
   return null;

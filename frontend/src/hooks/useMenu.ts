@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { logger } from '@/lib/logger'
 
 export interface MenuItem {
   id: number
@@ -23,7 +24,7 @@ export function useMenu(menuCode: string) {
           setMenu(data.menu.items || [])
         }
       })
-      .catch((err) => console.error(`Failed to load menu ${menuCode}:`, err))
+      .catch((err) => logger.error(`Failed to load menu ${menuCode}:`, err))
       .finally(() => setLoading(false))
   }, [menuCode])
 

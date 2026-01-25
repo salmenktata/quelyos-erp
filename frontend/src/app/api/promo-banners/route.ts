@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/lib/logger'
 
 const ODOO_URL = process.env.ODOO_URL || 'http://localhost:8069'
 
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
       headers: { 'Cache-Control': 'public, max-age=300' },
     })
   } catch (error) {
-    console.error('Promo banners API error:', error)
+    logger.error('Promo banners API error:', error)
     return NextResponse.json(
       { success: true, banners: [] },
       { status: 200 }

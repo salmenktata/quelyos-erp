@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { logger } from '@/lib/logger'
 
 export interface PromoBanner {
   id: number
@@ -23,7 +24,7 @@ export function usePromoBanners() {
       .then((data) => {
         if (data.success) setBanners(data.banners)
       })
-      .catch((err) => console.error('Failed to load promo banners:', err))
+      .catch((err) => logger.error('Failed to load promo banners:', err))
       .finally(() => setLoading(false))
   }, [])
 

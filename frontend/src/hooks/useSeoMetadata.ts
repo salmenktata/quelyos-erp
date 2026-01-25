@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { logger } from '@/lib/logger'
 
 export interface SeoMetadata {
   meta_title: string
@@ -34,7 +35,7 @@ export function useSeoMetadata(slug: string) {
           setMetadata(data.metadata)
         }
       })
-      .catch(err => console.error('Failed to load SEO metadata:', err))
+      .catch(err => logger.error('Failed to load SEO metadata:', err))
       .finally(() => setLoading(false))
   }, [slug])
 

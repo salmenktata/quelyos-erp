@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { logger } from '@/lib/logger'
 
 export interface StaticPage {
   id: number
@@ -37,7 +38,7 @@ export function useStaticPage(slug: string) {
         }
       })
       .catch(err => {
-        console.error('Failed to load static page:', err)
+        logger.error('Failed to load static page:', err)
         setError('Erreur de chargement')
       })
       .finally(() => setLoading(false))

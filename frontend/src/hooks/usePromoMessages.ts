@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { logger } from '@/lib/logger'
 
 export interface PromoMessage {
   id: number
@@ -16,7 +17,7 @@ export function usePromoMessages() {
       .then((data) => {
         if (data.success) setMessages(data.messages)
       })
-      .catch((err) => console.error('Failed to load promo messages:', err))
+      .catch((err) => logger.error('Failed to load promo messages:', err))
       .finally(() => setLoading(false))
   }, [])
 

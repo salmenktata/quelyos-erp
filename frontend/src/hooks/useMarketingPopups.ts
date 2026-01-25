@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import { logger } from '@/lib/logger'
 
 export interface MarketingPopup {
   id: number
@@ -44,7 +45,7 @@ export function useMarketingPopups() {
           setPopups(data.popups)
         }
       })
-      .catch(err => console.error('Failed to load popups:', err))
+      .catch(err => logger.error('Failed to load popups:', err))
       .finally(() => setLoading(false))
   }, [pathname])
 
@@ -56,7 +57,7 @@ export function trackPopupView(popupId: number) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ popup_id: popupId }),
-  }).catch(err => console.error('Failed to track popup view:', err))
+  }).catch(err => logger.error('Failed to track popup view:', err))
 }
 
 export function trackPopupClick(popupId: number) {
@@ -64,5 +65,5 @@ export function trackPopupClick(popupId: number) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ popup_id: popupId }),
-  }).catch(err => console.error('Failed to track popup click:', err))
+  }).catch(err => logger.error('Failed to track popup click:', err))
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { logger } from '@/lib/logger'
 
 export interface HeroSlide {
   id: number
@@ -22,7 +23,7 @@ export function useHeroSlides() {
       .then((data) => {
         if (data.success) setSlides(data.slides)
       })
-      .catch((err) => console.error('Failed to load hero slides:', err))
+      .catch((err) => logger.error('Failed to load hero slides:', err))
       .finally(() => setLoading(false))
   }, [])
 
