@@ -11,3 +11,4 @@ from . import hero_slide
 from . import promo_banner
 from . import promo_message
 from . import trust_badge
+from . import menu

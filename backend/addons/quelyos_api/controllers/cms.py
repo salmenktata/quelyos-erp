@@ -38,9 +38,38 @@ class QuelyCMS(BaseController):
         try:
             _logger.info(f"Récupération du menu: {code}")
 
-            # Configuration des menus statiques
-            # TODO: Implémenter avec website.menu d'Odoo ou créer un modèle custom
-            menus_config = {
+            # Récupérer menu depuis modèle quelyos.menu
+            menu = request.env['quelyos.menu'].sudo().search([
+                ('code', '=', code),
+                ('active', '=', True),
+                ('parent_id', '=', False)  # Menu racine uniquement
+            ], limit=1)
+
+            if not menu:
+                _logger.warning(f"Menu non trouvé: {code}")
+                # Fallback sur config statique pour compatibilité
+                return self._get_static_menu_fallback(code)
+
+            # Construire l'arbre du menu
+            menu_tree = menu.get_menu_tree()
+
+            return {
+                'success': True,
+                'menu': {
+                    'id': menu.id,
+                    'name': menu.name,
+                    'code': menu.code,
+                    'items': menu_tree.get('children', [])
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get menu error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    def _get_static_menu_fallback(self, code):
+        """Fallback menus statiques si aucune donnée en DB"""
+        menus_config = {
                 'header': {
                     'id': 1,
                     'name': 'Menu Principal',
@@ -162,19 +191,173 @@ class QuelyCMS(BaseController):
 
             menu = menus_config.get(code)
             if not menu:
-                _logger.warning(f"Menu non trouvé: {code}")
-                return {
-                    'success': False,
-                    'error': f'Menu {code} non trouvé'
-                }
+                _logger.warning(f"Menu fallback non trouvé: {code}")
+                return {'success': True, 'menu': None}
 
-            return {
-                'success': True,
-                'menu': menu
-            }
+            return {'success': True, 'menu': menu}
 
         except Exception as e:
             _logger.error(f"Get menu error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/menus/list', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def list_menus(self, **kwargs):
+        """Liste tous les menus (backoffice)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            menus = request.env['quelyos.menu'].sudo().search([
+                ('parent_id', '=', False)
+            ], order='sequence ASC')
+
+            return {
+                'success': True,
+                'menus': [{
+                    'id': m.id,
+                    'code': m.code,
+                    'name': m.name,
+                    'label': m.label,
+                    'url': m.url,
+                    'icon': m.icon,
+                    'active': m.active,
+                    'children_count': len(m.child_ids),
+                    'sequence': m.sequence
+                } for m in menus]
+            }
+
+        except Exception as e:
+            _logger.error(f"List menus error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/menus/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def create_menu(self, **kwargs):
+        """Créer menu ou item"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            error = self._require_admin()
+            if error:
+                return error
+
+            params = self._get_params()
+
+            menu = request.env['quelyos.menu'].sudo().create({
+                'name': params.get('name'),
+                'code': params.get('code'),
+                'label': params.get('label'),
+                'url': params.get('url'),
+                'icon': params.get('icon'),
+                'description': params.get('description'),
+                'parent_id': params.get('parent_id'),
+                'sequence': params.get('sequence', 10),
+                'active': params.get('active', True),
+                'open_new_tab': params.get('open_new_tab', False),
+                'requires_auth': params.get('requires_auth', False),
+                'css_class': params.get('css_class'),
+            })
+
+            return {'success': True, 'id': menu.id}
+
+        except Exception as e:
+            _logger.error(f"Create menu error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/menus/<int:menu_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def update_menu(self, menu_id, **kwargs):
+        """Modifier menu"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            error = self._require_admin()
+            if error:
+                return error
+
+            menu = request.env['quelyos.menu'].sudo().browse(menu_id)
+            if not menu.exists():
+                return {'success': False, 'error': 'Menu non trouvé'}
+
+            params = self._get_params()
+            menu.write({k: v for k, v in params.items() if k in [
+                'name', 'code', 'label', 'url', 'icon', 'description',
+                'parent_id', 'sequence', 'active', 'open_new_tab', 'requires_auth', 'css_class'
+            ]})
+
+            return {'success': True}
+
+        except Exception as e:
+            _logger.error(f"Update menu error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/menus/<int:menu_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def delete_menu(self, menu_id, **kwargs):
+        """Supprimer menu (cascade enfants)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            error = self._require_admin()
+            if error:
+                return error
+
+            menu = request.env['quelyos.menu'].sudo().browse(menu_id)
+            if not menu.exists():
+                return {'success': False, 'error': 'Menu non trouvé'}
+
+            menu.unlink()
+            return {'success': True}
+
+        except Exception as e:
+            _logger.error(f"Delete menu error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/menus/reorder', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def reorder_menus(self, **kwargs):
+        """Réordonner menus/items"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            error = self._require_admin()
+            if error:
+                return error
+
+            params = self._get_params()
+            menu_ids = params.get('menu_ids', [])
+
+            for index, menu_id in enumerate(menu_ids):
+                menu = request.env['quelyos.menu'].sudo().browse(menu_id)
+                if menu.exists():
+                    menu.write({'sequence': index * 10})
+
+            return {'success': True}
+
+        except Exception as e:
+            _logger.error(f"Reorder menus error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/menus/<int:menu_id>/tree', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_menu_tree(self, menu_id, **kwargs):
+        """Récupérer arbre complet d'un menu"""
+        try:
+            menu = request.env['quelyos.menu'].sudo().browse(menu_id)
+            if not menu.exists():
+                return {'success': False, 'error': 'Menu non trouvé'}
+
+            return {
+                'success': True,
+                'tree': menu.get_menu_tree()
+            }
+
+        except Exception as e:
+            _logger.error(f"Get menu tree error: {e}")
             return {'success': False, 'error': str(e)}
 
     # ==================== RECHERCHES POPULAIRES ====================
@@ -1119,4 +1302,42 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Upload promo banner image error: {e}")
+            return request.make_json_response({'success': False, 'error': str(e)})
+
+    @http.route('/api/ecommerce/categories/<int:category_id>/upload-image', type='http', auth='user', methods=['POST'], csrf=False, cors='*')
+    def upload_category_image(self, category_id, **kwargs):
+        """Upload image pour catégorie"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return request.make_json_response(error)
+
+            error = self._require_admin()
+            if error:
+                return request.make_json_response(error)
+
+            category = request.env['product.public.category'].sudo().browse(category_id)
+            if not category.exists():
+                return request.make_json_response({'success': False, 'error': 'Catégorie non trouvée'})
+
+            image_file = request.httprequest.files.get('image')
+            if not image_file:
+                return request.make_json_response({'success': False, 'error': 'Aucune image fournie'})
+
+            import base64
+            image_data = base64.b64encode(image_file.read())
+
+            category.write({'image': image_data})
+
+            # Calculer image_url
+            base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            image_url = f'{base_url}/web/image/product.public.category/{category_id}/image'
+
+            return request.make_json_response({
+                'success': True,
+                'image_url': image_url
+            })
+
+        except Exception as e:
+            _logger.error(f"Upload category image error: {e}")
             return request.make_json_response({'success': False, 'error': str(e)})

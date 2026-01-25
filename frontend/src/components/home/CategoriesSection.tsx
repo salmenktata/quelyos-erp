@@ -9,45 +9,12 @@ interface CategoriesSectionProps {
   isLoading: boolean;
 }
 
-// Images par défaut pour les catégories (placeholder professionnel)
-const categoryImages: Record<string, string> = {
-  default: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=400&h=400&fit=crop',
-  sport: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&h=400&fit=crop',
-  fitness: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=400&h=400&fit=crop',
-  running: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=400&h=400&fit=crop',
-  gym: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=400&fit=crop',
-  yoga: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop',
-  outdoor: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
-  training: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
-  equipment: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop',
-};
+// Image par défaut générique
+const DEFAULT_CATEGORY_IMAGE = 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=400&h=400&fit=crop';
 
 function getCategoryImage(category: Category): string {
-  // Si la catégorie a une image, l'utiliser
-  if (category.image_url) {
-    return category.image_url;
-  }
-
-  // Sinon, essayer de trouver une image correspondant au nom
-  const categoryName = category.name.toLowerCase();
-
-  if (categoryName.includes('sport') || categoryName.includes('all')) {
-    return categoryImages.sport;
-  }
-  if (categoryName.includes('fitness') || categoryName.includes('cardio')) {
-    return categoryImages.fitness;
-  }
-  if (categoryName.includes('run') || categoryName.includes('course')) {
-    return categoryImages.running;
-  }
-  if (categoryName.includes('gym') || categoryName.includes('musculation')) {
-    return categoryImages.gym;
-  }
-  if (categoryName.includes('yoga') || categoryName.includes('pilates')) {
-    return categoryImages.yoga;
-  }
-  if (categoryName.includes('outdoor') || categoryName.includes('extérieur')) {
-    return categoryImages.outdoor;
+  // Utiliser image uploadée depuis backoffice ou fallback générique
+  return category.image_url || DEFAULT_CATEGORY_IMAGE;
   }
   if (categoryName.includes('training') || categoryName.includes('entraînement')) {
     return categoryImages.training;

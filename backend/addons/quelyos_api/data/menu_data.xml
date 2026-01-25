@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Menu Header Principal -->
+        <record id="menu_header_main" model="quelyos.menu">
+            <field name="name">Menu Header Principal</field>
+            <field name="code">header</field>
+            <field name="label">Menu</field>
+            <field name="url">/</field>
+            <field name="sequence">1</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Items Header -->
+        <record id="menu_header_item_accueil" model="quelyos.menu">
+            <field name="name">Accueil</field>
+            <field name="code">header_accueil</field>
+            <field name="label">Accueil</field>
+            <field name="url">/</field>
+            <field name="parent_id" ref="menu_header_main"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="menu_header_item_products" model="quelyos.menu">
+            <field name="name">Produits</field>
+            <field name="code">header_products</field>
+            <field name="label">Produits</field>
+            <field name="url">/products</field>
+            <field name="parent_id" ref="menu_header_main"/>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="menu_header_item_about" model="quelyos.menu">
+            <field name="name">À propos</field>
+            <field name="code">header_about</field>
+            <field name="label">À propos</field>
+            <field name="url">/about</field>
+            <field name="parent_id" ref="menu_header_main"/>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="menu_header_item_contact" model="quelyos.menu">
+            <field name="name">Contact</field>
+            <field name="code">header_contact</field>
+            <field name="label">Contact</field>
+            <field name="url">/contact</field>
+            <field name="parent_id" ref="menu_header_main"/>
+            <field name="sequence">40</field>
+        </record>
+
+        <!-- Menu Footer Quick Links -->
+        <record id="menu_footer_quick" model="quelyos.menu">
+            <field name="name">Footer - Liens Rapides</field>
+            <field name="code">footer_quick</field>
+            <field name="label">Liens Rapides</field>
+            <field name="url">#</field>
+            <field name="sequence">2</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="menu_footer_quick_search" model="quelyos.menu">
+            <field name="name">Recherche</field>
+            <field name="code">footer_quick_search</field>
+            <field name="label">Recherche</field>
+            <field name="url">/products</field>
+            <field name="parent_id" ref="menu_footer_quick"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="menu_footer_quick_cart" model="quelyos.menu">
+            <field name="name">Panier</field>
+            <field name="code">footer_quick_cart</field>
+            <field name="label">Panier</field>
+            <field name="url">/cart</field>
+            <field name="parent_id" ref="menu_footer_quick"/>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="menu_footer_quick_wishlist" model="quelyos.menu">
+            <field name="name">Liste de souhaits</field>
+            <field name="code">footer_quick_wishlist</field>
+            <field name="label">Liste de souhaits</field>
+            <field name="url">/wishlist</field>
+            <field name="parent_id" ref="menu_footer_quick"/>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="menu_footer_quick_compare" model="quelyos.menu">
+            <field name="name">Comparateur</field>
+            <field name="code">footer_quick_compare</field>
+            <field name="label">Comparateur</field>
+            <field name="url">/compare</field>
+            <field name="parent_id" ref="menu_footer_quick"/>
+            <field name="sequence">40</field>
+        </record>
+
+        <!-- Menu Footer Service Client -->
+        <record id="menu_footer_service" model="quelyos.menu">
+            <field name="name">Footer - Service Client</field>
+            <field name="code">footer_service</field>
+            <field name="label">Service Client</field>
+            <field name="url">#</field>
+            <field name="sequence">3</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="menu_footer_service_shipping" model="quelyos.menu">
+            <field name="name">Livraison</field>
+            <field name="code">footer_service_shipping</field>
+            <field name="label">Livraison &amp; Retours</field>
+            <field name="url">/shipping</field>
+            <field name="parent_id" ref="menu_footer_service"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="menu_footer_service_faq" model="quelyos.menu">
+            <field name="name">FAQ</field>
+            <field name="code">footer_service_faq</field>
+            <field name="label">FAQ</field>
+            <field name="url">/faq</field>
+            <field name="parent_id" ref="menu_footer_service"/>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="menu_footer_service_contact" model="quelyos.menu">
+            <field name="name">Contact</field>
+            <field name="code">footer_service_contact</field>
+            <field name="label">Contactez-nous</field>
+            <field name="url">/contact</field>
+            <field name="parent_id" ref="menu_footer_service"/>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="menu_footer_service_cgv" model="quelyos.menu">
+            <field name="name">CGV</field>
+            <field name="code">footer_service_cgv</field>
+            <field name="label">Conditions Générales</field>
+            <field name="url">/cgv</field>
+            <field name="parent_id" ref="menu_footer_service"/>
+            <field name="sequence">40</field>
+        </record>
+    </data>
+</odoo>

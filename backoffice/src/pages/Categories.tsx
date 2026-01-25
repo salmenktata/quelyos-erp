@@ -16,10 +16,12 @@ import {
   SkeletonTable,
   Badge,
   CategoryTree,
+  ImageUpload,
 } from '../components/common'
 import { useToast } from '../hooks/useToast'
 import { useDebounce } from '../hooks/useDebounce'
 import { ToastContainer } from '../components/common/Toast'
+import { useImageUpload } from '../hooks/useImageUpload'
 import { Category } from '@/types'
 
 interface CategoryFormData {
@@ -65,6 +67,12 @@ export default function Categories() {
   const updateCategoryMutation = useUpdateCategory()
   const deleteCategoryMutation = useDeleteCategory()
   const moveCategoryMutation = useMoveCategory()
+
+  const imageUploadMutation = useImageUpload({
+    endpoint: '/api/ecommerce/categories',
+    id: editingCategory?.id || 0,
+    invalidateKey: ['categoriesTree', 'categories'],
+  })
 
   // Computed
   const isLoading = isTreeLoading || isSearchLoading
@@ -552,6 +560,17 @@ export default function Categories() {
                 Laissez vide pour créer une catégorie racine
               </p>
             </div>
+
+            {editingCategory && (
+              <ImageUpload
+                currentImageUrl={editingCategory.image_url}
+                onUpload={async (file) => {
+                  await imageUploadMutation.mutateAsync(file)
+                  toast.success('Image uploadée avec succès')
+                }}
+                label="Image de la catégorie (800x600px recommandé)"
+              />
+            )}
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="secondary" onClick={cancelEdit}>
