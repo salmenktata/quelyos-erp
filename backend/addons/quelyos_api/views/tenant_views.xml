@@ -245,16 +245,16 @@
                 <field name="name"/>
                 <field name="code"/>
                 <field name="domain"/>
+                <separator/>
                 <filter string="Actifs" name="active" domain="[('active', '=', True)]"/>
                 <filter string="Archivés" name="archived" domain="[('active', '=', False)]"/>
                 <separator/>
                 <filter string="En essai" name="trial" domain="[('subscription_state', '=', 'trial')]"/>
                 <filter string="Actifs (abonnement)" name="subscription_active" domain="[('subscription_state', '=', 'active')]"/>
                 <filter string="Expirés" name="expired" domain="[('subscription_state', 'in', ('expired', 'cancelled'))]"/>
-                <group expand="0" string="Grouper par">
-                    <filter string="Plan" name="group_plan" context="{'group_by': 'plan_id'}"/>
-                    <filter string="État" name="group_state" context="{'group_by': 'subscription_state'}"/>
-                </group>
+                <separator/>
+                <filter string="Par Plan" name="group_plan" context="{'group_by': 'plan_id'}"/>
+                <filter string="Par État" name="group_state" context="{'group_by': 'subscription_state'}"/>
             </search>
         </field>
     </record>
@@ -265,7 +265,7 @@
     <record id="action_quelyos_tenant" model="ir.actions.act_window">
         <field name="name">Tenants / Boutiques</field>
         <field name="res_model">quelyos.tenant</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="search_view_id" ref="view_quelyos_tenant_search"/>
         <field name="context">{'search_default_active': 1}</field>
         <field name="help" type="html">
