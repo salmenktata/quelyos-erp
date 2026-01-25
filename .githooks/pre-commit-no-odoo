@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Hook pre-commit : Détection références Odoo dans UI
+# Bloque commits avec "Odoo" visible dans frontend/backoffice (hors legal/)
+
+echo "🔍 Vérification références Odoo dans UI..."
+
+# Fichiers stagés pour commit
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '(frontend/src|backoffice/src)/.*\.(tsx?|jsx?)$' | grep -v 'legal/')
+
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+# Recherche violations P0
+VIOLATIONS=""
+for file in $STAGED_FILES; do
+  if [ -f "$file" ]; then
+    # Grep pour "Odoo" dans strings/tooltips (hors commentaires)
+    MATCHES=$(grep -n -i 'odoo' "$file" | grep -v '^\s*//' | grep -v 'lib/odoo')
+    if [ -n "$MATCHES" ]; then
+      VIOLATIONS="$VIOLATIONS\n❌ $file:\n$MATCHES\n"
+    fi
+  fi
+done
+
+if [ -n "$VIOLATIONS" ]; then
+  echo "🚫 COMMIT BLOQUÉ - Références Odoo détectées dans UI:"
+  echo -e "$VIOLATIONS"
+  echo ""
+  echo "💡 Solutions:"
+  echo "   1. Utiliser /no-odoo --fix pour corrections automatiques"
+  echo "   2. Remplacer manuellement (voir .claude/commands/no-odoo.md)"
+  echo ""
+  echo "✅ Exception autorisée: frontend/src/app/legal/page.tsx (conformité LGPL)"
+  exit 1
+fi
+
+echo "✅ Aucune référence Odoo dans UI"
+exit 0

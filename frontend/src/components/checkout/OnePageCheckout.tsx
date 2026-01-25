@@ -520,7 +520,7 @@ export function OnePageCheckout() {
                   <p className="text-xs text-gray-600">Quantité: {line.quantity}</p>
                 </div>
                 <p className="text-sm font-semibold text-gray-900">
-                  {formatPrice(line.price_total)}
+                  {formatPrice(line.price_total || line.price_subtotal || line.subtotal || 0)}
                 </p>
               </div>
             ))}

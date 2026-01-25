@@ -365,7 +365,7 @@ export default function PricelistDetail() {
               <p className="text-gray-500 dark:text-gray-400">
                 {searchQuery || filterType !== 'all'
                   ? 'Essayez de modifier vos critères de recherche.'
-                  : 'Les règles de prix sont configurées dans l'interface d'administration.'}
+                  : "Les règles de prix sont configurées dans l'interface d'administration."}
               </p>
             </div>
           )}

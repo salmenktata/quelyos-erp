@@ -29,12 +29,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     );
   }
 
-  const amountUntaxed = amountUntaxed ?? cart.subtotal;
-  const amountTax = amountTax ?? cart.tax_total;
-  const amountTotal = amountTotal ?? cart.total;
+  const amountUntaxed = cart.amount_untaxed ?? cart.subtotal;
+  const amountTax = cart.amount_tax ?? cart.tax_total;
+  const amountTotal = cart.amount_total ?? cart.total;
   const currencySymbol = cart.currency?.symbol || '€';
-  const couponCode = couponCode || cart.coupon?.code;
-  const couponDiscount = couponDiscount || cart.discount;
+  const couponCode = cart.coupon_code || cart.coupon?.code;
+  const couponDiscount = cart.coupon_discount || cart.discount;
 
   const handleCheckout = () => {
     router.push('/checkout');

@@ -1,0 +1,68 @@
+name: UI Odoo References Check
+
+on:
+  pull_request:
+    paths:
+      - 'frontend/src/**/*.ts'
+      - 'frontend/src/**/*.tsx'
+      - 'backoffice/src/**/*.ts'
+      - 'backoffice/src/**/*.tsx'
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/src/**/*.ts'
+      - 'frontend/src/**/*.tsx'
+      - 'backoffice/src/**/*.ts'
+      - 'backoffice/src/**/*.tsx'
+
+jobs:
+  check-odoo-references:
+    name: Detect Odoo references in UI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Scan for Odoo references
+        id: scan
+        run: |
+          echo "🔍 Scanning for 'Odoo' references in UI files..."
+
+          # Recherche dans frontend et backoffice (hors legal/)
+          VIOLATIONS=$(grep -r -n -i 'odoo' frontend/src backoffice/src \
+            --include="*.tsx" --include="*.ts" \
+            --exclude-dir=lib/odoo \
+            --exclude=*test.ts* \
+            | grep -v "frontend/src/app/legal" || true)
+
+          if [ -n "$VIOLATIONS" ]; then
+            echo "::error::Odoo references found in UI"
+            echo "🚫 VIOLATIONS DÉTECTÉES:"
+            echo "$VIOLATIONS"
+            echo ""
+            echo "💡 Corrections:"
+            echo "   - Utiliser /no-odoo --fix"
+            echo "   - Voir .claude/commands/no-odoo.md"
+            exit 1
+          fi
+
+          echo "✅ No Odoo references in UI (legal/ excluded)"
+
+      - name: Comment PR on failure
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚫 **Références Odoo détectées dans UI**\n\n' +
+                    'Ce PR contient des mentions "Odoo" visibles par les utilisateurs.\n\n' +
+                    '**Actions requises:**\n' +
+                    '1. Exécuter `/no-odoo --fix` pour corrections automatiques\n' +
+                    '2. Voir `.claude/commands/no-odoo.md` pour mapping de remplacement\n\n' +
+                    '**Exception autorisée:** `frontend/src/app/legal/page.tsx` (conformité LGPL)'
+            })

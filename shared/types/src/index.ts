@@ -257,6 +257,7 @@ export interface CartLine {
   price_unit?: number; // Alias de unit_price
   subtotal: number;
   price_subtotal?: number; // Alias de subtotal
+  price_total?: number; // Alias de subtotal (avec taxes si applicable)
   variant?: ProductVariant;
   // Champs dupliqués depuis product pour faciliter l'accès
   product_id?: number;
