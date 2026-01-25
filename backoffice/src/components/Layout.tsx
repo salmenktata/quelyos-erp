@@ -276,6 +276,11 @@ export function Layout({ children }: LayoutProps) {
           path: '/tenants',
           icon: BuildingStorefrontIcon,
         },
+        {
+          name: 'SEO Metadata',
+          path: '/seo-metadata',
+          icon: ChartBarIcon,
+        },
       ],
     },
     {

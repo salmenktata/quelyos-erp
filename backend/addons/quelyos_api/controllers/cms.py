@@ -1495,3 +1495,152 @@ class QuelyCMS(BaseController):
         except Exception as e:
             _logger.error(f"Upload tenant favicon error: {e}")
             return request.make_json_response({'success': False, 'error': str(e)})
+
+    # ============================================
+    # SEO METADATA
+    # ============================================
+
+    @http.route('/api/ecommerce/seo-metadata', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_seo_metadata_list(self, **kwargs):
+        """Liste toutes les metadata SEO (admin)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            _require_admin(request.env)
+
+            metadata = request.env['quelyos.seo.metadata'].sudo().search([])
+
+            return {
+                'success': True,
+                'metadata': [{
+                    'id': m.id,
+                    'name': m.name,
+                    'page_type': m.page_type,
+                    'slug': m.slug,
+                    'meta_title': m.meta_title,
+                    'meta_description': m.meta_description,
+                    'seo_score': m.seo_score,
+                    'active': m.active,
+                } for m in metadata]
+            }
+
+        except Exception as e:
+            _logger.error(f"Get SEO metadata list error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/seo-metadata/<string:slug>', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_seo_metadata_by_slug(self, slug, **kwargs):
+        """Récupérer metadata SEO par slug (public, pour frontend)"""
+        try:
+            metadata_obj = request.env['quelyos.seo.metadata'].sudo()
+            metadata = metadata_obj.get_by_slug(slug)
+
+            if metadata:
+                return {'success': True, 'metadata': metadata}
+            else:
+                return {'success': False, 'error': 'Metadata non trouvé'}
+
+        except Exception as e:
+            _logger.error(f"Get SEO metadata by slug error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/seo-metadata/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def create_seo_metadata(self, **kwargs):
+        """Créer metadata SEO (admin)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            _require_admin(request.env)
+
+            params = request.jsonrequest
+            metadata = request.env['quelyos.seo.metadata'].sudo().create({
+                'name': params.get('name'),
+                'page_type': params.get('page_type', 'static'),
+                'slug': params.get('slug'),
+                'meta_title': params.get('meta_title'),
+                'meta_description': params.get('meta_description'),
+                'og_title': params.get('og_title'),
+                'og_description': params.get('og_description'),
+                'og_image_url': params.get('og_image_url'),
+                'og_type': params.get('og_type', 'website'),
+                'twitter_card': params.get('twitter_card', 'summary_large_image'),
+                'twitter_title': params.get('twitter_title'),
+                'twitter_description': params.get('twitter_description'),
+                'twitter_image_url': params.get('twitter_image_url'),
+                'schema_type': params.get('schema_type', 'WebPage'),
+                'noindex': params.get('noindex', False),
+                'nofollow': params.get('nofollow', False),
+                'canonical_url': params.get('canonical_url'),
+                'keywords': params.get('keywords'),
+                'focus_keyword': params.get('focus_keyword'),
+                'active': params.get('active', True),
+            })
+
+            return {'success': True, 'id': metadata.id}
+
+        except Exception as e:
+            _logger.error(f"Create SEO metadata error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/seo-metadata/<int:metadata_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def update_seo_metadata(self, metadata_id, **kwargs):
+        """Modifier metadata SEO (admin)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            _require_admin(request.env)
+
+            metadata = request.env['quelyos.seo.metadata'].sudo().browse(metadata_id)
+            if not metadata.exists():
+                return {'success': False, 'error': 'Metadata non trouvé'}
+
+            params = request.jsonrequest
+            update_data = {}
+
+            allowed_fields = [
+                'name', 'page_type', 'slug', 'meta_title', 'meta_description',
+                'og_title', 'og_description', 'og_image_url', 'og_type',
+                'twitter_card', 'twitter_title', 'twitter_description', 'twitter_image_url',
+                'schema_type', 'noindex', 'nofollow', 'canonical_url',
+                'keywords', 'focus_keyword', 'active'
+            ]
+
+            for field in allowed_fields:
+                if field in params:
+                    update_data[field] = params[field]
+
+            metadata.write(update_data)
+
+            return {'success': True}
+
+        except Exception as e:
+            _logger.error(f"Update SEO metadata error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/seo-metadata/<int:metadata_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def delete_seo_metadata(self, metadata_id, **kwargs):
+        """Supprimer metadata SEO (admin)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            _require_admin(request.env)
+
+            metadata = request.env['quelyos.seo.metadata'].sudo().browse(metadata_id)
+            if not metadata.exists():
+                return {'success': False, 'error': 'Metadata non trouvé'}
+
+            metadata.unlink()
+
+            return {'success': True}
+
+        except Exception as e:
+            _logger.error(f"Delete SEO metadata error: {e}")
+            return {'success': False, 'error': str(e)}

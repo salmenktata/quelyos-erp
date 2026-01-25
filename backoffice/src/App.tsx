@@ -38,6 +38,7 @@ import HeroSlides from './pages/HeroSlides'
 import PromoBanners from './pages/PromoBanners'
 import PromoMessages from './pages/PromoMessages'
 import TrustBadges from './pages/TrustBadges'
+import SeoMetadata from './pages/SeoMetadata'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -333,6 +334,14 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <TrustBadges />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/seo-metadata"
+                element={
+                  <ProtectedRoute>
+                    <SeoMetadata />
                   </ProtectedRoute>
                 }
               />

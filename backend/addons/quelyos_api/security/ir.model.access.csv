@@ -15,3 +15,5 @@ access_trust_badge_public,quelyos.trust.badge public,model_quelyos_trust_badge,b
 access_trust_badge_user,quelyos.trust.badge user,model_quelyos_trust_badge,base.group_user,1,1,1,1
 access_menu_public,quelyos.menu public,model_quelyos_menu,base.group_public,1,0,0,0
 access_menu_user,quelyos.menu user,model_quelyos_menu,base.group_user,1,1,1,1
+access_seo_metadata_public,quelyos.seo.metadata public,model_quelyos_seo_metadata,base.group_public,1,0,0,0
+access_seo_metadata_user,quelyos.seo.metadata user,model_quelyos_seo_metadata,base.group_user,1,1,1,1
