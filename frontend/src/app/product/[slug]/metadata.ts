@@ -6,7 +6,7 @@
 import { Metadata } from 'next';
 import { getProductSeoMetadata } from '@/lib/seo/metadata';
 import { odooClient } from '@/lib/odoo/client';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
 
 interface Props {
   params: { slug: string };

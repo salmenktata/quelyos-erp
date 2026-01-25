@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { odooClient } from '@/lib/odoo/client';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
 
 interface LoyaltyTier {
   id: number;

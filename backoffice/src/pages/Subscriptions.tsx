@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Layout } from '../components/Layout'
 import { useSubscriptions } from '../hooks/useSubscriptions'
-import type { SubscriptionListItem } from '../types'
+import type { SubscriptionListItem } from '@/types'
 import { Button, Breadcrumbs, SkeletonTable } from '../components/common'
 import { useToast } from '../contexts/ToastContext'
 import { Link } from 'react-router-dom'

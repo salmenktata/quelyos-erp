@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { odooRpc } from '../lib/odoo-rpc';
-import { logger } from '../lib/logger';
+import { logger } from '@quelyos/logger';
 
 export interface CustomerCategory {
   id: number;

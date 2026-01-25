@@ -3,7 +3,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { Theme, ThemeName, ThemeColors } from './types';
 import { themes, defaultTheme } from './themes';
-import type { TenantTheme, TenantColors } from '@/types/tenant';
+import { FONT_FAMILIES } from '@/types/tenant';
+import type { TenantTheme, TenantColors, TenantTypography } from '@/types/tenant';
 
 interface ThemeContextType {
   theme: Theme;
@@ -16,6 +17,16 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'quelyos-theme';
+const FONT_LINK_ID = 'tenant-font-link';
+
+const FONT_STACKS: Record<TenantTypography['fontFamily'], string> = {
+  inter: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  roboto: '"Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  poppins: '"Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  montserrat: '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  'open-sans': '"Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  lato: '"Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+};
 
 /**
  * Applique les couleurs du theme aux variables CSS du document
@@ -47,6 +58,37 @@ function applyThemeToDOM(colors: ThemeColors) {
       root.style.setProperty(cssVar, value);
     }
   });
+}
+
+function ensureFontLoaded(fontFamily: TenantTypography['fontFamily']) {
+  if (fontFamily === 'inter') {
+    const existing = document.getElementById(FONT_LINK_ID);
+    if (existing) existing.remove();
+    return;
+  }
+
+  const fontConfig = FONT_FAMILIES[fontFamily];
+  if (!fontConfig?.url) return;
+
+  let link = document.getElementById(FONT_LINK_ID) as HTMLLinkElement | null;
+  if (!link) {
+    link = document.createElement('link');
+    link.id = FONT_LINK_ID;
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+  }
+
+  if (link.href !== fontConfig.url) {
+    link.href = fontConfig.url;
+  }
+}
+
+function applyTypographyToDOM(fontFamily: TenantTypography['fontFamily']) {
+  const root = document.documentElement;
+  const fontStack = FONT_STACKS[fontFamily] || FONT_STACKS.inter;
+
+  root.style.setProperty('--app-font-sans', fontStack);
+  ensureFontLoaded(fontFamily);
 }
 
 interface ThemeProviderProps {
@@ -114,31 +156,41 @@ export function ThemeProvider({
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && themes[stored]) {
       setThemeName(stored);
+    } else if (tenantTheme?.darkMode?.defaultDark) {
+      setThemeName('dark');
     }
     setMounted(true);
-  }, []);
+  }, [tenantTheme?.darkMode?.defaultDark]);
 
   // Appliquer le theme au DOM quand il change
   useEffect(() => {
     if (!mounted) return;
 
     applyThemeToDOM(theme.colors);
+    applyTypographyToDOM(tenantTheme?.typography?.fontFamily || 'inter');
 
     // Definir l'attribut data-theme pour les selecteurs CSS
     document.documentElement.setAttribute('data-theme', theme.name);
 
     // Gerer la classe dark pour les variantes Tailwind dark:
-    if (theme.isDark) {
+    const allowDarkMode = tenantTheme?.darkMode?.enabled ?? true;
+    if (allowDarkMode && theme.isDark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [theme, mounted]);
+  }, [theme, mounted, tenantTheme]);
 
-  const setTheme = useCallback((name: ThemeName) => {
-    setThemeName(name);
-    localStorage.setItem(STORAGE_KEY, name);
-  }, []);
+  const setTheme = useCallback(
+    (name: ThemeName) => {
+      if (tenantTheme?.darkMode?.enabled === false && name === 'dark') {
+        return;
+      }
+      setThemeName(name);
+      localStorage.setItem(STORAGE_KEY, name);
+    },
+    [tenantTheme?.darkMode?.enabled]
+  );
 
   const setCustomColors = useCallback((colors: Partial<ThemeColors>) => {
     setCustomColorsState(colors);

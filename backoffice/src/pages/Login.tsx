@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { Input, Button } from '../components/common'
-import { logger } from '../lib/logger'
+import { logger } from '@quelyos/logger'
 
 export default function Login() {
   const navigate = useNavigate()

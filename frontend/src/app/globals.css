@@ -18,6 +18,7 @@
   --muted-foreground: #737373;
   --border: #e5e5e5;
   --ring: #01613a;
+  --app-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   /* Design tokens - Inspired by lesportif.com.tn */
   --transition-default: 0.3s ease;
@@ -35,23 +36,23 @@
 
 @theme inline {
   /* Fonts */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: var(--app-font-sans);
   --font-mono: 'Menlo', 'Monaco', 'Courier New', monospace;
 
   /* Colors - Le Sportif theme (lesportif.com.tn) */
-  --color-primary: #01613a;
-  --color-primary-dark: #004d2e;
-  --color-primary-light: #028a52;
-  --color-secondary: #c9c18f;
-  --color-secondary-dark: #b4ac7a;
-  --color-secondary-light: #ddd5a4;
-  --color-accent: #f59e0b;
-  --color-background: #ffffff;
-  --color-foreground: #171717;
-  --color-muted: #f5f5f5;
-  --color-muted-foreground: #737373;
-  --color-border: #e5e5e5;
-  --color-ring: #01613a;
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-secondary: var(--secondary);
+  --color-secondary-dark: var(--secondary-dark);
+  --color-secondary-light: var(--secondary-light);
+  --color-accent: var(--accent);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
 
   /* Gray palette */
   --color-gray-50: #f9fafb;
@@ -91,7 +92,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+  font-family: var(--app-font-sans);
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   letter-spacing: -0.011em;
   line-height: 1.6;

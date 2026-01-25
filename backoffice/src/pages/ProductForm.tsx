@@ -22,7 +22,7 @@ import {
   useReorderProductImages,
 } from '../hooks/useProductImages'
 import { api } from '../lib/api'
-import { logger } from '../lib/logger'
+import { logger } from '@quelyos/logger'
 
 export default function ProductForm() {
   const navigate = useNavigate()
@@ -458,7 +458,7 @@ export default function ProductForm() {
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition-all"
                   >
                     <option value="">Sans catégorie</option>
-                    {categories.map((category) => (
+                    {categories.map((category: any) => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>
@@ -497,7 +497,7 @@ export default function ProductForm() {
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition-all"
                   >
                     <option value="">Aucun badge</option>
-                    {ribbons.map((ribbon) => (
+                    {ribbons.map((ribbon: any) => (
                       <option key={ribbon.id} value={ribbon.id}>
                         {ribbon.name}
                       </option>
@@ -777,7 +777,7 @@ export default function ProductForm() {
                         Aucune taxe disponible
                       </p>
                     ) : (
-                      taxes.map((tax) => (
+                      taxes.map((tax: any) => (
                         <label
                           key={tax.id}
                           className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded"

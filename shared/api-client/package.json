@@ -1,0 +1,12 @@
+{
+  "name": "@quelyos/api-client",
+  "version": "1.0.0",
+  "description": "Client API Odoo unifié Quelyos ERP",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "private": true,
+  "dependencies": {
+    "@quelyos/types": "*",
+    "@quelyos/logger": "*"
+  }
+}

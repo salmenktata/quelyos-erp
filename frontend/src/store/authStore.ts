@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User } from '@/types';
+import type { User } from '@quelyos/types';
 import { odooClient } from '@/lib/odoo/client';
 
 interface AuthState {

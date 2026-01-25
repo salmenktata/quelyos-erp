@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { ProductGrid, ProductCard } from '@/components/product';
 import { Loading } from '@/components/common';
 import { odooClient } from '@/lib/odoo/client';
-import type { Product } from '@/types';
-import { logger } from '@/lib/logger';
+import type { Product } from '@quelyos/types';
+import { logger } from '@quelyos/logger';
 
 interface ProductRecommendationsProps {
   productId?: number;

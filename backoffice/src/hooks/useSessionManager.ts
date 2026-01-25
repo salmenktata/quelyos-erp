@@ -2,7 +2,7 @@ import { useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useToast } from '../contexts/ToastContext'
-import { logger } from '../lib/logger'
+import { logger } from '@quelyos/logger'
 
 const SESSION_CHECK_INTERVAL = 5 * 60 * 1000 // 5 minutes
 const SESSION_REFRESH_INTERVAL = 25 * 60 * 1000 // 25 minutes (rafraîchir avant expiration à 30min)
@@ -17,8 +17,8 @@ export function useSessionManager(config: SessionManagerConfig = {}) {
   const { enableAutoRefresh = true, enableWarning = true } = config
   const navigate = useNavigate()
   const toast = useToast()
-  const checkIntervalRef = useRef<number>()
-  const refreshIntervalRef = useRef<number>()
+  const checkIntervalRef = useRef<number | undefined>(undefined)
+  const refreshIntervalRef = useRef<number | undefined>(undefined)
   const lastActivityRef = useRef<number>(Date.now())
   const warningShownRef = useRef<boolean>(false)
 

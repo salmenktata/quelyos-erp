@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { odooClient } from '@/lib/odoo/client';
-import type { Product } from '@/types';
+import type { Product } from '@quelyos/types';
 
 interface UseCachedProductsOptions {
   limit?: number;

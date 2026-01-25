@@ -15,9 +15,13 @@ import { useState, useEffect, useRef } from 'react'
 import { Layout } from '../components/Layout'
 import { useMyTenant, useUpdateMyTenant } from '../hooks/useMyTenant'
 import { FONT_OPTIONS, DEFAULT_COLORS } from '../hooks/useTenants'
+import type { TenantConfig } from '../hooks/useTenants'
 import { useToast } from '../contexts/ToastContext'
+import { THEME_PRESETS } from '../data/themePresets'
+import type { ThemePreset } from '../data/themePresets'
 import {
   SwatchIcon,
+  SparklesIcon,
   PhotoIcon,
   DevicePhoneMobileIcon,
   GlobeAltIcon,
@@ -80,8 +84,58 @@ interface FormData {
   favicon_filename?: string
 }
 
+type ThemeSnapshot = Pick<ThemePreset, 'colors' | 'fontFamily' | 'darkMode'>
+
+const buildThemeSnapshotFromTenant = (tenant: TenantConfig): ThemeSnapshot => ({
+  colors: {
+    primary: tenant.theme?.colors?.primary || DEFAULT_COLORS.primary,
+    primaryDark: tenant.theme?.colors?.primaryDark || DEFAULT_COLORS.primaryDark,
+    primaryLight: tenant.theme?.colors?.primaryLight || DEFAULT_COLORS.primaryLight,
+    secondary: tenant.theme?.colors?.secondary || DEFAULT_COLORS.secondary,
+    secondaryDark: tenant.theme?.colors?.secondaryDark || DEFAULT_COLORS.secondaryDark,
+    secondaryLight: tenant.theme?.colors?.secondaryLight || DEFAULT_COLORS.secondaryLight,
+    accent: tenant.theme?.colors?.accent || DEFAULT_COLORS.accent,
+    background: tenant.theme?.colors?.background || DEFAULT_COLORS.background,
+    foreground: tenant.theme?.colors?.foreground || DEFAULT_COLORS.foreground,
+    muted: tenant.theme?.colors?.muted || DEFAULT_COLORS.muted,
+    mutedForeground: tenant.theme?.colors?.mutedForeground || DEFAULT_COLORS.mutedForeground,
+    border: tenant.theme?.colors?.border || DEFAULT_COLORS.border,
+    ring: tenant.theme?.colors?.ring || DEFAULT_COLORS.ring,
+  },
+  fontFamily: tenant.theme?.typography?.fontFamily || 'inter',
+  darkMode: {
+    enabled: tenant.theme?.darkMode?.enabled ?? true,
+    defaultDark: tenant.theme?.darkMode?.defaultDark ?? false,
+  },
+})
+
+const buildThemeFormFields = (snapshot: ThemeSnapshot) => ({
+  primary_color: snapshot.colors.primary,
+  primary_dark: snapshot.colors.primaryDark,
+  primary_light: snapshot.colors.primaryLight,
+  secondary_color: snapshot.colors.secondary,
+  secondary_dark: snapshot.colors.secondaryDark,
+  secondary_light: snapshot.colors.secondaryLight,
+  accent_color: snapshot.colors.accent,
+  background_color: snapshot.colors.background,
+  foreground_color: snapshot.colors.foreground,
+  muted_color: snapshot.colors.muted,
+  muted_foreground: snapshot.colors.mutedForeground,
+  border_color: snapshot.colors.border,
+  ring_color: snapshot.colors.ring,
+  font_family: snapshot.fontFamily,
+  enable_dark_mode: snapshot.darkMode.enabled,
+  default_dark: snapshot.darkMode.defaultDark,
+})
+
+const isThemeMatch = (snapshot: ThemeSnapshot, data: FormData) => {
+  const fields = buildThemeFormFields(snapshot)
+  return Object.entries(fields).every(([key, value]) => data[key as keyof FormData] === value)
+}
+
 // Sections du formulaire
 const SECTIONS = [
+  { id: 'themes', label: 'Themes', icon: SparklesIcon },
   { id: 'colors', label: 'Couleurs', icon: SwatchIcon },
   { id: 'branding', label: 'Branding', icon: PhotoIcon },
   { id: 'contact', label: 'Contact', icon: DevicePhoneMobileIcon },
@@ -142,9 +196,10 @@ export default function MyShop() {
   const updateMutation = useUpdateMyTenant()
   const toast = useToast()
 
-  const [activeSection, setActiveSection] = useState('colors')
+  const [activeSection, setActiveSection] = useState('themes')
   const [formData, setFormData] = useState<FormData | null>(null)
   const [hasChanges, setHasChanges] = useState(false)
+  const [initialThemeSnapshot, setInitialThemeSnapshot] = useState<ThemeSnapshot | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const [faviconPreview, setFaviconPreview] = useState<string | null>(null)
 
@@ -154,26 +209,13 @@ export default function MyShop() {
   // Initialiser le formulaire quand le tenant est chargé
   useEffect(() => {
     if (tenant) {
+      const themeSnapshot = buildThemeSnapshotFromTenant(tenant)
       setFormData({
         name: tenant.name || '',
         slogan: tenant.branding?.slogan || '',
         description: tenant.branding?.description || '',
 
-        primary_color: tenant.theme?.colors?.primary || DEFAULT_COLORS.primary,
-        primary_dark: tenant.theme?.colors?.primaryDark || DEFAULT_COLORS.primaryDark,
-        primary_light: tenant.theme?.colors?.primaryLight || DEFAULT_COLORS.primaryLight,
-        secondary_color: tenant.theme?.colors?.secondary || DEFAULT_COLORS.secondary,
-        secondary_dark: tenant.theme?.colors?.secondaryDark || DEFAULT_COLORS.secondaryDark,
-        secondary_light: tenant.theme?.colors?.secondaryLight || DEFAULT_COLORS.secondaryLight,
-        accent_color: tenant.theme?.colors?.accent || DEFAULT_COLORS.accent,
-        background_color: tenant.theme?.colors?.background || DEFAULT_COLORS.background,
-        foreground_color: tenant.theme?.colors?.foreground || DEFAULT_COLORS.foreground,
-        muted_color: tenant.theme?.colors?.muted || DEFAULT_COLORS.muted,
-        muted_foreground: tenant.theme?.colors?.mutedForeground || DEFAULT_COLORS.mutedForeground,
-        border_color: tenant.theme?.colors?.border || DEFAULT_COLORS.border,
-        ring_color: tenant.theme?.colors?.ring || DEFAULT_COLORS.ring,
-
-        font_family: tenant.theme?.typography?.fontFamily || 'inter',
+        ...buildThemeFormFields(themeSnapshot),
 
         email: tenant.contact?.email || '',
         phone: tenant.contact?.phone || '',
@@ -184,14 +226,16 @@ export default function MyShop() {
         meta_title: tenant.seo?.title || '',
         meta_description: tenant.seo?.description || '',
 
-        enable_dark_mode: tenant.theme?.darkMode?.enabled ?? true,
-        default_dark: tenant.theme?.darkMode?.defaultDark ?? false,
         feature_wishlist: tenant.features?.wishlist ?? true,
         feature_comparison: tenant.features?.comparison ?? true,
         feature_reviews: tenant.features?.reviews ?? true,
         feature_newsletter: tenant.features?.newsletter ?? true,
         feature_guest_checkout: tenant.features?.guestCheckout ?? true,
       })
+
+      if (!initialThemeSnapshot) {
+        setInitialThemeSnapshot(themeSnapshot)
+      }
 
       // Set logo/favicon previews if they exist
       if (tenant.branding?.logoUrl) {
@@ -201,7 +245,7 @@ export default function MyShop() {
         setFaviconPreview(tenant.branding.faviconUrl)
       }
     }
-  }, [tenant])
+  }, [tenant, initialThemeSnapshot])
 
   // Mise à jour d'un champ
   const updateField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
@@ -218,6 +262,56 @@ export default function MyShop() {
       social: { ...formData.social, [key]: value },
     })
     setHasChanges(true)
+  }
+
+  const applyThemePreset = async (preset: ThemePreset) => {
+    if (!formData) return
+    if (hasChanges) {
+      toast.info('Enregistrez ou annulez vos modifications avant d\'appliquer un theme.')
+      return
+    }
+
+    const themeFields = buildThemeFormFields({
+      colors: preset.colors,
+      fontFamily: preset.fontFamily,
+      darkMode: preset.darkMode,
+    })
+    const nextData = { ...formData, ...themeFields }
+
+    setFormData(nextData)
+    setHasChanges(true)
+
+    try {
+      await updateMutation.mutateAsync(themeFields)
+      toast.success(`Theme applique: ${preset.label}`)
+      setHasChanges(false)
+      refetch()
+    } catch (err) {
+      toast.error((err as Error).message || 'Erreur lors de l\'application du theme')
+    }
+  }
+
+  const restoreInitialTheme = async () => {
+    if (!formData || !initialThemeSnapshot) return
+    if (hasChanges) {
+      toast.info('Enregistrez ou annulez vos modifications avant de restaurer le theme.')
+      return
+    }
+
+    const themeFields = buildThemeFormFields(initialThemeSnapshot)
+    const nextData = { ...formData, ...themeFields }
+
+    setFormData(nextData)
+    setHasChanges(true)
+
+    try {
+      await updateMutation.mutateAsync(themeFields)
+      toast.success('Theme initial restaure')
+      setHasChanges(false)
+      refetch()
+    } catch (err) {
+      toast.error((err as Error).message || 'Erreur lors de la restauration du theme')
+    }
   }
 
   // Gestion du fichier logo

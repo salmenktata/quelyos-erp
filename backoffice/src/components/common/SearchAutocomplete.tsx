@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, ReactNode } from 'react'
-import { logger } from '../../lib/logger'
+import { logger } from '@quelyos/logger'
 
 export interface SearchSuggestion<T = unknown> {
   id: string | number

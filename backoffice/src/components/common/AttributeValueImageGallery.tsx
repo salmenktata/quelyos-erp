@@ -8,7 +8,7 @@ import {
   useDeleteAttributeValueImage,
   useReorderAttributeValueImages,
 } from '../../hooks/useAttributeImages'
-import { logger } from '../../lib/logger'
+import { logger } from '@quelyos/logger'
 
 interface AttributeValueImageGalleryProps {
   productId: number

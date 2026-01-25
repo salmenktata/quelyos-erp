@@ -7,7 +7,7 @@ import { DashboardKPIs } from '../components/dashboard/DashboardKPIs'
 import { DashboardRecentOrders } from '../components/dashboard/DashboardRecentOrders'
 import { DashboardQuickActions } from '../components/dashboard/DashboardQuickActions'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import type { AnalyticsStats } from '../types'
+import type { AnalyticsStats } from '@/types'
 
 type StockAlert = AnalyticsStats['stock_alerts'][number]
 

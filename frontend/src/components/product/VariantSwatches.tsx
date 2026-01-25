@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Motion } from '@/components/common/Motion';
 import { fetchVariantsLazy, getColorHex, isLightColor } from '@/lib/variants';
-import { AttributeLine, ExtendedProductVariant } from '@/types';
-import { logger } from '@/lib/logger';
+import { AttributeLine, ExtendedProductVariant } from '@quelyos/types';
+import { logger } from '@quelyos/logger';
 
 // SVG CheckIcon inline
 const CheckIcon = ({ className }: { className?: string }) => (

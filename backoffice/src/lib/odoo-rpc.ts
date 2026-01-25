@@ -1,4 +1,4 @@
-import { logger } from './logger'
+import { logger } from '@quelyos/logger'
 
 // En développement, utiliser le proxy Vite (pas de CORS)
 // En production, utiliser l'URL complète

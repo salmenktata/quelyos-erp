@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { logger } from '../lib/logger'
+import { logger } from '@quelyos/logger'
 
 // URL de l'API (même config que api.ts)
 const API_URL = import.meta.env.VITE_API_URL || ''

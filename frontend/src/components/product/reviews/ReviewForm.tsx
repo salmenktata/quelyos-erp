@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button, Input } from '@/components/common';
 import StarRating from './StarRating';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
 
 interface ReviewFormProps {
   productId: number;

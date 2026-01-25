@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
-import type { SubscriptionCreateData } from '../types'
+import type { SubscriptionCreateData } from '@/types'
 
 export function useSubscriptions(params?: { limit?: number; offset?: number }) {
   return useQuery({

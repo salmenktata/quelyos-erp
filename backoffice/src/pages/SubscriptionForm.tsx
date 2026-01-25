@@ -5,7 +5,7 @@ import { Button, Breadcrumbs } from '../components/common'
 import { useSubscriptionPlans, useCreateSubscription } from '../hooks/useSubscriptions'
 import { useToast } from '../contexts/ToastContext'
 import { CheckIcon } from '@heroicons/react/24/outline'
-import type { SubscriptionCreateData } from '../types'
+import type { SubscriptionCreateData } from '@/types'
 
 /**
  * Page de création d'abonnement
@@ -26,7 +26,7 @@ export default function SubscriptionForm() {
   // Sélectionner le plan "Pro" par défaut si disponible
   useEffect(() => {
     if (plans.length > 0 && !selectedPlanId) {
-      const proPlan = plans.find((p) => p.code === 'pro')
+      const proPlan = plans.find((p: any) => p.code === 'pro')
       if (proPlan) {
         setSelectedPlanId(proPlan.id)
       } else {
@@ -62,7 +62,7 @@ export default function SubscriptionForm() {
     }
   }
 
-  const selectedPlan = plans.find((p) => p.id === selectedPlanId)
+  const selectedPlan = plans.find((p: any) => p.id === selectedPlanId)
   const price = billingCycle === 'monthly' ? selectedPlan?.price_monthly : selectedPlan?.price_yearly
 
   return (
@@ -156,7 +156,7 @@ export default function SubscriptionForm() {
                   Choisir un plan
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {plans.map((plan) => {
+                  {plans.map((plan: any) => {
                     const isSelected = plan.id === selectedPlanId
                     const planPrice =
                       billingCycle === 'monthly' ? plan.price_monthly : plan.price_yearly
@@ -232,7 +232,7 @@ export default function SubscriptionForm() {
                               {plan.max_orders_per_year === 0 ? 'Commandes illimitées' : `${plan.max_orders_per_year} commandes/an`}
                             </span>
                           </div>
-                          {plan.features.map((feature, idx) => (
+                          {plan.features.map((feature, idx: number) => (
                             <div key={idx} className="flex items-start gap-2">
                               <CheckIcon className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                               <span className="text-sm text-gray-700 dark:text-gray-300">

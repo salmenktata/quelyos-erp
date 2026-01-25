@@ -4,14 +4,14 @@
  */
 
 import Link from 'next/link';
-import type { Product, Category } from '@/types';
+import type { Product, Category } from '@quelyos/types';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { PromoBanners } from '@/components/home/PromoBanners';
 import { CategoriesSection } from '@/components/home/CategoriesSection';
 import { ProductGrid } from '@/components/product/ProductGrid';
 import { ProductCardHome } from '@/components/home/ProductCardHome';
 import { NewsletterForm } from '@/components/home/NewsletterForm';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
 
 // Server-side data fetching
 async function getHomeData(): Promise<{ products: Product[]; categories: Category[] }> {

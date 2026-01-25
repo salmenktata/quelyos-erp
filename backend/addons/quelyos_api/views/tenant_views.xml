@@ -201,7 +201,7 @@
                 <field name="users_count"/>
                 <field name="logo"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div class="oe_kanban_global_click">
                             <div class="o_kanban_image">
                                 <t t-if="record.logo.raw_value">

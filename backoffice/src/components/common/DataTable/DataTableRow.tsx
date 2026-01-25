@@ -1,4 +1,4 @@
-import type { DataTableColumn } from './types'
+import type { DataTableColumn } from '@/types'
 
 interface DataTableRowProps<T> {
   row: T

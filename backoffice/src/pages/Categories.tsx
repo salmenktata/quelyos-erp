@@ -20,7 +20,7 @@ import {
 import { useToast } from '../hooks/useToast'
 import { useDebounce } from '../hooks/useDebounce'
 import { ToastContainer } from '../components/common/Toast'
-import { Category } from '../types'
+import { Category } from '@/types'
 
 interface CategoryFormData {
   name: string

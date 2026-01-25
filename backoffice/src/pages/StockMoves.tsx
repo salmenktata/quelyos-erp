@@ -5,14 +5,14 @@ import { useStockMoves } from '../hooks/useStock'
 import { Badge, Button, Breadcrumbs, SkeletonTable, Input } from '../components/common'
 import { useToast } from '../contexts/ToastContext'
 import { api } from '../lib/api'
-import { logger } from '../lib/logger'
+import { logger } from '@quelyos/logger'
 import {
   ArrowsRightLeftIcon,
   ArrowDownTrayIcon,
   FunnelIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
-import type { StockMove } from '../types'
+import type { StockMove } from '@/types'
 
 export default function StockMoves() {
   const [page, setPage] = useState(0)

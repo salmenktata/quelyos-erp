@@ -11,8 +11,8 @@ import { useAuthStore } from '@/store/authStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { odooClient } from '@/lib/odoo/client';
-import type { Address } from '@/types';
-import { logger } from '@/lib/logger';
+import type { Address } from '@quelyos/types';
+import { logger } from '@quelyos/logger';
 
 export default function AccountAddressesPage() {
   const router = useRouter();

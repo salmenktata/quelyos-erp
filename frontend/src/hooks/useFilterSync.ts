@@ -5,7 +5,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import type { ProductFilters } from '@/types';
+import type { ProductFilters } from '@quelyos/types';
 
 interface UseFilterSyncOptions {
   /** Filtres actuels */

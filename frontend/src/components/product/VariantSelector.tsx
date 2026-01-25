@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { VariantsResponse, ExtendedProductVariant } from '@/types';
+import { VariantsResponse, ExtendedProductVariant } from '@quelyos/types';
 import { ColorSwatch } from './ColorSwatch';
 import { SizeButton } from './SizeButton';
 import { getColorHex } from '@/lib/variants';

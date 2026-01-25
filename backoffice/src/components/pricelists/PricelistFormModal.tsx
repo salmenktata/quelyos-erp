@@ -33,7 +33,7 @@ interface PricelistFormModalProps {
 
 export function PricelistFormModal({ isOpen, onClose, pricelist }: PricelistFormModalProps) {
   const isEditing = !!pricelist;
-  const { showToast } = useToast();
+  const { success, error: showError } = useToast();
 
   const {
     register,
@@ -84,7 +84,7 @@ export function PricelistFormModal({ isOpen, onClose, pricelist }: PricelistForm
             active: data.active,
           },
         });
-        showToast(`Liste de prix "${data.name}" mise à jour avec succès`, 'success');
+        success(`Liste de prix "${data.name}" mise à jour avec succès`);
       } else {
         // Mode création
         await createMutation.mutateAsync({
@@ -93,13 +93,12 @@ export function PricelistFormModal({ isOpen, onClose, pricelist }: PricelistForm
           discount_policy: data.discount_policy,
           active: data.active,
         });
-        showToast(`Liste de prix "${data.name}" créée avec succès`, 'success');
+        success(`Liste de prix "${data.name}" créée avec succès`);
       }
       onClose();
     } catch (error) {
-      showToast(
-        error instanceof Error ? error.message : 'Erreur lors de la sauvegarde',
-        'error'
+      showError(
+        error instanceof Error ? error.message : 'Erreur lors de la sauvegarde'
       );
     }
   };

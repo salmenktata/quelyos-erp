@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
 import { Button } from '@/components/common';
-import type { Product } from '@/types';
-import { logger } from '@/lib/logger';
+import type { Product } from '@quelyos/types';
+import { logger } from '@quelyos/logger';
 
 interface RecommendationsCarouselProps {
   productId: number;

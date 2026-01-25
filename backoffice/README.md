@@ -11,7 +11,7 @@ npm run dev
 
 ## Stack
 
-- React 18
+- React 18.3
 - Vite
 - TypeScript
 - Tailwind CSS

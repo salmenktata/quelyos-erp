@@ -27,8 +27,8 @@ import type {
   OrderHistoryItem,
   ShippingTrackingInfo,
   Ribbon,
-} from '../types'
-import { logger } from './logger'
+} from '@quelyos/types'
+import { logger } from '@quelyos/logger'
 
 // En développement, utiliser le proxy Vite (pas de CORS)
 // En production, utiliser l'URL complète

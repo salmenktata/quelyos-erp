@@ -112,7 +112,7 @@ export default function SiteConfig() {
         contactSchema.parse(contactConfig)
       } catch (error) {
         if (error instanceof z.ZodError) {
-          toast.error(`Contact: ${error.errors[0].message}`)
+          toast.error(`Contact: ${error.issues[0].message}`)
           return
         }
       }
@@ -121,7 +121,7 @@ export default function SiteConfig() {
         shippingSchema.parse(shippingConfig)
       } catch (error) {
         if (error instanceof z.ZodError) {
-          toast.error(`Livraison: ${error.errors[0].message}`)
+          toast.error(`Livraison: ${error.issues[0].message}`)
           return
         }
       }
@@ -130,7 +130,7 @@ export default function SiteConfig() {
         returnsSchema.parse(returnsConfig)
       } catch (error) {
         if (error instanceof z.ZodError) {
-          toast.error(`Retours: ${error.errors[0].message}`)
+          toast.error(`Retours: ${error.issues[0].message}`)
           return
         }
       }
@@ -139,7 +139,7 @@ export default function SiteConfig() {
         warrantySchema.parse(warrantyConfig)
       } catch (error) {
         if (error instanceof z.ZodError) {
-          toast.error(`Garantie: ${error.errors[0].message}`)
+          toast.error(`Garantie: ${error.issues[0].message}`)
           return
         }
       }
@@ -148,7 +148,7 @@ export default function SiteConfig() {
         paymentMethodsSchema.parse(paymentMethods)
       } catch (error) {
         if (error instanceof z.ZodError) {
-          toast.error(`Paiement: ${error.errors[0].message}`)
+          toast.error(`Paiement: ${error.issues[0].message}`)
           return
         }
       }

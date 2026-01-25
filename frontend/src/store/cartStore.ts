@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Cart } from '@/types';
+import type { Cart } from '@quelyos/types';
 import { odooClient } from '@/lib/odoo/client';
 
 interface CartState {

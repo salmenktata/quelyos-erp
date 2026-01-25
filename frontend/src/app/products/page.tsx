@@ -8,7 +8,7 @@ import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { odooClient } from '@/lib/odoo/client';
-import type { Product, ProductFilters, Category } from '@/types';
+import type { Product, ProductFilters, Category } from '@quelyos/types';
 import { ProductGridSkeleton } from '@/components/common/Skeleton';
 import { FilterDrawer } from '@/components/product/FilterDrawer';
 import { ProductGrid } from '@/components/product/ProductGrid';
@@ -22,7 +22,7 @@ import { ViewersCount } from '@/components/product/ViewersCount';
 import { CountdownTimer } from '@/components/product/CountdownTimer';
 import { useCompareStore } from '@/store/compareStore';
 import { useSiteConfig } from '@/hooks/useSiteConfig';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
 
 // Lazy load du carousel (non critique pour le premier affichage)
 const RecentlyViewedCarousel = dynamic(

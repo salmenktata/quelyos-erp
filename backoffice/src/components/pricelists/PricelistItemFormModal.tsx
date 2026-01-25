@@ -12,16 +12,14 @@ import {
   XMarkIcon,
   CalculatorIcon,
   CheckCircleIcon,
-  ExclamationCircleIcon,
-  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import { useCreatePricelistItem, type CreatePricelistItemParams } from '../../hooks/usePricelists';
 import { useCategories } from '../../hooks/useCategories';
 import { SearchAutocomplete, type SearchSuggestion } from '../common/SearchAutocomplete';
 import { useToast } from '../../hooks/useToast';
 import { api } from '../../lib/api';
-import { logger } from '../../lib/logger';
-import type { Product } from '../../types';
+import { logger } from '@quelyos/logger';
+import type { Product } from '@/types';
 
 interface PricelistItemFormData {
   applied_on: '3_global' | '2_product_category' | '1_product' | '0_product_variant';
@@ -49,7 +47,7 @@ export function PricelistItemFormModal({
   pricelistId,
   currencySymbol,
 }: PricelistItemFormModalProps) {
-  const { showToast } = useToast();
+  const { success, error: showError } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const {
@@ -69,7 +67,7 @@ export function PricelistItemFormModal({
   });
 
   const { data: categoriesData } = useCategories();
-  const categories = (categoriesData?.data?.categories || categoriesData?.categories || []) as Array<{
+  const categories = (categoriesData?.data?.categories || []) as Array<{
     id: number;
     name: string;
   }>;
@@ -119,22 +117,22 @@ export function PricelistItemFormModal({
     try {
       // Validation conditionnelle
       if (data.applied_on === '1_product' && !data.product_tmpl_id) {
-        showToast('Veuillez sélectionner un produit', 'error');
+        showError('Veuillez sélectionner un produit');
         return;
       }
 
       if (data.applied_on === '2_product_category' && !data.categ_id) {
-        showToast('Veuillez sélectionner une catégorie', 'error');
+        showError('Veuillez sélectionner une catégorie');
         return;
       }
 
       if (data.compute_price === 'fixed' && !data.fixed_price) {
-        showToast('Veuillez saisir un prix fixe', 'error');
+        showError('Veuillez saisir un prix fixe');
         return;
       }
 
       if (data.compute_price === 'percentage' && !data.percent_price && !data.price_discount) {
-        showToast('Veuillez saisir un pourcentage ou une remise', 'error');
+        showError('Veuillez saisir un pourcentage ou une remise');
         return;
       }
 
@@ -170,10 +168,10 @@ export function PricelistItemFormModal({
       }
 
       await createMutation.mutateAsync({ pricelistId, params });
-      showToast('Règle de prix ajoutée avec succès', 'success');
+      success('Règle de prix ajoutée avec succès');
       onClose();
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Erreur lors de la création', 'error');
+      showError(error instanceof Error ? error.message : 'Erreur lors de la création');
     }
   };
 
@@ -291,7 +289,6 @@ export function PricelistItemFormModal({
                             fetchSuggestions={fetchProductSuggestions}
                             onSelect={handleSelectProduct}
                             placeholder="Rechercher un produit..."
-                            icon={<MagnifyingGlassIcon className="w-5 h-5" />}
                           />
                         )}
                       />

@@ -1,7 +1,7 @@
 import { useState, useRef, DragEvent } from 'react'
 import { OdooImage } from './OdooImage'
 import { Button } from './Button'
-import { logger } from '../../lib/logger'
+import { logger } from '@quelyos/logger'
 
 export interface ProductImage {
   id: number

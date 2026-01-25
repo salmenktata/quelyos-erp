@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { odooClient } from '@/lib/odoo/client';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/common';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
 
 interface StockAlertProps {
   productId: number;

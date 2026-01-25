@@ -9,7 +9,7 @@ import {
 } from '../hooks/useCustomerCategories';
 import { SkeletonGrid } from '../components/common/Skeleton';
 import { useToast } from '../contexts/ToastContext';
-import { logger } from '../lib/logger';
+import { logger } from '@quelyos/logger';
 
 export default function CustomerCategories() {
   // Toast

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Category } from '@/types';
+import { Category } from '@quelyos/types';
 
 interface CategoriesSectionProps {
   categories: Category[];

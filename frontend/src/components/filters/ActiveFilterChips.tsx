@@ -8,7 +8,7 @@
 import React from 'react';
 import { Motion, AnimatePresence } from '@/components/common/Motion';
 import { chipAppear } from '@/lib/animations/variants';
-import type { ProductFilters, Category } from '@/types';
+import type { ProductFilters, Category } from '@quelyos/types';
 
 interface ActiveFilterChipsProps {
   /** Filtres actifs */

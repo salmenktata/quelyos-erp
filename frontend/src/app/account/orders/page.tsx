@@ -12,8 +12,8 @@ import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
 import { odooClient } from '@/lib/odoo/client';
-import type { Order } from '@/types';
-import { logger } from '@/lib/logger';
+import type { Order } from '@quelyos/types';
+import { logger } from '@quelyos/logger';
 
 const orderStates = {
   draft: { label: 'Brouillon', color: 'gray' },

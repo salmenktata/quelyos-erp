@@ -8,7 +8,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
-import type { Product } from '@/types';
+import type { Product } from '@quelyos/types';
 import { formatPrice } from '@/lib/utils/formatting';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
@@ -25,7 +25,7 @@ import { VariantSelector } from '@/components/product/VariantSelector';
 import { ViewersCount } from '@/components/product/ViewersCount';
 import { CountdownTimer } from '@/components/product/CountdownTimer';
 import { BundleSuggestions } from '@/components/product/BundleSuggestions';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
 
 export default function ProductDetailPage() {
   const params = useParams();

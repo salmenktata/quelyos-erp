@@ -1,5 +1,5 @@
 import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/outline'
-import type { DataTableColumn, SortOrder } from './types'
+import type { DataTableColumn, SortOrder } from '@/types'
 
 interface DataTableHeaderProps<T> {
   columns: DataTableColumn<T>[]

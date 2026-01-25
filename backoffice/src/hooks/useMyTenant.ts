@@ -9,7 +9,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { logger } from '../lib/logger'
+import { logger } from '@quelyos/logger'
 import type { TenantConfig, TenantFormData } from './useTenants'
 
 const API_URL = import.meta.env.VITE_API_URL || ''

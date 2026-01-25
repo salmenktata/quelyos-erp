@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
 import { StructuredData } from './StructuredData';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
 
 interface BreadcrumbItem {
   position: number;

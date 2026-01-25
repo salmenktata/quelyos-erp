@@ -5,7 +5,7 @@
 
 import { useEffect } from 'react';
 import { useRecentlyViewedStore } from '@/store/recentlyViewedStore';
-import type { Product } from '@/types';
+import type { Product } from '@quelyos/types';
 
 interface UseRecentlyViewedOptions {
   /** Produit à tracker */

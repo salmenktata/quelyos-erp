@@ -5,7 +5,7 @@ import { useLowStockAlerts, useHighStockAlerts, useStockProducts, useUpdateProdu
 import { Badge, Button, Breadcrumbs, SkeletonTable, Input } from '../components/common'
 import { useToast } from '../contexts/ToastContext'
 import { api } from '../lib/api'
-import { logger } from '../lib/logger'
+import { logger } from '@quelyos/logger'
 import {
   ExclamationTriangleIcon,
   ShoppingBagIcon,
@@ -15,7 +15,7 @@ import {
   PencilIcon,
   ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline'
-import type { StockProduct } from '../types'
+import type { StockProduct } from '@/types'
 
 type TabType = 'products' | 'alerts'
 

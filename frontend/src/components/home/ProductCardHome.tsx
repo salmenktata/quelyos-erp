@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Product } from '@/types';
+import type { Product } from '@quelyos/types';
 import { useToast } from '@/store/toastStore';
 
 // Helper function to proxy Odoo images through Next.js API

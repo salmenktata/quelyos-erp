@@ -14,8 +14,8 @@ import type {
   Address,
   WishlistItem,
   APIResponse,
-} from '@/types';
-import { logger } from '@/lib/logger';
+} from '@quelyos/types';
+import { logger } from '@quelyos/logger';
 
 // Use Next.js API proxy to avoid CORS issues
 // The proxy at /api/odoo/* forwards requests to Odoo server-side

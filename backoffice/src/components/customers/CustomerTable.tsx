@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Badge } from '../common'
 import { EyeIcon, ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/outline'
-import type { CustomerListItem } from '../../types'
+import type { CustomerListItem } from '@/types'
 import { formatDate, formatPrice } from '../../lib/utils/formatters'
 
 type SortField = 'name' | 'email' | 'orders_count' | 'total_spent' | 'create_date'

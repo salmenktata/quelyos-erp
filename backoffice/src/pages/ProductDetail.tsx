@@ -3,7 +3,7 @@ import { Layout } from '../components/Layout'
 import { useProduct } from '../hooks/useProducts'
 import { useProductImages } from '../hooks/useProductImages'
 import { Button, Breadcrumbs, Skeleton, Badge } from '../components/common'
-import type { ProductImage } from '../types'
+import type { ProductImage } from '@/types'
 import {
   PencilIcon,
   TagIcon,
@@ -408,7 +408,7 @@ export default function ProductDetail() {
                     Taxes
                   </h2>
                   <ul className="space-y-2">
-                    {product.taxes.map((tax) => (
+                    {product.taxes.map((tax: any) => (
                       <li key={tax.id} className="flex items-center justify-between text-sm">
                         <span className="text-gray-900 dark:text-gray-100">{tax.name}</span>
                         <span className="text-gray-500 dark:text-gray-400">

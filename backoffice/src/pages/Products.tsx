@@ -28,8 +28,8 @@ import {
 import { useToast } from '../hooks/useToast'
 import { ToastContainer } from '../components/common/Toast'
 import { api } from '../lib/api'
-import { logger } from '../lib/logger'
-import type { ProductsQueryParams, Product } from '../types'
+import { logger } from '@quelyos/logger'
+import type { ProductsQueryParams, Product } from '@/types'
 
 type SortField = 'name' | 'price' | 'qty_available' | 'default_code'
 type SortOrder = 'asc' | 'desc'
@@ -86,7 +86,7 @@ export default function Products() {
   const attributes: Attribute[] = useMemo(() => {
     if (!attributesData?.data?.attributes) return []
     // Ne garder que les attributs qui ont des valeurs
-    return attributesData.data.attributes.filter((attr) => attr.values.length > 0)
+    return attributesData.data.attributes.filter((attr: any) => attr.values.length > 0)
   }, [attributesData])
 
   const { data: productsData, isLoading, error } = useProducts(queryParams)
@@ -220,9 +220,9 @@ export default function Products() {
       const { products: exportData, columns } = result.data
 
       // Créer le CSV
-      const headers = columns.map((c) => c.label).join(';')
-      const rows = exportData.map((p) =>
-        columns.map((c) => {
+      const headers = columns.map((c: any) => c.label).join(';')
+      const rows = exportData.map((p: any) =>
+        columns.map((c: any) => {
           const value = p[c.key as keyof typeof p]
           // Échapper les points-virgules et guillemets
           const str = String(value ?? '')
@@ -279,18 +279,18 @@ export default function Products() {
 
   // Bulk actions helpers
   const isAllSelected = useMemo(() => {
-    return products.length > 0 && products.every((p) => selectedProductIds.has(p.id))
+    return products.length > 0 && products.every((p: any) => selectedProductIds.has(p.id))
   }, [products, selectedProductIds])
 
   const isSomeSelected = useMemo(() => {
-    return products.some((p) => selectedProductIds.has(p.id))
+    return products.some((p: any) => selectedProductIds.has(p.id))
   }, [products, selectedProductIds])
 
   const toggleSelectAll = useCallback(() => {
     if (isAllSelected) {
       setSelectedProductIds(new Set())
     } else {
-      setSelectedProductIds(new Set(products.map((p) => p.id)))
+      setSelectedProductIds(new Set(products.map((p: any) => p.id)))
     }
   }, [isAllSelected, products])
 
@@ -346,7 +346,7 @@ export default function Products() {
       if (modifier && e.key === 'a' && !(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) {
         e.preventDefault()
         if (products.length > 0) {
-          setSelectedProductIds(new Set(products.map((p) => p.id)))
+          setSelectedProductIds(new Set(products.map((p: any) => p.id)))
         }
       }
     }
@@ -717,7 +717,7 @@ export default function Products() {
               )}
               {categoryFilter && (
                 <Badge variant="info">
-                  Catégorie: {categories.find((c) => c.id === categoryFilter)?.name}
+                  Catégorie: {categories.find((c: any) => c.id === categoryFilter)?.name}
                 </Badge>
               )}
               {stockStatusFilter && (
@@ -868,7 +868,7 @@ export default function Products() {
                       {/* Image */}
                       <div className="h-16 w-16 shrink-0">
                         <OdooImage
-                          src={product.image}
+                          src={product.image || ''}
                           alt={product.name}
                           className="h-16 w-16 rounded-lg object-cover"
                           fallback={
@@ -893,7 +893,7 @@ export default function Products() {
                         </div>
 
                         <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 mb-2">
-                          <span className="font-semibold">{product.price.toFixed(2)} €</span>
+                          <span className="font-semibold">{product.price?.toFixed(2) ?? '0.00'} €</span>
                           {product.default_code && (
                             <>
                               <span className="text-gray-400">•</span>
@@ -903,7 +903,7 @@ export default function Products() {
                         </div>
 
                         <div className="flex items-center gap-2 flex-wrap">
-                          {getStockBadge(product.stock_status, product.qty_available)}
+                          {getStockBadge(product.stock_status ?? "out_of_stock", product.qty_available ?? 0)}
                           {product.category && (
                             <Badge variant="info">{product.category.name}</Badge>
                           )}
@@ -1116,10 +1116,10 @@ export default function Products() {
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                          {product.price.toFixed(2)} €
+                          {product.price?.toFixed(2)} €
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {getStockBadge(product.stock_status, product.qty_available)}
+                          {getStockBadge(product.stock_status ?? "out_of_stock", product.qty_available ?? 0)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end gap-2">

@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { odooClient } from '@/lib/odoo/client';
 import { useCartStore } from '@/store/cartStore';
-import type { Product } from '@/types';
+import type { Product } from '@quelyos/types';
 import { formatPrice } from '@/lib/utils/formatting';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
 
 interface BundleSuggestionsProps {
   currentProduct: Product;

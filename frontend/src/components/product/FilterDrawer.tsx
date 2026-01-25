@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import type { ProductFilters, Category } from '@/types';
+import type { ProductFilters, Category } from '@quelyos/types';
 
 interface FilterDrawerProps {
   isOpen: boolean;

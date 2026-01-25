@@ -3,10 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Product } from '@/types';
+import { Product } from '@quelyos/types';
 import { Card, Badge, Button } from '@/components/common';
 import { useCartStore } from '@/store/cartStore';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
 
 interface ProductCardProps {
   product: Product;

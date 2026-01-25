@@ -3,7 +3,7 @@
  * Cache intelligent avec TTL 5 minutes
  */
 
-import { VariantsResponse } from '@/types';
+import { VariantsResponse } from '@quelyos/types';
 import { odooClient } from './odoo/client';
 import { logger } from './logger';
 

@@ -12,6 +12,10 @@ Français pour communications. Code en anglais.
 Voir `.claude/reference/` pour conventions TS/Python, anti-patterns, UX/UI, parité Odoo.
 
 ## Workflow Odoo CRITIQUE
+**Consultation doc Odoo 19 Community obligatoire**
+- WebSearch pour vérifier modules/champs existants AVANT implémentation
+- Doc officielle : https://www.odoo.com/documentation/19.0/
+
 **Modification modèle = upgrade obligatoire**
 1. Modifier code `models/`
 2. Incrémenter version `__manifest__.py`
@@ -23,7 +27,7 @@ Alerter AVANT : schéma DB, modèles Odoo, endpoints API
 ## Commandes disponibles
 **DevOps** : `/ship`, `/deploy`, `/test`, `/security`, `/perf`, `/db-sync`
 **Odoo** : `/upgrade-odoo`, `/restart-odoo`, `/restart-backoffice`, `/restart-all`
-**Qualité** : `/polish`, `/parity`, `/coherence`, `/clean`, `/analyze-page`
+**Qualité** : `/polish`, `/parity`, `/coherence`, `/clean`, `/analyze-page`, `/docs`
 
 ## Essentiels
 1. Lire README.md et LOGME.md en début de session
