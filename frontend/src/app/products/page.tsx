@@ -121,8 +121,8 @@ function ProductsContent() {
   const handlePriceFilter = () => {
     setFilters({
       ...filters,
-      price_min: priceRange.min,
-      price_max: priceRange.max,
+      min_price: priceRange.min,
+      max_price: priceRange.max,
       offset: 0,
     });
   };
@@ -403,9 +403,9 @@ function ProductsContent() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
           </svg>
           {/* Badge compteur filtres actifs */}
-          {[filters.is_featured, filters.is_new, filters.is_bestseller, filters.category_id, filters.price_min, filters.price_max].filter(Boolean).length > 0 && (
+          {[filters.is_featured, filters.is_new, filters.is_bestseller, filters.category_id, filters.min_price, filters.max_price].filter(Boolean).length > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-              {[filters.is_featured, filters.is_new, filters.is_bestseller, filters.category_id, filters.price_min, filters.price_max].filter(Boolean).length}
+              {[filters.is_featured, filters.is_new, filters.is_bestseller, filters.category_id, filters.min_price, filters.max_price].filter(Boolean).length}
             </span>
           )}
         </button>
