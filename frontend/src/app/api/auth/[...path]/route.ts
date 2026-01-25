@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 const ODOO_URL = process.env.NEXT_PUBLIC_ODOO_URL || 'http://localhost:8069';
 
@@ -60,7 +61,7 @@ export async function POST(
     return nextResponse;
 
   } catch (error) {
-    console.error('Auth API error:', error);
+    logger.error('Auth API error:', error);
     return NextResponse.json(
       { success: false, error: 'Authentication failed' },
       { status: 500 }
@@ -106,7 +107,7 @@ export async function GET(
     return NextResponse.json(data.result || data);
 
   } catch (error) {
-    console.error('Auth API error:', error);
+    logger.error('Auth API error:', error);
     return NextResponse.json(
       { success: false, error: 'Authentication check failed' },
       { status: 500 }

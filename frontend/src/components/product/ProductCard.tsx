@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Product } from '@/types';
 import { Card, Badge, Button } from '@/components/common';
 import { useCartStore } from '@/store/cartStore';
+import { logger } from '@/lib/logger';
 
 interface ProductCardProps {
   product: Product;
@@ -24,7 +25,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
     try {
       await addToCart(product.id, 1);
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      logger.error('Error adding to cart:', error);
     } finally {
       setIsAdding(false);
     }

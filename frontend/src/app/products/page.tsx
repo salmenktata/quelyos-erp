@@ -16,6 +16,13 @@ import { ActiveFilterChips } from '@/components/filters/ActiveFilterChips';
 import { Pagination, PaginationInfo } from '@/components/common/Pagination';
 import { useFilterSync } from '@/hooks/useFilterSync';
 import { VariantSwatches } from '@/components/product/VariantSwatches';
+import StarRating from '@/components/product/reviews/StarRating';
+import { QuickViewModal } from '@/components/product/QuickViewModal';
+import { ViewersCount } from '@/components/product/ViewersCount';
+import { CountdownTimer } from '@/components/product/CountdownTimer';
+import { useCompareStore } from '@/store/compareStore';
+import { useSiteConfig } from '@/hooks/useSiteConfig';
+import { logger } from '@/lib/logger';
 
 // Lazy load du carousel (non critique pour le premier affichage)
 const RecentlyViewedCarousel = dynamic(
@@ -62,6 +69,8 @@ function ProductsContent() {
   const [total, setTotal] = useState(0);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  const [quickViewProductId, setQuickViewProductId] = useState<number | null>(null);
 
   // Synchroniser les filtres avec l'URL pour partageabilité
   useFilterSync({
@@ -84,7 +93,7 @@ function ProductsContent() {
         setTotal(response.total);
       }
     } catch (error) {
-      console.error('Erreur chargement produits:', error);
+      logger.error('Erreur chargement produits:', error);
     } finally {
       setIsLoading(false);
     }
@@ -97,7 +106,7 @@ function ProductsContent() {
         setCategories(response.categories);
       }
     } catch (error) {
-      console.error('Erreur chargement catégories:', error);
+      logger.error('Erreur chargement catégories:', error);
     }
   };
 
@@ -158,7 +167,7 @@ function ProductsContent() {
 
         <div className="flex gap-6">
           {/* SIDEBAR FILTRES */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
+          <aside className="hidden lg:block w-64 shrink-0">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100">
               {/* En-tête filtres */}
               <div className="p-4 border-b border-gray-100">
@@ -417,6 +426,18 @@ function ProductsContent() {
 
         {/* Produits récemment consultés */}
         <RecentlyViewedCarousel />
+
+        {/* QuickView Modal */}
+        {isQuickViewOpen && quickViewProductId && (
+          <QuickViewModal
+            productId={quickViewProductId}
+            isOpen={isQuickViewOpen}
+            onClose={() => {
+              setIsQuickViewOpen(false);
+              setQuickViewProductId(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -429,7 +450,7 @@ function ProductsLoading() {
         <div className="animate-pulse">
           <div className="h-4 bg-gray-200 rounded w-32 mb-6"></div>
           <div className="flex gap-6">
-            <aside className="hidden lg:block w-64 flex-shrink-0">
+            <aside className="hidden lg:block w-64 shrink-0">
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-4">
                 <div className="h-6 bg-gray-200 rounded w-24"></div>
                 <div className="space-y-2">
@@ -458,6 +479,50 @@ export default function ProductsPage() {
 }
 
 // Carte produit style Le Sportif Premium
+// Composant bouton pour ajouter/retirer de la comparaison
+function CompareProductButton({ product }: { product: Product }) {
+  const { addProduct, removeProduct, isInComparison, canAddMore } = useCompareStore();
+  const { data: siteConfig } = useSiteConfig();
+  const inComparison = isInComparison(product.id);
+
+  // Ne pas afficher si la fonctionnalité est désactivée
+  if (!siteConfig?.compare_enabled) {
+    return null;
+  }
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (inComparison) {
+      removeProduct(product.id);
+    } else {
+      if (!canAddMore()) {
+        alert('Vous pouvez comparer maximum 4 produits');
+        return;
+      }
+      addProduct(product);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`shrink-0 p-2.5 rounded-lg font-semibold flex items-center justify-center shadow-xl active:scale-95 transition-all ${
+        inComparison
+          ? 'bg-blue-600 text-white hover:bg-blue-700'
+          : 'bg-white text-gray-800 hover:bg-gray-100'
+      }`}
+      aria-label={inComparison ? "Retirer de la comparaison" : "Ajouter à la comparaison"}
+      title={inComparison ? "Retirer de la comparaison" : "Ajouter à la comparaison"}
+    >
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    </button>
+  );
+}
+
 function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMode: 'grid' | 'list' }) {
   // State pour le variant sélectionné
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
@@ -486,7 +551,7 @@ function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMod
   if (viewMode === 'list') {
     return (
       <div data-testid="product-card" className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex gap-4 hover:shadow-xl hover:border-primary/20 transition-all duration-300">
-        <div className="w-32 h-32 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden relative">
+        <div className="w-32 h-32 shrink-0 bg-gray-50 rounded-lg overflow-hidden relative">
           {imageUrl ? (
             <img src={imageUrl} alt={product.name} className="w-full h-full object-cover" />
           ) : (
@@ -597,25 +662,68 @@ function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMod
                 -{discountPercent}%
               </span>
             )}
-            {product.is_new && (
+            {/* Badge/Ruban du produit (géré depuis le backoffice) */}
+            {product.ribbon && (
+              <span
+                className="text-xs font-bold px-2.5 py-1 rounded-md shadow-lg"
+                style={{
+                  backgroundColor: product.ribbon.bg_color,
+                  color: product.ribbon.text_color,
+                }}
+              >
+                {product.ribbon.name}
+              </span>
+            )}
+            {/* Fallback sur is_new si pas de ribbon */}
+            {!product.ribbon && product.is_new && (
               <span className="bg-primary text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-lg">
                 NOUVEAU
               </span>
             )}
+            {/* Countdown Timer badge */}
+            {product.offer_end_date && (
+              <CountdownTimer
+                endDate={product.offer_end_date}
+                variant="badge"
+              />
+            )}
           </div>
 
-          {/* Button Ajouter au panier - Uniquement visible au hover sur desktop */}
+          {/* Boutons d'action - Uniquement visible au hover sur desktop */}
           <div className="absolute bottom-3 left-3 right-3 hidden lg:block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button
-              className="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark flex items-center justify-center gap-2 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all"
-              disabled={!displayInStock}
-              aria-label={displayInStock ? "Ajouter au panier" : "Produit en rupture de stock"}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              {displayInStock ? 'Ajouter au panier' : 'Rupture de stock'}
-            </button>
+            <div className="flex gap-2">
+              {/* Bouton Aperçu rapide - TODO: Implémenter QuickView modal */}
+              {/* <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  // setQuickViewProductId(product.id);
+                  // setIsQuickViewOpen(true);
+                }}
+                className="shrink-0 bg-white text-gray-800 p-2.5 rounded-lg font-semibold hover:bg-gray-100 flex items-center justify-center shadow-xl active:scale-95 transition-all"
+                aria-label="Aperçu rapide"
+                title="Aperçu rapide"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button> */}
+
+              {/* Bouton Comparer */}
+              <CompareProductButton product={product} />
+
+              {/* Bouton Ajouter au panier */}
+              <button
+                className="flex-1 bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark flex items-center justify-center gap-2 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all"
+                disabled={!displayInStock}
+                aria-label={displayInStock ? "Ajouter au panier" : "Produit en rupture de stock"}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {displayInStock ? 'Ajouter au panier' : 'Rupture de stock'}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -630,9 +738,24 @@ function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMod
             </div>
           )}
 
-          <h3 className="font-semibold text-sm text-gray-900 mb-3 line-clamp-2 group-hover:text-primary transition-colors min-h-10 leading-tight">
+          <h3 className="font-semibold text-sm text-gray-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors min-h-10 leading-tight">
             {product.name}
           </h3>
+
+          {/* Note moyenne (étoiles) */}
+          {product.avg_rating !== undefined && product.avg_rating > 0 && (
+            <div className="mb-2">
+              <StarRating
+                rating={product.avg_rating}
+                size="sm"
+                showCount={true}
+                reviewCount={product.review_count || 0}
+              />
+            </div>
+          )}
+
+          {/* Viewers Count - Preuve sociale */}
+          <ViewersCount productId={product.id} variant="compact" className="mb-2" />
 
           {/* Color Swatches - Affichage intelligent des variantes */}
           {product.variant_count && product.variant_count > 1 && (

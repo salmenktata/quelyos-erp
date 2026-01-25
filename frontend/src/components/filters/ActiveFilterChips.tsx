@@ -6,7 +6,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Motion, AnimatePresence } from '@/components/common/Motion';
 import { chipAppear } from '@/lib/animations/variants';
 import type { ProductFilters, Category } from '@/types';
 
@@ -103,7 +103,7 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
 
       <AnimatePresence mode="popLayout">
         {activeFilters.map((filter, index) => (
-          <motion.button
+          <Motion.button
             key={`${filter.key}-${filter.value}`}
             custom={index}
             variants={chipAppear}
@@ -134,13 +134,13 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </motion.button>
+          </Motion.button>
         ))}
       </AnimatePresence>
 
       {/* Bouton "Tout effacer" si > 1 filtre */}
       {activeFilters.length > 1 && (
-        <motion.button
+        <Motion.button
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
@@ -153,7 +153,7 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
           "
         >
           Tout effacer
-        </motion.button>
+        </Motion.button>
       )}
     </div>
   );

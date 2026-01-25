@@ -22,6 +22,10 @@ import { generateProductSchema, generateBreadcrumbSchema } from '@/lib/utils/seo
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import { useProductVariants } from '@/hooks/useProductVariants';
 import { VariantSelector } from '@/components/product/VariantSelector';
+import { ViewersCount } from '@/components/product/ViewersCount';
+import { CountdownTimer } from '@/components/product/CountdownTimer';
+import { BundleSuggestions } from '@/components/product/BundleSuggestions';
+import { logger } from '@/lib/logger';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -72,7 +76,7 @@ export default function ProductDetailPage() {
         router.push('/products');
       }
     } catch (error) {
-      console.error('Erreur chargement produit:', error);
+      logger.error('Erreur chargement produit:', error);
       router.push('/products');
     } finally {
       setIsLoading(false);
@@ -88,7 +92,7 @@ export default function ProductDetailPage() {
     } catch (error: any) {
       // Ignorer silencieusement si endpoint pas encore implémenté (404)
       if (error?.response?.status !== 404) {
-        console.error('Erreur chargement produits similaires:', error);
+        logger.error('Erreur chargement produits similaires:', error);
       }
     }
   };
@@ -195,7 +199,20 @@ export default function ProductDetailPage() {
                   -{discountPercent}%
                 </div>
               )}
-              {product.is_new && (
+              {/* Badge/Ruban du produit (géré depuis le backoffice) */}
+              {product.ribbon && (
+                <div
+                  className="text-sm font-bold px-3 py-1.5 rounded-md shadow-lg"
+                  style={{
+                    backgroundColor: product.ribbon.bg_color,
+                    color: product.ribbon.text_color,
+                  }}
+                >
+                  {product.ribbon.name}
+                </div>
+              )}
+              {/* Fallback sur is_new si pas de ribbon */}
+              {!product.ribbon && product.is_new && (
                 <div className="bg-primary text-white text-sm font-bold px-3 py-1.5 rounded-md shadow-lg">
                   NOUVEAU
                 </div>
@@ -210,21 +227,34 @@ export default function ProductDetailPage() {
 
           {/* Informations produit */}
           <div>
-            {/* Badges */}
+            {/* Badges - Utilise le ribbon du backoffice si disponible */}
             <div className="flex gap-2 mb-4">
-              {product.is_new && (
+              {/* Badge/Ruban principal (géré depuis le backoffice) */}
+              {product.ribbon && (
+                <span
+                  className="text-xs font-bold px-4 py-1.5 rounded-full shadow-md"
+                  style={{
+                    backgroundColor: product.ribbon.bg_color,
+                    color: product.ribbon.text_color,
+                  }}
+                >
+                  {product.ribbon.name}
+                </span>
+              )}
+              {/* Fallback sur les champs booléens si pas de ribbon */}
+              {!product.ribbon && product.is_new && (
                 <span className="bg-gradient-to-r from-primary to-primary-light text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
-                  🆕 NOUVEAU
+                  NOUVEAU
                 </span>
               )}
-              {product.is_bestseller && (
+              {!product.ribbon && product.is_bestseller && (
                 <span className="bg-gradient-to-r from-amber-400 to-amber-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
-                  ⭐ TOP VENTE
+                  TOP VENTE
                 </span>
               )}
-              {product.is_featured && (
+              {!product.ribbon && product.is_featured && (
                 <span className="bg-gradient-to-r from-red-500 to-red-700 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
-                  🔥 PROMO
+                  PROMO
                 </span>
               )}
             </div>
@@ -238,6 +268,9 @@ export default function ProductDetailPage() {
 
             {/* Titre */}
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h1>
+
+            {/* Viewers Count - Preuve sociale */}
+            <ViewersCount productId={product.id} className="mb-4" />
 
             {/* SKU */}
             {product.default_code && (
@@ -276,6 +309,15 @@ export default function ProductDetailPage() {
                 <p className="text-xs text-gray-600">À utiliser sur votre prochaine commande</p>
               </div>
             </div>
+
+            {/* Countdown Timer - Offre limitée */}
+            {product.offer_end_date && (
+              <CountdownTimer
+                endDate={product.offer_end_date}
+                variant="full"
+                className="mb-6"
+              />
+            )}
 
             {/* Description */}
             {product.description && (
@@ -687,6 +729,9 @@ export default function ProductDetailPage() {
             )}
           </div>
         </div>
+
+        {/* Bundle Suggestions - Achetés ensemble */}
+        <BundleSuggestions currentProduct={product} className="mt-12" />
 
         {/* Produits similaires */}
         {relatedProducts.length > 0 && (

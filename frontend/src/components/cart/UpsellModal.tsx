@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
 import { Button } from '@/components/common';
 import { Product } from '@/types';
+import { logger } from '@/lib/logger';
 
 interface UpsellModalProps {
   isOpen: boolean;
@@ -58,7 +59,7 @@ export function UpsellModal({
         setUpsellProducts(response.products);
       }
     } catch (error) {
-      console.error('Error fetching upsell products:', error);
+      logger.error('Error fetching upsell products:', error);
     } finally {
       setLoading(false);
     }

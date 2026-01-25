@@ -5,6 +5,7 @@ import { ProductGrid, ProductCard } from '@/components/product';
 import { Loading } from '@/components/common';
 import { odooClient } from '@/lib/odoo/client';
 import type { Product } from '@/types';
+import { logger } from '@/lib/logger';
 
 interface ProductRecommendationsProps {
   productId?: number;
@@ -92,7 +93,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
           break;
       }
     } catch (error) {
-      console.error('Error loading recommendations:', error);
+      logger.error('Error loading recommendations:', error);
     } finally {
       setIsLoading(false);
     }

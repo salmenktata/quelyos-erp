@@ -13,6 +13,7 @@ import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
 import { odooClient } from '@/lib/odoo/client';
 import type { Order } from '@/types';
+import { logger } from '@/lib/logger';
 
 const orderStates = {
   draft: { label: 'Brouillon', color: 'gray' },
@@ -42,7 +43,7 @@ export default function AccountOrdersPage() {
           setOrders(result.orders);
         }
       } catch (error) {
-        console.error('Erreur chargement commandes:', error);
+        logger.error('Erreur chargement commandes:', error);
       } finally {
         setIsLoading(false);
       }

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { Motion } from '@/components/common/Motion';
 import { isLightColor } from '@/lib/variants';
 
 // SVG CheckIcon inline
@@ -37,7 +37,7 @@ export function AttributeImageButton({
   colorHex,
 }: AttributeImageButtonProps) {
   return (
-    <motion.button
+    <Motion.button
       type="button"
       whileHover={!disabled ? { scale: 1.02 } : {}}
       whileTap={!disabled ? { scale: 0.98 } : {}}
@@ -96,14 +96,14 @@ export function AttributeImageButton({
 
       {/* Checkmark si selected */}
       {selected && (
-        <motion.div
+        <Motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center"
         >
           <CheckIcon className="w-4 h-4 text-white" />
-        </motion.div>
+        </Motion.div>
       )}
 
       {/* Overlay "Épuisé" si disabled */}
@@ -114,6 +114,6 @@ export function AttributeImageButton({
           </span>
         </div>
       )}
-    </motion.button>
+    </Motion.button>
   );
 }

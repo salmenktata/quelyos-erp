@@ -4,9 +4,8 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ToastContainer } from "@/components/common/Toast";
-import { SiteConfigProvider } from "@/lib/config/SiteConfigProvider";
+import { AppProviders } from "@/components/providers";
 import { siteConfig } from "@/lib/config/site";
-import { ThemeProvider } from "@/lib/theme";
 import { generateOrganizationSchema } from "@/lib/utils/seo";
 
 const inter = Inter({
@@ -52,18 +51,16 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
-        <SiteConfigProvider>
-          <ThemeProvider>
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
-            </div>
-            <ToastContainer />
-          </ThemeProvider>
-        </SiteConfigProvider>
+        <AppProviders>
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </div>
+          <ToastContainer />
+        </AppProviders>
       </body>
     </html>
   );

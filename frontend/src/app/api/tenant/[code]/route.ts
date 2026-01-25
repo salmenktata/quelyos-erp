@@ -1,0 +1,68 @@
+/**
+ * Route API pour récupérer la config d'un tenant par son code.
+ *
+ * GET /api/tenant/[code]
+ *
+ * Proxy vers Odoo: GET /api/ecommerce/tenant/[code]
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
+
+const ODOO_URL = process.env.ODOO_URL || process.env.NEXT_PUBLIC_ODOO_URL || 'http://localhost:8069';
+
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ code: string }> }
+) {
+  try {
+    const params = await context.params;
+    const { code } = params;
+
+    if (!code) {
+      return NextResponse.json(
+        { success: false, error: 'Code manquant' },
+        { status: 400 }
+      );
+    }
+
+    // Appel direct HTTP vers Odoo (pas JSON-RPC)
+    const odooUrl = `${ODOO_URL}/api/ecommerce/tenant/${code}`;
+
+    const response = await fetch(odooUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // Cache Next.js
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return NextResponse.json(
+          { success: false, error: 'Tenant non trouvé' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json(
+        { success: false, error: `Odoo error: ${response.status}` },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
+      },
+    });
+  } catch (error) {
+    logger.error('Tenant API error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Erreur serveur' },
+      { status: 500 }
+    );
+  }
+}

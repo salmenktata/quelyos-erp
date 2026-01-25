@@ -28,6 +28,7 @@ import {
 import { useToast } from '../hooks/useToast'
 import { ToastContainer } from '../components/common/Toast'
 import { api } from '../lib/api'
+import { logger } from '../lib/logger'
 import type { ProductsQueryParams, Product } from '../types'
 
 type SortField = 'name' | 'price' | 'qty_available' | 'default_code'
@@ -122,7 +123,7 @@ export default function Products() {
         }
         return []
       } catch (error) {
-        console.error('Error fetching suggestions:', error)
+        logger.error('Error fetching suggestions:', error)
         return []
       }
     },

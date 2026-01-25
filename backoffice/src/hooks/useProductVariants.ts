@@ -206,7 +206,7 @@ export function useRegenerateVariants(productId: number | undefined) {
       if (!response.success) {
         throw new Error(response.error || 'Failed to regenerate variants')
       }
-      return response.data as RegenerateVariantsResult
+      return response.data as unknown as RegenerateVariantsResult
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productVariants', productId] })

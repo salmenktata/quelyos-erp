@@ -1,0 +1,5 @@
+# Redis client pour rate limiting et cache distribué
+redis>=5.0.0,<6.0.0
+
+# Passlib pour cryptage des mots de passe (déjà utilisé)
+passlib>=1.7.4

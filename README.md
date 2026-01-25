@@ -96,16 +96,17 @@ npm run dev  # http://localhost:5175
 
 | Métrique | Valeur | Évolution |
 |----------|--------|-----------|
-| Parité fonctionnelle Odoo | **~80%** | ⬇️ -5% (audit Stock révèle gaps réels) |
-| Endpoints API Backend | **102** | ⬆️ +4 (Analytics charts) |
-| Pages Backoffice | **17** | ⬆️ +1 (Invoices.tsx) |
-| Pages Frontend | **33+** | ⬆️ +19 (boutique + espace client complets) |
-| Gaps P0 (Bloquants) | **2** | ⚠️ +2 (Stock : UI ajustement + inventaire) |
-| Gaps P1 (Importants) | **16** | ⬆️ +8 (Stock : audit révèle 8 P1) |
+| Parité fonctionnelle Odoo | **~78%** | ⬇️ -4% (audit Pricelists 2026-01-25) |
+| Score Sécurité API | **A (90/100)** | ⬆️ D→A (25 endpoints sécurisés) |
+| Endpoints API Backend | **130+** | ⬆️ +28 (multi-devises, pricelists, warehouses) |
+| Pages Backoffice | **22** | ⬆️ +5 (Pricelists, Warehouses, SiteConfig) |
+| Pages Frontend | **22+** | Stable (boutique + espace client complets) |
+| Gaps P0 (Bloquants) | **5** | 🔴 +3 (Pricelists : CRUD complet manquant) |
+| Gaps P1 (Importants) | **26** | 🔴 +10 (Pricelists : 10 P1 identifiés) |
 | Composants UI modernes | **17** | Mode sombre, WCAG 2.1 AA |
 | Hooks React Query | **16** | State management optimisé |
 
-**🏆 Statut** : **Fonctionnel** mais 2 gaps P0 bloquent gestion stock quotidienne (E-commerce complet OK)
+**🏆 Statut** : **Fonctionnel** mais 5 gaps P0 bloquent gestion quotidienne (Stock + Pricelists)
 
 ### Planning Global
 
@@ -140,9 +141,10 @@ Parité     Packaging  Légal          Commercial  Lancement
 | **Stock** | **31%** | 🔴 2 P0 (UI ajustement + inventaire) + 8 P1 | Audit `/parity` révèle gaps réels |
 | **Commandes** | **75%** | 🟡 3 P1 (bon livraison, tracking, historique) | |
 | **Paiement** | **65%** | 🟡 2 P1 (Stripe Elements, remboursements UI) | |
+| **Pricelists** | **21%** | 🔴 3 P0 (CRUD complet) + 10 P1 | Audit 2026-01-25 : Lecture seule uniquement |
 
-**Score global** : **~80%** (audit `/parity` Stock révèle gaps réels)
-**Production-ready** : 🟡 E-commerce complet OK, mais 2 gaps P0 Stock bloquent gestion quotidienne
+**Score global** : **~78%** (audit `/parity` révèle gaps Pricelists + Stock)
+**Production-ready** : 🔴 5 gaps P0 bloquent segmentation clients (Pricelists) + gestion stock quotidienne
 
 ### Phase 2 : Packaging Produit (3-4 semaines)
 
@@ -860,6 +862,11 @@ docker-compose -f docker-compose.prod.yml logs -f
 | `./stop.sh` | Arrête tous les services de développement |
 | `./status.sh` | Affiche le statut de tous les services |
 | `./attach.sh` | Se connecte à la session tmux |
+| **Sécurité** | |
+| `backend/test-security.sh` | Teste les endpoints sécurisés (sans auth = refus) |
+| `backend/monitor-security.sh` | Affiche statistiques tentatives non autorisées |
+| `backend/monitor-security.sh --live` | Monitoring temps réel événements sécurité |
+| `backend/monitor-security.sh --today` | Filtrer événements du jour |
 | **Production** | |
 | `./deploy.sh` | Déploie l'application (build + start) |
 | `./ssl-init.sh` | Configure les certificats SSL |
@@ -1729,6 +1736,8 @@ Cette section documente la **parité fonctionnelle totale** entre Odoo natif et 
 
 **Score Module Stock** : 22/33 ✅ (67%), 1/33 🟡, 10/33 🔴
 
+**Note audit 2026-01-25** : Parité stable à 67% après sprints 1-5. Principales forces : Alertes stock bas/haut, Inventaire physique workflow 4 étapes, Valorisation temps réel, Export CSV. Gaps P1 : Stock multi-emplacements, Bons livraison picking, Validation picking.
+
 > **Sprint 4** (2026-01-24) : Page Mouvements de stock + filtres avancés + validation panier. Nouvelle page **StockMoves.tsx** (420+ lignes) avec tableau complet historique mouvements (date, produit, quantité, origine, destination, référence, état) ✅ | Route `/stock/moves` + item menu navigation sidebar ✅ | Hook `useStockMoves()` avec React Query ✅ | Filtres avancés frontend (produit texte search, date from/to, état dropdown draft/waiting/confirmed/assigned/done/cancel) avec panneau dédié collapsible ✅ | Export CSV mouvements (10,000 max, 7 colonnes, UTF-8 BOM) ✅ | Badge état coloré (success done, info confirmed/assigned, warning waiting, error cancel) ✅ | Lien "Voir les mouvements" dans Stock.tsx header ✅ | Validation réservation stock panier confirmée existante (ProductCard + ProductDetail désactivent bouton si !in_stock) ✅ | Pagination 20/page avec compteur "Affichage X à Y sur Z" ✅ | UX 2026 : Dark mode complet, skeleton loading, filtres client-side temps réel, lien produit vers /products/:id, formatage date français, responsive design ✅ | Parité augmentée de 49% → 63% (+5 features) ✅.
 
 > **Sprint 5** (2026-01-24) : Filtres avancés Stock.tsx + Export & Tableau valorisation + Filtre type mouvements. **Filtres avancés Stock.tsx** : Dropdown catégorie dynamique (unique categories depuis données produits) ✅ | Dropdown statut stock (Tous/En stock/Stock faible/Rupture) ✅ | Filtrage client-side temps réel avec reset pagination ✅ | Affichage badges filtres actifs avec suppression individuelle ✅ | **Export valorisation CSV** : Fonction `handleExportValorisation()` avec agrégation par catégorie (count produits, total unités, valorisation €, valeur moyenne/produit) ✅ | Export CSV avec ligne totaux, UTF-8 BOM Excel-compatible, nom fichier `valorisation_stock_YYYY-MM-DD.csv` ✅ | **Tableau valorisation par catégorie** : Section dédiée Stock.tsx avec tableau top 10 catégories triées par valorisation décroissante ✅ | Colonnes : Catégorie, Produits, Unités, Valorisation €, % Total ✅ | Bouton export intégré dans header tableau ✅ | Calcul pourcentage valorisation par catégorie vs total stock ✅ | **Filtre type mouvements StockMoves.tsx** : Fonction `getMoveType()` classification intelligente (inventory/customer/supplier/internal/other) basée pattern matching référence + locations ✅ | Dropdown Type avec 5 options (Tous/Ajustements/Livraisons clients/Réceptions fournisseurs/Transferts internes) ✅ | Grid layout responsive adapté (md:grid-cols-3 lg:grid-cols-5) ✅ | Intégration dans `clearFilters()` et `hasActiveFilters` ✅ | Filtrage client-side temps réel ✅ | UX 2026 : Dark mode complet, responsive design, feedback toast, formatage français, design WCAG AA ✅ | Parité augmentée de 63% → 67% (+4 features) ✅.
@@ -1891,6 +1900,8 @@ Cette section documente la **parité fonctionnelle totale** entre Odoo natif et 
 
 **Score Module Paiement** : 3/14 ✅ (21%), 2/14 🟡, 9/14 🔴
 
+**Note audit 2026-01-25** : Backend solide (7 endpoints), backoffice Payments.tsx fonctionnel, mais frontend checkout incomplet. Gaps P1 critiques : Interface Stripe Elements (sécurité), UI remboursements admin (SAV). Score réel 65% si on compte backend + backoffice.
+
 ---
 
 ### Module Coupons (`loyalty.program`)
@@ -1942,32 +1953,124 @@ Cette section documente la **parité fonctionnelle totale** entre Odoo natif et 
 
 **Score Module Analytics** : 6/9 ✅ (67%), 0/9 🟡, 3/9 🔴
 
+**Note audit 2026-01-25** : Parité augmentée de 70% → 95% suite ajout graphiques Recharts (2026-01-24). 5 endpoints backend (stats, revenue-chart, orders-chart, conversion-funnel, top-categories). Gap P1 principal : Filtres période (7j/30j/12m/custom).
+
+---
+
+### Module Pricelists (`product.pricelist`)
+
+**Audit complet 2026-01-25** : `/parity http://localhost:5175/pricelists`
+
+| Fonctionnalité Odoo | Backend API | Frontend | Backoffice | Statut | Priorité | Notes |
+|---------------------|-------------|----------|------------|--------|----------|-------|
+| **Gestion Listes de Prix** |||||||
+| Lister pricelists | ✅ GET /pricelists | ❌ | ✅ Pricelists.tsx | ✅ | - | Filtres, tri, recherche, dark mode |
+| Voir détail pricelist | ✅ GET /pricelists/<id> | ❌ | ✅ PricelistDetail.tsx | ✅ | - | Règles + filtrage |
+| Créer pricelist | 🔴 | ❌ | 🔴 | 🔴 | **P0** | Aucun endpoint CREATE |
+| Modifier pricelist | 🔴 | ❌ | 🔴 | 🔴 | **P0** | Nom, devise, politique non modifiables |
+| Supprimer pricelist | 🔴 | ❌ | 🔴 | 🔴 | **P1** | Pas de bouton delete |
+| Dupliquer pricelist | 🔴 | ❌ | 🔴 | 🔴 | **P1** | Fonctionnalité Odoo standard |
+| Activer/Désactiver | 🔴 | ❌ | 🔴 | 🔴 | **P1** | Pas de toggle UI |
+| **Règles de Prix (Items)** |||||||
+| Voir rules existantes | ✅ Inclus dans detail | ❌ | ✅ Table détail | ✅ | - | Avec filtres par type |
+| Ajouter rule | 🔴 | ❌ | 🔴 | 🔴 | **P0** | BLOQUANT - Promotions impossibles |
+| Modifier rule | 🔴 | ❌ | 🔴 | 🔴 | **P1** | Doit modifier dans Odoo |
+| Supprimer rule | 🔴 | ❌ | 🔴 | 🔴 | **P1** | Pas de bouton delete |
+| Dates validité rule | 🔴 | ❌ | 🔴 | 🔴 | **P1** | date_start/date_end non exposés |
+| Réordonner rules | 🔴 | ❌ | 🔴 | 🔴 | **P2** | Drag & drop séquence |
+| **Attribution & Usage** |||||||
+| Assigner à client | ✅ POST assign-pricelist | ❌ | 🟡 Hook existe | 🟡 | **P1** | Pas d'UI dans CustomerDetail |
+| Calculer prix produit | 🔴 | 🔴 | 🔴 | 🔴 | **P1** | API produits doit intégrer pricelist_id |
+| Appliquer dans panier | 🔴 | 🔴 | ❌ | 🔴 | **P1** | Transparent selon client connecté |
+| Voir clients assignés | 🔴 | ❌ | 🔴 | 🔴 | **P1** | Vue inverse "Qui utilise cette liste ?" |
+| Tester prix temps réel | 🔴 | ❌ | 🔴 | 🔴 | **P2** | Preview avant activation |
+
+**Score Module Pricelists** : 5/24 ✅ (21%), 1/24 🟡 (4%), 18/24 🔴 (75%)
+
+#### 🔴 Gaps Critiques (P0) - 3 bloquants
+
+1. **Créer Pricelist** (Effort : 4-6h)
+   - Impact : Impossible segmentation clients (VIP, Revendeurs, etc.)
+   - Solution : Backend POST /pricelists + Modal backoffice
+
+2. **Modifier Pricelist** (Effort : 3-5h)
+   - Impact : Impossible ajuster stratégie tarifaire
+   - Solution : Backend PUT /pricelists/<id> + Form édition
+
+3. **Ajouter Règles de Prix** (Effort : 8-12h)
+   - Impact : **BLOQUANT MAJEUR** - Promotions/remises impossibles
+   - Solution : Backend POST /pricelists/<id>/items + Modal avec SearchAutocomplete produits/catégories
+
+#### 🟡 Gaps Importants (P1) - 10 à implémenter
+
+4. Supprimer pricelist (2h)
+5. Dupliquer pricelist (3h)
+6. Toggle actif/inactif (2h)
+7. Modifier/Supprimer rules (6h)
+8. Dates validité rules (4h)
+9. UI attribution client (3h)
+10. Calculer prix selon pricelist (4h)
+11. Appliquer pricelist panier (3h)
+12. Voir clients assignés (2h)
+13. Recherche produits form règle (inclus dans P0-3)
+
+#### ➕ Améliorations UX Quelyos
+
+- 🎨 Interface moderne : Cards + Dark mode vs formulaires Odoo
+- 🔍 Recherche debounce 300ms vs basique Odoo
+- ⌨️ Raccourcis clavier : ⌘F / Esc
+- 📊 Statistiques visuelles vs liste Odoo
+- 🔎 Filtres combinés vs séparés
+- 📱 Responsive mobile-first
+
+**Note audit 2026-01-25** : Module **lecture seule** (21% parité). 3 gaps P0 bloquent CRUD complet. Effort déblocage : ~13h (Sprint 1) pour atteindre 60% parité fonctionnelle. **Non production-ready** pour gestion quotidienne.
+
 ---
 
 ### 📊 Résumé Global de Parité
 
-**Date du dernier audit** : 2026-01-24
+**Date du dernier audit** : 2026-01-25
 **Auditeur** : Commande `/parity` (audit automatisé complet)
 
 | Module | Backend API | Frontend | Backoffice | Score Parité | Gaps P0 | Gaps P1 | Statut |
 |--------|-------------|----------|------------|--------------|---------|---------|--------|
 | **Produits** | 26 endpoints ✅ | ✅ Complet | ✅ Complet | **100%** ✅ | 0 | 0 | Production-ready |
 | **Catégories** | 6 endpoints ✅ | ✅ Complet | ✅ Complet | **95%** ✅ | 0 | 0 | Production-ready |
+| **Analytics** | 5 endpoints ✅ | - | ✅ Dashboard | **95%** ✅ | 0 | 1 | Production-ready |
 | **Coupons** | 7 endpoints ✅ | ✅ Complet | ✅ Complet | **95%** ✅ | 0 | 0 | Production-ready |
-| **Livraison** | 7 endpoints ✅ | ✅ Complet | ✅ Complet | **90%** ✅ | 0 | 0 | Production-ready |
-| **Panier** | 5 endpoints ✅ | ✅ Complet | - | **90%** ✅ | 0 | 1 | Très bon |
-| **Clients** | 10 endpoints ✅ | ✅ Complet | ✅ Complet | **85%** ✅ | 0 | 1 | Très bon |
-| **Stock** | 6 endpoints ✅ | ✅ Badges | 🔴 UI partielle | **31%** | 2 | 8 | À améliorer |
-| **Commandes** | 5 endpoints ✅ | ✅ Complet | ✅ Complet | **75%** | 0 | 3 | Bon |
-| **Analytics** | 1 endpoint ✅ | - | ✅ Dashboard | **70%** | 0 | 1 | Bon |
-| **Paiement** | 6 endpoints ✅ | 🟡 Partiel | ✅ Complet | **65%** | 0 | 2 | À améliorer |
-| **Factures** | 4 endpoints ✅ | 🔴 Manquant | 🔴 UI manquante | **40%** | 0 | 1 | Backend OK |
 | **Featured** | 5 endpoints ✅ | ✅ Homepage | ✅ Complet | **90%** ✅ | 0 | 0 | Production-ready |
-| **TOTAL** | **98 endpoints** | **33+ pages** | **16 pages** | **~82%** | **0** | **10** | **Production-ready** ✅ |
+| **Livraison** | 7 endpoints ✅ | ✅ Complet | ✅ Complet | **90%** ✅ | 0 | 0 | Production-ready |
+| **Panier** | 11 endpoints ✅ | ✅ Complet | - | **90%** ✅ | 0 | 1 | Très bon |
+| **Clients** | 10 endpoints ✅ | ✅ Complet | ✅ Complet | **85%** ✅ | 0 | 3 | Très bon |
+| **Commandes** | 14 endpoints ✅ | ✅ Complet | ✅ Complet | **75%** | 0 | 4 | Bon |
+| **Stock** | 7 endpoints ✅ | ✅ Badges | 🟡 UI partielle | **67%** | 0 | 3 | À améliorer |
+| **Paiement** | 7 endpoints ✅ | 🟡 Partiel | ✅ Complet | **65%** | 0 | 2 | À améliorer |
+| **Abonnements** | Module Odoo ✅ | - | ✅ Complet | **54%** | 0 | 5 | À améliorer |
+| **Factures** | 4 endpoints ✅ | 🔴 Manquant | ✅ Complet | **40%** | 0 | 1 | À améliorer |
+| **Pricelists** | 3 endpoints 🟡 | ❌ | 🟡 Lecture seule | **21%** | 3 | 10 | 🔴 Non prod-ready |
+| **TOTAL** | **130+ endpoints** | **22+ pages** | **22 pages** | **~78%** | **3** | **25** | 🟡 **Gaps critiques** |
 
-### 🎉 Gaps P0 Critiques - TOUS RÉSOLUS
+### 🔴 Gaps P0 Critiques - 3 NOUVEAUX (Audit 2026-01-25)
 
-**Excellente nouvelle** : Aucun gap P0 bloquant ! Tous les gaps critiques du dernier audit ont été résolus :
+**Alerte** : L'audit Pricelists révèle **3 gaps P0 bloquants** pour la segmentation clients :
+
+#### Module Pricelists - 3 P0 🔴
+
+1. 🔴 **Créer Pricelist** (Effort : 4-6h)
+   - Impact : Impossible de créer listes prix pour segmentation VIP/Revendeurs
+   - Solution : POST /api/ecommerce/pricelists + Modal backoffice
+
+2. 🔴 **Modifier Pricelist** (Effort : 3-5h)
+   - Impact : Impossible d'ajuster stratégie tarifaire
+   - Solution : PUT /api/ecommerce/pricelists/<id> + Form édition
+
+3. 🔴 **Ajouter Règles de Prix** (Effort : 8-12h)
+   - Impact : **BLOQUANT MAJEUR** - Promotions/remises segmentées impossibles
+   - Solution : POST /api/ecommerce/pricelists/<id>/items + Modal SearchAutocomplete
+
+**Effort total déblocage** : ~15h (Sprint 1 urgent)
+
+#### Gaps P0 Précédemment Résolus ✅
 
 1. ✅ **Factures backend** → RÉSOLU (4 endpoints account.move opérationnels)
 2. ✅ **Liste transactions paiement** → RÉSOLU (Payments.tsx avec filtres)
@@ -1975,53 +2078,51 @@ Cette section documente la **parité fonctionnelle totale** entre Odoo natif et 
 4. ✅ **Upload images multiples** → RÉSOLU (ImageGallery.tsx drag & drop, 10 images max)
 5. ✅ **Édition variantes produits** → RÉSOLU (VariantManager.tsx complet)
 
-**Résultat** : Système **production-ready** pour e-commerce complet ! 🚀
-
 ---
 
-### ⚠️ Gaps P1 Importants (10 restants)
+### ⚠️ Gaps P1 Importants (25 restants)
 
 **Priorisation par impact métier** :
 
-#### 🏅 Haute Priorité (Impact Business Direct)
+#### 🏅 Haute Priorité Business (Impact CA/Légal)
 
-1. **Panier abandonné - Sauvegarde & relance** (Module Panier)
-   - **Impact** : Conversion e-commerce (+15-30% de CA récupéré)
-   - **Effort** : 3 jours (backend cron + email template + frontend localStorage)
+1. **Panier abandonné - Sauvegarde invité** (Module Panier)
+   - **Impact** : Conversion +15-30% CA
+   - **Effort** : 2 jours (backend token + email relance + frontend modal)
 
-2. **Interface backoffice Factures** (Module Factures)
-   - **Impact** : Obligation légale, comptabilité
-   - **Effort** : 1 jour (backend déjà prêt, créer Invoices.tsx + InvoiceDetail.tsx)
+2. **Génération facture automatique** (Module Factures)
+   - **Impact** : Obligation légale France
+   - **Effort** : 2 jours (auto-création lors confirmation commande)
 
-3. **Graphiques Analytics temporels** (Module Analytics)
-   - **Impact** : Décision business, KPIs évolution
-   - **Effort** : 2 jours (Chart.js + endpoint avec période)
+3. **Interface Stripe Elements** (Module Paiement)
+   - **Impact** : Sécurité paiements, confiance client
+   - **Effort** : 3 jours (intégration @stripe/react-stripe-js + 3D Secure)
 
-#### 🟡 Priorité Moyenne
+4. **Graphiques Analytics temporels** (Module Analytics)
+   - **Impact** : Décisions business data-driven
+   - **Effort** : 1 jour (filtres période 7j/30j/12m/custom)
 
-4. **Bon de livraison PDF** (Module Commandes)
-   - **Effort** : 2 jours (report Qweb + endpoint download)
+#### 🛠️ Productivité Admin
 
-5. **Tracking livraison intégré** (Module Commandes)
-   - **Effort** : 3-4 jours (APIs transporteurs Colissimo/Mondial Relay)
+5. **Filtres avancés Commandes** (date, client, recherche) - 2 jours
+6. **Détail client admin** (CustomerDetail.tsx) - 2 jours
+7. **Export CSV clients** - 1 jour
+8. **Bon de livraison PDF** - 2 jours
+9. **Générer devis PDF** - 2 jours
+10. **Remboursements admin UI** - 2 jours
 
-6. **Stripe Elements UI carte** (Module Paiement)
-   - **Effort** : 1 jour (intégration @stripe/react-stripe-js)
+#### 🏢 Multi-tenant & Stock
 
-7. **Remboursements UI** (Module Paiement)
-   - **Effort** : 1 jour (bouton + modal, endpoint existe déjà)
+11. **Boutons actions workflow Abonnements** - 2 jours
+12. **Webhook Stripe Abonnements** - 3 jours
+13. **Validation quotas bloquante** - 1 jour
+14. **Stock par emplacement** (multi-entrepôts) - 3 jours
+15. **Bons de livraison stock.picking** - 3 jours
 
-8. **Alertes stock bas automatiques** (Module Stock)
-   - **Effort** : 2 jours (cron Odoo + notifications + seuils)
-
-9. **Export CSV clients** (Module Clients)
-   - **Effort** : 0.5 jour (endpoint + bouton UI)
-
-10. **Historique changements statut commandes** (Module Commandes)
-    - **Effort** : 2 jours (exploiter mail.message Odoo + Timeline.tsx)
-
-**Total effort estimé** : 17-19 jours pour résoudre tous les gaps P1
+**Total effort estimé** : 32 jours (6-7 semaines avec 1 dev)
 **Parité après résolution** : **~95%**
+**ROI estimé** : 3-6 mois
+**Roadmap détaillée** : Voir [PARITY_ROADMAP_2026-01-25.md](PARITY_ROADMAP_2026-01-25.md)
 
 ---
 

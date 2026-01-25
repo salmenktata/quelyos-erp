@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
 import { Button } from '@/components/common';
 import type { Product } from '@/types';
+import { logger } from '@/lib/logger';
 
 interface RecommendationsCarouselProps {
   productId: number;
@@ -48,7 +49,7 @@ export function RecommendationsCarousel({
         }
       }
     } catch (err) {
-      console.error('Error fetching recommendations:', err);
+      logger.error('Error fetching recommendations:', err);
       setError('Failed to load recommendations');
     } finally {
       setLoading(false);
@@ -220,7 +221,7 @@ export function RecommendationsCarousel({
               onClick={(e) => {
                 e.preventDefault();
                 // TODO: Add to cart functionality
-                console.log('Add to cart:', product.id);
+                logger.debug('Add to cart:', product.id);
               }}
             >
               Ajouter

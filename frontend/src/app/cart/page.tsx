@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button, Input } from '@/components/common';
 import { LoadingSpinner } from '@/components/common/Loading';
 import { CartItem, CartSummary } from '@/components/cart';
+import { CartSaveModal } from '@/components/cart/CartSaveModal';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 
@@ -17,6 +18,7 @@ export default function CartPage() {
   const [couponLoading, setCouponLoading] = React.useState(false);
   const [couponError, setCouponError] = React.useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = React.useState<string | null>(null);
+  const [isCartSaveModalOpen, setIsCartSaveModalOpen] = React.useState(false);
 
   useEffect(() => {
     fetchCart();
@@ -172,12 +174,22 @@ export default function CartPage() {
                   </form>
                 </div>
 
-                <div className="mt-6">
+                <div className="mt-6 space-y-3">
                   <Link href="/products">
                     <Button variant="outline" fullWidth>
                       ← Continuer mes achats
                     </Button>
                   </Link>
+
+                  {!isAuthenticated && (
+                    <Button
+                      variant="secondary"
+                      fullWidth
+                      onClick={() => setIsCartSaveModalOpen(true)}
+                    >
+                      💾 Sauvegarder mon panier
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -258,6 +270,12 @@ export default function CartPage() {
             </div>
           </div>
         )}
+
+        {/* Cart Save Modal for guests */}
+        <CartSaveModal
+          isOpen={isCartSaveModalOpen}
+          onClose={() => setIsCartSaveModalOpen(false)}
+        />
       </div>
     </div>
   );

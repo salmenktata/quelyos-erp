@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useAuthStore } from '@/store/authStore';
+import { logger } from '@/lib/logger';
 
 interface WishlistButtonProps {
   productId: number;
@@ -50,7 +51,7 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
         await addToWishlist(productId);
       }
     } catch (error) {
-      console.error('Error toggling wishlist:', error);
+      logger.error('Error toggling wishlist:', error);
     } finally {
       setIsLoading(false);
     }

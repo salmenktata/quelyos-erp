@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cmsService } from '@/lib/odoo/cms';
 import { CmsPageContent } from '@/components/cms';
+import { logger } from '@/lib/logger';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -54,7 +55,7 @@ export default async function CmsPage({ params }: PageProps) {
 
     return <CmsPageContent page={page} />;
   } catch (error) {
-    console.error(`Error loading CMS page ${slug}:`, error);
+    logger.error(`Error loading CMS page ${slug}:`, error);
     notFound();
   }
 }

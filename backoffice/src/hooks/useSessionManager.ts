@@ -2,6 +2,7 @@ import { useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useToast } from '../contexts/ToastContext'
+import { logger } from '../lib/logger'
 
 const SESSION_CHECK_INTERVAL = 5 * 60 * 1000 // 5 minutes
 const SESSION_REFRESH_INTERVAL = 25 * 60 * 1000 // 25 minutes (rafraîchir avant expiration à 30min)
@@ -56,7 +57,7 @@ export function useSessionManager(config: SessionManagerConfig = {}) {
 
       return true
     } catch (error) {
-      console.error('Session check error:', error)
+      logger.error('Session check error:', error)
       return false
     }
   }, [navigate, toast, enableWarning, isDevMode])
@@ -73,7 +74,7 @@ export function useSessionManager(config: SessionManagerConfig = {}) {
       if (result.authenticated) {
         lastActivityRef.current = Date.now()
         warningShownRef.current = false
-        console.log('Session refreshed successfully')
+        logger.debug('Session refreshed successfully')
       } else {
         // Session expirée
         localStorage.removeItem('session_id')
@@ -82,7 +83,7 @@ export function useSessionManager(config: SessionManagerConfig = {}) {
         navigate('/login')
       }
     } catch (error) {
-      console.error('Session refresh error:', error)
+      logger.error('Session refresh error:', error)
     }
   }, [navigate, toast, isDevMode])
 

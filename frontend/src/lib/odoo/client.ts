@@ -15,6 +15,7 @@ import type {
   WishlistItem,
   APIResponse,
 } from '@/types';
+import { logger } from '@/lib/logger';
 
 // Use Next.js API proxy to avoid CORS issues
 // The proxy at /api/odoo/* forwards requests to Odoo server-side
@@ -53,13 +54,13 @@ export class OdooClient {
       return config;
     });
 
-    // Log errors for debugging
+    // Log errors for debugging (only in development)
     this.api.interceptors.response.use(
       (response) => response,
       (error) => {
-        console.error('API Proxy Error:', error);
+        logger.error('API Error:', error);
         if (error.response?.data?.error) {
-          console.error('Odoo Error:', error.response.data.error);
+          logger.error('Détails:', error.response.data.error);
         }
         return Promise.reject(error);
       }
@@ -86,12 +87,12 @@ export class OdooClient {
     } catch (error: any) {
       // Gestion gracieuse des 404 pour les endpoints non implémentés
       if (error.response?.status === 404 && !throwOn404) {
-        console.warn(`API endpoint not implemented: ${endpoint}`);
+        logger.warn(`Endpoint non implémenté: ${endpoint}`);
         // Retourner une structure par défaut selon le type de réponse attendu
         return { success: false, error: 'Not implemented' } as T;
       }
 
-      console.error(`Odoo API Error [${endpoint}]:`, error);
+      logger.error(`Erreur API [${endpoint}]:`, error);
 
       // Extract error message from various possible formats
       const errorMessage =
@@ -198,6 +199,10 @@ export class OdooClient {
     return this.jsonrpc(`/products/slug/${slug}`);
   }
 
+  async getProductVariants(productId: number): Promise<any> {
+    return this.jsonrpc(`/products/${productId}/variants`);
+  }
+
   async getUpsellProducts(productId: number, limit: number = 3): Promise<{ success: boolean; products?: Product[]; error?: string }> {
     return this.jsonrpc(`/products/${productId}/upsell`, { limit });
   }
@@ -290,7 +295,7 @@ export class OdooClient {
   }
 
   async getDeliveryMethods(): Promise<APIResponse & { data?: { delivery_methods: any[] } }> {
-    return this.jsonrpc('/checkout/delivery-methods');
+    return this.jsonrpc('/delivery/methods');
   }
 
   async completeCheckout(data: any): Promise<APIResponse & { order?: Order }> {
@@ -340,7 +345,7 @@ export class OdooClient {
   }
 
   async updateProfile(data: Partial<User>): Promise<APIResponse> {
-    return this.jsonrpc('/customer/profile', data);
+    return this.jsonrpc('/customer/profile/update', data);
   }
 
   async getOrders(filters?: { limit?: number; offset?: number }): Promise<APIResponse & { orders?: Order[] }> {
@@ -348,7 +353,7 @@ export class OdooClient {
   }
 
   async getOrder(id: number): Promise<APIResponse & { order?: Order }> {
-    return this.jsonrpc(`/customer/orders/${id}`);
+    return this.jsonrpc(`/orders/${id}`);
   }
 
   async getAddresses(): Promise<APIResponse & { addresses?: Address[] }> {
@@ -356,11 +361,11 @@ export class OdooClient {
   }
 
   async addAddress(address: Address): Promise<APIResponse> {
-    return this.jsonrpc('/customer/addresses', address);
+    return this.jsonrpc('/customer/addresses/create', address);
   }
 
   async updateAddress(id: number, address: Partial<Address>): Promise<APIResponse> {
-    return this.jsonrpc(`/customer/addresses/${id}`, address);
+    return this.jsonrpc(`/customer/addresses/${id}/update`, address);
   }
 
   async deleteAddress(id: number): Promise<APIResponse> {
@@ -404,11 +409,11 @@ export class OdooClient {
   // ========================================
 
   async validateCoupon(code: string, order_id?: number): Promise<APIResponse & { cart?: Cart; discount?: number }> {
-    return this.jsonrpc('/coupon/validate', { code, order_id });
+    return this.jsonrpc('/cart/coupon/apply', { code, order_id });
   }
 
   async removeCoupon(order_id?: number): Promise<APIResponse & { cart?: Cart }> {
-    return this.jsonrpc('/coupon/remove', { order_id });
+    return this.jsonrpc('/cart/coupon/remove', { order_id });
   }
 
   async getAvailableCoupons(): Promise<APIResponse & { coupons?: any[] }> {
@@ -420,9 +425,37 @@ export class OdooClient {
     return this.jsonrpc('/analytics/dashboard', { period });
   }
 
-  // Cart recovery
-  async recoverCart(token: string): Promise<APIResponse & { data?: any }> {
+  // Cart save & recovery
+  async saveCart(email: string): Promise<APIResponse & { recovery_url?: string; token?: string; cart?: Cart }> {
+    return this.jsonrpc('/cart/save', { email });
+  }
+
+  async recoverCart(token: string): Promise<APIResponse & { cart?: Cart }> {
     return this.jsonrpc('/cart/recover', { token });
+  }
+
+  // Stripe payment
+  async createStripePaymentIntent(orderId: number, returnUrl?: string): Promise<APIResponse & {
+    client_secret?: string;
+    payment_intent_id?: string;
+    amount?: number;
+    currency?: string;
+    order?: any;
+  }> {
+    return this.jsonrpc('/payment/stripe/create-intent', {
+      order_id: orderId,
+      return_url: returnUrl
+    });
+  }
+
+  async confirmStripePayment(paymentIntentId: string, orderId: number): Promise<APIResponse & {
+    status?: string;
+    order?: Order;
+  }> {
+    return this.jsonrpc('/payment/stripe/confirm', {
+      payment_intent_id: paymentIntentId,
+      order_id: orderId
+    });
   }
 
   // Product facets (filters)

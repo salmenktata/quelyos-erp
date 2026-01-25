@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { Motion } from '@/components/common/Motion';
 
 interface AttributePillProps {
   label: string;
@@ -26,7 +26,7 @@ export function AttributePill({
   };
 
   return (
-    <motion.button
+    <Motion.button
       type="button"
       whileHover={!disabled ? { scale: 1.05 } : {}}
       whileTap={!disabled ? { scale: 0.95 } : {}}
@@ -47,6 +47,6 @@ export function AttributePill({
       `}
     >
       {label}
-    </motion.button>
+    </Motion.button>
   );
 }

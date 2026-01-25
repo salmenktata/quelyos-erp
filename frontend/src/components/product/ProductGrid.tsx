@@ -6,7 +6,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Motion, AnimatePresence } from '@/components/common/Motion';
 import { staggerContainer, staggerItem } from '@/lib/animations/variants';
 
 interface ProductGridProps {
@@ -33,7 +33,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     : 'space-y-4';
 
   return (
-    <motion.div
+    <Motion.div
       variants={staggerContainer}
       initial="hidden"
       animate="visible"
@@ -41,7 +41,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     >
       <AnimatePresence mode="popLayout">
         {React.Children.map(children, (child, index) => (
-          <motion.div
+          <Motion.div
             key={index}
             variants={staggerItem}
             layout
@@ -50,10 +50,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             exit="hidden"
           >
             {child}
-          </motion.div>
+          </Motion.div>
         ))}
       </AnimatePresence>
-    </motion.div>
+    </Motion.div>
   );
 };
 

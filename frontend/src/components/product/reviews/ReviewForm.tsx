@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Button, Input } from '@/components/common';
 import StarRating from './StarRating';
+import { logger } from '@/lib/logger';
 
 interface ReviewFormProps {
   productId: number;
@@ -57,7 +58,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ productId, onSubmit, onCancel }
       setComment('');
       setErrors({});
     } catch (error) {
-      console.error('Error submitting review:', error);
+      logger.error('Error submitting review:', error);
     } finally {
       setIsSubmitting(false);
     }

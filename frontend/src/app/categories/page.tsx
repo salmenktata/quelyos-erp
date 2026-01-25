@@ -5,6 +5,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { logger } from '@/lib/logger';
 
 export const metadata: Metadata = {
   title: 'Catégories de Produits | Quelyos',
@@ -25,7 +26,7 @@ async function getCategories() {
     const data = await response.json();
     return data.categories || [];
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    logger.error('Error fetching categories:', error);
     return [];
   }
 }

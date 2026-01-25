@@ -5,6 +5,7 @@ import { useLowStockAlerts, useHighStockAlerts, useStockProducts, useUpdateProdu
 import { Badge, Button, Breadcrumbs, SkeletonTable, Input } from '../components/common'
 import { useToast } from '../contexts/ToastContext'
 import { api } from '../lib/api'
+import { logger } from '../lib/logger'
 import {
   ExclamationTriangleIcon,
   ShoppingBagIcon,
@@ -166,7 +167,7 @@ export default function Stock() {
 
       toast.success(`${allProducts.length} produits exportés avec succès`)
     } catch (error) {
-      console.error('Export CSV error:', error)
+      logger.error('Export CSV error:', error)
       toast.error('Erreur lors de l\'export CSV')
     }
   }
@@ -243,7 +244,7 @@ export default function Stock() {
 
       toast.success('Rapport de valorisation exporté avec succès')
     } catch (error) {
-      console.error('Export valorisation error:', error)
+      logger.error('Export valorisation error:', error)
       toast.error('Erreur lors de l\'export du rapport')
     }
   }

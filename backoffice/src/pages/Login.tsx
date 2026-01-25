@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { Input, Button } from '../components/common'
+import { logger } from '../lib/logger'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -30,30 +31,30 @@ export default function Login() {
     setError('')
     setLoading(true)
 
-    console.log('========== LOGIN SUBMIT ==========')
-    console.log('Email:', email)
-    console.log('Password length:', password.length)
+    logger.debug('========== LOGIN SUBMIT ==========')
+    logger.debug('Email:', email)
+    logger.debug('Password length:', password.length)
 
     try {
-      console.log('Calling api.login...')
+      logger.debug('Calling api.login...')
       const result = await api.login(email, password)
-      console.log('Login result:', result)
+      logger.debug('Login result:', result)
 
       if (result.success) {
-        console.log('Login successful, navigating to /dashboard')
-        console.log('localStorage session_id:', localStorage.getItem('session_id'))
-        console.log('localStorage user:', localStorage.getItem('user'))
+        logger.debug('Login successful, navigating to /dashboard')
+        logger.debug('localStorage session_id:', localStorage.getItem('session_id'))
+        logger.debug('localStorage user:', localStorage.getItem('user'))
         navigate('/dashboard')
       } else {
-        console.log('Login failed:', result.error)
+        logger.warn('Login failed:', result.error)
         setError(result.error || 'Échec de la connexion')
       }
     } catch (err) {
-      console.error('Login exception:', err)
+      logger.error('Login exception:', err)
       setError('Erreur de connexion. Vérifiez vos identifiants.')
     } finally {
       setLoading(false)
-      console.log('========== LOGIN END ==========')
+      logger.debug('========== LOGIN END ==========')
     }
   }
 

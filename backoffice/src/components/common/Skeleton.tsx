@@ -89,3 +89,20 @@ export function SkeletonCard() {
     </div>
   )
 }
+
+// Skeleton Grid pour grilles de cards
+export function SkeletonGrid({ count = 6, columns = 4 }: { count?: number; columns?: number }) {
+  const gridCols = {
+    2: 'grid-cols-1 md:grid-cols-2',
+    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+  }[columns] || 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+
+  return (
+    <div className={`grid ${gridCols} gap-4`}>
+      {Array.from({ length: count }).map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
+    </div>
+  );
+}

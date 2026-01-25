@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { Motion } from '@/components/common/Motion';
 import { fetchVariantsLazy, getColorHex, isLightColor } from '@/lib/variants';
 import { AttributeLine, ExtendedProductVariant } from '@/types';
+import { logger } from '@/lib/logger';
 
 // SVG CheckIcon inline
 const CheckIcon = ({ className }: { className?: string }) => (
@@ -54,7 +55,7 @@ export function VariantSwatches({
         setVariants(response.data.variants);
       }
     } catch (error) {
-      console.error('Error loading variants:', error);
+      logger.error('Error loading variants:', error);
     } finally {
       setIsLoading(false);
     }
@@ -237,7 +238,7 @@ export function VariantSwatches({
   }
 
   return (
-    <motion.div
+    <Motion.div
       className={`space-y-2 ${className}`}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -261,7 +262,7 @@ export function VariantSwatches({
                   className="flex items-center gap-1.5"
                 >
                   {visibleValues.map((value, index) => (
-                    <motion.button
+                    <Motion.button
                       key={value.valueId}
                       type="button"
                       role="radio"
@@ -298,19 +299,19 @@ export function VariantSwatches({
 
                       {/* Checkmark si sélectionné */}
                       {selectedId === value.variant?.id && (
-                        <motion.div
+                        <Motion.div
                           className="absolute inset-0 flex items-center justify-center"
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                         >
                           <CheckIcon className="w-3 h-3 text-white drop-shadow-lg" />
-                        </motion.div>
+                        </Motion.div>
                       )}
 
                       {/* Tooltip au hover (desktop uniquement) */}
                       {hoveredId === value.variant?.id && (
-                        <motion.div
+                        <Motion.div
                           className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap z-10"
                           initial={{ opacity: 0, y: 5 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -319,9 +320,9 @@ export function VariantSwatches({
                           {value.name}
                           {/* Petite flèche */}
                           <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
-                        </motion.div>
+                        </Motion.div>
                       )}
-                    </motion.button>
+                    </Motion.button>
                   ))}
                 </div>
 
@@ -337,7 +338,7 @@ export function VariantSwatches({
               <>
                 <div className="flex items-center gap-1 flex-wrap">
                   {visibleValues.map((value, index) => (
-                    <motion.span
+                    <Motion.span
                       key={value.valueId}
                       className={`
                         px-2 py-0.5 text-xs rounded-md border transition-colors
@@ -352,7 +353,7 @@ export function VariantSwatches({
                       title={value.inStock ? `${value.name} disponible` : `${value.name} épuisé`}
                     >
                       {value.name}
-                    </motion.span>
+                    </Motion.span>
                   ))}
 
                   {/* Compteur */}
@@ -367,6 +368,6 @@ export function VariantSwatches({
           </div>
         );
       })}
-    </motion.div>
+    </Motion.div>
   );
 }

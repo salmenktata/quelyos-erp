@@ -6,6 +6,7 @@ import type { CouponCreate } from '../types'
 import { Button, Input, Breadcrumbs } from '../components/common'
 import { useToast } from '../hooks/useToast'
 import { ToastContainer } from '../components/common/Toast'
+import { logger } from '../lib/logger'
 
 export default function CouponForm() {
   const navigate = useNavigate()
@@ -105,7 +106,7 @@ export default function CouponForm() {
       toast.success(`Le coupon "${formData.code.toUpperCase()}" a été créé avec succès`)
       navigate('/coupons')
     } catch (error) {
-      console.error('Erreur lors de la création du coupon:', error)
+      logger.error('Erreur lors de la création du coupon:', error)
       toast.error('Erreur lors de la création du coupon. Veuillez réessayer.')
     }
   }

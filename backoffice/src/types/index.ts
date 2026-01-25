@@ -28,6 +28,13 @@ export interface Product {
     id: number
     name: string
   } | null
+  ribbon?: Ribbon | null
+  // Champs marketing e-commerce
+  is_featured?: boolean
+  is_new?: boolean
+  is_bestseller?: boolean
+  compare_at_price?: number | null
+  offer_end_date?: string | null
 }
 
 export interface ProductTax {
@@ -79,6 +86,18 @@ export interface ProductImage {
   name: string
   url: string
   sequence: number
+}
+
+// ==================== RIBBONS (BADGES) ====================
+
+export interface Ribbon {
+  id: number
+  name: string
+  bg_color: string
+  text_color: string
+  position: 'left' | 'right'
+  style: 'ribbon' | 'tag'
+  sequence?: number
 }
 
 export interface ProductAttribute {
@@ -152,6 +171,12 @@ export interface ProductCreateData {
   product_height?: number
   taxes_id?: number[]
   product_tag_ids?: number[]
+  // Champs marketing e-commerce
+  is_featured?: boolean
+  is_new?: boolean
+  is_bestseller?: boolean
+  compare_at_price?: number
+  offer_end_date?: string | null
 }
 
 export interface ProductUpdateData {
@@ -169,6 +194,12 @@ export interface ProductUpdateData {
   active?: boolean
   taxes_id?: number[]
   product_tag_ids?: number[]
+  // Champs marketing e-commerce
+  is_featured?: boolean
+  is_new?: boolean
+  is_bestseller?: boolean
+  compare_at_price?: number
+  offer_end_date?: string | null
 }
 
 // ==================== CATEGORIES ====================

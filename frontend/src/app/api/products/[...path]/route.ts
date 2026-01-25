@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 const ODOO_URL = process.env.NEXT_PUBLIC_ODOO_URL || 'http://localhost:8069';
 
@@ -50,7 +51,7 @@ export async function GET(
     return NextResponse.json(data.result || data);
 
   } catch (error) {
-    console.error('Products API error:', error);
+    logger.error('Products API error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch product data' },
       { status: 500 }

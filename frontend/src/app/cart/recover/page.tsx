@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/common';
+import { logger } from '@/lib/logger';
 
 /**
  * Cart Recovery Content Component
@@ -65,7 +66,7 @@ function CartRecoverContent() {
         setError(response.message || 'Échec de la récupération du panier');
       }
     } catch (err: any) {
-      console.error('Error recovering cart:', err);
+      logger.error('Error recovering cart:', err);
       setError(err.message || 'Une erreur est survenue');
     } finally {
       setLoading(false);

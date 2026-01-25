@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+import { Motion, AnimatePresence, type PanInfo } from '@/components/common/Motion';
 import { useKeyboardNav } from '@/hooks/useKeyboardNav';
 import { carouselItem } from '@/lib/animations/variants';
 
@@ -129,7 +129,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
         onClick={() => setIsModalOpen(true)}
       >
         <AnimatePresence initial={false} custom={direction}>
-          <motion.img
+          <Motion.img
             key={selectedIndex}
             src={getProxiedImageUrl(currentImage.url)}
             alt={currentImage.alt || productName}
@@ -201,7 +201,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
         {safeImages.length > 1 && (
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 md:hidden">
             {safeImages.map((_, index) => (
-              <motion.div
+              <Motion.div
                 key={index}
                 className={`h-2 rounded-full transition-all ${
                   index === selectedIndex
@@ -247,7 +247,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
       {/* Modal Zoom */}
       <AnimatePresence>
         {isModalOpen && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -264,7 +264,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
               </svg>
             </button>
 
-            <motion.img
+            <Motion.img
               src={getProxiedImageUrl(currentImage.url)}
               alt={currentImage.alt || productName}
               className="max-w-full max-h-full object-contain"
@@ -321,7 +321,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
                 </div>
               </>
             )}
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </div>

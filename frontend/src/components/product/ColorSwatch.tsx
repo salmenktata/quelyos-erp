@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { Motion } from '@/components/common/Motion';
 import { isLightColor } from '@/lib/variants';
 
 interface ColorSwatchProps {
@@ -32,7 +32,7 @@ export function ColorSwatch({
   const sizeClass = size === 'sm' ? 'w-8 h-8' : 'w-10 h-10';
 
   return (
-    <motion.button
+    <Motion.button
       type="button"
       onClick={onClick}
       onMouseEnter={() => !disabled && onHover?.()}
@@ -63,7 +63,7 @@ export function ColorSwatch({
 
       {/* Checkmark si sélectionné */}
       {selected && (
-        <motion.div
+        <Motion.div
           className="absolute inset-0 flex items-center justify-center"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -80,7 +80,7 @@ export function ColorSwatch({
               clipRule="evenodd"
             />
           </svg>
-        </motion.div>
+        </Motion.div>
       )}
 
       {/* Croix si épuisé */}
@@ -90,6 +90,6 @@ export function ColorSwatch({
           <div className="absolute w-full h-0.5 bg-red-500 -rotate-45" />
         </div>
       )}
-    </motion.button>
+    </Motion.button>
   );
 }

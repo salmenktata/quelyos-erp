@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/common';
+import { logger } from '@/lib/logger';
 
 interface WishlistProduct {
   id: number;
@@ -58,7 +59,7 @@ export default function PublicWishlistPage() {
         setError(response.message || 'Failed to load wishlist');
       }
     } catch (err: any) {
-      console.error('Error loading wishlist:', err);
+      logger.error('Error loading wishlist:', err);
       setError(err.message || 'Une erreur est survenue');
     } finally {
       setLoading(false);
@@ -69,7 +70,7 @@ export default function PublicWishlistPage() {
     try {
       await addToCart(productId, 1);
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      logger.error('Error adding to cart:', error);
     }
   };
 

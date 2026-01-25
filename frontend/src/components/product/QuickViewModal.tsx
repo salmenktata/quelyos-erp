@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/common';
+import { logger } from '@/lib/logger';
 
 interface ProductVariant {
   id: number;
@@ -76,7 +77,7 @@ export function QuickViewModal({ productId, isOpen, onClose }: QuickViewModalPro
         }
       }
     } catch (error) {
-      console.error('Error loading product:', error);
+      logger.error('Error loading product:', error);
     } finally {
       setLoading(false);
     }
@@ -98,7 +99,7 @@ export function QuickViewModal({ productId, isOpen, onClose }: QuickViewModalPro
         onClose();
       }, 500);
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      logger.error('Error adding to cart:', error);
     } finally {
       setAddingToCart(false);
     }

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { cmsService } from '@/lib/odoo/cms';
 import { useAuthStore } from '@/store/authStore';
 import type { Menu, MenuItem } from '@/types/cms';
+import { logger } from '@/lib/logger';
 
 interface DynamicMenuProps {
   code: string;
@@ -39,7 +40,7 @@ export const DynamicMenu: React.FC<DynamicMenuProps> = ({
         setMenu(menuData);
         setError(null);
       } catch (err: any) {
-        console.error(`Failed to load menu ${code}:`, err);
+        logger.error(`Failed to load menu ${code}:`, err);
         setError(err.message);
       } finally {
         setLoading(false);

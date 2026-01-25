@@ -35,6 +35,8 @@ export interface Product {
   related_products?: number[];
   default_code?: string;
   image_url?: string;
+  ribbon?: Ribbon | null; // Badge/ruban du produit
+  offer_end_date?: string | null; // Date de fin d'offre limitée (ISO 8601)
 }
 
 export interface ProductVariant {
@@ -61,6 +63,16 @@ export interface ProductImage {
   alt: string;
   is_main?: boolean;
   sequence?: number;
+}
+
+// Type pour les rubans (badges produit)
+export interface Ribbon {
+  id: number;
+  name: string;
+  bg_color: string;
+  text_color: string;
+  position: 'left' | 'right';
+  style: 'ribbon' | 'tag';
 }
 
 // Types pour l'API /variants enrichie

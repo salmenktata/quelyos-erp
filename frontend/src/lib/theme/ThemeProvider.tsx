@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { Theme, ThemeName, ThemeColors } from './types';
 import { themes, defaultTheme } from './themes';
+import type { TenantTheme, TenantColors } from '@/types/tenant';
 
 interface ThemeContextType {
   theme: Theme;
@@ -55,35 +56,58 @@ interface ThemeProviderProps {
     primaryColor?: string;
     secondaryColor?: string;
   };
+  /** Thème du tenant (priorité maximale) */
+  tenantTheme?: TenantTheme | null;
 }
 
 export function ThemeProvider({
   children,
   defaultThemeName = 'default',
   configColors,
+  tenantTheme,
 }: ThemeProviderProps) {
   const [themeName, setThemeName] = useState<ThemeName>(defaultThemeName);
   const [customColors, setCustomColorsState] = useState<Partial<ThemeColors>>({});
   const [mounted, setMounted] = useState(false);
 
   // Calculer le theme effectif (theme de base + overrides)
+  // Priorité: tenantTheme > configColors > theme de base
   const theme = React.useMemo(() => {
     const baseTheme = themes[themeName] || defaultTheme;
-
-    // Fusionner avec les couleurs de config (SiteConfig)
     const mergedColors = { ...baseTheme.colors };
-    if (configColors?.primaryColor) {
-      mergedColors.primary = configColors.primaryColor;
-      mergedColors.ring = configColors.primaryColor;
+
+    // 1. Si tenantTheme est fourni, l'utiliser en priorité
+    if (tenantTheme?.colors) {
+      const tc = tenantTheme.colors;
+      mergedColors.primary = tc.primary;
+      mergedColors.primaryDark = tc.primaryDark;
+      mergedColors.primaryLight = tc.primaryLight;
+      mergedColors.secondary = tc.secondary;
+      mergedColors.secondaryDark = tc.secondaryDark;
+      mergedColors.secondaryLight = tc.secondaryLight;
+      mergedColors.accent = tc.accent;
+      mergedColors.background = tc.background;
+      mergedColors.foreground = tc.foreground;
+      mergedColors.muted = tc.muted;
+      mergedColors.mutedForeground = tc.mutedForeground;
+      mergedColors.border = tc.border;
+      mergedColors.ring = tc.ring;
+    } else {
+      // 2. Sinon, utiliser configColors (SiteConfig legacy)
+      if (configColors?.primaryColor) {
+        mergedColors.primary = configColors.primaryColor;
+        mergedColors.ring = configColors.primaryColor;
+      }
+      if (configColors?.secondaryColor) {
+        mergedColors.secondary = configColors.secondaryColor;
+      }
     }
-    if (configColors?.secondaryColor) {
-      mergedColors.secondary = configColors.secondaryColor;
-    }
-    // Appliquer les overrides personnalises
+
+    // 3. Appliquer les overrides personnalises (setCustomColors)
     Object.assign(mergedColors, customColors);
 
     return { ...baseTheme, colors: mergedColors };
-  }, [themeName, configColors, customColors]);
+  }, [themeName, configColors, customColors, tenantTheme]);
 
   // Initialiser depuis localStorage
   useEffect(() => {

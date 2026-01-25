@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { Motion } from '@/components/common/Motion';
 
 interface SizeButtonProps {
   label: string;
@@ -37,7 +37,7 @@ export function SizeButton({
   const isLowStock = stockInfo?.qty && stockInfo.qty <= 3 && stockInfo.inStock;
 
   return (
-    <motion.button
+    <Motion.button
       type="button"
       onClick={onClick}
       disabled={disabled}
@@ -81,6 +81,6 @@ export function SizeButton({
           </svg>
         </div>
       )}
-    </motion.button>
+    </Motion.button>
   );
 }

@@ -13,6 +13,7 @@ import { CheckoutStepper } from '@/components/checkout/CheckoutStepper';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
 import { ShippingForm, ShippingAddress } from '@/components/checkout/ShippingForm';
 import { LoadingPage } from '@/components/common/Loading';
+import { logger } from '@/lib/logger';
 
 export default function CheckoutShippingPage() {
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function CheckoutShippingPage() {
       // Rediriger vers le paiement
       router.push('/checkout/payment');
     } catch (error) {
-      console.error('Erreur mise à jour adresse:', error);
+      logger.error('Erreur mise à jour adresse:', error);
       alert('Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setIsSubmitting(false);

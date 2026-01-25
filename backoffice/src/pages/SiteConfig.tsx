@@ -327,6 +327,8 @@ export default function SiteConfig() {
                   checked={features[feature.key]}
                   onChange={() => toggleFeature(feature.key)}
                   className="mt-1 w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                  aria-label={`Activer ${feature.label}`}
+                  aria-checked={features[feature.key]}
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
@@ -370,6 +372,8 @@ export default function SiteConfig() {
                 checked={catalogConfig.viewers_count_enabled}
                 onChange={() => setCatalogConfig(prev => ({ ...prev, viewers_count_enabled: !prev.viewers_count_enabled }))}
                 className="mt-1 w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                aria-label="Activer la preuve sociale (ViewersCount)"
+                aria-checked={catalogConfig.viewers_count_enabled}
               />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
@@ -474,6 +478,8 @@ export default function SiteConfig() {
                 onChange={(e) => setContactConfig(prev => ({ ...prev, whatsapp_number: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="+21600000000"
+                aria-label="Numéro WhatsApp"
+                aria-required="true"
               />
             </div>
             <div>
@@ -486,6 +492,8 @@ export default function SiteConfig() {
                 onChange={(e) => setContactConfig(prev => ({ ...prev, contact_email: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="contact@quelyos.com"
+                aria-label="Email de contact"
+                aria-required="true"
               />
             </div>
             <div>
@@ -498,6 +506,8 @@ export default function SiteConfig() {
                 onChange={(e) => setContactConfig(prev => ({ ...prev, contact_phone: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="+21600000000"
+                aria-label="Numéro de téléphone"
+                aria-required="true"
               />
             </div>
           </div>
@@ -528,6 +538,8 @@ export default function SiteConfig() {
                 onChange={(e) => setShippingConfig(prev => ({ ...prev, shipping_standard_days: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="2-5"
+                aria-label="Délai de livraison standard en jours (format: min-max)"
+                aria-required="true"
               />
             </div>
             <div>
@@ -540,6 +552,8 @@ export default function SiteConfig() {
                 onChange={(e) => setShippingConfig(prev => ({ ...prev, shipping_express_days: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="1-2"
+                aria-label="Délai de livraison express en jours (format: min-max)"
+                aria-required="true"
               />
             </div>
             <div>
@@ -552,6 +566,9 @@ export default function SiteConfig() {
                 onChange={(e) => setShippingConfig(prev => ({ ...prev, free_shipping_threshold: Number(e.target.value) }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="150"
+                aria-label="Montant minimum pour livraison gratuite en dinars tunisiens"
+                aria-required="true"
+                min="0"
               />
             </div>
           </div>
@@ -582,6 +599,10 @@ export default function SiteConfig() {
                 onChange={(e) => setReturnsConfig(prev => ({ ...prev, return_delay_days: Number(e.target.value) }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="30"
+                aria-label="Délai de retour en jours"
+                aria-required="true"
+                min="1"
+                max="365"
               />
             </div>
             <div>
@@ -594,6 +615,8 @@ export default function SiteConfig() {
                 onChange={(e) => setReturnsConfig(prev => ({ ...prev, refund_delay_days: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="7-10"
+                aria-label="Délai de remboursement en jours (format: min-max)"
+                aria-required="true"
               />
             </div>
             <div>
@@ -606,6 +629,10 @@ export default function SiteConfig() {
                 onChange={(e) => setWarrantyConfig(prev => ({ ...prev, warranty_years: Number(e.target.value) }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="2"
+                aria-label="Durée de garantie en années"
+                aria-required="true"
+                min="0"
+                max="10"
               />
             </div>
           </div>
@@ -643,6 +670,9 @@ export default function SiteConfig() {
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
                   }
                 `}
+                role="checkbox"
+                aria-checked={paymentMethods.includes(method.key)}
+                aria-label={`${paymentMethods.includes(method.key) ? 'Désactiver' : 'Activer'} le paiement par ${method.label}`}
               >
                 {method.label}
               </button>

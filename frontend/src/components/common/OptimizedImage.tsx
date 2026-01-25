@@ -15,6 +15,7 @@ interface OptimizedImageProps {
   width?: number;
   height?: number;
   priority?: boolean;
+  sizes?: string; // Responsive images: "(max-width: 768px) 100vw, 50vw"
 }
 
 export const OptimizedImage: React.FC<OptimizedImageProps> = ({
@@ -25,6 +26,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   width,
   height,
   priority = false,
+  sizes, // Responsive images
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -48,6 +50,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
           src={src}
           alt={alt}
           fill
+          sizes={sizes} // Responsive images
           className={imgClassName}
           onLoad={() => setIsLoading(false)}
           onError={() => setHasError(true)}
@@ -59,6 +62,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
           alt={alt}
           width={width || 400}
           height={height || 400}
+          sizes={sizes} // Responsive images
           className={imgClassName}
           onLoad={() => setIsLoading(false)}
           onError={() => setHasError(true)}

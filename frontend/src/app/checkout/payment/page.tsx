@@ -14,6 +14,7 @@ import { OrderSummary } from '@/components/checkout/OrderSummary';
 import { PaymentForm, PaymentMethod } from '@/components/checkout/PaymentForm';
 import { LoadingPage } from '@/components/common/Loading';
 import { odooClient } from '@/lib/odoo/client';
+import { logger } from '@/lib/logger';
 
 // Méthodes de paiement disponibles
 const paymentMethods: PaymentMethod[] = [
@@ -110,7 +111,7 @@ export default function CheckoutPaymentPage() {
         throw new Error(result.error || 'Erreur confirmation commande');
       }
     } catch (error: any) {
-      console.error('Erreur confirmation commande:', error);
+      logger.error('Erreur confirmation commande:', error);
       alert(error.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setIsSubmitting(false);

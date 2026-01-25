@@ -11,6 +11,7 @@ import { CategoriesSection } from '@/components/home/CategoriesSection';
 import { ProductGrid } from '@/components/product/ProductGrid';
 import { ProductCardHome } from '@/components/home/ProductCardHome';
 import { NewsletterForm } from '@/components/home/NewsletterForm';
+import { logger } from '@/lib/logger';
 
 // Server-side data fetching
 async function getHomeData(): Promise<{ products: Product[]; categories: Category[] }> {
@@ -52,7 +53,7 @@ async function getHomeData(): Promise<{ products: Product[]; categories: Categor
 
     return { products, categories };
   } catch (error) {
-    console.error('Error fetching home data:', error);
+    logger.error('Error fetching home data:', error);
     return { products: [], categories: [] };
   }
 }

@@ -5,7 +5,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { Motion } from '@/components/common/Motion';
 
 interface PaginationProps {
   currentPage: number;
@@ -53,7 +53,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <nav className={"flex items-center justify-center gap-2 " + className} aria-label="Pagination">
       {showFirstLast && currentPage > 1 && (
-        <motion.button
+        <Motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => handlePageClick(1)}
@@ -63,10 +63,10 @@ export const Pagination: React.FC<PaginationProps> = ({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
           </svg>
           <span className="hidden md:inline">Première</span>
-        </motion.button>
+        </Motion.button>
       )}
 
-      <motion.button
+      <Motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => handlePageClick(currentPage - 1)}
@@ -77,7 +77,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
         <span className="hidden sm:inline">Précédent</span>
-      </motion.button>
+      </Motion.button>
 
       <div className="flex items-center gap-1">
         {pages.map((page, index) => {
@@ -86,7 +86,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           }
           const isActive = page === currentPage;
           return (
-            <motion.button
+            <Motion.button
               key={page}
               whileHover={{ scale: isActive ? 1 : 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -94,12 +94,12 @@ export const Pagination: React.FC<PaginationProps> = ({
               className={"min-w-[40px] h-10 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 " + (isActive ? 'bg-primary text-white shadow-lg scale-110' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-primary')}
             >
               {page}
-            </motion.button>
+            </Motion.button>
           );
         })}
       </div>
 
-      <motion.button
+      <Motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => handlePageClick(currentPage + 1)}
@@ -110,10 +110,10 @@ export const Pagination: React.FC<PaginationProps> = ({
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-      </motion.button>
+      </Motion.button>
 
       {showFirstLast && currentPage < totalPages && (
-        <motion.button
+        <Motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => handlePageClick(totalPages)}
@@ -123,7 +123,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
           </svg>
-        </motion.button>
+        </Motion.button>
       )}
     </nav>
   );

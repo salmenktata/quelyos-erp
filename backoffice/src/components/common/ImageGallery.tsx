@@ -1,6 +1,7 @@
 import { useState, useRef, DragEvent } from 'react'
 import { OdooImage } from './OdooImage'
 import { Button } from './Button'
+import { logger } from '../../lib/logger'
 
 export interface ProductImage {
   id: number
@@ -90,7 +91,7 @@ export function ImageGallery({
 
       await onUpload(imagesData)
     } catch (error) {
-      console.error('Upload error:', error)
+      logger.error('Upload error:', error)
       alert('Erreur lors de l\'upload des images')
     } finally {
       setUploading(false)
@@ -145,7 +146,7 @@ export function ImageGallery({
     // Appeler onReorder avec les nouveaux IDs
     const imageIds = newImages.map((img) => img.id)
     onReorder(imageIds).catch((error) => {
-      console.error('Reorder error:', error)
+      logger.error('Reorder error:', error)
     })
 
     setDraggedIndex(index)

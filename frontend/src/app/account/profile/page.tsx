@@ -12,6 +12,7 @@ import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { odooClient } from '@/lib/odoo/client';
+import { logger } from '@/lib/logger';
 
 export default function AccountProfilePage() {
   const router = useRouter();
@@ -122,7 +123,7 @@ export default function AccountProfilePage() {
         throw new Error(result.error || 'Erreur mise à jour profil');
       }
     } catch (error: any) {
-      console.error('Erreur mise à jour profil:', error);
+      logger.error('Erreur mise à jour profil:', error);
       alert(error.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setIsSaving(false);

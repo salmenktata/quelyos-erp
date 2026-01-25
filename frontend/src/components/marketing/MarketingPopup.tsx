@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
 import { useExitIntent } from '@/hooks/useExitIntent';
+import { logger } from '@/lib/logger';
 
 interface PopupCampaign {
   id: number;
@@ -118,7 +119,7 @@ export function MarketingPopup() {
         setPopup(response.data.popup);
       }
     } catch (error) {
-      console.error('Error loading popup:', error);
+      logger.error('Error loading popup:', error);
     } finally {
       setLoading(false);
     }
@@ -199,7 +200,7 @@ export function MarketingPopup() {
       try {
         await odooClient.trackPopupClick(popup.id);
       } catch (error) {
-        console.error('Error tracking popup click:', error);
+        logger.error('Error tracking popup click:', error);
       }
     }
 

@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
 import { StructuredData } from './StructuredData';
+import { logger } from '@/lib/logger';
 
 interface BreadcrumbItem {
   position: number;
@@ -47,7 +48,7 @@ export function Breadcrumbs({ productId, customItems }: BreadcrumbsProps) {
         setStructuredData(response.data.structured_data);
       }
     } catch (error) {
-      console.error('Error loading breadcrumbs:', error);
+      logger.error('Error loading breadcrumbs:', error);
     } finally {
       setLoading(false);
     }

@@ -6,6 +6,7 @@
 import { Metadata } from 'next';
 import { odooClient } from '@/lib/odoo/client';
 import { siteConfig } from '@/lib/config/site';
+import { logger } from '@/lib/logger';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -81,7 +82,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       },
     };
   } catch (error) {
-    console.error('Error generating product metadata:', error);
+    logger.error('Error generating product metadata:', error);
     return {
       title: 'Produit - ' + siteConfig.brand.name,
       description: siteConfig.brand.description,

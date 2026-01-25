@@ -1,0 +1,79 @@
+# Dépendances
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+.Python
+
+# Build & Cache
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+backoffice/dist/
+backoffice/.turbo/
+backend/odoo/
+.cache/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Assets lourds
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.ico
+*.webp
+*.woff
+*.woff2
+*.ttf
+*.eot
+*.otf
+
+# Lockfiles (déjà dans git, mais éviter lecture inutile)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Tests & Coverage
+coverage/
+.coverage
+htmlcov/
+.nyc_output/
+
+# Docker & OS
+.docker/
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Env & Secrets
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Documentation générée
+COHERENCE_AUDIT_*.md
+PERFORMANCE_AUDIT_*.md
+SECURITY_AUDIT_*.md
+PARITY_ROADMAP_*.md
+PARITY_REPORT_*.md
+
+# Backup
+*.backup
+*.bak

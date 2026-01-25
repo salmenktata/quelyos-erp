@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import time
+import os
 from odoo import http, fields
 from odoo.http import request
 from passlib.context import CryptContext
@@ -8,11 +9,39 @@ from ..config import is_origin_allowed, get_cors_headers
 
 _logger = logging.getLogger(__name__)
 
+try:
+    import redis
+    REDIS_AVAILABLE = True
+except ImportError:
+    REDIS_AVAILABLE = False
+    _logger.warning("Redis package not installed. Rate limiting will use in-memory cache (not production-ready for multi-worker setups)")
+
 # Context de cryptage pour vérifier les mots de passe
 crypt_context = CryptContext(schemes=['pbkdf2_sha512', 'plaintext'], deprecated=['plaintext'])
 
-# Cache simple pour rate limiting des vues produits (IP:product_id -> timestamp)
-# En production, utiliser Redis pour un cache distribué
+# Redis client pour cache distribué (rate limiting, etc.)
+_redis_client = None
+if REDIS_AVAILABLE:
+    try:
+        redis_host = os.environ.get('REDIS_HOST', 'localhost')
+        redis_port = int(os.environ.get('REDIS_PORT', 6379))
+        _redis_client = redis.Redis(
+            host=redis_host,
+            port=redis_port,
+            db=0,
+            decode_responses=True,
+            socket_connect_timeout=2,
+            socket_timeout=2
+        )
+        # Tester la connexion
+        _redis_client.ping()
+        _logger.info(f"Redis connected successfully at {redis_host}:{redis_port}")
+    except Exception as e:
+        _logger.warning(f"Could not connect to Redis: {e}. Falling back to in-memory cache.")
+        _redis_client = None
+
+# Fallback: Cache en mémoire pour rate limiting (si Redis non disponible)
+# ATTENTION: Ne fonctionne pas correctement avec plusieurs workers Odoo
 _view_count_cache = {}
 
 
@@ -116,6 +145,179 @@ class QuelyosAPI(http.Controller):
             }
 
         return None
+
+    def _serialize_product_detail(self, product, slug=None, include_ribbon=True):
+        """
+        Sérialise un produit product.template en dictionnaire JSON.
+        Helper pour réduire duplication entre get_product_detail et get_product_by_slug.
+
+        Args:
+            product: Recordset product.template
+            slug: Slug du produit (optionnel, auto-généré si absent)
+            include_ribbon: Inclure les données du ribbon/badge (défaut: True)
+
+        Returns:
+            dict: Données du produit formatées pour l'API
+        """
+        # Récupérer toutes les images du produit
+        images = []
+        for img in product.product_template_image_ids.sorted('sequence'):
+            images.append({
+                'id': img.id,
+                'name': img.name or f'Image {img.sequence}',
+                'url': f'/web/image/product.image/{img.id}/image_1920',
+                'sequence': img.sequence,
+            })
+
+        # Calculer le stock depuis stock.quant (somme de toutes les variantes)
+        # Note: product.qty_available ne fonctionne pas correctement avec auth='public'
+        StockQuant = request.env['stock.quant'].sudo()
+        variant_ids = product.product_variant_ids.ids
+        quants = StockQuant.search([
+            ('product_id', 'in', variant_ids),
+            ('location_id.usage', '=', 'internal')
+        ])
+        qty = sum(quants.mapped('quantity')) if quants else 0.0
+
+        if qty <= 0:
+            stock_status = 'out_of_stock'
+        elif qty <= 5:
+            stock_status = 'low_stock'
+        else:
+            stock_status = 'in_stock'
+
+        # Récupérer les taxes applicables
+        taxes = []
+        for tax in product.taxes_id:
+            taxes.append({
+                'id': tax.id,
+                'name': tax.name,
+                'amount': tax.amount,
+                'amount_type': tax.amount_type,
+                'price_include': tax.price_include,
+            })
+
+        # Récupérer le ribbon (badge) du produit (optionnel)
+        ribbon_data = None
+        if include_ribbon and product.website_ribbon_id:
+            ribbon = product.website_ribbon_id
+            ribbon_name = ribbon.name
+            if isinstance(ribbon_name, dict):
+                ribbon_name = ribbon_name.get('fr_FR', ribbon_name.get('en_US', ''))
+            ribbon_data = {
+                'id': ribbon.id,
+                'name': ribbon_name,
+                'bg_color': ribbon.bg_color,
+                'text_color': ribbon.text_color,
+                'position': ribbon.position,
+                'style': ribbon.style,
+            }
+
+        # Construire le slug (auto-généré ou fourni)
+        product_slug = slug if slug is not None else product.name.lower().replace(' ', '-')
+
+        # Construire le dictionnaire de données du produit
+        data = {
+            'id': product.id,
+            'name': product.name,
+            'description': product.description_sale or '',
+            'description_purchase': product.description_purchase or '',
+            'price': product.list_price,
+            'standard_price': product.standard_price,
+            'default_code': product.default_code or '',
+            'barcode': product.barcode or '',
+            'weight': product.weight or 0,
+            'volume': product.volume or 0,
+            'product_length': getattr(product, 'product_length', 0) or 0,
+            'product_width': getattr(product, 'product_width', 0) or 0,
+            'product_height': getattr(product, 'product_height', 0) or 0,
+            'type': product.type or 'consu',
+            'uom_id': product.uom_id.id if product.uom_id else None,
+            'uom_name': product.uom_id.name if product.uom_id else None,
+            'product_tag_ids': [
+                {
+                    'id': tag.id,
+                    'name': tag.name,
+                    'color': tag.color if hasattr(tag, 'color') else 0
+                }
+                for tag in product.product_tag_ids
+            ] if product.product_tag_ids else [],
+            'image': f'/web/image/product.template/{product.id}/image_1920' if product.image_1920 else None,
+            'images': images,
+            'slug': product_slug,
+            'qty_available': qty,
+            'virtual_available': product.virtual_available,
+            'stock_status': stock_status,
+            'active': product.active,
+            'create_date': product.create_date.isoformat() if product.create_date else None,
+            'variant_count': product.product_variant_count,
+            'category': {
+                'id': product.categ_id.id,
+                'name': product.categ_id.name,
+            } if product.categ_id else None,
+            'ribbon': ribbon_data,
+            'taxes': taxes,
+            # Champs marketing e-commerce
+            'is_featured': getattr(product, 'x_is_featured', False) or False,
+            'is_new': getattr(product, 'x_is_new', False) or False,
+            'is_bestseller': getattr(product, 'x_is_bestseller', False) or False,
+            'compare_at_price': product.compare_list_price if hasattr(product, 'compare_list_price') and product.compare_list_price else None,
+            'offer_end_date': getattr(product, 'x_offer_end_date', None).isoformat() if getattr(product, 'x_offer_end_date', None) else None,
+            # Champs contenu enrichi
+            'technical_description': getattr(product, 'x_technical_description', None) or None,
+            # Champs statistiques
+            'view_count': getattr(product, 'x_view_count', 0) or 0,
+        }
+
+        return data
+
+    def _check_view_count_rate_limit(self, product_id):
+        """
+        Vérifie et incrémente le compteur de vues avec rate limiting.
+        Utilise Redis si disponible, sinon fallback sur cache mémoire.
+
+        Args:
+            product_id: ID du produit
+
+        Returns:
+            bool: True si la vue doit être comptée, False sinon
+        """
+        try:
+            # Récupérer l'IP du client
+            ip = request.httprequest.environ.get('HTTP_X_REAL_IP') or \
+                 request.httprequest.environ.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
+                 request.httprequest.remote_addr
+
+            cache_key = f"view_count:{ip}:{product_id}"
+            current_time = time.time()
+
+            # Utiliser Redis si disponible
+            if _redis_client:
+                try:
+                    # SET avec NX (not exists) et EX (expiration en secondes)
+                    # Retourne True si la clé a été créée, False si elle existe déjà
+                    was_set = _redis_client.set(cache_key, current_time, ex=60, nx=True)
+                    return bool(was_set)
+                except Exception as redis_err:
+                    _logger.warning(f"Redis error in rate limiting: {redis_err}. Falling back to memory cache.")
+                    # Continuer avec le cache mémoire en cas d'erreur Redis
+
+            # Fallback: cache en mémoire (non-distribué)
+            last_view = _view_count_cache.get(cache_key, 0)
+            if current_time - last_view >= 60:
+                _view_count_cache[cache_key] = current_time
+
+                # Nettoyage du cache (éviter croissance infinie)
+                if len(_view_count_cache) > 10000:
+                    _view_count_cache.clear()
+
+                return True
+
+            return False
+
+        except Exception as e:
+            _logger.warning(f"Error in view count rate limiting: {e}")
+            return False
 
     def _validate_customer_ownership(self, customer_id):
         """
@@ -611,104 +813,8 @@ class QuelyosAPI(http.Controller):
                     'error': 'Product not found'
                 }
 
-            # Récupérer toutes les images du produit (product.image)
-            images = []
-            for img in product.product_template_image_ids.sorted('sequence'):
-                images.append({
-                    'id': img.id,
-                    'name': img.name or f'Image {img.sequence}',
-                    'url': f'/web/image/product.image/{img.id}/image_1920',
-                    'sequence': img.sequence,
-                })
-
-            # Calculer le stock depuis stock.quant (somme de toutes les variantes)
-            # Note: product.qty_available ne fonctionne pas correctement avec auth='public'
-            StockQuant = request.env['stock.quant'].sudo()
-            variant_ids = product.product_variant_ids.ids
-            quants = StockQuant.search([
-                ('product_id', 'in', variant_ids),
-                ('location_id.usage', '=', 'internal')
-            ])
-            qty = sum(quants.mapped('quantity')) if quants else 0.0
-
-            if qty <= 0:
-                stock_status = 'out_of_stock'
-            elif qty <= 5:
-                stock_status = 'low_stock'
-            else:
-                stock_status = 'in_stock'
-
-            # Récupérer les taxes applicables
-            taxes = []
-            for tax in product.taxes_id:
-                taxes.append({
-                    'id': tax.id,
-                    'name': tax.name,
-                    'amount': tax.amount,
-                    'amount_type': tax.amount_type,
-                    'price_include': tax.price_include,
-                })
-
-            # Récupérer le ribbon (badge) du produit
-            ribbon_data = None
-            if product.website_ribbon_id:
-                ribbon = product.website_ribbon_id
-                ribbon_name = ribbon.name
-                if isinstance(ribbon_name, dict):
-                    ribbon_name = ribbon_name.get('fr_FR', ribbon_name.get('en_US', ''))
-                ribbon_data = {
-                    'id': ribbon.id,
-                    'name': ribbon_name,
-                    'bg_color': ribbon.bg_color,
-                    'text_color': ribbon.text_color,
-                    'position': ribbon.position,
-                    'style': ribbon.style,
-                }
-
-            data = {
-                'id': product.id,
-                'name': product.name,
-                'description': product.description_sale or '',
-                'description_purchase': product.description_purchase or '',
-                'price': product.list_price,
-                'standard_price': product.standard_price,
-                'default_code': product.default_code or '',
-                'barcode': product.barcode or '',
-                'weight': product.weight or 0,
-                'volume': product.volume or 0,
-                'product_length': getattr(product, 'product_length', 0) or 0,
-                'product_width': getattr(product, 'product_width', 0) or 0,
-                'product_height': getattr(product, 'product_height', 0) or 0,
-                'type': product.type or 'consu',
-                'uom_id': product.uom_id.id if product.uom_id else None,
-                'uom_name': product.uom_id.name if product.uom_id else None,
-                'product_tag_ids': [{'id': tag.id, 'name': tag.name, 'color': tag.color if hasattr(tag, 'color') else 0} for tag in product.product_tag_ids] if product.product_tag_ids else [],
-                'image': f'/web/image/product.template/{product.id}/image_1920' if product.image_1920 else None,
-                'images': images,  # Liste complète des images
-                'slug': product.name.lower().replace(' ', '-'),
-                'qty_available': qty,
-                'virtual_available': product.virtual_available,
-                'stock_status': stock_status,
-                'active': product.active,
-                'create_date': product.create_date.isoformat() if product.create_date else None,
-                'variant_count': product.product_variant_count,
-                'category': {
-                    'id': product.categ_id.id,
-                    'name': product.categ_id.name,
-                } if product.categ_id else None,
-                'ribbon': ribbon_data,  # Badge/ruban du produit
-                'taxes': taxes,  # Taxes de vente applicables
-                # Champs marketing e-commerce
-                'is_featured': getattr(product, 'x_is_featured', False) or False,
-                'is_new': getattr(product, 'x_is_new', False) or False,
-                'is_bestseller': getattr(product, 'x_is_bestseller', False) or False,
-                'compare_at_price': product.compare_list_price if hasattr(product, 'compare_list_price') and product.compare_list_price else None,
-                'offer_end_date': getattr(product, 'x_offer_end_date', None).isoformat() if getattr(product, 'x_offer_end_date', None) else None,
-                # Champs contenu enrichi
-                'technical_description': getattr(product, 'x_technical_description', None) or None,
-                # Champs statistiques
-                'view_count': getattr(product, 'x_view_count', 0) or 0,
-            }
+            # Utiliser le helper pour sérialiser le produit
+            data = self._serialize_product_detail(product, include_ribbon=True)
 
             return {
                 'success': True,
@@ -747,113 +853,19 @@ class QuelyosAPI(http.Controller):
 
             # Incrémenter le compteur de vues (tracking) avec rate limiting
             # Limite: 1 vue par IP/produit toutes les 60 secondes
-            try:
-                # Récupérer l'IP du client
-                ip = request.httprequest.environ.get('HTTP_X_REAL_IP') or \
-                     request.httprequest.environ.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
-                     request.httprequest.remote_addr
-
-                cache_key = f"{ip}:{product.id}"
-                current_time = time.time()
-
-                # Vérifier le rate limit (60 secondes)
-                last_view = _view_count_cache.get(cache_key, 0)
-                if current_time - last_view >= 60:
+            if self._check_view_count_rate_limit(product.id):
+                try:
                     # Incrémenter de manière atomique (évite race condition)
                     request.env.cr.execute("""
                         UPDATE product_template
                         SET x_view_count = COALESCE(x_view_count, 0) + 1
                         WHERE id = %s
                     """, (product.id,))
-                    _view_count_cache[cache_key] = current_time
+                except Exception as view_err:
+                    _logger.warning(f"Could not increment view count: {view_err}")
 
-                    # Nettoyage du cache (supprimer entrées > 5 minutes)
-                    if len(_view_count_cache) > 10000:  # Éviter croissance infinie
-                        _view_count_cache.clear()
-            except Exception as view_err:
-                _logger.warning(f"Could not increment view count: {view_err}")
-
-            # Récupérer toutes les images du produit (product.image)
-            images = []
-            for img in product.product_template_image_ids.sorted('sequence'):
-                images.append({
-                    'id': img.id,
-                    'name': img.name or f'Image {img.sequence}',
-                    'url': f'/web/image/product.image/{img.id}/image_1920',
-                    'sequence': img.sequence,
-                })
-
-            # Calculer le stock depuis stock.quant (somme de toutes les variantes)
-            # Note: product.qty_available ne fonctionne pas correctement avec auth='public'
-            StockQuant = request.env['stock.quant'].sudo()
-            variant_ids = product.product_variant_ids.ids
-            quants = StockQuant.search([
-                ('product_id', 'in', variant_ids),
-                ('location_id.usage', '=', 'internal')
-            ])
-            qty = sum(quants.mapped('quantity')) if quants else 0.0
-
-            if qty <= 0:
-                stock_status = 'out_of_stock'
-            elif qty <= 5:
-                stock_status = 'low_stock'
-            else:
-                stock_status = 'in_stock'
-
-            # Récupérer les taxes applicables
-            taxes = []
-            for tax in product.taxes_id:
-                taxes.append({
-                    'id': tax.id,
-                    'name': tax.name,
-                    'amount': tax.amount,
-                    'amount_type': tax.amount_type,
-                    'price_include': tax.price_include,
-                })
-
-            data = {
-                'id': product.id,
-                'name': product.name,
-                'description': product.description_sale or '',
-                'description_purchase': product.description_purchase or '',
-                'price': product.list_price,
-                'standard_price': product.standard_price,
-                'default_code': product.default_code or '',
-                'barcode': product.barcode or '',
-                'weight': product.weight or 0,
-                'volume': product.volume or 0,
-                'product_length': getattr(product, 'product_length', 0) or 0,
-                'product_width': getattr(product, 'product_width', 0) or 0,
-                'product_height': getattr(product, 'product_height', 0) or 0,
-                'type': product.type or 'consu',
-                'uom_id': product.uom_id.id if product.uom_id else None,
-                'uom_name': product.uom_id.name if product.uom_id else None,
-                'product_tag_ids': [{'id': tag.id, 'name': tag.name, 'color': tag.color if hasattr(tag, 'color') else 0} for tag in product.product_tag_ids] if product.product_tag_ids else [],
-                'image': f'/web/image/product.template/{product.id}/image_1920' if product.image_1920 else None,
-                'images': images,
-                'slug': slug,  # Utiliser le slug passé en paramètre
-                'qty_available': qty,
-                'virtual_available': product.virtual_available,
-                'stock_status': stock_status,
-                'active': product.active,
-                'create_date': product.create_date.isoformat() if product.create_date else None,
-                'variant_count': product.product_variant_count,
-                'category': {
-                    'id': product.categ_id.id,
-                    'name': product.categ_id.name,
-                } if product.categ_id else None,
-                'taxes': taxes,
-                # Champs marketing e-commerce
-                'is_featured': getattr(product, 'x_is_featured', False) or False,
-                'is_new': getattr(product, 'x_is_new', False) or False,
-                'is_bestseller': getattr(product, 'x_is_bestseller', False) or False,
-                'compare_at_price': product.compare_list_price if hasattr(product, 'compare_list_price') and product.compare_list_price else None,
-                'offer_end_date': getattr(product, 'x_offer_end_date', None).isoformat() if getattr(product, 'x_offer_end_date', None) else None,
-                # Champs contenu enrichi
-                'technical_description': getattr(product, 'x_technical_description', None) or None,
-                # Champs statistiques
-                'view_count': getattr(product, 'x_view_count', 0) or 0,
-            }
+            # Utiliser le helper pour sérialiser le produit (sans ribbon pour cet endpoint)
+            data = self._serialize_product_detail(product, slug=slug, include_ribbon=False)
 
             return {
                 'success': True,

@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 const ODOO_URL = process.env.NEXT_PUBLIC_ODOO_URL || 'http://localhost:8069';
 
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error('Image proxy error:', error);
+    logger.error('Image proxy error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to proxy image' },
       { status: 500 }

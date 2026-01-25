@@ -12,6 +12,7 @@ import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { odooClient } from '@/lib/odoo/client';
 import type { Address } from '@/types';
+import { logger } from '@/lib/logger';
 
 export default function AccountAddressesPage() {
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function AccountAddressesPage() {
           setAddresses(result.addresses);
         }
       } catch (error) {
-        console.error('Erreur chargement adresses:', error);
+        logger.error('Erreur chargement adresses:', error);
       } finally {
         setIsLoading(false);
       }

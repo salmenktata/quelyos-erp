@@ -5,16 +5,13 @@ Contrôleurs CMS pour les menus, pages et configuration du site
 import logging
 from odoo import http
 from odoo.http import request
+from .base import BaseController
 
 _logger = logging.getLogger(__name__)
 
 
-class QuelyCMS(http.Controller):
+class QuelyCMS(BaseController):
     """API CMS pour menus, pages et configuration"""
-
-    def _get_params(self):
-        """Extrait les paramètres de la requête JSON-RPC"""
-        return request.params if hasattr(request, 'params') and request.params else {}
 
     # ==================== MENUS ====================
 
@@ -349,6 +346,11 @@ class QuelyCMS(http.Controller):
                     'comparison': get_param('quelyos.comparison_enabled', 'True') == 'True',
                     'reviews': get_param('quelyos.reviews_enabled', 'True') == 'True',
                     'guestCheckout': get_param('quelyos.guest_checkout', 'False') == 'True',
+                    'newsletter': get_param('quelyos.newsletter_enabled', 'True') == 'True',
+                },
+                'newsletter': {
+                    'delaySeconds': int(get_param('quelyos.newsletter_delay_seconds', '30')),
+                    'exitIntentEnabled': get_param('quelyos.newsletter_exit_intent', 'True') == 'True',
                 },
                 'assets': {
                     'logoUrl': get_param('quelyos.logo_url', ''),
@@ -366,4 +368,131 @@ class QuelyCMS(http.Controller):
 
         except Exception as e:
             _logger.error(f"Get site config error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/site-config/update', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def update_site_config(self, **kwargs):
+        """
+        Mettre à jour la configuration du site (ADMIN UNIQUEMENT)
+
+        Paramètres supportés:
+        - shipping: { freeThreshold, standardDaysMin, standardDaysMax, expressDaysMin, expressDaysMax }
+        - returns: { windowDays, refundDaysMin, refundDaysMax, warrantyYears }
+        - brand: { name, slogan, description, email, phone, whatsapp }
+        - social: { facebook, instagram, twitter, youtube, linkedin, tiktok }
+        - loyalty: { pointsRatio, defaultDiscountPercent }
+        - features: { wishlist, comparison, reviews, guestCheckout, newsletter }
+        - newsletter: { delaySeconds, exitIntentEnabled }
+        - assets: { logoUrl, primaryColor, secondaryColor }
+        """
+        try:
+            # Authentifier via le header X-Session-Id (pour les requêtes sans cookies)
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            # SECURITE : Vérifier que l'utilisateur a les droits admin
+            error = self._require_admin()
+            if error:
+                return error
+
+            params = self._get_params()
+
+            set_param = request.env['ir.config_parameter'].sudo().set_param
+
+            # Mapping des paramètres frontend -> Odoo
+            param_mapping = {
+                # Shipping
+                'shipping.freeThreshold': 'quelyos.shipping_free_threshold',
+                'shipping.standardDaysMin': 'quelyos.shipping_standard_days_min',
+                'shipping.standardDaysMax': 'quelyos.shipping_standard_days_max',
+                'shipping.expressDaysMin': 'quelyos.shipping_express_days_min',
+                'shipping.expressDaysMax': 'quelyos.shipping_express_days_max',
+                # Returns
+                'returns.windowDays': 'quelyos.returns_window_days',
+                'returns.refundDaysMin': 'quelyos.returns_refund_days_min',
+                'returns.refundDaysMax': 'quelyos.returns_refund_days_max',
+                'returns.warrantyYears': 'quelyos.warranty_years',
+                # Brand
+                'brand.name': 'quelyos.site_name',
+                'brand.slogan': 'quelyos.brand_slogan',
+                'brand.description': 'quelyos.brand_description',
+                'brand.email': 'quelyos.contact_email',
+                'brand.phone': 'quelyos.contact_phone',
+                'brand.whatsapp': 'quelyos.whatsapp',
+                # Social
+                'social.facebook': 'quelyos.social_facebook',
+                'social.instagram': 'quelyos.social_instagram',
+                'social.twitter': 'quelyos.social_twitter',
+                'social.youtube': 'quelyos.social_youtube',
+                'social.linkedin': 'quelyos.social_linkedin',
+                'social.tiktok': 'quelyos.social_tiktok',
+                # Loyalty
+                'loyalty.pointsRatio': 'quelyos.loyalty_points_ratio',
+                'loyalty.defaultDiscountPercent': 'quelyos.loyalty_default_discount_percent',
+                # Features
+                'features.wishlist': 'quelyos.wishlist_enabled',
+                'features.comparison': 'quelyos.comparison_enabled',
+                'features.reviews': 'quelyos.reviews_enabled',
+                'features.guestCheckout': 'quelyos.guest_checkout',
+                'features.newsletter': 'quelyos.newsletter_enabled',
+                # Newsletter
+                'newsletter.delaySeconds': 'quelyos.newsletter_delay_seconds',
+                'newsletter.exitIntentEnabled': 'quelyos.newsletter_exit_intent',
+                # Assets
+                'assets.logoUrl': 'quelyos.logo_url',
+                'assets.primaryColor': 'quelyos.primary_color',
+                'assets.secondaryColor': 'quelyos.secondary_color',
+            }
+
+            updated = []
+
+            # Mapping pour les paramètres plats (utilisés par le backoffice simple)
+            flat_param_mapping = {
+                'compare_enabled': 'quelyos.feature.compare_enabled',
+                'wishlist_enabled': 'quelyos.feature.wishlist_enabled',
+                'reviews_enabled': 'quelyos.feature.reviews_enabled',
+                'newsletter_enabled': 'quelyos.feature.newsletter_enabled',
+            }
+
+            # Traiter les paramètres plats (compare_enabled, wishlist_enabled, etc.)
+            for key, odoo_key in flat_param_mapping.items():
+                if key in params:
+                    value = 'true' if params[key] else 'false'
+                    set_param(odoo_key, value)
+                    updated.append(key)
+                    _logger.info(f"Updated site config: {key} -> {value}")
+
+            # Traiter les paramètres imbriqués
+            for section in ['shipping', 'returns', 'brand', 'social', 'loyalty', 'features', 'newsletter', 'assets']:
+                if section in params and isinstance(params[section], dict):
+                    for key, value in params[section].items():
+                        full_key = f"{section}.{key}"
+                        if full_key in param_mapping:
+                            odoo_key = param_mapping[full_key]
+                            # Convertir les booléens en chaînes
+                            if isinstance(value, bool):
+                                value = 'True' if value else 'False'
+                            set_param(odoo_key, str(value))
+                            updated.append(full_key)
+                            _logger.info(f"Updated site config: {full_key} -> {value}")
+
+            # Récupérer la configuration mise à jour pour les paramètres simples
+            get_param = request.env['ir.config_parameter'].sudo().get_param
+            config_data = {
+                'compare_enabled': get_param('quelyos.feature.compare_enabled', 'true') == 'true',
+                'wishlist_enabled': get_param('quelyos.feature.wishlist_enabled', 'true') == 'true',
+                'reviews_enabled': get_param('quelyos.feature.reviews_enabled', 'true') == 'true',
+                'newsletter_enabled': get_param('quelyos.feature.newsletter_enabled', 'true') == 'true',
+            }
+
+            return {
+                'success': True,
+                'data': config_data,
+                'message': f'Configuration mise à jour ({len(updated)} paramètre(s))',
+                'updated': updated
+            }
+
+        except Exception as e:
+            _logger.error(f"Update site config error: {e}")
             return {'success': False, 'error': str(e)}

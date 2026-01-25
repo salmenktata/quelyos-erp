@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Product, VariantsResponse, ExtendedProductVariant, ProductImage } from '@/types';
+import { logger } from '@/lib/logger';
 
 interface UseProductVariantsReturn {
   // État
@@ -55,7 +56,7 @@ export function useProductVariants(product: Product | null): UseProductVariantsR
 
       // Si 404, l'endpoint n'existe pas (produit sans variantes) - pas d'erreur
       if (res.status === 404) {
-        console.log(`Endpoint variantes non trouvé pour produit ${productId} (probablement sans variantes)`);
+        logger.debug(`Endpoint variantes non trouvé pour produit ${productId} (probablement sans variantes)`);
         return;
       }
 
@@ -79,7 +80,7 @@ export function useProductVariants(product: Product | null): UseProductVariantsR
         }
       }
     } catch (error) {
-      console.error('Erreur chargement variantes:', error);
+      logger.error('Erreur chargement variantes:', error);
     } finally {
       setIsLoadingVariants(false);
     }

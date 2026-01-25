@@ -5,6 +5,7 @@ import { useStockMoves } from '../hooks/useStock'
 import { Badge, Button, Breadcrumbs, SkeletonTable, Input } from '../components/common'
 import { useToast } from '../contexts/ToastContext'
 import { api } from '../lib/api'
+import { logger } from '../lib/logger'
 import {
   ArrowsRightLeftIcon,
   ArrowDownTrayIcon,
@@ -126,7 +127,7 @@ export default function StockMoves() {
 
       toast.success(`${allMoves.length} mouvements exportés avec succès`)
     } catch (error) {
-      console.error('Export CSV error:', error)
+      logger.error('Export CSV error:', error)
       toast.error('Erreur lors de l\'export CSV')
     }
   }

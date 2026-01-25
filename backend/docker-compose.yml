@@ -20,6 +20,22 @@ services:
     networks:
       - quelyos-network
 
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: quelyos-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - quelyos-network
+
   # Odoo Backend
   odoo:
     image: odoo:19.0
@@ -28,10 +44,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       HOST: db
       USER: ${DB_USER:-odoo}
       PASSWORD: ${DB_PASSWORD:-odoo}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     volumes:
       - odoo_data:/var/lib/odoo
       - odoo_config:/etc/odoo

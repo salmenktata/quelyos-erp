@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Badge } from '@/components/common';
 import { useCartStore } from '@/store/cartStore';
+import { logger } from '@/lib/logger';
 
 interface CartSummaryProps {
   cart: {
@@ -44,7 +45,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     try {
       await removeCoupon();
     } catch (error) {
-      console.error('Failed to remove coupon:', error);
+      logger.error('Failed to remove coupon:', error);
     }
   };
 

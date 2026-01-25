@@ -15,6 +15,7 @@ import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
 import { odooClient } from '@/lib/odoo/client';
 import type { WishlistItem } from '@/types';
+import { logger } from '@/lib/logger';
 
 export default function AccountWishlistPage() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function AccountWishlistPage() {
           setWishlist(result.wishlist);
         }
       } catch (error) {
-        console.error('Erreur chargement wishlist:', error);
+        logger.error('Erreur chargement wishlist:', error);
       } finally {
         setIsLoading(false);
       }
@@ -65,7 +66,7 @@ export default function AccountWishlistPage() {
         throw new Error(result.error || 'Erreur suppression wishlist');
       }
     } catch (error: any) {
-      console.error('Erreur suppression wishlist:', error);
+      logger.error('Erreur suppression wishlist:', error);
       alert(error.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setRemovingId(null);

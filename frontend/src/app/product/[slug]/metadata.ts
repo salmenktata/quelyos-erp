@@ -6,6 +6,7 @@
 import { Metadata } from 'next';
 import { getProductSeoMetadata } from '@/lib/seo/metadata';
 import { odooClient } from '@/lib/odoo/client';
+import { logger } from '@/lib/logger';
 
 interface Props {
   params: { slug: string };
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // Fetch SEO metadata from Odoo
     return await getProductSeoMetadata(productId);
   } catch (error) {
-    console.error('Error generating product metadata:', error);
+    logger.error('Error generating product metadata:', error);
     return {
       title: 'Product',
       description: 'View product details',
@@ -72,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 //       slug: product.slug || String(product.id),
 //     }));
 //   } catch (error) {
-//     console.error('Error generating static params:', error);
+//     logger.error('Error generating static params:', error);
 //     return [];
 //   }
 // }

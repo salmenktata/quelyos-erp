@@ -26,7 +26,9 @@ import type {
   CartRecoveryStats,
   OrderHistoryItem,
   ShippingTrackingInfo,
+  Ribbon,
 } from '../types'
+import { logger } from './logger'
 
 // En développement, utiliser le proxy Vite (pas de CORS)
 // En production, utiliser l'URL complète
@@ -51,7 +53,7 @@ class ApiClient {
 
   private async request<T>(endpoint: string, data?: unknown): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
-    console.log('[API] request() ->', endpoint, 'URL:', url)
+    logger.debug('[API] request() ->', endpoint, 'URL:', url)
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -62,7 +64,7 @@ class ApiClient {
       headers['X-Session-Id'] = this.sessionId
     }
 
-    console.log('[API] Sending fetch to:', url)
+    logger.debug('[API] Sending fetch to:', url)
     const response = await fetch(url, {
       method: 'POST',
       headers,
@@ -75,7 +77,7 @@ class ApiClient {
         id: Math.random(),
       }),
     })
-    console.log('[API] Response status:', response.status, response.statusText)
+    logger.debug('[API] Response status:', response.status, response.statusText)
 
     if (!response.ok) {
       if (response.status === 401 && !import.meta.env.DEV) {
@@ -123,23 +125,23 @@ class ApiClient {
   // ==================== AUTH ====================
 
   async login(email: string, password: string): Promise<LoginResponse> {
-    console.log('[API] login() called with email:', email)
+    logger.debug('[API] login() called with email:', email)
     const result = await this.request<LoginResponse>('/api/ecommerce/auth/login', {
       email,
       password,
     })
-    console.log('[API] login() result:', result)
+    logger.debug('[API] login() result:', result)
 
     if (result.success && result.session_id) {
-      console.log('[API] Login successful, storing session')
+      logger.debug('[API] Login successful, storing session')
       this.sessionId = result.session_id
       localStorage.setItem('session_id', result.session_id)
       if (result.user) {
         localStorage.setItem('user', JSON.stringify(result.user))
       }
-      console.log('[API] Session stored:', this.sessionId?.substring(0, 20) + '...')
+      logger.debug('[API] Session stored:', this.sessionId?.substring(0, 20) + '...')
     } else {
-      console.log('[API] Login failed or no session_id:', result)
+      logger.warn('[API] Login failed or no session_id:', result)
     }
 
     return result
@@ -255,6 +257,19 @@ class ApiClient {
         }
       }>
     >('/api/ecommerce/products/import', data)
+  }
+
+  // ==================== RIBBONS (BADGES) ====================
+
+  async getRibbons() {
+    return this.request<ApiResponse<{ ribbons: Ribbon[] }>>('/api/ecommerce/ribbons')
+  }
+
+  async updateProductRibbon(productId: number, ribbonId: number | null) {
+    return this.request<ApiResponse<{ message: string }>>(
+      `/api/ecommerce/products/${productId}/ribbon`,
+      { ribbon_id: ribbonId }
+    )
   }
 
   // Taxes
@@ -1562,6 +1577,123 @@ class ApiClient {
       data: import('../types').SubscriptionListItem[]
       total: number
     }>('/api/ecommerce/subscription/admin/list', params)
+  }
+
+  // ==================== SITE CONFIGURATION ====================
+
+  async getSiteConfig() {
+    return this.request<ApiResponse<{
+      config: {
+        brand: {
+          name: string
+          slogan: string
+          description: string
+          email: string
+          phone: string
+          phoneFormatted: string
+          whatsapp: string
+        }
+        social: {
+          facebook: string
+          instagram: string
+          twitter: string
+          youtube: string
+          linkedin: string
+          tiktok: string
+        }
+        shipping: {
+          freeThreshold: number
+          standardDaysMin: number
+          standardDaysMax: number
+          expressDaysMin: number
+          expressDaysMax: number
+        }
+        returns: {
+          windowDays: number
+          refundDaysMin: number
+          refundDaysMax: number
+          warrantyYears: number
+        }
+        customerService: {
+          hoursStart: number
+          hoursEnd: number
+          days: string
+        }
+        loyalty: {
+          pointsRatio: number
+          defaultDiscountPercent: number
+        }
+        currency: {
+          code: string
+          symbol: string
+        }
+        seo: {
+          siteUrl: string
+          title: string
+          description: string
+        }
+        features: {
+          wishlist: boolean
+          comparison: boolean
+          reviews: boolean
+          guestCheckout: boolean
+        }
+        assets: {
+          logoUrl: string
+          primaryColor: string
+          secondaryColor: string
+        }
+      }
+    }>>('/api/ecommerce/site-config')
+  }
+
+  async updateSiteConfig(data: {
+    shipping?: {
+      freeThreshold?: number
+      standardDaysMin?: number
+      standardDaysMax?: number
+      expressDaysMin?: number
+      expressDaysMax?: number
+    }
+    returns?: {
+      windowDays?: number
+      refundDaysMin?: number
+      refundDaysMax?: number
+      warrantyYears?: number
+    }
+    brand?: {
+      name?: string
+      slogan?: string
+      description?: string
+      email?: string
+      phone?: string
+      whatsapp?: string
+    }
+    social?: {
+      facebook?: string
+      instagram?: string
+      twitter?: string
+      youtube?: string
+      linkedin?: string
+      tiktok?: string
+    }
+    loyalty?: {
+      pointsRatio?: number
+      defaultDiscountPercent?: number
+    }
+    features?: {
+      wishlist?: boolean
+      comparison?: boolean
+      reviews?: boolean
+      guestCheckout?: boolean
+    }
+    assets?: {
+      logoUrl?: string
+      primaryColor?: string
+      secondaryColor?: string
+    }
+  }) {
+    return this.request<ApiResponse<{ message: string; updated: string[] }>>('/api/ecommerce/site-config/update', data)
   }
 }
 

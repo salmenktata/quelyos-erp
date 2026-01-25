@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 const ODOO_URL = process.env.NEXT_PUBLIC_ODOO_URL || 'http://localhost:8069';
 
@@ -53,9 +54,16 @@ export async function POST(
     }
 
     // Return the result
-    return NextResponse.json(data.result);
+    // Some Odoo endpoints are type='http' and return data directly (not wrapped in JSON-RPC)
+    // Others are type='json' and return {jsonrpc, id, result}
+    if (data.result !== undefined) {
+      return NextResponse.json(data.result);
+    } else {
+      // Direct HTTP response (not JSON-RPC wrapped)
+      return NextResponse.json(data);
+    }
   } catch (error: any) {
-    console.error('Proxy error:', error);
+    logger.error('Proxy error:', error);
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }
@@ -111,9 +119,17 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(data.result);
+    // Return the result
+    // Some Odoo endpoints are type='http' and return data directly (not wrapped in JSON-RPC)
+    // Others are type='json' and return {jsonrpc, id, result}
+    if (data.result !== undefined) {
+      return NextResponse.json(data.result);
+    } else {
+      // Direct HTTP response (not JSON-RPC wrapped)
+      return NextResponse.json(data);
+    }
   } catch (error: any) {
-    console.error('Proxy error:', error);
+    logger.error('Proxy error:', error);
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }

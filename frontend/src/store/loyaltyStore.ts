@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { odooClient } from '@/lib/odoo/client';
+import { logger } from '@/lib/logger';
 
 interface LoyaltyTier {
   id: number;
@@ -71,7 +72,7 @@ export const useLoyaltyStore = create<LoyaltyStore>((set, get) => ({
         set({ error: response.message || 'Failed to fetch loyalty balance', loading: false });
       }
     } catch (error: any) {
-      console.error('Error fetching loyalty balance:', error);
+      logger.error('Error fetching loyalty balance:', error);
       set({
         error: error.message || 'An error occurred while fetching loyalty balance',
         loading: false
@@ -87,7 +88,7 @@ export const useLoyaltyStore = create<LoyaltyStore>((set, get) => ({
         set({ tiers: response.data.tiers });
       }
     } catch (error: any) {
-      console.error('Error fetching loyalty tiers:', error);
+      logger.error('Error fetching loyalty tiers:', error);
     }
   },
 
@@ -121,7 +122,7 @@ export const useLoyaltyStore = create<LoyaltyStore>((set, get) => ({
         };
       }
     } catch (error: any) {
-      console.error('Error redeeming points:', error);
+      logger.error('Error redeeming points:', error);
       set({
         error: error.message || 'An error occurred while redeeming points',
         loading: false
@@ -147,7 +148,7 @@ export const useLoyaltyStore = create<LoyaltyStore>((set, get) => ({
 
       return { points: 0, program_active: false };
     } catch (error: any) {
-      console.error('Error calculating points:', error);
+      logger.error('Error calculating points:', error);
       return { points: 0, program_active: false };
     }
   },

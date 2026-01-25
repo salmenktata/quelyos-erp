@@ -12,6 +12,7 @@ import type {
   GetPagesOptions,
   PagesResponse,
 } from '@/types/cms';
+import { logger } from '../logger';
 
 // Use absolute URL for SSR, relative for client-side
 const getApiBase = () => {
@@ -43,12 +44,12 @@ async function jsonrpc<T = any>(
   } catch (error: any) {
     // Gestion gracieuse des 404 pour les endpoints CMS non implémentés
     if (error.response?.status === 404 && !throwOn404) {
-      console.warn(`CMS endpoint not implemented: ${endpoint}`);
+      logger.warn(`Endpoint CMS non implémenté: ${endpoint}`);
       // Retourner une structure par défaut selon le type de réponse attendu
       return { success: false, error: 'Not implemented' } as T;
     }
 
-    console.error(`CMS API Error [${endpoint}]:`, error);
+    logger.error(`Erreur API CMS [${endpoint}]:`, error);
     const errorMessage =
       error.response?.data?.error ||
       error.response?.data?.message ||

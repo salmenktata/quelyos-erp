@@ -14,6 +14,7 @@ import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
 import { odooClient } from '@/lib/odoo/client';
 import type { Order } from '@/types';
+import { logger } from '@/lib/logger';
 
 const orderStates = {
   draft: { label: 'Brouillon', color: 'gray' },
@@ -47,7 +48,7 @@ export default function OrderDetailPage() {
           setOrder(null);
         }
       } catch (error) {
-        console.error('Erreur lors du chargement de la commande:', error);
+        logger.error('Erreur lors du chargement de la commande:', error);
         setOrder(null);
       } finally {
         setIsLoading(false);

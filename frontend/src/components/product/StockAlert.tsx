@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { odooClient } from '@/lib/odoo/client';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/common';
+import { logger } from '@/lib/logger';
 
 interface StockAlertProps {
   productId: number;
@@ -45,7 +46,7 @@ export function StockAlert({ productId, productName }: StockAlertProps) {
         setSubscriptionId(response.data.subscription_id || null);
       }
     } catch (error) {
-      console.error('Error checking subscription status:', error);
+      logger.error('Error checking subscription status:', error);
     }
   };
 
@@ -76,7 +77,7 @@ export function StockAlert({ productId, productName }: StockAlertProps) {
         setError(response.message || 'Échec de l\'inscription');
       }
     } catch (err: any) {
-      console.error('Error subscribing to stock alert:', err);
+      logger.error('Error subscribing to stock alert:', err);
       setError(err.message || 'Une erreur est survenue');
     } finally {
       setLoading(false);
@@ -104,7 +105,7 @@ export function StockAlert({ productId, productName }: StockAlertProps) {
         setError(response.message || 'Échec de la désinscription');
       }
     } catch (err: any) {
-      console.error('Error unsubscribing from stock alert:', err);
+      logger.error('Error unsubscribing from stock alert:', err);
       setError(err.message || 'Une erreur est survenue');
     } finally {
       setLoading(false);

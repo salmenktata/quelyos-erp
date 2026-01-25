@@ -10,6 +10,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useComparisonStore } from '@/store/comparisonStore';
 import { useCartStore } from '@/store/cartStore';
+import { useSiteConfig } from '@/hooks/useSiteConfig';
 import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
 
@@ -17,6 +18,14 @@ export default function ComparePage() {
   const router = useRouter();
   const { products, removeProduct, clearComparison } = useComparisonStore();
   const { addToCart } = useCartStore();
+  const { data: siteConfig, isLoading } = useSiteConfig();
+
+  // Rediriger si la comparaison est désactivée
+  useEffect(() => {
+    if (!isLoading && siteConfig && !siteConfig.compare_enabled) {
+      router.push('/products');
+    }
+  }, [siteConfig, isLoading, router]);
 
   // Rediriger si aucun produit
   useEffect(() => {

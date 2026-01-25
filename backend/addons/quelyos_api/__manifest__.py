@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos API',
-    'version': '19.0.1.0.20',
+    'version': '19.0.1.0.22',
     'category': 'Website',
     'summary': 'API REST pour frontend e-commerce et backoffice',
     'author': 'Quelyos',
@@ -9,6 +9,7 @@
     'license': 'LGPL-3',
     'depends': [
         'base',
+        'mail',
         'sale_management',
         'stock',
         'website',
@@ -19,6 +20,8 @@
         'data/subscription_sequence.xml',
         'data/ir_cron_stock_alerts.xml',
         'data/ir_cron_abandoned_cart.xml',
+        'views/tenant_views.xml',
+        'views/menu_views.xml',
     ],
     'installable': True,
     'application': True,

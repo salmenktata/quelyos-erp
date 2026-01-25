@@ -6,7 +6,9 @@ import { Button } from '@/components/common';
 import { LoadingSpinner } from '@/components/common/Loading';
 import CartItem from './CartItem';
 import CartSummary from './CartSummary';
+import { FreeShippingBar } from './FreeShippingBar';
 import { useCartStore } from '@/store/cartStore';
+import { logger } from '@/lib/logger';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -40,7 +42,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       try {
         await clearCart();
       } catch (error) {
-        console.error('Failed to clear cart:', error);
+        logger.error('Failed to clear cart:', error);
       }
     }
   };
@@ -148,6 +150,12 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                     </button>
                   </div>
                 )}
+
+                {/* Barre de progression livraison gratuite */}
+                <FreeShippingBar
+                  cartTotal={cart.amount_total || 0}
+                  className="mt-4"
+                />
               </div>
 
               {/* Summary Footer */}

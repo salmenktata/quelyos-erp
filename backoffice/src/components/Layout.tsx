@@ -23,6 +23,9 @@ import {
   ArrowLeftOnRectangleIcon,
   ChevronDownIcon,
   ChevronRightIcon,
+  Cog6ToothIcon,
+  ClipboardDocumentListIcon,
+  BuildingOffice2Icon,
 } from '@heroicons/react/24/outline'
 import { useAnalyticsStats } from '../hooks/useAnalytics'
 
@@ -222,6 +225,16 @@ export function Layout({ children }: LayoutProps) {
           path: '/customers',
           icon: UserGroupIcon,
         },
+        {
+          name: 'Catégories Clients',
+          path: '/customer-categories',
+          icon: TagIcon,
+        },
+        {
+          name: 'Listes de Prix',
+          path: '/pricelists',
+          icon: ClipboardDocumentListIcon,
+        },
       ],
     },
     {
@@ -260,6 +273,11 @@ export function Layout({ children }: LayoutProps) {
           path: '/stock/moves',
           icon: ArrowsRightLeftIcon,
         },
+        {
+          name: 'Entrepôts',
+          path: '/warehouses',
+          icon: BuildingOffice2Icon,
+        },
       ],
     },
     {
@@ -287,6 +305,16 @@ export function Layout({ children }: LayoutProps) {
       name: 'Configuration',
       defaultOpen: false,
       items: [
+        {
+          name: 'Ma Boutique',
+          path: '/my-shop',
+          icon: BuildingStorefrontIcon,
+        },
+        {
+          name: 'Configuration du site',
+          path: '/site-config',
+          icon: Cog6ToothIcon,
+        },
         {
           name: 'Livraison',
           path: '/delivery',

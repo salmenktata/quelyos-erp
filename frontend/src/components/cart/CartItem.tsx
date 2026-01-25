@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/common';
 import { useCartStore } from '@/store/cartStore';
+import { logger } from '@/lib/logger';
 
 interface CartItemProps {
   item: {
@@ -38,7 +39,7 @@ const CartItem: React.FC<CartItemProps> = ({
     try {
       await updateQuantity(item.id, newQuantity);
     } catch (error) {
-      console.error('Failed to update quantity:', error);
+      logger.error('Failed to update quantity:', error);
     } finally {
       setIsUpdating(false);
     }
@@ -49,7 +50,7 @@ const CartItem: React.FC<CartItemProps> = ({
     try {
       await removeItem(item.id);
     } catch (error) {
-      console.error('Failed to remove item:', error);
+      logger.error('Failed to remove item:', error);
       setIsRemoving(false);
     }
   };
@@ -66,6 +67,7 @@ const CartItem: React.FC<CartItemProps> = ({
             src={imageUrl}
             alt={item.product_name}
             fill
+            sizes="64px"
             className="object-cover rounded"
           />
         </div>
@@ -92,6 +94,7 @@ const CartItem: React.FC<CartItemProps> = ({
           src={imageUrl}
           alt={item.product_name}
           fill
+          sizes="96px"
           className="object-cover rounded-lg"
         />
       </div>

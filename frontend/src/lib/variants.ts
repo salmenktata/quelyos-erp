@@ -5,6 +5,7 @@
 
 import { VariantsResponse } from '@/types';
 import { odooClient } from './odoo/client';
+import { logger } from './logger';
 
 // Cache globale avec TTL 5 minutes
 const variantsCache = new Map<number, {
@@ -27,7 +28,7 @@ export async function fetchVariantsLazy(productId: number): Promise<VariantsResp
     }
 
     // Fetch depuis l'API
-    const response = await odooClient.jsonrpc(`/products/${productId}/variants`, {});
+    const response = await odooClient.getProductVariants(productId);
 
     // Stocker en cache si succès
     if (response.success) {
@@ -40,7 +41,7 @@ export async function fetchVariantsLazy(productId: number): Promise<VariantsResp
 
     return null;
   } catch (error) {
-    console.error(`Error fetching variants for product ${productId}:`, error);
+    logger.error(`Erreur lors de la récupération des variantes du produit ${productId}:`, error);
     return null;
   }
 }
@@ -81,7 +82,7 @@ export const colorToHex: Record<string, string> = {
   'blue': '#3B82F6',
   'green': '#22C55E',
   'yellow': '#EAB308',
-  'orange': '#F97316',
+  // 'orange': already defined in French section (same word)
   'pink': '#EC4899',
   'purple': '#8B5CF6',
   'gray': '#6B7280',

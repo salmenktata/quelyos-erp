@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { odooClient } from '@/lib/odoo/client';
+import { logger } from '@/lib/logger';
 
 interface PriceRange {
   min: number;
@@ -109,7 +110,7 @@ export function ProductFilters({ categoryId, onFiltersChange }: ProductFiltersPr
         setFacets(response.data);
       }
     } catch (error) {
-      console.error('Error loading facets:', error);
+      logger.error('Error loading facets:', error);
     } finally {
       setLoading(false);
     }

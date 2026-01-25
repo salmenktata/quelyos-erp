@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
 import { useSearchHistoryStore } from '@/store/searchHistoryStore';
+import { logger } from '@/lib/logger';
 
 interface Product {
   id: number;
@@ -101,7 +102,7 @@ export function SearchAutocomplete({
         }
       } catch (error) {
         // Silently fail - popular searches are optional
-        console.debug('Popular searches not available');
+        logger.debug('Popular searches not available');
       }
     };
     fetchPopular();
@@ -130,7 +131,7 @@ export function SearchAutocomplete({
         setIsOpen(true);
       }
     } catch (error) {
-      console.error('Search autocomplete error:', error);
+      logger.error('Search autocomplete error:', error);
     } finally {
       setIsLoading(false);
     }

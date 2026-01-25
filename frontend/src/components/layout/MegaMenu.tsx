@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { odooClient } from '@/lib/odoo/client';
+import { logger } from '@/lib/logger';
 
 interface Subcategory {
   id: number;
@@ -79,7 +80,7 @@ export function MegaMenu() {
         setCategories(topLevelCategories);
       }
     } catch (error) {
-      console.error('Error loading categories:', error);
+      logger.error('Error loading categories:', error);
     } finally {
       setLoading(false);
     }

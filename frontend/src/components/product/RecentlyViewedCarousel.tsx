@@ -7,10 +7,27 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { Motion } from '@/components/common/Motion';
 import { useRecentlyViewedStore } from '@/store/recentlyViewedStore';
 import { formatPrice } from '@/lib/utils/formatting';
 import { staggerContainer, staggerItem } from '@/lib/animations/variants';
+
+// Helper function to proxy Odoo images through Next.js API
+function getProxiedImageUrl(url: string | undefined): string {
+  if (!url) return '';
+  if (url.startsWith('/api/image')) return url;
+  if (url.startsWith('/') && !url.includes('/web/image')) return url;
+
+  const isOdooImage = url.includes('/web/image') ||
+    url.includes('localhost:8069') ||
+    url.includes('odoo:8069');
+
+  if (isOdooImage) {
+    return `/api/image?url=${encodeURIComponent(url)}`;
+  }
+
+  return url;
+}
 
 export const RecentlyViewedCarousel: React.FC = () => {
   const { products } = useRecentlyViewedStore();
@@ -29,7 +46,7 @@ export const RecentlyViewedCarousel: React.FC = () => {
   };
 
   return (
-    <motion.section
+    <Motion.section
       variants={staggerContainer}
       initial="hidden"
       animate="visible"
@@ -69,7 +86,7 @@ export const RecentlyViewedCarousel: React.FC = () => {
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {products.map((product, index) => (
-          <motion.div
+          <Motion.div
             key={product.id}
             variants={staggerItem}
             custom={index}
@@ -83,7 +100,7 @@ export const RecentlyViewedCarousel: React.FC = () => {
               <div className="relative aspect-square bg-gray-100 overflow-hidden">
                 {product.image_url ? (
                   <img
-                    src={product.image_url}
+                    src={getProxiedImageUrl(product.image_url)}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
@@ -108,7 +125,7 @@ export const RecentlyViewedCarousel: React.FC = () => {
                 </div>
               </div>
             </Link>
-          </motion.div>
+          </Motion.div>
         ))}
       </div>
 
@@ -118,7 +135,7 @@ export const RecentlyViewedCarousel: React.FC = () => {
           display: none;
         }
       `}</style>
-    </motion.section>
+    </Motion.section>
   );
 };
 

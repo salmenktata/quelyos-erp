@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================ -->
+    <!-- TENANT FORM VIEW -->
+    <!-- ============================================================ -->
+    <record id="view_quelyos_tenant_form" model="ir.ui.view">
+        <field name="name">quelyos.tenant.form</field>
+        <field name="model">quelyos.tenant</field>
+        <field name="arch" type="xml">
+            <form string="Tenant">
+                <header>
+                    <button name="action_create_admin_user"
+                            string="Créer utilisateur admin"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not admin_email or user_ids"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_users"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-users">
+                            <field name="users_count" widget="statinfo" string="Utilisateurs"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archivé" bg_color="bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom de la boutique"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Identification">
+                            <field name="code"/>
+                            <field name="domain"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Abonnement">
+                            <field name="plan_id" options="{'no_create': True}"/>
+                            <field name="subscription_id" readonly="1"/>
+                            <field name="subscription_state" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Premier Utilisateur (Admin)">
+                        <field name="admin_email" placeholder="admin@client.com"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Branding" name="branding">
+                            <group>
+                                <group>
+                                    <field name="logo" widget="image" class="oe_avatar"/>
+                                    <field name="favicon" widget="image"/>
+                                </group>
+                                <group>
+                                    <field name="slogan"/>
+                                    <field name="font_family"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="description" placeholder="Description de la boutique..."/>
+                            </group>
+                        </page>
+
+                        <page string="Couleurs" name="colors">
+                            <group>
+                                <group string="Couleurs Principales">
+                                    <field name="primary_color" widget="color"/>
+                                    <field name="primary_dark" widget="color"/>
+                                    <field name="primary_light" widget="color"/>
+                                </group>
+                                <group string="Couleurs Secondaires">
+                                    <field name="secondary_color" widget="color"/>
+                                    <field name="secondary_dark" widget="color"/>
+                                    <field name="secondary_light" widget="color"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Accent et Fond">
+                                    <field name="accent_color" widget="color"/>
+                                    <field name="background_color" widget="color"/>
+                                    <field name="foreground_color" widget="color"/>
+                                </group>
+                                <group string="Éléments UI">
+                                    <field name="muted_color" widget="color"/>
+                                    <field name="muted_foreground" widget="color"/>
+                                    <field name="border_color" widget="color"/>
+                                    <field name="ring_color" widget="color"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Contact" name="contact">
+                            <group>
+                                <group>
+                                    <field name="email"/>
+                                    <field name="phone"/>
+                                    <field name="whatsapp"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Réseaux Sociaux" name="social">
+                            <group>
+                                <group>
+                                    <field name="social_facebook" placeholder="https://facebook.com/..."/>
+                                    <field name="social_instagram" placeholder="https://instagram.com/..."/>
+                                    <field name="social_twitter" placeholder="https://x.com/..."/>
+                                </group>
+                                <group>
+                                    <field name="social_youtube" placeholder="https://youtube.com/..."/>
+                                    <field name="social_linkedin" placeholder="https://linkedin.com/..."/>
+                                    <field name="social_tiktok" placeholder="https://tiktok.com/..."/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="SEO" name="seo">
+                            <group>
+                                <field name="meta_title" placeholder="Titre pour les moteurs de recherche"/>
+                                <field name="meta_description" placeholder="Description SEO (max 160 caractères)"/>
+                            </group>
+                        </page>
+
+                        <page string="Options" name="options">
+                            <group>
+                                <group string="Mode Sombre">
+                                    <field name="enable_dark_mode"/>
+                                    <field name="default_dark" invisible="not enable_dark_mode"/>
+                                </group>
+                                <group string="Fonctionnalités">
+                                    <field name="feature_wishlist"/>
+                                    <field name="feature_comparison"/>
+                                    <field name="feature_reviews"/>
+                                    <field name="feature_newsletter"/>
+                                    <field name="feature_guest_checkout"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Utilisateurs" name="users">
+                            <group>
+                                <group>
+                                    <field name="users_count" readonly="1"/>
+                                    <field name="max_users" readonly="1"/>
+                                </group>
+                            </group>
+                            <p class="text-muted">
+                                Cliquez sur le bouton "Utilisateurs" en haut du formulaire pour voir la liste des utilisateurs liés à ce tenant.
+                            </p>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- TENANT TREE VIEW -->
+    <!-- ============================================================ -->
+    <record id="view_quelyos_tenant_tree" model="ir.ui.view">
+        <field name="name">quelyos.tenant.tree</field>
+        <field name="model">quelyos.tenant</field>
+        <field name="arch" type="xml">
+            <list string="Tenants" decoration-muted="not active">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="domain"/>
+                <field name="plan_id"/>
+                <field name="subscription_state"
+                       decoration-success="subscription_state == 'active'"
+                       decoration-warning="subscription_state == 'trial'"
+                       decoration-danger="subscription_state in ('past_due', 'expired', 'cancelled')"
+                       widget="badge"/>
+                <field name="users_count"/>
+                <field name="active" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- TENANT KANBAN VIEW -->
+    <!-- ============================================================ -->
+    <record id="view_quelyos_tenant_kanban" model="ir.ui.view">
+        <field name="name">quelyos.tenant.kanban</field>
+        <field name="model">quelyos.tenant</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="domain"/>
+                <field name="subscription_state"/>
+                <field name="users_count"/>
+                <field name="logo"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <t t-if="record.logo.raw_value">
+                                    <img t-att-src="kanban_image('quelyos.tenant', 'logo', record.id.raw_value)" alt="Logo"/>
+                                </t>
+                                <t t-else="">
+                                    <span class="fa fa-store fa-2x text-muted"/>
+                                </t>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="o_kanban_record_subtitle text-muted">
+                                    <field name="domain"/>
+                                </div>
+                                <div class="mt-2">
+                                    <span t-att-class="'badge ' + (record.subscription_state.raw_value == 'active' ? 'text-bg-success' : (record.subscription_state.raw_value == 'trial' ? 'text-bg-warning' : 'text-bg-danger'))">
+                                        <field name="subscription_state"/>
+                                    </span>
+                                    <span class="badge text-bg-info ms-1">
+                                        <field name="users_count"/> utilisateurs
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- TENANT SEARCH VIEW -->
+    <!-- ============================================================ -->
+    <record id="view_quelyos_tenant_search" model="ir.ui.view">
+        <field name="name">quelyos.tenant.search</field>
+        <field name="model">quelyos.tenant</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher Tenants">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="domain"/>
+                <filter string="Actifs" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archivés" name="archived" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="En essai" name="trial" domain="[('subscription_state', '=', 'trial')]"/>
+                <filter string="Actifs (abonnement)" name="subscription_active" domain="[('subscription_state', '=', 'active')]"/>
+                <filter string="Expirés" name="expired" domain="[('subscription_state', 'in', ('expired', 'cancelled'))]"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Plan" name="group_plan" context="{'group_by': 'plan_id'}"/>
+                    <filter string="État" name="group_state" context="{'group_by': 'subscription_state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- TENANT ACTION -->
+    <!-- ============================================================ -->
+    <record id="action_quelyos_tenant" model="ir.actions.act_window">
+        <field name="name">Tenants / Boutiques</field>
+        <field name="res_model">quelyos.tenant</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_quelyos_tenant_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre premier tenant !
+            </p>
+            <p>
+                Un tenant représente un client (boutique/marque) avec son propre branding.
+            </p>
+        </field>
+    </record>
+</odoo>

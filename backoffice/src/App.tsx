@@ -11,6 +11,7 @@ import OrderDetail from './pages/OrderDetail'
 import Customers from './pages/Customers'
 import CustomerDetail from './pages/CustomerDetail'
 import Products from './pages/Products'
+import ProductDetail from './pages/ProductDetail'
 import ProductForm from './pages/ProductForm'
 import Categories from './pages/Categories'
 import Coupons from './pages/Coupons'
@@ -19,6 +20,7 @@ import Stock from './pages/Stock'
 import Inventory from './pages/Inventory'
 import StockMoves from './pages/StockMoves'
 import DeliveryMethods from './pages/DeliveryMethods'
+import SiteConfig from './pages/SiteConfig'
 import Payments from './pages/Payments'
 import Featured from './pages/Featured'
 import Analytics from './pages/Analytics'
@@ -26,6 +28,12 @@ import Invoices from './pages/Invoices'
 import AbandonedCarts from './pages/AbandonedCarts'
 import Subscriptions from './pages/Subscriptions'
 import SubscriptionForm from './pages/SubscriptionForm'
+import Pricelists from './pages/Pricelists'
+import PricelistDetail from './pages/PricelistDetail'
+import CustomerCategories from './pages/CustomerCategories'
+import Warehouses from './pages/Warehouses'
+import WarehouseDetail from './pages/WarehouseDetail'
+import MyShop from './pages/MyShop'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -117,6 +125,14 @@ export default function App() {
                 }
               />
               <Route
+                path="/products/:id"
+                element={
+                  <ProtectedRoute>
+                    <ProductDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/products/:id/edit"
                 element={
                   <ProtectedRoute>
@@ -181,6 +197,14 @@ export default function App() {
                 }
               />
               <Route
+                path="/site-config"
+                element={
+                  <ProtectedRoute>
+                    <SiteConfig />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/payments"
                 element={
                   <ProtectedRoute>
@@ -241,6 +265,54 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <SubscriptionForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pricelists"
+                element={
+                  <ProtectedRoute>
+                    <Pricelists />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pricelists/:id"
+                element={
+                  <ProtectedRoute>
+                    <PricelistDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/customer-categories"
+                element={
+                  <ProtectedRoute>
+                    <CustomerCategories />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/warehouses"
+                element={
+                  <ProtectedRoute>
+                    <Warehouses />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/warehouses/:id"
+                element={
+                  <ProtectedRoute>
+                    <WarehouseDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-shop"
+                element={
+                  <ProtectedRoute>
+                    <MyShop />
                   </ProtectedRoute>
                 }
               />

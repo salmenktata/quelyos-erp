@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback, ReactNode } from 'react'
+import { logger } from '../../lib/logger'
 
 export interface SearchSuggestion<T = unknown> {
   id: string | number
@@ -77,7 +78,7 @@ export function SearchAutocomplete<T = unknown>({
           setIsOpen(results.length > 0)
           setHighlightedIndex(-1)
         } catch (error) {
-          console.error('Error fetching suggestions:', error)
+          logger.error('Error fetching suggestions:', error)
           setSuggestions([])
         } finally {
           setIsLoading(false)

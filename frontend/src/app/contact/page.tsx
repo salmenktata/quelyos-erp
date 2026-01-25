@@ -6,6 +6,7 @@ import { useToast } from '@/store/toastStore';
 import { useSiteConfig } from '@/lib/config/SiteConfigProvider';
 import { odooClient } from '@/lib/odoo/client';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 
 interface ContactFormData {
   name: string;
@@ -58,7 +59,7 @@ export default function ContactPage() {
         toast.error(response.error || 'Une erreur est survenue. Veuillez reessayer.');
       }
     } catch (error: any) {
-      console.error('Contact form error:', error);
+      logger.error('Contact form error:', error);
       toast.error('Une erreur est survenue. Veuillez reessayer.');
     } finally {
       setIsSubmitting(false);

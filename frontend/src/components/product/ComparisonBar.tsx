@@ -9,14 +9,16 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useComparisonStore } from '@/store/comparisonStore';
+import { useSiteConfig } from '@/hooks/useSiteConfig';
 import { Button } from '@/components/common/Button';
 
 export const ComparisonBar: React.FC = () => {
   const router = useRouter();
   const { products, removeProduct, clearComparison, maxProducts } = useComparisonStore();
+  const { data: siteConfig } = useSiteConfig();
 
-  // N'afficher que si au moins 1 produit
-  if (products.length === 0) {
+  // N'afficher que si la fonctionnalité est activée et au moins 1 produit
+  if (!siteConfig?.compare_enabled || products.length === 0) {
     return null;
   }
 

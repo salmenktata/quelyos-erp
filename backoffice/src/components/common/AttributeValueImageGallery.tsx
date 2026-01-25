@@ -8,6 +8,7 @@ import {
   useDeleteAttributeValueImage,
   useReorderAttributeValueImages,
 } from '../../hooks/useAttributeImages'
+import { logger } from '../../lib/logger'
 
 interface AttributeValueImageGalleryProps {
   productId: number
@@ -98,7 +99,7 @@ export function AttributeValueImageGallery({
       await uploadMutation.mutateAsync(imagesData)
       onSuccess?.(`${imagesData.length} image(s) uploadée(s)`)
     } catch (error) {
-      console.error('Upload error:', error)
+      logger.error('Upload error:', error)
       onError?.("Erreur lors de l'upload des images")
     } finally {
       setUploading(false)
@@ -136,7 +137,7 @@ export function AttributeValueImageGallery({
       await deleteMutation.mutateAsync(imageId)
       onSuccess?.('Image supprimée')
     } catch (error) {
-      console.error('Delete error:', error)
+      logger.error('Delete error:', error)
       onError?.('Erreur lors de la suppression')
     }
   }
@@ -160,7 +161,7 @@ export function AttributeValueImageGallery({
     try {
       await reorderMutation.mutateAsync(imageIds)
     } catch (error) {
-      console.error('Reorder error:', error)
+      logger.error('Reorder error:', error)
     }
 
     setDraggedIndex(index)

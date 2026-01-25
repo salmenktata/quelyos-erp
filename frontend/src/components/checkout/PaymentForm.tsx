@@ -1,9 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Button } from '@/components/common';
 import { PayPalButton } from './PayPalButton';
-import { StripePaymentForm } from './StripePaymentForm';
+import { logger } from '@/lib/logger';
+
+// Lazy load Stripe (chargé uniquement si paiement carte sélectionné)
+// Gain: -30 KB sur pages hors checkout
+const StripePaymentForm = dynamic(
+  () => import('./StripePaymentForm').then(mod => mod.StripePaymentForm),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="ml-3 text-gray-600">Chargement du paiement sécurisé...</span>
+      </div>
+    ),
+  }
+);
 
 export interface PaymentMethod {
   id: string;
@@ -121,16 +137,18 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       </div>
 
       {/* Stripe Card Payment (if Card is selected) */}
-      {selectedMethod === 'card' && orderAmount ? (
+      {selectedMethod === 'card' && orderAmount && orderId ? (
         <StripePaymentForm
           orderAmount={orderAmount}
+          orderId={orderId}
           onSuccess={(paymentMethodId) => {
-            console.log('Stripe payment method created:', paymentMethodId);
-            // Soumettre avec l'ID du Payment Method
+            logger.debug('Stripe payment successful:', paymentMethodId);
+            // Le paiement et la confirmation de commande sont déjà faits par le hook
+            // On peut appeler onSubmit pour gérer la navigation
             onSubmit('card');
           }}
           onError={(error) => {
-            console.error('Stripe payment error:', error);
+            logger.error('Stripe payment error:', error);
           }}
           onBack={onBack}
         />
@@ -141,15 +159,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             orderId={orderId}
             amount={orderAmount}
             onSuccess={(transactionId) => {
-              console.log('PayPal payment successful:', transactionId);
+              logger.debug('PayPal payment successful:', transactionId);
               onSubmit('paypal');
             }}
             onError={(error) => {
-              console.error('PayPal payment error:', error);
+              logger.error('PayPal payment error:', error);
               alert(`Erreur PayPal: ${error.message}`);
             }}
             onCancel={() => {
-              console.log('PayPal payment cancelled');
+              logger.debug('PayPal payment cancelled');
             }}
           />
 

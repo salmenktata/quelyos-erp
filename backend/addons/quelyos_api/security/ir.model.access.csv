@@ -1,1 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_quelyos_subscription_plan_all,access_quelyos_subscription_plan_all,model_quelyos_subscription_plan,,1,0,0,0
+access_quelyos_subscription_plan_manager,access_quelyos_subscription_plan_manager,model_quelyos_subscription_plan,base.group_system,1,1,1,1
+access_quelyos_subscription_user,access_quelyos_subscription_user,model_quelyos_subscription,base.group_user,1,0,0,0
+access_quelyos_subscription_manager,access_quelyos_subscription_manager,model_quelyos_subscription,base.group_system,1,1,1,1
+access_quelyos_tenant_public,access_quelyos_tenant_public,model_quelyos_tenant,,1,0,0,0
+access_quelyos_tenant_manager,access_quelyos_tenant_manager,model_quelyos_tenant,base.group_system,1,1,1,1

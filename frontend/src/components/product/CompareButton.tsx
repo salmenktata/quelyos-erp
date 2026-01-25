@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useComparisonStore } from '@/store/comparisonStore';
+import { useSiteConfig } from '@/hooks/useSiteConfig';
 
 interface CompareButtonProps {
   product: {
@@ -16,8 +17,14 @@ interface CompareButtonProps {
 
 const CompareButton: React.FC<CompareButtonProps> = ({ product, size = 'md' }) => {
   const { addProduct, removeProduct, isInComparison, canAdd } = useComparisonStore();
+  const { data: siteConfig } = useSiteConfig();
 
   const inComparison = isInComparison(product.id);
+
+  // Ne pas afficher si la fonctionnalité est désactivée
+  if (!siteConfig?.compare_enabled) {
+    return null;
+  }
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();

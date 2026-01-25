@@ -3,6 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 const ODOO_URL = process.env.NEXT_PUBLIC_ODOO_URL || 'http://localhost:8069';
 
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data.result || data);
 
   } catch (error) {
-    console.error('Categories API error:', error);
+    logger.error('Categories API error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch categories' },
       { status: 500 }

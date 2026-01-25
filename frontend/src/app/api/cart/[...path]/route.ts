@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 const ODOO_URL = process.env.NEXT_PUBLIC_ODOO_URL || 'http://localhost:8069';
 
@@ -45,7 +46,7 @@ export async function GET(
     return NextResponse.json(data.result || data);
 
   } catch (error) {
-    console.error('Cart API error:', error);
+    logger.error('Cart API error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch cart data' },
       { status: 500 }
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json(data.result || data);
 
   } catch (error) {
-    console.error('Cart API error:', error);
+    logger.error('Cart API error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update cart' },
       { status: 500 }
@@ -132,7 +133,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     return NextResponse.json(data.result || data);
 
   } catch (error) {
-    console.error('Cart API error:', error);
+    logger.error('Cart API error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to delete from cart' },
       { status: 500 }

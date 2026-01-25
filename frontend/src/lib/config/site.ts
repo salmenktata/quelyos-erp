@@ -5,6 +5,7 @@
  */
 
 import { odooClient } from '@/lib/odoo/client';
+import { logger } from '@/lib/logger';
 
 // Type definitions for site config
 export interface SiteConfig {
@@ -156,7 +157,7 @@ export async function fetchSiteConfig(): Promise<SiteConfig> {
       return cachedConfig;
     }
   } catch (error) {
-    console.warn('Failed to fetch site config from API, using defaults:', error);
+    logger.warn('Échec de récupération de la configuration, utilisation des valeurs par défaut:', error);
   }
 
   return defaultConfig;

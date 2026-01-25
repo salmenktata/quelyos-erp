@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { loadStripe, Stripe, PaymentRequest } from '@stripe/stripe-js';
 import { odooClient } from '@/lib/odoo/client';
+import { logger } from '@/lib/logger';
 
 interface WalletPaymentButtonProps {
   orderId?: number;
@@ -40,7 +41,7 @@ export function WalletPaymentButton({
 
     // Load Stripe
     if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-      console.warn('Stripe API key missing');
+      logger.warn('Stripe API key missing');
       return;
     }
 
@@ -92,10 +93,10 @@ export function WalletPaymentButton({
           await handlePaymentMethod(event, stripe);
         });
       } else {
-        console.log('Wallet payment not available on this device/browser');
+        logger.debug('Wallet payment not available on this device/browser');
       }
     } catch (error) {
-      console.error('Error initializing payment request:', error);
+      logger.error('Error initializing payment request:', error);
     }
   };
 
@@ -149,7 +150,7 @@ export function WalletPaymentButton({
         router.push(`/checkout/confirmation?payment_intent=${paymentIntent.id}`);
       }
     } catch (error: any) {
-      console.error('Error processing wallet payment:', error);
+      logger.error('Error processing wallet payment:', error);
       event.complete('fail');
       if (onError) {
         onError(error.message || 'Payment processing error');

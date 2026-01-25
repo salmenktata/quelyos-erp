@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { Motion } from '@/components/common/Motion';
 
 interface PriceRangeSliderProps {
   min: number;
@@ -90,13 +90,13 @@ export const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
       </div>
 
       {isDragging && (
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="text-xs text-center text-gray-500"
         >
           Relâchez pour appliquer
-        </motion.div>
+        </Motion.div>
       )}
     </div>
   );

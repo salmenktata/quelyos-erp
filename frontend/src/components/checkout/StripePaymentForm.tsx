@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Elements,
   CardNumberElement,
@@ -11,6 +11,7 @@ import {
 } from '@stripe/react-stripe-js';
 import { loadStripe, StripeElementStyleVariant } from '@stripe/stripe-js';
 import { Button } from '@/components/common';
+import { useStripePayment } from '@/hooks/useStripePayment';
 
 // Initialiser Stripe (remplacer par votre clé publique)
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
@@ -44,6 +45,7 @@ interface StripePaymentFormContentProps {
   onError: (error: Error) => void;
   onBack: () => void;
   orderAmount: number;
+  orderId: number;
 }
 
 function StripePaymentFormContent({
@@ -51,43 +53,55 @@ function StripePaymentFormContent({
   onError,
   onBack,
   orderAmount,
+  orderId,
 }: StripePaymentFormContentProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const [isProcessing, setIsProcessing] = useState(false);
   const [cardholderName, setCardholderName] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [cardBrand, setCardBrand] = useState<string>('unknown');
   const [cardNumberComplete, setCardNumberComplete] = useState(false);
   const [cardExpiryComplete, setCardExpiryComplete] = useState(false);
   const [cardCvcComplete, setCardCvcComplete] = useState(false);
 
+  // Utiliser le hook Stripe Payment
+  const {
+    isProcessing,
+    error: paymentError,
+    clientSecret,
+    createPaymentIntent,
+    confirmPayment,
+  } = useStripePayment({
+    orderId,
+    orderAmount,
+    onSuccess: () => {
+      onSuccess('stripe'); // Appeler le callback parent avec succès
+    },
+    onError: (error) => {
+      onError(error); // Propager l'erreur au parent
+    },
+  });
+
+  const errorMessage = paymentError;
+
+  // Créer le Payment Intent au montage du composant
+  useEffect(() => {
+    if (orderId && orderAmount > 0) {
+      createPaymentIntent();
+    }
+  }, [orderId, orderAmount, createPaymentIntent]);
+
   const handleCardNumberChange = (event: any) => {
     setCardBrand(event.brand);
     setCardNumberComplete(event.complete);
-    if (event.error) {
-      setErrorMessage(event.error.message);
-    } else {
-      setErrorMessage(null);
-    }
+    // Les erreurs de validation Stripe sont gérées par le hook useStripePayment
   };
 
   const handleCardExpiryChange = (event: any) => {
     setCardExpiryComplete(event.complete);
-    if (event.error) {
-      setErrorMessage(event.error.message);
-    } else if (!cardNumberComplete) {
-      setErrorMessage(null);
-    }
   };
 
   const handleCardCvcChange = (event: any) => {
     setCardCvcComplete(event.complete);
-    if (event.error) {
-      setErrorMessage(event.error.message);
-    } else if (!cardNumberComplete && !cardExpiryComplete) {
-      setErrorMessage(null);
-    }
   };
 
   const isFormValid = () => {
@@ -107,48 +121,20 @@ function StripePaymentFormContent({
     }
 
     if (!cardholderName.trim()) {
-      setErrorMessage('Veuillez entrer le nom du titulaire de la carte');
       return;
     }
 
     if (!isFormValid()) {
-      setErrorMessage('Veuillez remplir tous les champs de la carte');
       return;
     }
 
-    setIsProcessing(true);
-    setErrorMessage(null);
-
-    try {
-      const cardNumberElement = elements.getElement(CardNumberElement);
-      if (!cardNumberElement) {
-        throw new Error('Élément de carte non trouvé');
-      }
-
-      // Créer un Payment Method
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardNumberElement,
-        billing_details: {
-          name: cardholderName,
-        },
-      });
-
-      if (error) {
-        throw new Error(error.message || 'Erreur lors de la création du moyen de paiement');
-      }
-
-      if (paymentMethod) {
-        // Appeler le callback de succès avec l'ID du Payment Method
-        onSuccess(paymentMethod.id);
-      }
-    } catch (error: any) {
-      console.error('Erreur paiement Stripe:', error);
-      setErrorMessage(error.message || 'Une erreur est survenue');
-      onError(error);
-    } finally {
-      setIsProcessing(false);
+    if (!clientSecret) {
+      // Payment Intent pas encore créé, attendre
+      return;
     }
+
+    // Utiliser le hook pour confirmer le paiement
+    await confirmPayment(cardholderName);
   };
 
   // Logos cartes bancaires selon le type détecté
@@ -348,6 +334,7 @@ interface StripePaymentFormProps {
   onError: (error: Error) => void;
   onBack: () => void;
   orderAmount: number;
+  orderId: number;
 }
 
 export function StripePaymentForm({
@@ -355,6 +342,7 @@ export function StripePaymentForm({
   onError,
   onBack,
   orderAmount,
+  orderId,
 }: StripePaymentFormProps) {
   return (
     <Elements stripe={stripePromise}>
@@ -363,6 +351,7 @@ export function StripePaymentForm({
         onError={onError}
         onBack={onBack}
         orderAmount={orderAmount}
+        orderId={orderId}
       />
     </Elements>
   );
