@@ -1062,7 +1062,7 @@ export default function Products() {
                           <div className="flex items-center">
                             <div className="h-10 w-10 shrink-0">
                               <OdooImage
-                                src={product.image}
+                                src={product.image ?? null}
                                 alt={product.name}
                                 className="h-10 w-10 rounded object-cover"
                                 fallback={

@@ -34,7 +34,7 @@ export function useSessionManager(config: SessionManagerConfig = {}) {
     try {
       const result = await api.checkSession()
 
-      if (!result.authenticated) {
+      if (!result.is_authenticated) {
         // Session expirée
         localStorage.removeItem('session_id')
         localStorage.removeItem('user')
@@ -71,7 +71,7 @@ export function useSessionManager(config: SessionManagerConfig = {}) {
     try {
       const result = await api.checkSession()
 
-      if (result.authenticated) {
+      if (result.is_authenticated) {
         lastActivityRef.current = Date.now()
         warningShownRef.current = false
         logger.debug('Session refreshed successfully')
@@ -105,11 +105,11 @@ export function useSessionManager(config: SessionManagerConfig = {}) {
     }
 
     // Vérifier la session périodiquement
-    checkIntervalRef.current = setInterval(checkSession, SESSION_CHECK_INTERVAL)
+    checkIntervalRef.current = setInterval(checkSession, SESSION_CHECK_INTERVAL) as unknown as number
 
     // Rafraîchir automatiquement la session
     if (enableAutoRefresh) {
-      refreshIntervalRef.current = setInterval(refreshSession, SESSION_REFRESH_INTERVAL)
+      refreshIntervalRef.current = setInterval(refreshSession, SESSION_REFRESH_INTERVAL) as unknown as number
     }
 
     // Écouter l'activité utilisateur pour réinitialiser le timer

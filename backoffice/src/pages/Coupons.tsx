@@ -235,7 +235,7 @@ export default function Coupons() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900 dark:text-white">
-                            {formatDate(coupon.date_from)} - {formatDate(coupon.date_to)}
+                            {formatDate(coupon.date_from ?? null)} - {formatDate(coupon.date_to ?? null)}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">

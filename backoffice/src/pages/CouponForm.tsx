@@ -44,7 +44,7 @@ export default function CouponForm() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.name.trim()) {
+    if (!formData.name || !formData.name.trim()) {
       newErrors.name = 'Le nom est requis'
     }
 

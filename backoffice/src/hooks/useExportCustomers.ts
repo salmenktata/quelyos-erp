@@ -20,10 +20,10 @@ export function useExportCustomers() {
       }
 
       const { customers, columns } = response.data
-      const headers = columns.map((col) => col.label).join(',')
-      const rows = customers.map((customer) =>
+      const headers = columns.map((col: { label: string }) => col.label).join(',')
+      const rows = customers.map((customer: Record<string, any>) =>
         columns
-          .map((col) => {
+          .map((col: { key: string }) => {
             const value = customer[col.key as keyof typeof customer]
             const stringValue = String(value ?? '')
             // Échapper les valeurs contenant des virgules, guillemets ou retours à la ligne

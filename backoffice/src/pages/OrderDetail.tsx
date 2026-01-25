@@ -194,15 +194,15 @@ export default function OrderDetail() {
               isUpdating={updateTracking.isPending}
             />
 
-            <OrderLineItems lines={order.lines} />
+            <OrderLineItems lines={order.lines as any} />
           </div>
 
           {/* Colonne droite : Résumé, historique, actions */}
           <div className="space-y-6">
             <OrderSummary
-              amountUntaxed={order.amount_untaxed}
-              amountTax={order.amount_tax}
-              amountTotal={order.amount_total}
+              amountUntaxed={order.amount_untaxed ?? 0}
+              amountTax={order.amount_tax ?? 0}
+              amountTotal={order.amount_total ?? 0}
             />
 
             <OrderHistory history={historyData?.data?.history || []} isLoading={historyLoading} />

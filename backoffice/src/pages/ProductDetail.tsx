@@ -199,7 +199,7 @@ export default function ProductDetail() {
                     <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Prix de vente</dt>
                       <dd className="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        {product.price.toFixed(2)} €
+                        {(product.price ?? 0).toFixed(2)} €
                       </dd>
                     </div>
                     {product.standard_price !== undefined && (
@@ -365,9 +365,9 @@ export default function ProductDetail() {
                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Statut</dt>
                     <dd>
                       <span
-                        className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full ${stockStatusColors[product.stock_status]}`}
+                        className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full ${product.stock_status ? stockStatusColors[product.stock_status] : ''}`}
                       >
-                        {stockStatusLabels[product.stock_status]}
+                        {product.stock_status ? stockStatusLabels[product.stock_status] : 'N/A'}
                       </span>
                     </dd>
                   </div>

@@ -232,7 +232,7 @@ export default function SubscriptionForm() {
                               {plan.max_orders_per_year === 0 ? 'Commandes illimitées' : `${plan.max_orders_per_year} commandes/an`}
                             </span>
                           </div>
-                          {plan.features.map((feature, idx: number) => (
+                          {plan.features.map((feature: string, idx: number) => (
                             <div key={idx} className="flex items-start gap-2">
                               <CheckIcon className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                               <span className="text-sm text-gray-700 dark:text-gray-300">

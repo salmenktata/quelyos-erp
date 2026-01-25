@@ -12,6 +12,19 @@ export interface APIResponse<T = any> {
   data?: T;
 }
 
+export interface LoginResponse {
+  success: boolean;
+  user?: User;
+  session_id?: string;
+  error?: string;
+}
+
+export interface SessionResponse {
+  success: boolean;
+  user?: User;
+  is_authenticated: boolean;
+}
+
 // ==================== USER & AUTH ====================
 
 export interface User {
@@ -204,6 +217,8 @@ export interface Category {
   image?: string;
   image_url?: string;
   product_count?: number;
+  total_product_count?: number;
+  child_count?: number;
   featured_products?: Product[];
   description?: string;
   seo?: SEOData;
@@ -270,6 +285,13 @@ export interface OrderLine {
   price_subtotal: number;
   price_tax: number;
   price_total: number;
+}
+
+export interface OrderDetail extends Order {
+  amount_untaxed?: number;
+  amount_tax?: number;
+  history?: any[];
+  tracking_info?: any;
 }
 
 // ==================== ADDRESS ====================

@@ -72,11 +72,11 @@ export default function Customers() {
     if (!data?.data?.customers) return { totalCustomers: 0, totalRevenue: 0, avgBasket: 0 }
 
     const customers = data.data.customers as CustomerListItem[]
-    const totalRevenue = customers.reduce((sum, c) => sum + c.total_spent, 0)
-    const customersWithOrders = customers.filter((c) => c.orders_count > 0)
+    const totalRevenue = customers.reduce((sum, c) => sum + (c.total_spent ?? 0), 0)
+    const customersWithOrders = customers.filter((c) => (c.orders_count ?? 0) > 0)
     const avgBasket =
       customersWithOrders.length > 0
-        ? customersWithOrders.reduce((sum, c) => sum + c.total_spent / c.orders_count, 0) /
+        ? customersWithOrders.reduce((sum, c) => sum + (c.total_spent ?? 0) / (c.orders_count ?? 1), 0) /
           customersWithOrders.length
         : 0
 

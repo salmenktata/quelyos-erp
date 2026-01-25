@@ -191,7 +191,7 @@ export function OrdersKanban({ orders, onOrderUpdate }: OrdersKanbanProps) {
                               {formatDate(order.date_order)}
                             </span>
                             <span className="font-semibold text-gray-900 dark:text-white">
-                              {formatPrice(order.amount_total)}
+                              {formatPrice(order.amount_total ?? 0)}
                             </span>
                           </div>
                         </div>

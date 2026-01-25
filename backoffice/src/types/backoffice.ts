@@ -370,21 +370,90 @@ export interface CustomerListItem {
   name: string;
   email: string;
   phone?: string;
+  mobile?: string;
+  city?: string;
+  zip?: string;
+  country?: string;
   total_orders?: number;
   orders_count?: number;
   total_spent?: number;
   create_date?: string;
 }
 
+export interface DataTableColumn<T = any> {
+  key: string;
+  id?: string;
+  label: string;
+  sortable?: boolean;
+  accessor?: (item: T) => any;
+  sortFn?: (a: T, b: T) => number;
+  render?: (item: T) => React.ReactNode;
+  width?: string;
+  align?: 'left' | 'center' | 'right';
+  className?: string;
+  cellClassName?: string;
+  headerClassName?: string;
+  showOnMobile?: boolean;
+}
+
+export interface MobileCardConfig<T = any> {
+  title: (item: T) => React.ReactNode;
+  subtitle?: (item: T) => React.ReactNode;
+  content: (item: T) => React.ReactNode;
+  actions?: (item: T) => React.ReactNode;
+  renderCard?: (item: T) => React.ReactNode;
+  renderActions?: (item: T) => React.ReactNode;
+}
+
+export interface BulkAction<T = any> {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
+  onClick: (selectedItems: T[]) => void;
+  onExecute?: (selectedItems: T[]) => void;
+  variant?: 'default' | 'danger' | 'primary' | 'secondary' | 'ghost';
+  disabled?: boolean;
+}
+
+export interface DataTableState {
+  sortField?: string;
+  sortOrder?: SortOrder;
+  selectedIds?: Set<number | string>;
+}
+
 export interface DataTableProps<T> {
   data: T[];
-  columns: any[];
+  columns: DataTableColumn<T>[];
+  keyExtractor?: (item: T) => string | number;
+  isLoading?: boolean;
+  error?: string | null;
+  mobileConfig?: MobileCardConfig<T>;
+  sortField?: string;
+  sortOrder?: SortOrder;
   onSort?: (key: string, order: SortOrder) => void;
+  onSortChange?: (field: string, order: SortOrder) => void;
+  pagination?: {
+    total: number;
+    offset: number;
+    limit: number;
+    onPageChange: (offset: number) => void;
+  };
+  bulkActions?: BulkAction<T>[];
+  selectedItems?: T[];
   selectedIds?: Set<number | string>;
   onSelectionChange?: (ids: Set<number | string>) => void;
+  emptyMessage?: string;
+  emptyComponent?: React.ReactNode;
+  skeletonRows?: number;
+  className?: string;
+  tableClassName?: string;
 }
 
 export type SortOrder = 'asc' | 'desc' | null;
+
+// Import types from shared
+import type { User } from '@quelyos/types';
+
 export type Customer = User;
-export interface ProductCreateData extends Partial<Product> {}
-export interface ProductUpdateData extends Partial<Product> {}
+export type ProductCreateData = Record<string, any>;
+export type ProductUpdateData = Record<string, any>;

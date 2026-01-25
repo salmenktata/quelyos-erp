@@ -140,7 +140,7 @@ export function CustomerTable({ customers, sortField, sortOrder, onSort }: Custo
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900 dark:text-white">
-                    {customer.orders_count > 0 ? (
+                    {(customer.orders_count ?? 0) > 0 ? (
                       <Badge variant="info">{customer.orders_count}</Badge>
                     ) : (
                       <span className="text-gray-400">0</span>
@@ -149,15 +149,15 @@ export function CustomerTable({ customers, sortField, sortOrder, onSort }: Custo
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900 dark:text-white">
-                    {customer.total_spent > 0 ? (
-                      formatPrice(customer.total_spent)
+                    {(customer.total_spent ?? 0) > 0 ? (
+                      formatPrice(customer.total_spent ?? 0)
                     ) : (
                       <span className="text-gray-400">0,00 €</span>
                     )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">{formatDate(customer.create_date)}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{formatDate(customer.create_date ?? null)}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right">
                   <Link
@@ -189,7 +189,7 @@ export function CustomerTable({ customers, sortField, sortOrder, onSort }: Custo
               >
                 {customer.name}
               </Link>
-              {customer.orders_count > 0 && <Badge variant="info">{customer.orders_count} cmd</Badge>}
+              {(customer.orders_count ?? 0) > 0 && <Badge variant="info">{customer.orders_count} cmd</Badge>}
             </div>
 
             <div className="space-y-2 text-sm">
@@ -216,13 +216,13 @@ export function CustomerTable({ customers, sortField, sortOrder, onSort }: Custo
               <div className="flex justify-between items-center pt-2 mt-2 border-t border-gray-200 dark:border-gray-700">
                 <span className="text-gray-600 dark:text-gray-400">Total dépensé :</span>
                 <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {customer.total_spent > 0 ? formatPrice(customer.total_spent) : '0,00 €'}
+                  {(customer.total_spent ?? 0) > 0 ? formatPrice(customer.total_spent ?? 0) : '0,00 €'}
                 </span>
               </div>
 
               <div className="flex justify-between text-xs">
                 <span className="text-gray-500 dark:text-gray-400">Inscrit le :</span>
-                <span className="text-gray-600 dark:text-gray-300">{formatDate(customer.create_date)}</span>
+                <span className="text-gray-600 dark:text-gray-300">{formatDate(customer.create_date ?? null)}</span>
               </div>
             </div>
 

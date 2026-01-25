@@ -1,21 +1,10 @@
 import type {
-  ApiResponse,
-  LoginResponse,
-  SessionResponse,
   PaginatedResponse,
-  Order,
-  OrderDetail,
   Customer,
   CustomerListItem,
-  Address,
-  Product,
-  ProductDetail,
   ProductsQueryParams,
   ProductCreateData,
   ProductUpdateData,
-  Category,
-  Cart,
-  Coupon,
   CouponCreate,
   StockProduct,
   StockMove,
@@ -26,8 +15,21 @@ import type {
   CartRecoveryStats,
   OrderHistoryItem,
   ShippingTrackingInfo,
-  Ribbon,
 } from '@/types'
+import type {
+  APIResponse,
+  LoginResponse,
+  SessionResponse,
+  Order,
+  OrderDetail,
+  Address,
+  Product,
+  ProductDetail,
+  Category,
+  Cart,
+  Coupon,
+  Ribbon,
+} from '@quelyos/types'
 import { logger } from '@quelyos/logger'
 
 // En développement, utiliser le proxy Vite (pas de CORS)
@@ -147,8 +149,8 @@ class ApiClient {
     return result
   }
 
-  async logout(): Promise<ApiResponse> {
-    const result = await this.request<ApiResponse>('/api/ecommerce/auth/logout')
+  async logout(): Promise<APIResponse> {
+    const result = await this.request<APIResponse>('/api/ecommerce/auth/logout')
     this.sessionId = null
     localStorage.removeItem('session_id')
     localStorage.removeItem('user')
@@ -160,7 +162,7 @@ class ApiClient {
   }
 
   async register(data: { name: string; email: string; password: string; phone?: string }) {
-    return this.request<ApiResponse<{ user: Customer }>>('/api/ecommerce/auth/register', data)
+    return this.request<APIResponse<{ user: Customer }>>('/api/ecommerce/auth/register', data)
   }
 
   // ==================== PRODUCTS ====================
@@ -170,32 +172,32 @@ class ApiClient {
   }
 
   async getProduct(id: number) {
-    return this.request<ApiResponse<{ product: ProductDetail }>>(
+    return this.request<APIResponse<{ product: ProductDetail }>>(
       `/api/ecommerce/products/${id}`
     )
   }
 
   async createProduct(data: ProductCreateData) {
-    return this.request<ApiResponse<{ product: Product }>>(
+    return this.request<APIResponse<{ product: Product }>>(
       '/api/ecommerce/products/create',
       data
     )
   }
 
   async updateProduct(id: number, data: ProductUpdateData) {
-    return this.request<ApiResponse<{ product: Product }>>(
+    return this.request<APIResponse<{ product: Product }>>(
       `/api/ecommerce/products/${id}/update`,
       data
     )
   }
 
   async deleteProduct(id: number) {
-    return this.request<ApiResponse>(`/api/ecommerce/products/${id}/delete`)
+    return this.request<APIResponse>(`/api/ecommerce/products/${id}/delete`)
   }
 
   async archiveProduct(id: number, archive: boolean = true) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         product: { id: number; name: string; active: boolean }
         message: string
       }>
@@ -203,7 +205,7 @@ class ApiClient {
   }
 
   async duplicateProduct(id: number, name?: string) {
-    return this.request<ApiResponse<{ product: Product; message: string }>>(
+    return this.request<APIResponse<{ product: Product; message: string }>>(
       `/api/ecommerce/products/${id}/duplicate`,
       name ? { name } : {}
     )
@@ -211,7 +213,7 @@ class ApiClient {
 
   async exportProducts(params?: { category_id?: number; search?: string }) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         products: Array<{
           id: number
           name: string
@@ -245,7 +247,7 @@ class ApiClient {
     update_existing?: boolean
   }) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         created: Array<{ id: number; name: string; row: number }>
         updated: Array<{ id: number; name: string; row: number }>
         errors: Array<{ row: number; error: string }>
@@ -262,11 +264,11 @@ class ApiClient {
   // ==================== RIBBONS (BADGES) ====================
 
   async getRibbons() {
-    return this.request<ApiResponse<{ ribbons: Ribbon[] }>>('/api/ecommerce/ribbons')
+    return this.request<APIResponse<{ ribbons: Ribbon[] }>>('/api/ecommerce/ribbons')
   }
 
   async updateProductRibbon(productId: number, ribbonId: number | null) {
-    return this.request<ApiResponse<{ message: string }>>(
+    return this.request<APIResponse<{ message: string }>>(
       `/api/ecommerce/products/${productId}/ribbon`,
       { ribbon_id: ribbonId }
     )
@@ -275,7 +277,7 @@ class ApiClient {
   // Taxes
   async getTaxes() {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         taxes: Array<{
           id: number
           name: string
@@ -291,7 +293,7 @@ class ApiClient {
   // Unités de mesure
   async getUom() {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         uom: Array<{
           id: number
           name: string
@@ -307,7 +309,7 @@ class ApiClient {
   // Types de produits
   async getProductTypes() {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         product_types: Array<{
           value: 'consu' | 'service' | 'product'
           label: string
@@ -320,7 +322,7 @@ class ApiClient {
   // Tags produits
   async getProductTags() {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         tags: Array<{
           id: number
           name: string
@@ -332,7 +334,7 @@ class ApiClient {
 
   async createProductTag(name: string, color?: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         id: number
         name: string
         color: number
@@ -343,7 +345,7 @@ class ApiClient {
   // Product Images
   async getProductImages(productId: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         images: Array<{ id: number; name: string; url: string; sequence: number }>
       }>
     >(`/api/ecommerce/products/${productId}/images`)
@@ -354,7 +356,7 @@ class ApiClient {
     images: Array<{ name: string; image_1920: string }>
   ) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         images: Array<{ id: number; name: string; url: string; sequence: number }>
         message: string
       }>
@@ -362,13 +364,13 @@ class ApiClient {
   }
 
   async deleteProductImage(productId: number, imageId: number) {
-    return this.request<ApiResponse<{ message: string }>>(
+    return this.request<APIResponse<{ message: string }>>(
       `/api/ecommerce/products/${productId}/images/${imageId}/delete`
     )
   }
 
   async reorderProductImages(productId: number, imageIds: number[]) {
-    return this.request<ApiResponse<{ message: string }>>(
+    return this.request<APIResponse<{ message: string }>>(
       `/api/ecommerce/products/${productId}/images/reorder`,
       { image_ids: imageIds }
     )
@@ -377,7 +379,7 @@ class ApiClient {
   // Variant Images (product.product specific)
   async getVariantImages(productId: number, variantId: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         images: Array<{
           id: number
           name: string
@@ -396,7 +398,7 @@ class ApiClient {
     images: Array<{ name: string; image_1920: string }>
   ) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         images: Array<{
           id: number
           name: string
@@ -411,13 +413,13 @@ class ApiClient {
   }
 
   async deleteVariantImage(productId: number, variantId: number, imageId: number) {
-    return this.request<ApiResponse<{ message: string }>>(
+    return this.request<APIResponse<{ message: string }>>(
       `/api/ecommerce/products/${productId}/variants/${variantId}/images/${imageId}/delete`
     )
   }
 
   async reorderVariantImages(productId: number, variantId: number, imageIds: number[]) {
-    return this.request<ApiResponse<{ message: string }>>(
+    return this.request<APIResponse<{ message: string }>>(
       `/api/ecommerce/products/${productId}/variants/${variantId}/images/reorder`,
       { image_ids: imageIds }
     )
@@ -426,7 +428,7 @@ class ApiClient {
   // Product Variants
   async getAllAttributes() {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         attributes: Array<{
           id: number
           name: string
@@ -445,7 +447,7 @@ class ApiClient {
 
   async getProductVariants(productId: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         attribute_lines: Array<{
           id: number
           attribute_id: number
@@ -480,7 +482,7 @@ class ApiClient {
     data: { attribute_id: number; value_ids: number[] }
   ) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         attribute_line: {
           id: number
           attribute_id: number
@@ -498,7 +500,7 @@ class ApiClient {
     data: { value_ids: number[] }
   ) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         attribute_line: {
           id: number
           attribute_id: number
@@ -511,7 +513,7 @@ class ApiClient {
   }
 
   async deleteProductAttribute(productId: number, lineId: number) {
-    return this.request<ApiResponse<{ message: string }>>(
+    return this.request<APIResponse<{ message: string }>>(
       `/api/ecommerce/products/${productId}/attributes/${lineId}/delete`
     )
   }
@@ -527,7 +529,7 @@ class ApiClient {
     }
   ) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         variant: {
           id: number
           name: string
@@ -544,7 +546,7 @@ class ApiClient {
 
   async updateVariantStock(productId: number, variantId: number, quantity: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         variant: {
           id: number
           name: string
@@ -557,7 +559,7 @@ class ApiClient {
 
   async regenerateProductVariants(productId: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         variants_before: number
         variants_after: number
         variants_created: number
@@ -588,7 +590,7 @@ class ApiClient {
 
   async getProductAttributeImages(productId: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         attribute_lines: Array<{
           id: number
           attribute_id: number
@@ -608,7 +610,7 @@ class ApiClient {
 
   async getAttributeValueImages(productId: number, ptavId: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         images: Array<{
           id: number
           name: string
@@ -629,7 +631,7 @@ class ApiClient {
     images: Array<{ name: string; image_1920: string }>
   ) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         images: Array<{
           id: number
           name: string
@@ -644,13 +646,13 @@ class ApiClient {
   }
 
   async deleteAttributeValueImage(productId: number, ptavId: number, imageId: number) {
-    return this.request<ApiResponse<{ message: string }>>(
+    return this.request<APIResponse<{ message: string }>>(
       `/api/ecommerce/products/${productId}/attribute-values/${ptavId}/images/${imageId}/delete`
     )
   }
 
   async reorderAttributeValueImages(productId: number, ptavId: number, imageIds: number[]) {
-    return this.request<ApiResponse<{ message: string }>>(
+    return this.request<APIResponse<{ message: string }>>(
       `/api/ecommerce/products/${productId}/attribute-values/${ptavId}/images/reorder`,
       { image_ids: imageIds }
     )
@@ -664,7 +666,7 @@ class ApiClient {
     search?: string
     include_tree?: boolean
   }) {
-    return this.request<ApiResponse<{
+    return this.request<APIResponse<{
       categories: Category[]
       total: number
       limit: number
@@ -676,31 +678,31 @@ class ApiClient {
   }
 
   async getCategory(id: number) {
-    return this.request<ApiResponse<{ category: Category }>>(
+    return this.request<APIResponse<{ category: Category }>>(
       `/api/ecommerce/categories/${id}`
     )
   }
 
   async createCategory(data: { name: string; parent_id?: number }) {
-    return this.request<ApiResponse<{ category: Category }>>(
+    return this.request<APIResponse<{ category: Category }>>(
       '/api/ecommerce/categories/create',
       data
     )
   }
 
   async updateCategory(id: number, data: { name?: string; parent_id?: number | null }) {
-    return this.request<ApiResponse<{ category: Category }>>(
+    return this.request<APIResponse<{ category: Category }>>(
       `/api/ecommerce/categories/${id}/update`,
       data
     )
   }
 
   async deleteCategory(id: number) {
-    return this.request<ApiResponse>(`/api/ecommerce/categories/${id}/delete`)
+    return this.request<APIResponse>(`/api/ecommerce/categories/${id}/delete`)
   }
 
   async moveCategory(id: number, newParentId: number | null) {
-    return this.request<ApiResponse<{ category: Category }>>(
+    return this.request<APIResponse<{ category: Category }>>(
       `/api/ecommerce/categories/${id}/move`,
       { parent_id: newParentId }
     )
@@ -720,7 +722,7 @@ class ApiClient {
   }
 
   async getOrder(id: number) {
-    return this.request<ApiResponse<{ order: OrderDetail }>>(
+    return this.request<APIResponse<{ order: OrderDetail }>>(
       `/api/ecommerce/orders/${id}`
     )
   }
@@ -730,11 +732,11 @@ class ApiClient {
     lines?: Array<{ product_id: number; quantity: number; price_unit?: number }>
     confirm?: boolean
   }) {
-    return this.request<ApiResponse<{ order: Order }>>('/api/ecommerce/orders/create', data)
+    return this.request<APIResponse<{ order: Order }>>('/api/ecommerce/orders/create', data)
   }
 
   async updateOrderStatus(id: number, action: 'confirm' | 'cancel' | 'done') {
-    return this.request<ApiResponse<{ order: Order }>>(
+    return this.request<APIResponse<{ order: Order }>>(
       `/api/ecommerce/orders/${id}/status`,
       { action }
     )
@@ -766,7 +768,7 @@ class ApiClient {
   }
 
   async getShippingTracking(orderId: number) {
-    return this.request<ApiResponse<ShippingTrackingInfo>>(
+    return this.request<APIResponse<ShippingTrackingInfo>>(
       `/api/ecommerce/orders/${orderId}/tracking`
     )
   }
@@ -776,7 +778,7 @@ class ApiClient {
     data: { picking_id: number; tracking_ref: string; carrier_id?: number }
   ) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         message: string
         data: {
           picking_id: number
@@ -789,14 +791,14 @@ class ApiClient {
   }
 
   async getOrderHistory(orderId: number) {
-    return this.request<ApiResponse<{ history: OrderHistoryItem[] }>>(
+    return this.request<APIResponse<{ history: OrderHistoryItem[] }>>(
       `/api/ecommerce/orders/${orderId}/history`
     )
   }
 
   async sendQuotationEmail(orderId: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         message: string
         order: {
           id: number
@@ -809,7 +811,7 @@ class ApiClient {
 
   async createInvoiceFromOrder(orderId: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         message: string
         invoice: {
           id: number
@@ -823,7 +825,7 @@ class ApiClient {
 
   async unlockOrder(orderId: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         message: string
         order: {
           id: number
@@ -904,7 +906,7 @@ class ApiClient {
 
   async exportCustomersCSV(params?: { search?: string }) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         customers: Array<{
           id: number
           name: string
@@ -934,14 +936,14 @@ class ApiClient {
   }
 
   async updateProductStock(productId: number, quantity: number) {
-    return this.request<ApiResponse<{ stock: { product_id: number; qty_available: number } }>>(
+    return this.request<APIResponse<{ stock: { product_id: number; qty_available: number } }>>(
       `/api/ecommerce/products/${productId}/stock/update`,
       { quantity }
     )
   }
 
   async getStockMoves(params?: { limit?: number; offset?: number; product_id?: number }) {
-    return this.request<ApiResponse<{ moves: StockMove[]; total: number; limit: number; offset: number }>>(
+    return this.request<APIResponse<{ moves: StockMove[]; total: number; limit: number; offset: number }>>(
       '/api/ecommerce/stock/moves',
       params
     )
@@ -950,7 +952,7 @@ class ApiClient {
   // ==================== DELIVERY ====================
 
   async getDeliveryMethods() {
-    return this.request<ApiResponse<{ delivery_methods: DeliveryMethod[] }>>(
+    return this.request<APIResponse<{ delivery_methods: DeliveryMethod[] }>>(
       '/api/ecommerce/delivery/methods'
     )
   }
@@ -1019,7 +1021,7 @@ class ApiClient {
 
   async getFeaturedProducts(params?: { limit?: number; offset?: number }) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         products: Array<{
           id: number
           name: string
@@ -1041,7 +1043,7 @@ class ApiClient {
     search?: string
   }) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         products: Array<{
           id: number
           name: string
@@ -1057,7 +1059,7 @@ class ApiClient {
 
   async addFeaturedProduct(productId: number) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         product: { id: number; name: string; sequence: number }
         message: string
       }>
@@ -1065,13 +1067,13 @@ class ApiClient {
   }
 
   async removeFeaturedProduct(productId: number) {
-    return this.request<ApiResponse<{ message: string }>>('/api/ecommerce/featured/remove', {
+    return this.request<APIResponse<{ message: string }>>('/api/ecommerce/featured/remove', {
       product_id: productId,
     })
   }
 
   async reorderFeaturedProducts(productIds: number[]) {
-    return this.request<ApiResponse<{ message: string }>>('/api/ecommerce/featured/reorder', {
+    return this.request<APIResponse<{ message: string }>>('/api/ecommerce/featured/reorder', {
       product_ids: productIds,
     })
   }
@@ -1079,7 +1081,7 @@ class ApiClient {
   // ==================== ANALYTICS ====================
 
   async getAnalyticsStats() {
-    return this.request<ApiResponse<AnalyticsStats>>('/api/ecommerce/analytics/stats')
+    return this.request<APIResponse<AnalyticsStats>>('/api/ecommerce/analytics/stats')
   }
 
   async getRevenueChart(params?: { period?: string; start_date?: string; end_date?: string; group_by?: string }) {
@@ -1118,34 +1120,34 @@ class ApiClient {
   // ==================== CART ====================
 
   async getCart(guestEmail?: string) {
-    return this.request<ApiResponse<{ cart: Cart }>>('/api/ecommerce/cart', {
+    return this.request<APIResponse<{ cart: Cart }>>('/api/ecommerce/cart', {
       guest_email: guestEmail,
     })
   }
 
   async addToCart(data: { product_id: number; quantity: number; guest_email?: string }) {
-    return this.request<ApiResponse<{ cart: Partial<Cart> }>>(
+    return this.request<APIResponse<{ cart: Partial<Cart> }>>(
       '/api/ecommerce/cart/add',
       data
     )
   }
 
   async updateCartLine(data: { line_id: number; quantity: number; guest_email?: string }) {
-    return this.request<ApiResponse<{ cart: Partial<Cart> }>>(
+    return this.request<APIResponse<{ cart: Partial<Cart> }>>(
       '/api/ecommerce/cart/update',
       data
     )
   }
 
   async removeFromCart(lineId: number, guestEmail?: string) {
-    return this.request<ApiResponse<{ cart: Partial<Cart> }>>(
+    return this.request<APIResponse<{ cart: Partial<Cart> }>>(
       `/api/ecommerce/cart/remove/${lineId}`,
       { guest_email: guestEmail }
     )
   }
 
   async clearCart(guestEmail?: string) {
-    return this.request<ApiResponse<{ cart: Partial<Cart> }>>(
+    return this.request<APIResponse<{ cart: Partial<Cart> }>>(
       '/api/ecommerce/cart/clear',
       { guest_email: guestEmail }
     )
@@ -1155,7 +1157,7 @@ class ApiClient {
 
   async getAbandonedCarts(params?: AbandonedCartsQueryParams) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         abandoned_carts: AbandonedCart[]
         total: number
         limit: number
@@ -1165,13 +1167,13 @@ class ApiClient {
   }
 
   async sendCartReminder(cartId: number) {
-    return this.request<ApiResponse<{ message: string }>>(
+    return this.request<APIResponse<{ message: string }>>(
       `/api/ecommerce/cart/${cartId}/send-reminder`
     )
   }
 
   async getCartRecoveryStats(params?: { period?: string }) {
-    return this.request<ApiResponse<CartRecoveryStats>>(
+    return this.request<APIResponse<CartRecoveryStats>>(
       '/api/ecommerce/cart/recovery-stats',
       params
     )
@@ -1180,13 +1182,13 @@ class ApiClient {
   // ==================== CUSTOMER PROFILE ====================
 
   async getCustomerProfile() {
-    return this.request<ApiResponse<{ profile: Customer }>>(
+    return this.request<APIResponse<{ profile: Customer }>>(
       '/api/ecommerce/customer/profile'
     )
   }
 
   async updateCustomerProfile(data: Partial<Customer>) {
-    return this.request<ApiResponse<{ profile: Customer }>>(
+    return this.request<APIResponse<{ profile: Customer }>>(
       '/api/ecommerce/customer/profile/update',
       data
     )
@@ -1195,27 +1197,27 @@ class ApiClient {
   // ==================== CUSTOMER ADDRESSES ====================
 
   async getCustomerAddresses() {
-    return this.request<ApiResponse<{ addresses: Address[] }>>(
+    return this.request<APIResponse<{ addresses: Address[] }>>(
       '/api/ecommerce/customer/addresses'
     )
   }
 
   async createCustomerAddress(data: Omit<Address, 'id'>) {
-    return this.request<ApiResponse<{ address: Address }>>(
+    return this.request<APIResponse<{ address: Address }>>(
       '/api/ecommerce/customer/addresses/create',
       data
     )
   }
 
   async updateCustomerAddress(id: number, data: Partial<Address>) {
-    return this.request<ApiResponse<{ address: Address }>>(
+    return this.request<APIResponse<{ address: Address }>>(
       `/api/ecommerce/customer/addresses/${id}/update`,
       data
     )
   }
 
   async deleteCustomerAddress(id: number) {
-    return this.request<ApiResponse>(
+    return this.request<APIResponse>(
       `/api/ecommerce/customer/addresses/${id}/delete`
     )
   }
@@ -1227,7 +1229,7 @@ class ApiClient {
   }
 
   async createCoupon(data: CouponCreate) {
-    return this.request<ApiResponse<{ coupon: Coupon }>>(
+    return this.request<APIResponse<{ coupon: Coupon }>>(
       '/api/ecommerce/coupons/create',
       data
     )
@@ -1281,14 +1283,14 @@ class ApiClient {
   }
 
   async applyCouponToCart(code: string, guestEmail?: string) {
-    return this.request<ApiResponse<{ cart: Partial<Cart>; discount_amount?: number }>>(
+    return this.request<APIResponse<{ cart: Partial<Cart>; discount_amount?: number }>>(
       '/api/ecommerce/cart/coupon/apply',
       { code, guest_email: guestEmail }
     )
   }
 
   async removeCouponFromCart(guestEmail?: string) {
-    return this.request<ApiResponse<{ cart: Partial<Cart> }>>(
+    return this.request<APIResponse<{ cart: Partial<Cart> }>>(
       '/api/ecommerce/cart/coupon/remove',
       { guest_email: guestEmail }
     )
@@ -1374,7 +1376,7 @@ class ApiClient {
 
   async prepareInventory(params?: { category_id?: number; search?: string }) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         inventory_lines: Array<{
           product_id: number
           product_name: string
@@ -1391,7 +1393,7 @@ class ApiClient {
 
   async validateInventory(adjustments: Array<{ product_id: number; new_qty: number }>) {
     return this.request<
-      ApiResponse<{
+      APIResponse<{
         adjusted_products: Array<{
           product_id: number
           product_name: string
@@ -1548,27 +1550,27 @@ class ApiClient {
   // ==================== SUBSCRIPTIONS ====================
 
   async getSubscriptionPlans() {
-    return this.request<ApiResponse<import('../types').SubscriptionPlan[]>>('/api/ecommerce/subscription/plans')
+    return this.request<APIResponse<import('../types').SubscriptionPlan[]>>('/api/ecommerce/subscription/plans')
   }
 
   async getCurrentSubscription() {
-    return this.request<ApiResponse<import('../types').Subscription>>('/api/ecommerce/subscription/current')
+    return this.request<APIResponse<import('../types').Subscription>>('/api/ecommerce/subscription/current')
   }
 
   async createSubscription(data: import('../types').SubscriptionCreateData) {
-    return this.request<ApiResponse<import('../types').Subscription>>('/api/ecommerce/subscription/create', data)
+    return this.request<APIResponse<import('../types').Subscription>>('/api/ecommerce/subscription/create', data)
   }
 
   async upgradeSubscription(planId: number) {
-    return this.request<ApiResponse<{ message: string }>>('/api/ecommerce/subscription/upgrade', { plan_id: planId })
+    return this.request<APIResponse<{ message: string }>>('/api/ecommerce/subscription/upgrade', { plan_id: planId })
   }
 
   async cancelSubscription() {
-    return this.request<ApiResponse<{ message: string }>>('/api/ecommerce/subscription/cancel')
+    return this.request<APIResponse<{ message: string }>>('/api/ecommerce/subscription/cancel')
   }
 
   async checkQuota(resourceType: 'users' | 'products' | 'orders') {
-    return this.request<ApiResponse<import('../types').SubscriptionUsage>>('/api/ecommerce/subscription/check-quota', { resource_type: resourceType })
+    return this.request<APIResponse<import('../types').SubscriptionUsage>>('/api/ecommerce/subscription/check-quota', { resource_type: resourceType })
   }
 
   async getSubscriptions(params?: { limit?: number; offset?: number }) {
@@ -1582,7 +1584,7 @@ class ApiClient {
   // ==================== SITE CONFIGURATION ====================
 
   async getSiteConfig() {
-    return this.request<ApiResponse<{
+    return this.request<APIResponse<{
       config: {
         brand: {
           name: string
@@ -1693,7 +1695,7 @@ class ApiClient {
       secondaryColor?: string
     }
   }) {
-    return this.request<ApiResponse<{ message: string; updated: string[] }>>('/api/ecommerce/site-config/update', data)
+    return this.request<APIResponse<{ message: string; updated: string[] }>>('/api/ecommerce/site-config/update', data)
   }
 }
 

@@ -53,7 +53,7 @@ export function DataTableRow<T>({
               ${column.cellClassName || ''}
             `.trim()}
           >
-            {column.accessor(row)}
+            {column.accessor?.(row)}
           </td>
         )
       })}

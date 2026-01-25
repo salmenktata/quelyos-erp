@@ -27,4 +27,4 @@ export type {
   MobileCardConfig,
   SortOrder,
   DataTableState,
-} from '@quelyos/types'
+} from '@/types/backoffice'

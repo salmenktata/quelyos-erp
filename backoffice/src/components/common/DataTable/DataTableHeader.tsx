@@ -62,7 +62,7 @@ export function DataTableHeader<T>({
             <th
               key={column.id}
               scope="col"
-              onClick={isSortable ? () => onSort(column.id) : undefined}
+              onClick={isSortable ? () => onSort(column.id || column.key) : undefined}
               className={`
                 px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider
                 ${alignClass}
@@ -77,7 +77,7 @@ export function DataTableHeader<T>({
                   ? (e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault()
-                        onSort(column.id)
+                        onSort(column.id || column.key)
                       }
                     }
                   : undefined

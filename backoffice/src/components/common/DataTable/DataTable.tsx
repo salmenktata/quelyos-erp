@@ -40,7 +40,7 @@ import type { DataTableProps, SortOrder } from '@/types'
 export function DataTable<T>({
   data,
   columns,
-  keyExtractor,
+  keyExtractor = (item: any) => item.id,
   isLoading = false,
   error = null,
   mobileConfig,
@@ -70,7 +70,7 @@ export function DataTable<T>({
 
   // Utiliser la sélection externe ou interne
   const selectedKeys = useMemo(() => {
-    if (externalSelectedItems) {
+    if (externalSelectedItems && keyExtractor) {
       return new Set(externalSelectedItems.map(keyExtractor))
     }
     return internalSelectedKeys
@@ -108,8 +108,8 @@ export function DataTable<T>({
       }
 
       // Tri par défaut basé sur l'accessor
-      const aValue = column.accessor(a)
-      const bValue = column.accessor(b)
+      const aValue = column.accessor ? column.accessor(a) : ''
+      const bValue = column.accessor ? column.accessor(b) : ''
 
       // Conversion en string pour comparaison
       const aStr = String(aValue ?? '')
@@ -127,7 +127,7 @@ export function DataTable<T>({
     const allSelected = sortedData.every((row) => selectedKeys.has(keyExtractor(row)))
 
     if (onSelectionChange) {
-      onSelectionChange(allSelected ? [] : sortedData)
+      onSelectionChange(allSelected ? new Set() : allKeys)
     } else {
       setInternalSelectedKeys(allSelected ? new Set() : allKeys)
     }
@@ -138,10 +138,13 @@ export function DataTable<T>({
       const key = keyExtractor(row)
 
       if (onSelectionChange) {
-        const newSelection = selected
-          ? [...(externalSelectedItems || []), row]
-          : (externalSelectedItems || []).filter((item) => keyExtractor(item) !== key)
-        onSelectionChange(newSelection)
+        const newKeys = new Set(selectedKeys)
+        if (selected) {
+          newKeys.add(key)
+        } else {
+          newKeys.delete(key)
+        }
+        onSelectionChange(newKeys)
       } else {
         setInternalSelectedKeys((prev) => {
           const next = new Set(prev)
@@ -154,7 +157,7 @@ export function DataTable<T>({
         })
       }
     },
-    [keyExtractor, onSelectionChange, externalSelectedItems]
+    [keyExtractor, onSelectionChange, selectedKeys]
   )
 
   const hasSelection = Boolean(bulkActions && bulkActions.length > 0)
@@ -213,9 +216,9 @@ export function DataTable<T>({
             {bulkActions.map((action) => (
               <Button
                 key={action.id}
-                variant={action.variant || 'secondary'}
+                variant={action.variant === 'default' ? 'secondary' : (action.variant || 'secondary')}
                 size="sm"
-                onClick={() => action.onExecute(selectedData)}
+                onClick={() => (action.onExecute || action.onClick)(selectedData)}
                 disabled={action.disabled}
                 icon={action.icon}
               >
@@ -271,11 +274,11 @@ export function DataTable<T>({
       />
 
       {/* Pagination */}
-      {pagination && pagination.totalItems > pagination.pageSize && (
+      {pagination && pagination.total > pagination.limit && (
         <DataTablePagination
-          currentPage={pagination.currentPage}
-          pageSize={pagination.pageSize}
-          totalItems={pagination.totalItems}
+          currentPage={Math.floor(pagination.offset / pagination.limit)}
+          pageSize={pagination.limit}
+          totalItems={pagination.total}
           onPageChange={pagination.onPageChange}
         />
       )}
