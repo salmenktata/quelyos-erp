@@ -121,17 +121,31 @@ class QuelyosTenant(models.Model):
 
     logo = fields.Binary(
         string='Logo',
-        help="Logo principal de la boutique"
+        help="Logo principal de la boutique",
+        attachment=True
     )
     logo_filename = fields.Char(
         string='Nom fichier logo'
     )
+    logo_url = fields.Char(
+        string='URL Logo',
+        compute='_compute_logo_url',
+        store=False,
+        help="URL publique du logo"
+    )
     favicon = fields.Binary(
         string='Favicon',
-        help="Icône affichée dans l'onglet du navigateur"
+        help="Icône affichée dans l'onglet du navigateur",
+        attachment=True
     )
     favicon_filename = fields.Char(
         string='Nom fichier favicon'
+    )
+    favicon_url = fields.Char(
+        string='URL Favicon',
+        compute='_compute_favicon_url',
+        store=False,
+        help="URL publique du favicon"
     )
     slogan = fields.Char(
         string='Slogan',
@@ -342,6 +356,26 @@ class QuelyosTenant(models.Model):
     # ═══════════════════════════════════════════════════════════════════════════
     # COMPUTED FIELDS
     # ═══════════════════════════════════════════════════════════════════════════
+
+    @api.depends('logo')
+    def _compute_logo_url(self):
+        """Génère l'URL publique du logo"""
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        for tenant in self:
+            if tenant.logo:
+                tenant.logo_url = f'{base_url}/web/image/quelyos.tenant/{tenant.id}/logo'
+            else:
+                tenant.logo_url = False
+
+    @api.depends('favicon')
+    def _compute_favicon_url(self):
+        """Génère l'URL publique du favicon"""
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        for tenant in self:
+            if tenant.favicon:
+                tenant.favicon_url = f'{base_url}/web/image/quelyos.tenant/{tenant.id}/favicon'
+            else:
+                tenant.favicon_url = False
 
     @api.depends('social_links_json')
     def _compute_social_links(self):

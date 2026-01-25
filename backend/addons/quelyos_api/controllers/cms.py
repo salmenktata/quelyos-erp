@@ -70,123 +70,123 @@ class QuelyCMS(BaseController):
     def _get_static_menu_fallback(self, code):
         """Fallback menus statiques si aucune donnée en DB"""
         menus_config = {
-                'header': {
-                    'id': 1,
-                    'name': 'Menu Principal',
-                    'code': 'header',
-                    'items': [
-                        {
-                            'id': 1,
-                            'name': 'Accueil',
-                            'url': '/',
-                            'link_type': 'url',
-                            'icon': None,
-                            'css_class': None,
-                            'open_in_new_tab': False,
-                            'highlight': False,
-                            'visibility': 'all',
-                            'children': []
-                        },
-                        {
-                            'id': 2,
-                            'name': 'Produits',
-                            'url': '/products',
-                            'link_type': 'url',
-                            'icon': None,
-                            'css_class': None,
-                            'open_in_new_tab': False,
-                            'highlight': False,
-                            'visibility': 'all',
-                            'children': []
-                        },
-                        {
-                            'id': 3,
-                            'name': 'Contact',
-                            'url': '/contact',
-                            'link_type': 'url',
-                            'icon': None,
-                            'css_class': None,
-                            'open_in_new_tab': False,
-                            'highlight': False,
-                            'visibility': 'all',
-                            'children': []
-                        }
-                    ]
-                },
-                'footer_quick': {
-                    'id': 2,
-                    'name': 'Liens Rapides Footer',
-                    'code': 'footer_quick',
-                    'items': [
-                        {
-                            'id': 10,
-                            'name': 'À propos',
-                            'url': '/about',
-                            'link_type': 'page',
-                            'icon': None,
-                            'css_class': None,
-                            'open_in_new_tab': False,
-                            'highlight': False,
-                            'visibility': 'all',
-                            'children': []
-                        },
-                        {
-                            'id': 11,
-                            'name': 'Contact',
-                            'url': '/contact',
-                            'link_type': 'page',
-                            'icon': None,
-                            'css_class': None,
-                            'open_in_new_tab': False,
-                            'highlight': False,
-                            'visibility': 'all',
-                            'children': []
-                        }
-                    ]
-                },
-                'footer_service': {
-                    'id': 3,
-                    'name': 'Service Client Footer',
-                    'code': 'footer_service',
-                    'items': [
-                        {
-                            'id': 20,
-                            'name': 'Livraison',
-                            'url': '/shipping',
-                            'link_type': 'page',
-                            'icon': None,
-                            'css_class': None,
-                            'open_in_new_tab': False,
-                            'highlight': False,
-                            'visibility': 'all',
-                            'children': []
-                        },
-                        {
-                            'id': 21,
-                            'name': 'Retours',
-                            'url': '/returns',
-                            'link_type': 'page',
-                            'icon': None,
-                            'css_class': None,
-                            'open_in_new_tab': False,
-                            'highlight': False,
-                            'visibility': 'all',
-                            'children': []
-                        },
-                        {
-                            'id': 22,
-                            'name': 'CGV',
-                            'url': '/terms',
-                            'link_type': 'page',
-                            'icon': None,
-                            'css_class': None,
-                            'open_in_new_tab': False,
-                            'highlight': False,
-                            'visibility': 'all',
-                            'children': []
-                        }
-                    ]
-                }
+            'header': {
+                'id': 1,
+                'name': 'Menu Principal',
+                'code': 'header',
+                'items': [
+                    {
+                        'id': 1,
+                        'name': 'Accueil',
+                        'url': '/',
+                        'link_type': 'url',
+                        'icon': None,
+                        'css_class': None,
+                        'open_in_new_tab': False,
+                        'highlight': False,
+                        'visibility': 'all',
+                        'children': []
+                    },
+                    {
+                        'id': 2,
+                        'name': 'Produits',
+                        'url': '/products',
+                        'link_type': 'url',
+                        'icon': None,
+                        'css_class': None,
+                        'open_in_new_tab': False,
+                        'highlight': False,
+                        'visibility': 'all',
+                        'children': []
+                    },
+                    {
+                        'id': 3,
+                        'name': 'Contact',
+                        'url': '/contact',
+                        'link_type': 'url',
+                        'icon': None,
+                        'css_class': None,
+                        'open_in_new_tab': False,
+                        'highlight': False,
+                        'visibility': 'all',
+                        'children': []
+                    }
+                ]
+            },
+            'footer_quick': {
+                'id': 2,
+                'name': 'Liens Rapides Footer',
+                'code': 'footer_quick',
+                'items': [
+                    {
+                        'id': 10,
+                        'name': 'À propos',
+                        'url': '/about',
+                        'link_type': 'page',
+                        'icon': None,
+                        'css_class': None,
+                        'open_in_new_tab': False,
+                        'highlight': False,
+                        'visibility': 'all',
+                        'children': []
+                    },
+                    {
+                        'id': 11,
+                        'name': 'Contact',
+                        'url': '/contact',
+                        'link_type': 'page',
+                        'icon': None,
+                        'css_class': None,
+                        'open_in_new_tab': False,
+                        'highlight': False,
+                        'visibility': 'all',
+                        'children': []
+                    }
+                ]
+            },
+            'footer_service': {
+                'id': 3,
+                'name': 'Service Client Footer',
+                'code': 'footer_service',
+                'items': [
+                    {
+                        'id': 20,
+                        'name': 'Livraison',
+                        'url': '/shipping',
+                        'link_type': 'page',
+                        'icon': None,
+                        'css_class': None,
+                        'open_in_new_tab': False,
+                        'highlight': False,
+                        'visibility': 'all',
+                        'children': []
+                    },
+                    {
+                        'id': 21,
+                        'name': 'Retours',
+                        'url': '/returns',
+                        'link_type': 'page',
+                        'icon': None,
+                        'css_class': None,
+                        'open_in_new_tab': False,
+                        'highlight': False,
+                        'visibility': 'all',
+                        'children': []
+                    },
+                    {
+                        'id': 22,
+                        'name': 'CGV',
+                        'url': '/terms',
+                        'link_type': 'page',
+                        'icon': None,
+                        'css_class': None,
+                        'open_in_new_tab': False,
+                        'highlight': False,
+                        'visibility': 'all',
+                        'children': []
+                    }
+                ]
+            }
         }
 
         menu = menus_config.get(code)
@@ -408,8 +408,8 @@ class QuelyCMS(BaseController):
                         'category_id': category.id
                     })
 
-                if len(popular_searches) >= limit:
-                    break
+                    if len(popular_searches) >= limit:
+                        break
 
             # Ajouter quelques recherches génériques si pas assez de catégories
             if len(popular_searches) < limit:
@@ -555,7 +555,7 @@ class QuelyCMS(BaseController):
         Mettre à jour la configuration du site (ADMIN UNIQUEMENT)
 
         Paramètres supportés:
-        - shipping: { freeThreshold, standardDaysMin, standardDaysMax, expressDaysMin, expressDaysMax }
+            - shipping: { freeThreshold, standardDaysMin, standardDaysMax, expressDaysMin, expressDaysMax }
         - returns: { windowDays, refundDaysMin, refundDaysMax, warrantyYears }
         - brand: { name, slogan, description, email, phone, whatsapp }
         - social: { facebook, instagram, twitter, youtube, linkedin, tiktok }
@@ -1336,4 +1336,162 @@ class QuelyCMS(BaseController):
 
         except Exception as e:
             _logger.error(f"Upload category image error: {e}")
+            return request.make_json_response({'success': False, 'error': str(e)})
+
+    # ==================== TENANT THEME ====================
+
+    @http.route('/api/ecommerce/tenants/<int:tenant_id>/theme', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_tenant_theme(self, tenant_id, **kwargs):
+        """Récupérer thème complet du tenant (public)"""
+        try:
+            tenant = request.env['quelyos.tenant'].sudo().browse(tenant_id)
+            if not tenant.exists() or not tenant.active:
+                return {'success': False, 'error': 'Tenant non trouvé'}
+
+            return {
+                'success': True,
+                'theme': {
+                    'colors': {
+                        'primary': tenant.primary_color,
+                        'primary_dark': tenant.primary_dark,
+                        'primary_light': tenant.primary_light,
+                        'secondary': tenant.secondary_color,
+                        'secondary_dark': tenant.secondary_dark,
+                        'secondary_light': tenant.secondary_light,
+                        'accent': tenant.accent_color,
+                        'background': tenant.background_color,
+                        'foreground': tenant.foreground_color,
+                        'muted': tenant.muted_color,
+                        'muted_foreground': tenant.muted_foreground,
+                        'border': tenant.border_color,
+                        'ring': tenant.ring_color
+                    },
+                    'logos': {
+                        'logo_url': tenant.logo_url,
+                        'favicon_url': tenant.favicon_url
+                    },
+                    'fonts': {
+                        'family': tenant.font_family
+                    },
+                    'options': {
+                        'enable_dark_mode': tenant.enable_dark_mode,
+                        'default_dark': tenant.default_dark
+                    }
+                }
+            }
+        except Exception as e:
+            _logger.error(f"Get tenant theme error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/tenants/<int:tenant_id>/theme/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def update_tenant_theme(self, tenant_id, **kwargs):
+        """Modifier thème tenant (ADMIN)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            _require_admin(request.env)
+
+            tenant = request.env['quelyos.tenant'].sudo().browse(tenant_id)
+            if not tenant.exists():
+                return {'success': False, 'error': 'Tenant non trouvé'}
+
+            params = self._get_params()
+            theme_data = {}
+
+            # Couleurs
+            if 'colors' in params:
+                color_mapping = {
+                    'primary': 'primary_color',
+                    'primary_dark': 'primary_dark',
+                    'primary_light': 'primary_light',
+                    'secondary': 'secondary_color',
+                    'secondary_dark': 'secondary_dark',
+                    'secondary_light': 'secondary_light',
+                    'accent': 'accent_color',
+                    'background': 'background_color',
+                    'foreground': 'foreground_color',
+                    'muted': 'muted_color',
+                    'muted_foreground': 'muted_foreground',
+                    'border': 'border_color',
+                    'ring': 'ring_color'
+                }
+                for key, field in color_mapping.items():
+                    if key in params['colors']:
+                        theme_data[field] = params['colors'][key]
+
+            # Polices
+            if 'fonts' in params and 'family' in params['fonts']:
+                theme_data['font_family'] = params['fonts']['family']
+
+            # Options
+            if 'options' in params:
+                if 'enable_dark_mode' in params['options']:
+                    theme_data['enable_dark_mode'] = params['options']['enable_dark_mode']
+                if 'default_dark' in params['options']:
+                    theme_data['default_dark'] = params['options']['default_dark']
+
+            tenant.write(theme_data)
+
+            return {'success': True}
+
+        except Exception as e:
+            _logger.error(f"Update tenant theme error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/tenants/<int:tenant_id>/upload-logo', type='http', auth='user', methods=['POST'], csrf=False, cors='*')
+    def upload_tenant_logo(self, tenant_id, **kwargs):
+        """Upload logo tenant"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return request.make_json_response(error)
+
+            _require_admin(request.env)
+
+            tenant = request.env['quelyos.tenant'].sudo().browse(tenant_id)
+            if not tenant.exists():
+                return request.make_json_response({'success': False, 'error': 'Tenant non trouvé'})
+
+            image_file = request.httprequest.files.get('image')
+            if not image_file:
+                return request.make_json_response({'success': False, 'error': 'Aucune image fournie'})
+
+            import base64
+            image_data = base64.b64encode(image_file.read())
+            tenant.write({'logo': image_data, 'logo_filename': image_file.filename})
+
+            return request.make_json_response({'success': True, 'logo_url': tenant.logo_url})
+
+        except Exception as e:
+            _logger.error(f"Upload tenant logo error: {e}")
+            return request.make_json_response({'success': False, 'error': str(e)})
+
+    @http.route('/api/ecommerce/tenants/<int:tenant_id>/upload-favicon', type='http', auth='user', methods=['POST'], csrf=False, cors='*')
+    def upload_tenant_favicon(self, tenant_id, **kwargs):
+        """Upload favicon tenant"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return request.make_json_response(error)
+
+            _require_admin(request.env)
+
+            tenant = request.env['quelyos.tenant'].sudo().browse(tenant_id)
+            if not tenant.exists():
+                return request.make_json_response({'success': False, 'error': 'Tenant non trouvé'})
+
+            image_file = request.httprequest.files.get('image')
+            if not image_file:
+                return request.make_json_response({'success': False, 'error': 'Aucune image fournie'})
+
+            import base64
+            image_data = base64.b64encode(image_file.read())
+            tenant.write({'favicon': image_data, 'favicon_filename': image_file.filename})
+
+            return request.make_json_response({'success': True, 'favicon_url': tenant.favicon_url})
+
+        except Exception as e:
+            _logger.error(f"Upload tenant favicon error: {e}")
             return request.make_json_response({'success': False, 'error': str(e)})
