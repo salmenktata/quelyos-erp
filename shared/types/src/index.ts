@@ -235,12 +235,17 @@ export interface Cart {
   id: number;
   lines: CartLine[];
   subtotal: number;
+  amount_untaxed?: number; // Alias de subtotal
   tax_total: number;
+  amount_tax?: number; // Alias de tax_total
   shipping_cost?: number;
   discount?: number;
+  coupon_discount?: number; // Réduction appliquée par le coupon
   total: number;
+  amount_total?: number; // Alias de total
   currency?: Currency;
   coupon?: Coupon;
+  coupon_code?: string; // Alias de coupon.code
   item_count: number;
 }
 
@@ -249,8 +254,15 @@ export interface CartLine {
   product: Product;
   quantity: number;
   unit_price: number;
+  price_unit?: number; // Alias de unit_price
   subtotal: number;
+  price_subtotal?: number; // Alias de subtotal
   variant?: ProductVariant;
+  // Champs dupliqués depuis product pour faciliter l'accès
+  product_id?: number;
+  product_name?: string;
+  product_image?: string;
+  currency_symbol?: string;
 }
 
 export interface Order {

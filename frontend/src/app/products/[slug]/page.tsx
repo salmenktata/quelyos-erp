@@ -347,7 +347,7 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Sélecteur de variantes intelligent */}
-            {variantsData && variantsData.data.variants.length > 1 && (
+            {variantsData && variantsData.variants.length > 1 && (
               <div className="mb-6">
                 <VariantSelector
                   productId={product.id}

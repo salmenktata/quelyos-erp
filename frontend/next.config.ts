@@ -59,15 +59,13 @@ const nextConfig: NextConfig = {
     } : false,
   },
 
-  // Webpack configuration for shared packages
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
+  // Turbopack configuration for shared packages
+  turbopack: {
+    resolveAlias: {
       '@quelyos/logger': path.resolve(__dirname, '../shared/logger/src'),
       '@quelyos/types': path.resolve(__dirname, '../shared/types/src'),
       '@quelyos/api-client': path.resolve(__dirname, '../shared/api-client/src'),
-    };
-    return config;
+    },
   },
 
   // Headers de sécurité

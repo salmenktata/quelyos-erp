@@ -4,19 +4,11 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/common';
 import { useCartStore } from '@/store/cartStore';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
+import type { CartLine } from '@quelyos/types';
 
 interface CartItemProps {
-  item: {
-    id: number;
-    product_id: number;
-    product_name: string;
-    product_image?: string;
-    quantity: number;
-    price_unit: number;
-    price_subtotal: number;
-    currency_symbol?: string;
-  };
+  item: CartLine;
   showRemove?: boolean;
   compact?: boolean;
 }
@@ -30,7 +22,7 @@ const CartItem: React.FC<CartItemProps> = ({
   const [isRemoving, setIsRemoving] = useState(false);
   const { updateQuantity, removeItem } = useCartStore();
 
-  const currencySymbol = item.currency_symbol || 'TND';
+  const currencySymbol = item.currency_symbol || item.product?.currency?.symbol || 'TND';
 
   const handleQuantityChange = async (newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -55,8 +47,13 @@ const CartItem: React.FC<CartItemProps> = ({
     }
   };
 
-  const imageUrl = item.product_image
-    ? `${process.env.NEXT_PUBLIC_ODOO_URL}${item.product_image}`
+  const productName = productName || item.product?.name || 'Produit';
+  const productImage = item.product_image || item.product?.image_url || '';
+  const priceUnit = priceUnit || item.unit_price || 0;
+  const priceSubtotal = priceSubtotal || item.subtotal || 0;
+
+  const imageUrl = productImage
+    ? `${process.env.NEXT_PUBLIC_ODOO_URL}${productImage}`
     : '/placeholder-product.png';
 
   if (compact) {
@@ -65,7 +62,7 @@ const CartItem: React.FC<CartItemProps> = ({
         <div className="relative w-16 h-16 flex-shrink-0">
           <Image
             src={imageUrl}
-            alt={item.product_name}
+            alt={productName}
             fill
             sizes="64px"
             className="object-cover rounded"
@@ -73,13 +70,13 @@ const CartItem: React.FC<CartItemProps> = ({
         </div>
         <div className="flex-1 min-w-0">
           <h4 className="text-sm font-medium text-gray-900 truncate">
-            {item.product_name}
+            {productName}
           </h4>
           <p className="text-sm text-gray-500">
             Qté: {item.quantity}
           </p>
           <p className="text-sm font-semibold text-gray-900">
-            {item.price_subtotal.toFixed(2)} {currencySymbol}
+            {priceSubtotal.toFixed(2)} {currencySymbol}
           </p>
         </div>
       </div>
@@ -92,7 +89,7 @@ const CartItem: React.FC<CartItemProps> = ({
       <div className="relative w-24 h-24 flex-shrink-0">
         <Image
           src={imageUrl}
-          alt={item.product_name}
+          alt={productName}
           fill
           sizes="96px"
           className="object-cover rounded-lg"
@@ -102,10 +99,10 @@ const CartItem: React.FC<CartItemProps> = ({
       {/* Product Info */}
       <div className="flex-1 min-w-0">
         <h3 className="text-base font-semibold text-gray-900 mb-1">
-          {item.product_name}
+          {productName}
         </h3>
         <p className="text-sm text-gray-600 mb-2">
-          Prix unitaire: {item.price_unit.toFixed(2)} {currencySymbol}
+          Prix unitaire: {priceUnit.toFixed(2)} {currencySymbol}
         </p>
 
         {/* Quantity Controls */}
@@ -147,7 +144,7 @@ const CartItem: React.FC<CartItemProps> = ({
       {/* Subtotal */}
       <div className="text-right flex-shrink-0">
         <p className="text-lg font-bold text-gray-900">
-          {item.price_subtotal.toFixed(2)} {currencySymbol}
+          {priceSubtotal.toFixed(2)} {currencySymbol}
         </p>
       </div>
     </div>

@@ -4,19 +4,11 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Badge } from '@/components/common';
 import { useCartStore } from '@/store/cartStore';
-import { logger } from '@/lib/logger';
+import { logger } from '@quelyos/logger';
+import type { Cart } from '@quelyos/types';
 
 interface CartSummaryProps {
-  cart: {
-    amount_untaxed: number;
-    amount_tax: number;
-    amount_total: number;
-    currency: {
-      symbol: string;
-    };
-    coupon_code?: string;
-    coupon_discount?: number;
-  } | null;
+  cart: Cart | null;
   showCheckoutButton?: boolean;
   compact?: boolean;
 }
@@ -36,6 +28,13 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       </div>
     );
   }
+
+  const amountUntaxed = amountUntaxed ?? cart.subtotal;
+  const amountTax = amountTax ?? cart.tax_total;
+  const amountTotal = amountTotal ?? cart.total;
+  const currencySymbol = cart.currency?.symbol || '€';
+  const couponCode = couponCode || cart.coupon?.code;
+  const couponDiscount = couponDiscount || cart.discount;
 
   const handleCheckout = () => {
     router.push('/checkout');
@@ -61,16 +60,16 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         <div className="flex justify-between text-gray-700">
           <span>Sous-total</span>
           <span className="font-medium">
-            {cart.amount_untaxed.toFixed(2)} {cart.currency.symbol}
+            {amountUntaxed.toFixed(2)} {currencySymbol}
           </span>
         </div>
 
         {/* Coupon Discount */}
-        {cart.coupon_code && cart.coupon_discount && (
+        {couponCode && couponDiscount && (
           <div className="flex justify-between items-center text-green-700">
             <div className="flex items-center gap-2">
               <span>Coupon</span>
-              <Badge variant="success">{cart.coupon_code}</Badge>
+              <Badge variant="success">{couponCode}</Badge>
               <button
                 onClick={handleRemoveCoupon}
                 className="text-xs text-red-600 hover:text-red-800"
@@ -80,7 +79,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
               </button>
             </div>
             <span className="font-medium">
-              -{cart.coupon_discount.toFixed(2)} {cart.currency.symbol}
+              -{couponDiscount.toFixed(2)} {currencySymbol}
             </span>
           </div>
         )}
@@ -89,7 +88,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         <div className="flex justify-between text-gray-700">
           <span>TVA</span>
           <span className="font-medium">
-            {cart.amount_tax.toFixed(2)} {cart.currency.symbol}
+            {amountTax.toFixed(2)} {currencySymbol}
           </span>
         </div>
 
@@ -107,7 +106,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
               Total
             </span>
             <span className={`font-bold text-primary ${compact ? 'text-lg' : 'text-2xl'}`}>
-              {cart.amount_total.toFixed(2)} {cart.currency.symbol}
+              {amountTotal.toFixed(2)} {currencySymbol}
             </span>
           </div>
         </div>

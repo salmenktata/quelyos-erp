@@ -188,7 +188,7 @@ export default function AccountWishlistPage() {
 
                     <p className="text-xs text-gray-500 mb-4">
                       Ajouté le{' '}
-                      {new Date(item.date_added).toLocaleDateString('fr-FR', {
+                      {new Date(item.added_date).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'long',
                         year: 'numeric',
