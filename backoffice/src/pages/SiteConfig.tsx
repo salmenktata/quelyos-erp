@@ -3,6 +3,14 @@ import { Layout } from '../components/Layout'
 import { useSiteConfig, useUpdateSiteConfig } from '../hooks/useSiteConfig'
 import { Button, Breadcrumbs, Skeleton } from '../components/common'
 import { useToast } from '../contexts/ToastContext'
+import { z } from 'zod'
+import {
+  contactSchema,
+  shippingSchema,
+  returnsSchema,
+  warrantySchema,
+  paymentMethodsSchema
+} from '../lib/validation'
 
 export default function SiteConfig() {
   const toast = useToast()
@@ -99,6 +107,53 @@ export default function SiteConfig() {
 
   const handleSave = async () => {
     try {
+      // Validation des données avant envoi
+      try {
+        contactSchema.parse(contactConfig)
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          toast.error(`Contact: ${error.errors[0].message}`)
+          return
+        }
+      }
+
+      try {
+        shippingSchema.parse(shippingConfig)
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          toast.error(`Livraison: ${error.errors[0].message}`)
+          return
+        }
+      }
+
+      try {
+        returnsSchema.parse(returnsConfig)
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          toast.error(`Retours: ${error.errors[0].message}`)
+          return
+        }
+      }
+
+      try {
+        warrantySchema.parse(warrantyConfig)
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          toast.error(`Garantie: ${error.errors[0].message}`)
+          return
+        }
+      }
+
+      try {
+        paymentMethodsSchema.parse(paymentMethods)
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          toast.error(`Paiement: ${error.errors[0].message}`)
+          return
+        }
+      }
+
+      // Envoyer les données validées
       await updateMutation.mutateAsync({
         ...features,
         ...contactConfig,
@@ -109,7 +164,7 @@ export default function SiteConfig() {
         catalog_settings: catalogConfig,
       })
       toast.success('Configuration mise à jour avec succès')
-    } catch {
+    } catch (error) {
       toast.error('Erreur lors de la mise à jour de la configuration')
     }
   }

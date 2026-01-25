@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import time
 from odoo import http, fields
 from odoo.http import request
 from passlib.context import CryptContext
@@ -9,6 +10,10 @@ _logger = logging.getLogger(__name__)
 
 # Context de cryptage pour vérifier les mots de passe
 crypt_context = CryptContext(schemes=['pbkdf2_sha512', 'plaintext'], deprecated=['plaintext'])
+
+# Cache simple pour rate limiting des vues produits (IP:product_id -> timestamp)
+# En production, utiliser Redis pour un cache distribué
+_view_count_cache = {}
 
 
 class QuelyosAPI(http.Controller):
@@ -740,10 +745,31 @@ class QuelyosAPI(http.Controller):
                     'error': 'Product not found'
                 }
 
-            # Incrémenter le compteur de vues (tracking)
+            # Incrémenter le compteur de vues (tracking) avec rate limiting
+            # Limite: 1 vue par IP/produit toutes les 60 secondes
             try:
-                current_views = getattr(product, 'x_view_count', 0) or 0
-                product.sudo().write({'x_view_count': current_views + 1})
+                # Récupérer l'IP du client
+                ip = request.httprequest.environ.get('HTTP_X_REAL_IP') or \
+                     request.httprequest.environ.get('HTTP_X_FORWARDED_FOR', '').split(',')[0] or \
+                     request.httprequest.remote_addr
+
+                cache_key = f"{ip}:{product.id}"
+                current_time = time.time()
+
+                # Vérifier le rate limit (60 secondes)
+                last_view = _view_count_cache.get(cache_key, 0)
+                if current_time - last_view >= 60:
+                    # Incrémenter de manière atomique (évite race condition)
+                    request.env.cr.execute("""
+                        UPDATE product_template
+                        SET x_view_count = COALESCE(x_view_count, 0) + 1
+                        WHERE id = %s
+                    """, (product.id,))
+                    _view_count_cache[cache_key] = current_time
+
+                    # Nettoyage du cache (supprimer entrées > 5 minutes)
+                    if len(_view_count_cache) > 10000:  # Éviter croissance infinie
+                        _view_count_cache.clear()
             except Exception as view_err:
                 _logger.warning(f"Could not increment view count: {view_err}")
 
@@ -8664,6 +8690,337 @@ class QuelyosAPI(http.Controller):
 
         except Exception as e:
             _logger.error(f"Get pricelist detail error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/pricelists/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def create_pricelist(self, **params):
+        """
+        Créer une nouvelle pricelist (ADMIN UNIQUEMENT).
+
+        Params:
+            name (str): Nom de la liste de prix (requis)
+            currency_id (int): ID de la devise (requis)
+            discount_policy (str): Politique remise 'with_discount' ou 'without_discount' (optionnel, défaut 'with_discount')
+            active (bool): Statut actif (optionnel, défaut True)
+
+        Returns:
+            Pricelist créée avec son ID
+        """
+        try:
+            # Vérification admin
+            admin_check = self._require_admin()
+            if not admin_check['success']:
+                return admin_check
+
+            # Validation paramètres requis
+            name = params.get('name')
+            currency_id = params.get('currency_id')
+
+            if not name:
+                return {
+                    'success': False,
+                    'error': 'Le nom de la liste de prix est requis'
+                }
+
+            if not currency_id:
+                return {
+                    'success': False,
+                    'error': 'La devise est requise'
+                }
+
+            # Vérifier que la devise existe
+            Currency = request.env['res.currency'].sudo()
+            currency = Currency.browse(currency_id)
+            if not currency.exists():
+                return {
+                    'success': False,
+                    'error': f'Devise {currency_id} introuvable'
+                }
+
+            # Paramètres optionnels
+            discount_policy = params.get('discount_policy', 'with_discount')
+            active = params.get('active', True)
+
+            # Créer la pricelist
+            Pricelist = request.env['product.pricelist'].sudo()
+            new_pricelist = Pricelist.create({
+                'name': name,
+                'currency_id': currency_id,
+                'discount_policy': discount_policy,
+                'active': active,
+            })
+
+            _logger.info(f"Pricelist créée : {new_pricelist.id} - {name} par user {request.env.user.login}")
+
+            return {
+                'success': True,
+                'data': {
+                    'id': new_pricelist.id,
+                    'name': new_pricelist.name,
+                    'currency_id': new_pricelist.currency_id.id,
+                    'currency_name': new_pricelist.currency_id.name,
+                    'currency_symbol': new_pricelist.currency_id.symbol,
+                    'active': new_pricelist.active,
+                    'discount_policy': new_pricelist.discount_policy,
+                },
+                'message': f"Liste de prix '{name}' créée avec succès"
+            }
+
+        except Exception as e:
+            _logger.error(f"Create pricelist error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/pricelists/<int:pricelist_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def update_pricelist(self, pricelist_id, **params):
+        """
+        Modifier une pricelist existante (ADMIN UNIQUEMENT).
+
+        Params:
+            name (str): Nouveau nom (optionnel)
+            currency_id (int): Nouvelle devise (optionnel)
+            discount_policy (str): Nouvelle politique remise (optionnel)
+            active (bool): Nouveau statut actif (optionnel)
+
+        Returns:
+            Pricelist mise à jour
+        """
+        try:
+            # Vérification admin
+            admin_check = self._require_admin()
+            if not admin_check['success']:
+                return admin_check
+
+            Pricelist = request.env['product.pricelist'].sudo()
+            pricelist = Pricelist.browse(pricelist_id)
+
+            if not pricelist.exists():
+                return {
+                    'success': False,
+                    'error': f'Pricelist {pricelist_id} introuvable'
+                }
+
+            # Construire dictionnaire des champs à mettre à jour
+            update_vals = {}
+
+            if 'name' in params:
+                update_vals['name'] = params['name']
+
+            if 'currency_id' in params:
+                currency_id = params['currency_id']
+                Currency = request.env['res.currency'].sudo()
+                currency = Currency.browse(currency_id)
+                if not currency.exists():
+                    return {
+                        'success': False,
+                        'error': f'Devise {currency_id} introuvable'
+                    }
+                update_vals['currency_id'] = currency_id
+
+            if 'discount_policy' in params:
+                update_vals['discount_policy'] = params['discount_policy']
+
+            if 'active' in params:
+                update_vals['active'] = params['active']
+
+            # Appliquer les modifications
+            if update_vals:
+                pricelist.write(update_vals)
+                _logger.info(f"Pricelist mise à jour : {pricelist_id} par user {request.env.user.login}")
+
+            return {
+                'success': True,
+                'data': {
+                    'id': pricelist.id,
+                    'name': pricelist.name,
+                    'currency_id': pricelist.currency_id.id,
+                    'currency_name': pricelist.currency_id.name,
+                    'currency_symbol': pricelist.currency_id.symbol,
+                    'active': pricelist.active,
+                    'discount_policy': pricelist.discount_policy,
+                },
+                'message': f"Liste de prix '{pricelist.name}' mise à jour avec succès"
+            }
+
+        except Exception as e:
+            _logger.error(f"Update pricelist error: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+    @http.route('/api/ecommerce/pricelists/<int:pricelist_id>/items/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def create_pricelist_item(self, pricelist_id, **params):
+        """
+        Ajouter une règle de prix à une pricelist (ADMIN UNIQUEMENT).
+
+        Params:
+            applied_on (str): Type d'application '3_global', '2_product_category', '1_product', '0_product_variant' (requis)
+            compute_price (str): Type de calcul 'fixed', 'percentage', 'formula' (requis)
+            fixed_price (float): Prix fixe (si compute_price='fixed')
+            percent_price (float): Pourcentage du prix (si compute_price='percentage')
+            price_discount (float): Pourcentage de remise (si compute_price='percentage')
+            min_quantity (int): Quantité minimale (optionnel, défaut 1)
+            product_tmpl_id (int): ID du produit (si applied_on='1_product')
+            categ_id (int): ID de la catégorie (si applied_on='2_product_category')
+            date_start (str): Date début validité YYYY-MM-DD (optionnel)
+            date_end (str): Date fin validité YYYY-MM-DD (optionnel)
+
+        Returns:
+            Règle de prix créée
+        """
+        try:
+            # Vérification admin
+            admin_check = self._require_admin()
+            if not admin_check['success']:
+                return admin_check
+
+            Pricelist = request.env['product.pricelist'].sudo()
+            pricelist = Pricelist.browse(pricelist_id)
+
+            if not pricelist.exists():
+                return {
+                    'success': False,
+                    'error': f'Pricelist {pricelist_id} introuvable'
+                }
+
+            # Validation paramètres requis
+            applied_on = params.get('applied_on')
+            compute_price = params.get('compute_price')
+
+            if not applied_on:
+                return {
+                    'success': False,
+                    'error': "Le type d'application (applied_on) est requis"
+                }
+
+            if applied_on not in ['3_global', '2_product_category', '1_product', '0_product_variant']:
+                return {
+                    'success': False,
+                    'error': f"Type d'application invalide : {applied_on}"
+                }
+
+            if not compute_price:
+                return {
+                    'success': False,
+                    'error': "Le type de calcul (compute_price) est requis"
+                }
+
+            if compute_price not in ['fixed', 'percentage', 'formula']:
+                return {
+                    'success': False,
+                    'error': f"Type de calcul invalide : {compute_price}"
+                }
+
+            # Construire les valeurs de la règle
+            item_vals = {
+                'pricelist_id': pricelist_id,
+                'applied_on': applied_on,
+                'compute_price': compute_price,
+                'min_quantity': params.get('min_quantity', 1),
+            }
+
+            # Validation selon applied_on
+            if applied_on == '1_product':
+                product_tmpl_id = params.get('product_tmpl_id')
+                if not product_tmpl_id:
+                    return {
+                        'success': False,
+                        'error': "product_tmpl_id requis pour applied_on='1_product'"
+                    }
+                # Vérifier que le produit existe
+                ProductTemplate = request.env['product.template'].sudo()
+                product = ProductTemplate.browse(product_tmpl_id)
+                if not product.exists():
+                    return {
+                        'success': False,
+                        'error': f'Produit {product_tmpl_id} introuvable'
+                    }
+                item_vals['product_tmpl_id'] = product_tmpl_id
+
+            elif applied_on == '2_product_category':
+                categ_id = params.get('categ_id')
+                if not categ_id:
+                    return {
+                        'success': False,
+                        'error': "categ_id requis pour applied_on='2_product_category'"
+                    }
+                # Vérifier que la catégorie existe
+                Category = request.env['product.category'].sudo()
+                category = Category.browse(categ_id)
+                if not category.exists():
+                    return {
+                        'success': False,
+                        'error': f'Catégorie {categ_id} introuvable'
+                    }
+                item_vals['categ_id'] = categ_id
+
+            # Validation selon compute_price
+            if compute_price == 'fixed':
+                fixed_price = params.get('fixed_price')
+                if fixed_price is None:
+                    return {
+                        'success': False,
+                        'error': "fixed_price requis pour compute_price='fixed'"
+                    }
+                item_vals['fixed_price'] = float(fixed_price)
+
+            elif compute_price == 'percentage':
+                # Soit percent_price (base prix * pourcentage), soit price_discount (remise)
+                if 'percent_price' in params:
+                    item_vals['percent_price'] = float(params['percent_price'])
+                elif 'price_discount' in params:
+                    item_vals['price_discount'] = float(params['price_discount'])
+                else:
+                    return {
+                        'success': False,
+                        'error': "percent_price ou price_discount requis pour compute_price='percentage'"
+                    }
+
+            # Dates optionnelles
+            if 'date_start' in params:
+                item_vals['date_start'] = params['date_start']
+            if 'date_end' in params:
+                item_vals['date_end'] = params['date_end']
+
+            # Créer la règle
+            PricelistItem = request.env['product.pricelist.item'].sudo()
+            new_item = PricelistItem.create(item_vals)
+
+            _logger.info(f"Règle de prix créée : {new_item.id} pour pricelist {pricelist_id} par user {request.env.user.login}")
+
+            # Préparer la réponse avec les infos de la règle
+            item_data = {
+                'id': new_item.id,
+                'applied_on': new_item.applied_on,
+                'compute_price': new_item.compute_price,
+                'fixed_price': float(new_item.fixed_price) if new_item.fixed_price else None,
+                'percent_price': float(new_item.percent_price) if new_item.percent_price else None,
+                'price_discount': float(new_item.price_discount) if new_item.price_discount else None,
+                'min_quantity': new_item.min_quantity,
+            }
+
+            # Ajouter les références produit/catégorie
+            if new_item.applied_on == '1_product' and new_item.product_tmpl_id:
+                item_data['product_id'] = new_item.product_tmpl_id.id
+                item_data['product_name'] = new_item.product_tmpl_id.name
+            elif new_item.applied_on == '2_product_category' and new_item.categ_id:
+                item_data['category_id'] = new_item.categ_id.id
+                item_data['category_name'] = new_item.categ_id.name
+
+            return {
+                'success': True,
+                'data': item_data,
+                'message': f"Règle de prix ajoutée à '{pricelist.name}' avec succès"
+            }
+
+        except Exception as e:
+            _logger.error(f"Create pricelist item error: {e}")
             return {
                 'success': False,
                 'error': str(e)
