@@ -1,6 +1,6 @@
 
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { GlassPanel, GlassBadge } from "@/components/ui/glass";
 import { Clock, Mail, CheckCircle, XCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { useCurrency } from "@/lib/finance/CurrencyContext";

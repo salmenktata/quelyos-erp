@@ -26,6 +26,7 @@ type CurrencyContextType = {
   exchangeRates: ExchangeRates | null;
   convertAmount: (amount: number, fromCurrency?: string, toCurrency?: string) => number;
   formatAmount: (amount: number, fromCurrency?: string) => string;
+  formatMoney: (amount: number, fromCurrency?: string) => string; // Alias for formatAmount
 };
 
 const CurrencyContext = createContext<CurrencyContextType>({
@@ -38,6 +39,7 @@ const CurrencyContext = createContext<CurrencyContextType>({
   exchangeRates: null,
   convertAmount: (amount) => amount,
   formatAmount: (amount) => amount.toString(),
+  formatMoney: (amount) => amount.toString(),
 });
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
@@ -236,6 +238,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       exchangeRates,
       convertAmount,
       formatAmount,
+      formatMoney: formatAmount,
     }}>
       {children}
     </CurrencyContext.Provider>

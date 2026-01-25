@@ -200,7 +200,7 @@ export function ColumnMappingTable({
                 {headers.map((header) => {
                   // Find which target field this header is mapped to
                   const mappedField = Object.entries(currentMappings).find(
-                    ([_, mapping]) => mapping.headerName === header
+                    ([_, mapping]) => mapping?.headerName === header
                   );
                   const targetField = mappedField
                     ? TARGET_FIELDS.find((f) => f.value === mappedField[0])

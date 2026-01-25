@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "@/lib/finance/api";
 import { GlassCard } from "@/components/ui/glass";
 import { AlertTriangle, ChevronRight, TrendingDown, Target, Clock } from "lucide-react";
@@ -120,7 +120,7 @@ export default function AlertWidget() {
           <h3 className="font-semibold text-white">Alertes récentes</h3>
         </div>
         <Link
-          href="/dashboard/alerts"
+          to="/dashboard/alerts"
           className="text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors"
         >
           Voir tout
@@ -166,7 +166,7 @@ export default function AlertWidget() {
 
       <div className="mt-4 pt-4 border-t border-white/5">
         <Link
-          href="/dashboard/alerts"
+          to="/dashboard/alerts"
           className="block text-center text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
         >
           Configurer mes alertes →

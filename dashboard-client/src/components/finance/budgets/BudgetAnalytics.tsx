@@ -221,7 +221,7 @@ export function BudgetAnalytics({ budgets, isExpanded, onToggle, formatCurrency 
                           ))}
                         </Pie>
                         <Tooltip
-                          formatter={(value: number) => formatCurrency(value)}
+                          formatter={(value) => formatCurrency(value as number)}
                           contentStyle={{
                             backgroundColor: "rgba(30, 27, 75, 0.95)",
                             border: "1px solid rgba(255,255,255,0.15)",

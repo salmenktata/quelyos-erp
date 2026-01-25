@@ -1,34 +1,45 @@
-# Multi-stage build for Next.js production
+# Multi-stage build for Next.js production (pnpm monorepo)
+# Build context: root of monorepo
 
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json* ./
+# Enable pnpm via corepack
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+# Copy workspace config and lockfile
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+
+# Copy all package.json files for workspace resolution
+COPY packages/ ./packages/
+COPY vitrine-client/package.json ./vitrine-client/
 
 # Install dependencies
-RUN npm ci --only=production
+RUN pnpm install --frozen-lockfile
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY package.json package-lock.json* ./
+COPY --from=deps /app/packages ./packages
+COPY --from=deps /app/vitrine-client/node_modules ./vitrine-client/node_modules
 
-# Install all dependencies (including dev)
-RUN npm ci
-
-# Copy source code
-COPY . .
+# Copy workspace files
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY packages/ ./packages/
+COPY vitrine-client/ ./vitrine-client/
 
 # Build Next.js app
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-RUN npm run build
+WORKDIR /app/vitrine-client
+RUN pnpm build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
@@ -42,9 +53,9 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Copy necessary files
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/vitrine-client/public ./public
+COPY --from=builder /app/vitrine-client/.next/standalone ./
+COPY --from=builder /app/vitrine-client/.next/static ./.next/static
 
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app

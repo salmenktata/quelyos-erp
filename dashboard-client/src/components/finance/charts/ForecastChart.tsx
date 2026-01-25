@@ -143,8 +143,8 @@ export function ForecastChart({
             }}
             labelStyle={{ color: "white", marginBottom: "8px", fontWeight: "bold" }}
             itemStyle={{ color: "white", fontSize: "12px" }}
-            formatter={(value: any, name: string) => {
-              if (value === null) return [null, name];
+            formatter={(value, name) => {
+              if (value === null) return [null, name || ""];
               const formattedValue = formatValue(Number(value));
               const labels: Record<string, string> = {
                 actual: valueLabel,
@@ -154,7 +154,7 @@ export function ForecastChart({
                 upper95: "IC 95% (max)",
                 lower95: "IC 95% (min)",
               };
-              return [formattedValue, labels[name] || name];
+              return [formattedValue, labels[name || ""] || name || ""];
             }}
             labelFormatter={(label) => {
               const date = new Date(label);

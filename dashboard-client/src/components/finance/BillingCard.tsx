@@ -41,9 +41,9 @@ export function BillingCard() {
   const [error, setError] = useState<string | null>(null);
   const [billingInterval, setBillingInterval] = useState<"month" | "year">("month");
 
-  const searchParams = useSearchParams();
-  const sessionId = searchParams?.get("session_id");
-  const canceled = searchParams?.get("canceled");
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get("session_id");
+  const canceled = searchParams.get("canceled");
 
   // Load subscription and plans on mount
   useEffect(() => {

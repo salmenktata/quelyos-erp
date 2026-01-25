@@ -1,31 +1,39 @@
-# Dockerfile Production - Backoffice Vite
+# Dockerfile Production - Backoffice Vite (pnpm monorepo)
+# Build context: root of monorepo
 
-# Stage 1: Dependencies
-FROM node:20-alpine AS deps
-WORKDIR /app
-
-# Install dependencies
-COPY package.json package-lock.json* ./
-RUN npm ci --only=production
-
-# Stage 2: Builder
+# Stage 1: Builder
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+# Enable pnpm via corepack
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+# Copy workspace config and lockfile
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+
+# Copy all package.json files for workspace resolution
+COPY packages/ ./packages/
+COPY dashboard-client/package.json ./dashboard-client/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY packages/ ./packages/
+COPY dashboard-client/ ./dashboard-client/
 
 # Set environment variables for build
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # Build application
-RUN npm run build
+WORKDIR /app/dashboard-client
+RUN pnpm build
 
-# Stage 3: Runner - Nginx pour servir les fichiers statiques
+# Stage 2: Runner - Nginx pour servir les fichiers statiques
 FROM nginx:alpine AS runner
 
-# Copier la configuration Nginx
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copier les fichiers buildés
+COPY --from=builder /app/dashboard-client/dist /usr/share/nginx/html
 
 # Configuration Nginx personnalisée pour SPA
 RUN echo 'server { \

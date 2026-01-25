@@ -232,31 +232,31 @@ function CustomTooltip({ active, payload, label, formatCurrency }: CustomTooltip
               <span className="text-gray-600">{entry.name}:</span>
             </div>
             <span className="font-semibold text-gray-900">
-              {formatCurrency(entry.value)}
+              {formatCurrency(entry.value ?? 0)}
             </span>
           </div>
         );
       })}
 
       {/* Show components if available */}
-      {payload[0]?.payload?.components && (
+      {(payload[0] as { payload?: { components?: { trend: number; seasonal: number; planned: number } } })?.payload?.components && (
         <div className="mt-2 pt-2 border-t border-gray-200">
           <p className="text-xs font-medium text-gray-500 mb-1">Composants:</p>
           <div className="text-xs text-gray-600 space-y-0.5">
             <div className="flex justify-between">
               <span>Tendance:</span>
-              <span>{formatCurrency(payload[0].payload.components.trend)}</span>
+              <span>{formatCurrency((payload[0] as { payload?: { components?: { trend: number } } })?.payload?.components?.trend ?? 0)}</span>
             </div>
             <div className="flex justify-between">
               <span>Saisonnier:</span>
               <span>
-                {formatCurrency(payload[0].payload.components.seasonal)}
+                {formatCurrency((payload[0] as { payload?: { components?: { seasonal: number } } })?.payload?.components?.seasonal ?? 0)}
               </span>
             </div>
             <div className="flex justify-between">
               <span>Planifié:</span>
               <span>
-                {formatCurrency(payload[0].payload.components.planned)}
+                {formatCurrency((payload[0] as { payload?: { components?: { planned: number } } })?.payload?.components?.planned ?? 0)}
               </span>
             </div>
           </div>

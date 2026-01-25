@@ -10,29 +10,54 @@ interface GlassProps {
   className?: string
   gradient?: string
   variant?: string
+  title?: string
+  subtitle?: string
+  onClick?: () => void
+  'data-testid'?: string
+  'data-status'?: string
 }
 
 // GlassCard - Carte avec effet verre
-export function GlassCard({ children, className = '', gradient, variant }: GlassProps) {
+export function GlassCard({ children, className = '', gradient, title, subtitle, onClick, ...rest }: GlassProps) {
   const baseClass = gradient
     ? `bg-gradient-to-br ${gradient}`
     : 'bg-white/80 dark:bg-gray-800/80'
 
   return (
-    <div className={`${baseClass} backdrop-blur-lg rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg ${className}`}>
+    <div
+      className={`${baseClass} backdrop-blur-lg rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      onClick={onClick}
+      {...rest}
+    >
+      {(title || subtitle) && (
+        <div className="px-6 py-4 border-b border-gray-200/30 dark:border-gray-700/30">
+          {title && <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>}
+          {subtitle && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>}
+        </div>
+      )}
       {children}
     </div>
   )
 }
 
 // GlassPanel - Panneau glassmorphism
-export function GlassPanel({ children, className = '', gradient, variant }: GlassProps) {
+export function GlassPanel({ children, className = '', gradient, title, subtitle, onClick, ...rest }: GlassProps) {
   const baseClass = gradient
     ? `bg-gradient-to-br ${gradient}`
     : 'bg-white/70 dark:bg-gray-800/70'
 
   return (
-    <div className={`${baseClass} backdrop-blur-md rounded-lg border border-gray-100/50 dark:border-gray-700/50 ${className}`}>
+    <div
+      className={`${baseClass} backdrop-blur-md rounded-lg border border-gray-100/50 dark:border-gray-700/50 ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      onClick={onClick}
+      {...rest}
+    >
+      {(title || subtitle) && (
+        <div className="px-5 py-3 border-b border-gray-100/30 dark:border-gray-700/30">
+          {title && <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>}
+          {subtitle && <p className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
+        </div>
+      )}
       {children}
     </div>
   )
@@ -82,7 +107,7 @@ export function GlassListItem({ children, className = '', onClick, active }: Gla
 
 // GlassButton - Bouton avec effet verre
 interface GlassButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'primary' | 'secondary' | 'danger'
+  variant?: 'default' | 'primary' | 'secondary' | 'danger' | 'ghost' | 'subtle'
   size?: 'sm' | 'md' | 'lg'
 }
 
@@ -98,6 +123,8 @@ export function GlassButton({
     primary: 'bg-blue-500/90 hover:bg-blue-600/90 text-white border-blue-400/50',
     secondary: 'bg-gray-500/90 hover:bg-gray-600/90 text-white border-gray-400/50',
     danger: 'bg-red-500/90 hover:bg-red-600/90 text-white border-red-400/50',
+    ghost: 'bg-transparent hover:bg-gray-100/50 text-gray-700 dark:text-gray-300 border-transparent',
+    subtle: 'bg-gray-100/60 hover:bg-gray-200/60 text-gray-700 dark:text-gray-300 border-gray-200/30',
   }
 
   const sizeClasses = {
@@ -248,5 +275,56 @@ export function GlassTableHeaderCell({ children, className = '' }: GlassProps) {
     <th className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${className}`}>
       {children}
     </th>
+  )
+}
+
+// GlassStatCard - Carte de statistiques avec effet verre
+interface GlassStatCardProps {
+  label: string
+  value: string | number
+  icon?: React.ReactNode
+  trend?: 'up' | 'down' | 'neutral'
+  trendValue?: string
+  accentColor?: 'indigo' | 'rose' | 'emerald' | 'amber' | 'blue' | 'purple'
+  className?: string
+}
+
+export function GlassStatCard({
+  label,
+  value,
+  icon,
+  trend,
+  trendValue,
+  accentColor = 'indigo',
+  className = ''
+}: GlassStatCardProps) {
+  const accentClasses = {
+    indigo: 'border-l-indigo-500/50',
+    rose: 'border-l-rose-500/50',
+    emerald: 'border-l-emerald-500/50',
+    amber: 'border-l-amber-500/50',
+    blue: 'border-l-blue-500/50',
+    purple: 'border-l-purple-500/50',
+  }
+
+  const trendClasses = {
+    up: 'text-emerald-400',
+    down: 'text-rose-400',
+    neutral: 'text-amber-400',
+  }
+
+  return (
+    <div className={`bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-lg border border-gray-200/30 dark:border-gray-700/30 border-l-4 ${accentClasses[accentColor]} p-4 ${className}`}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
+        {icon && <div>{icon}</div>}
+      </div>
+      <div className="text-xl font-bold text-gray-900 dark:text-white">{value}</div>
+      {trendValue && (
+        <div className={`text-xs mt-1 ${trend ? trendClasses[trend] : 'text-gray-500'}`}>
+          {trendValue}
+        </div>
+      )}
+    </div>
   )
 }

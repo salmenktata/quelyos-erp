@@ -10,10 +10,16 @@
     "vitrine-client"
   ],
   "scripts": {
-    "dev": "echo 'Use individual pnpm run dev in each app'",
-    "dev:api": "cd api && pnpm run dev",
-    "dev:dashboard": "cd dashboard-client && pnpm run dev",
-    "dev:vitrine-quelyos": "cd vitrine-quelyos && pnpm run dev",
-    "dev:vitrine-client": "cd vitrine-client && pnpm run dev"
+    "build": "pnpm -r build",
+    "dev": "echo 'Use pnpm dev:<app> or pnpm dev:all'",
+    "dev:all": "pnpm -r --parallel dev",
+    "dev:api": "pnpm --filter @quelyos/api dev",
+    "dev:dashboard": "pnpm --filter quelyos-backoffice dev",
+    "dev:vitrine-quelyos": "pnpm --filter @quelyos/website dev",
+    "dev:vitrine-client": "pnpm --filter frontend dev",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "type-check": "pnpm -r type-check",
+    "clean": "pnpm -r exec rm -rf node_modules dist .next .turbo"
   }
 }

@@ -66,7 +66,14 @@ export function BudgetModal({ isOpen, onClose, onSuccess, editingId, categories 
   const loadBudget = async () => {
     try {
       setLoading(true);
-      const budget = await api(`/budgets/${editingId}`);
+      const budget = await api<{
+        name?: string;
+        amount?: number;
+        categoryId?: number;
+        period?: BudgetPeriod;
+        startDate?: string;
+        endDate?: string;
+      }>(`/budgets/${editingId}`);
       setFormData({
         name: budget.name || "",
         amount: budget.amount?.toString() || "",

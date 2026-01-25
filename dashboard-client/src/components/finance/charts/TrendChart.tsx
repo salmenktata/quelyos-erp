@@ -89,12 +89,12 @@ export function TrendChart({
             }}
             labelStyle={{ color: "white", marginBottom: "8px" }}
             itemStyle={{ color: "white" }}
-            formatter={(value: any, name: string) => {
+            formatter={(value, name) => {
               const line = lines.find((l) => l.name === name);
-              if (line?.format) {
-                return [line.format(value), name];
+              if (line?.format && value !== undefined) {
+                return [line.format(value as number), name || ""];
               }
-              return [value, name];
+              return [value ?? "", name || ""];
             }}
           />
           {showLegend && (
