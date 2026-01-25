@@ -77,3 +77,11 @@ PARITY_REPORT_*.md
 # Backup
 *.backup
 *.bak
+
+# OPTIMISATION TOKENS - Fichiers volumineux
+shared/types/src/index.ts
+frontend/next.config.ts
+backoffice/vite.config.ts
+tsconfig.json
+*.d.ts
+package.json

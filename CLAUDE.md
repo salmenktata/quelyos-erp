@@ -1,5 +1,14 @@
 # Instructions Claude Code - Quelyos ERP
 
+## ⚡ MODE ÉCONOMIE TOKENS ACTIVÉ
+**PRIORITÉ ABSOLUE** : Optimiser consommation tokens
+- **Lectures limitées** : Max 500 lignes/fichier (use `limit` param)
+- **Pas d'agents Task/Explore** : Utiliser Glob + Grep direct
+- **Ciblé uniquement** : Demander fichier précis si requête vague
+- **Réponses courtes** : Pas de répétition code, pas verbosité
+- **Ignorer** : node_modules/, dist/, .next/, types volumineux
+- Voir `.claude/OPTIMIZATION_MODE.md` et `.claude/GUIDE_ECONOMIE_TOKENS.md`
+
 ## Langue
 Français pour communications. Code en anglais.
 
