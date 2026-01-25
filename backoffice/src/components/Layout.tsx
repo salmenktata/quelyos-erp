@@ -286,6 +286,11 @@ export function Layout({ children }: LayoutProps) {
           path: '/marketing-popups',
           icon: SparklesIcon,
         },
+        {
+          name: 'Pages Statiques',
+          path: '/static-pages',
+          icon: DocumentTextIcon,
+        },
       ],
     },
     {

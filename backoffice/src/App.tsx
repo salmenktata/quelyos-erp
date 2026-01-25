@@ -40,6 +40,7 @@ import PromoMessages from './pages/PromoMessages'
 import TrustBadges from './pages/TrustBadges'
 import SeoMetadata from './pages/SeoMetadata'
 import MarketingPopups from './pages/MarketingPopups'
+import StaticPages from './pages/StaticPages'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -351,6 +352,14 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <MarketingPopups />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/static-pages"
+                element={
+                  <ProtectedRoute>
+                    <StaticPages />
                   </ProtectedRoute>
                 }
               />

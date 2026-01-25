@@ -1,0 +1,34 @@
+import { NextRequest, NextResponse } from 'next/server'
+
+const ODOO_URL = process.env.ODOO_URL || 'http://localhost:8069'
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { slug: string } }
+) {
+  try {
+    const slug = params.slug
+
+    const response = await fetch(`${ODOO_URL}/api/ecommerce/pages/${slug}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+      next: { revalidate: 3600 }, // Cache 1h
+    })
+
+    const data = await response.json()
+
+    if (!data.success) {
+      return NextResponse.json(data, { status: 404 })
+    }
+
+    return NextResponse.json(data, {
+      headers: { 'Cache-Control': 'public, max-age=3600' },
+    })
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: 'Page non trouvée' },
+      { status: 404 }
+    )
+  }
+}

@@ -1,66 +1,141 @@
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { cmsService } from '@/lib/odoo/cms';
-import { CmsPageContent } from '@/components/cms';
-import { logger } from '@/lib/logger';
+'use client'
 
-interface PageProps {
-  params: Promise<{ slug: string }>;
-}
+import { useParams } from 'next/navigation'
+import { useStaticPage } from '@/hooks/useStaticPage'
+import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
 
-/**
- * Génère les métadonnées SEO pour la page
- */
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+export default function StaticPageView() {
+  const params = useParams()
+  const slug = params.slug as string
+  const { page, loading, error } = useStaticPage(slug)
 
-  try {
-    const seo = await cmsService.getPageSeo(slug);
-
-    return {
-      title: seo.meta_title,
-      description: seo.meta_description,
-      keywords: seo.meta_keywords,
-      alternates: {
-        canonical: seo.canonical_url || undefined,
-      },
-      robots: seo.robots || 'index, follow',
-      openGraph: {
-        title: seo.og_title || seo.meta_title,
-        description: seo.og_description || seo.meta_description,
-        images: seo.og_image ? [{ url: seo.og_image }] : [],
-        type: seo.og_type as 'website' | 'article' || 'website',
-      },
-    };
-  } catch {
-    return {
-      title: 'Page non trouvée',
-      description: 'La page demandée n\'existe pas.',
-    };
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <div className="container mx-auto px-4 py-16">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-8"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    )
   }
-}
 
-/**
- * Page CMS dynamique
- */
-export default async function CmsPage({ params }: PageProps) {
-  const { slug } = await params;
-
-  try {
-    const page = await cmsService.getPage(slug);
-
-    if (!page) {
-      notFound();
-    }
-
-    return <CmsPageContent page={page} />;
-  } catch (error) {
-    logger.error(`Error loading CMS page ${slug}:`, error);
-    notFound();
+  if (error || !page) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <div className="container mx-auto px-4 py-16">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                Page non trouvée
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mb-8">
+                {error || 'La page que vous recherchez n\'existe pas.'}
+              </p>
+              <a
+                href="/"
+                className="inline-block px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+              >
+                Retour à l'accueil
+              </a>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    )
   }
-}
 
-/**
- * Revalidation ISR : régénère la page toutes les 60 secondes
- */
-export const revalidate = 60;
+  const layoutClass = {
+    default: 'max-w-4xl mx-auto',
+    full_width: 'max-w-full',
+    narrow: 'max-w-2xl mx-auto',
+    with_sidebar: 'max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8',
+  }[page.layout] || 'max-w-4xl mx-auto'
+
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        {page.show_header_image && page.header_image_url && (
+          <div className="w-full h-64 mb-8 overflow-hidden">
+            <img
+              src={page.header_image_url}
+              alt={page.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+
+        <div className="container mx-auto px-4">
+          <div className={layoutClass}>
+            {page.layout === 'with_sidebar' ? (
+              <>
+                <div className="lg:col-span-2">
+                  <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                    {page.title}
+                  </h1>
+                  {page.subtitle && (
+                    <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
+                      {page.subtitle}
+                    </p>
+                  )}
+                  <div
+                    className="prose prose-lg dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ __html: page.content }}
+                  />
+                </div>
+
+                {page.show_sidebar && page.sidebar_content && (
+                  <aside className="lg:col-span-1">
+                    <div className="sticky top-24 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                      <div
+                        className="prose prose-sm dark:prose-invert"
+                        dangerouslySetInnerHTML={{ __html: page.sidebar_content }}
+                      />
+                    </div>
+                  </aside>
+                )}
+              </>
+            ) : (
+              <>
+                <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                  {page.title}
+                </h1>
+                {page.subtitle && (
+                  <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
+                    {page.subtitle}
+                  </p>
+                )}
+                <div
+                  className="prose prose-lg dark:prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: page.content }}
+                />
+              </>
+            )}
+
+            {page.updated_date && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-12 pt-6 border-t border-gray-200 dark:border-gray-700">
+                Dernière mise à jour : {new Date(page.updated_date).toLocaleDateString('fr-FR')}
+              </p>
+            )}
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </>
+  )
+}

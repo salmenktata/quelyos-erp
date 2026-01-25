@@ -19,3 +19,5 @@ access_seo_metadata_public,quelyos.seo.metadata public,model_quelyos_seo_metadat
 access_seo_metadata_user,quelyos.seo.metadata user,model_quelyos_seo_metadata,base.group_user,1,1,1,1
 access_marketing_popup_public,quelyos.marketing.popup public,model_quelyos_marketing_popup,base.group_public,1,0,0,0
 access_marketing_popup_user,quelyos.marketing.popup user,model_quelyos_marketing_popup,base.group_user,1,1,1,1
+access_static_page_public,quelyos.static.page public,model_quelyos_static_page,base.group_public,1,0,0,0
+access_static_page_user,quelyos.static.page user,model_quelyos_static_page,base.group_user,1,1,1,1

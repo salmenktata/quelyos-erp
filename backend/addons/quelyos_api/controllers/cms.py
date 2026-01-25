@@ -1830,3 +1830,163 @@ class QuelyCMS(BaseController):
         except Exception as e:
             _logger.error(f"Track popup click error: {e}")
             return {'success': False, 'error': str(e)}
+
+    # ============================================
+    # STATIC PAGES
+    # ============================================
+
+    @http.route('/api/ecommerce/pages/<string:slug>', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_static_page_by_slug(self, slug, **kwargs):
+        """Récupérer page statique par slug (public, frontend)"""
+        try:
+            page_obj = request.env['quelyos.static.page'].sudo()
+            page = page_obj.get_by_slug(slug)
+
+            if page:
+                return {'success': True, 'page': page}
+            else:
+                return {'success': False, 'error': 'Page non trouvée'}
+
+        except Exception as e:
+            _logger.error(f"Get static page by slug error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/pages', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_static_pages_list(self, **kwargs):
+        """Liste toutes les pages statiques (admin)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            _require_admin(request.env)
+
+            pages = request.env['quelyos.static.page'].sudo().search([])
+
+            return {
+                'success': True,
+                'pages': [{
+                    'id': p.id,
+                    'name': p.name,
+                    'slug': p.slug,
+                    'title': p.title,
+                    'layout': p.layout,
+                    'active': p.active,
+                    'show_in_footer': p.show_in_footer,
+                    'show_in_menu': p.show_in_menu,
+                    'views_count': p.views_count,
+                    'published_date': p.published_date.isoformat() if p.published_date else None,
+                } for p in pages]
+            }
+
+        except Exception as e:
+            _logger.error(f"Get static pages list error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/pages/footer-links', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_footer_links(self, **kwargs):
+        """Récupérer liens footer (public, frontend)"""
+        try:
+            page_obj = request.env['quelyos.static.page'].sudo()
+            links = page_obj.get_footer_links()
+
+            return {'success': True, 'links': links}
+
+        except Exception as e:
+            _logger.error(f"Get footer links error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/pages/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def create_static_page(self, **kwargs):
+        """Créer page statique (admin)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            _require_admin(request.env)
+
+            params = request.jsonrequest
+            page = request.env['quelyos.static.page'].sudo().create({
+                'name': params.get('name'),
+                'slug': params.get('slug'),
+                'title': params.get('title'),
+                'subtitle': params.get('subtitle'),
+                'content': params.get('content'),
+                'layout': params.get('layout', 'default'),
+                'show_sidebar': params.get('show_sidebar', False),
+                'sidebar_content': params.get('sidebar_content'),
+                'header_image_url': params.get('header_image_url'),
+                'show_header_image': params.get('show_header_image', False),
+                'meta_title': params.get('meta_title'),
+                'meta_description': params.get('meta_description'),
+                'show_in_footer': params.get('show_in_footer', False),
+                'footer_column': params.get('footer_column'),
+                'show_in_menu': params.get('show_in_menu', False),
+                'menu_position': params.get('menu_position', 100),
+                'active': params.get('active', True),
+            })
+
+            return {'success': True, 'id': page.id}
+
+        except Exception as e:
+            _logger.error(f"Create static page error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/pages/<int:page_id>/update', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def update_static_page(self, page_id, **kwargs):
+        """Modifier page statique (admin)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            _require_admin(request.env)
+
+            page = request.env['quelyos.static.page'].sudo().browse(page_id)
+            if not page.exists():
+                return {'success': False, 'error': 'Page non trouvée'}
+
+            params = request.jsonrequest
+            update_data = {}
+
+            allowed_fields = [
+                'name', 'slug', 'title', 'subtitle', 'content', 'layout',
+                'show_sidebar', 'sidebar_content', 'header_image_url', 'show_header_image',
+                'meta_title', 'meta_description', 'show_in_footer', 'footer_column',
+                'show_in_menu', 'menu_position', 'active'
+            ]
+
+            for field in allowed_fields:
+                if field in params:
+                    update_data[field] = params[field]
+
+            page.write(update_data)
+
+            return {'success': True}
+
+        except Exception as e:
+            _logger.error(f"Update static page error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/ecommerce/pages/<int:page_id>/delete', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def delete_static_page(self, page_id, **kwargs):
+        """Supprimer page statique (admin)"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            _require_admin(request.env)
+
+            page = request.env['quelyos.static.page'].sudo().browse(page_id)
+            if not page.exists():
+                return {'success': False, 'error': 'Page non trouvée'}
+
+            page.unlink()
+
+            return {'success': True}
+
+        except Exception as e:
+            _logger.error(f"Delete static page error: {e}")
+            return {'success': False, 'error': str(e)}
