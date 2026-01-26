@@ -1,7 +1,6 @@
 
 
 import { useEffect, useState } from "react";
-import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { Loader2, Zap, Check, AlertCircle } from "lucide-react";
 import { logger } from '@quelyos/logger';
 
@@ -56,8 +55,6 @@ const AVAILABLE_INTEGRATIONS: Omit<Integration, "connected" | "connectedAt">[] =
 const STORAGE_KEY = "qyl_integrations";
 
 export default function IntegrationsPage() {
-  useRequireAuth();
-
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState<string | null>(null);
@@ -141,13 +138,7 @@ export default function IntegrationsPage() {
   }
 
   return (
-    <div className="space-y-6 text-white">
-      {/* Background blur orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/3 h-[350px] w-[350px] rounded-full bg-emerald-500/20 blur-[120px]" />
-      </div>
+    <div className="space-y-6">
 
       <div className="relative">
         <div className="space-y-1">

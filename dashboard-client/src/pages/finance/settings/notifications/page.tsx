@@ -1,7 +1,6 @@
 
 
 import { useEffect, useState, useCallback } from "react";
-import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { Loader2, Bell, FileJson, Download, AlertCircle, CheckCircle2, Gauge } from "lucide-react";
 import { Switch } from "@/components/ui/Switch";
 import { API_BASE_URL } from "@/lib/api-base";
@@ -19,7 +18,6 @@ type NotificationSettings = {
 const STORAGE_KEY = "qyl_notifications";
 
 export default function NotificationsPage() {
-  useRequireAuth();
 
   const [settings, setSettings] = useState<NotificationSettings>({
     emailOnTransaction: false,
@@ -136,18 +134,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="space-y-6 text-white">
-      {/* Background blur orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/3 h-[350px] w-[350px] rounded-full bg-emerald-500/20 blur-[120px]" />
-      </div>
-
-      <div className="relative">
-        <div className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">Communication</p>
-          <h1 className="bg-gradient-to-r from-white via-indigo-100 to-purple-200 bg-clip-text text-3xl font-semibold text-transparent">Notifications & exports</h1>
+    <div className="space-y-6">
           <p className="text-sm text-indigo-100/80">Gérez vos alertes, digests et exports de données.</p>
         </div>
 
