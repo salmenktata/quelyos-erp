@@ -50,12 +50,17 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
   const [loading, setLoading] = useState(false)
   const [selectedUrl, setSelectedUrl] = useState<string>(currentImageUrl || '')
   const [source, setSource] = useState<ImageSource>('both')
+  const [error, setError] = useState<string>('')
 
   // API Keys depuis .env (optionnel)
   const UNSPLASH_ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY || '' // 50 req/h
   const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_API_KEY || '' // 200 req/h
 
   const searchUnsplash = async (): Promise<UnifiedImage[]> => {
+    if (!UNSPLASH_ACCESS_KEY) {
+      throw new Error('UNSPLASH_NOT_CONFIGURED')
+    }
+
     try {
       const response = await fetch(
         `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=12&orientation=landscape`,
@@ -66,7 +71,15 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
         }
       )
 
-      if (!response.ok) throw new Error('Unsplash API error')
+      if (response.status === 401) {
+        throw new Error('UNSPLASH_INVALID_KEY')
+      }
+      if (response.status === 403) {
+        throw new Error('UNSPLASH_RATE_LIMIT')
+      }
+      if (!response.ok) {
+        throw new Error('UNSPLASH_ERROR')
+      }
 
       const data = await response.json()
       return (data.results || []).map((img: UnsplashImage) => ({
@@ -80,11 +93,15 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
       }))
     } catch (error) {
       console.error('Erreur Unsplash:', error)
-      return []
+      throw error
     }
   }
 
   const searchPexels = async (): Promise<UnifiedImage[]> => {
+    if (!PEXELS_API_KEY) {
+      throw new Error('PEXELS_NOT_CONFIGURED')
+    }
+
     try {
       const response = await fetch(
         `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=12&orientation=landscape`,
@@ -95,7 +112,15 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
         }
       )
 
-      if (!response.ok) throw new Error('Pexels API error')
+      if (response.status === 401) {
+        throw new Error('PEXELS_INVALID_KEY')
+      }
+      if (response.status === 429) {
+        throw new Error('PEXELS_RATE_LIMIT')
+      }
+      if (!response.ok) {
+        throw new Error('PEXELS_ERROR')
+      }
 
       const data = await response.json()
       return (data.photos || []).map((img: PexelsImage) => ({
@@ -109,39 +134,84 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
       }))
     } catch (error) {
       console.error('Erreur Pexels:', error)
-      return []
+      throw error
     }
+  }
+
+  const getErrorMessage = (error: Error): string => {
+    const errorMessages: Record<string, string> = {
+      'UNSPLASH_NOT_CONFIGURED': '⚠️ Clé API Unsplash non configurée. Voir OBTENIR_CLES_API_IMAGES.md',
+      'UNSPLASH_INVALID_KEY': '❌ Clé API Unsplash invalide ou expirée. Vérifiez votre .env',
+      'UNSPLASH_RATE_LIMIT': '⏱️ Limite Unsplash atteinte (50 req/h). Attendez 1h ou utilisez Pexels',
+      'UNSPLASH_ERROR': '❌ Erreur Unsplash. Vérifiez votre connexion',
+      'PEXELS_NOT_CONFIGURED': '⚠️ Clé API Pexels non configurée. Voir OBTENIR_CLES_API_IMAGES.md',
+      'PEXELS_INVALID_KEY': '❌ Clé API Pexels invalide ou expirée. Vérifiez votre .env',
+      'PEXELS_RATE_LIMIT': '⏱️ Limite Pexels atteinte (200 req/h). Attendez 1h ou utilisez Unsplash',
+      'PEXELS_ERROR': '❌ Erreur Pexels. Vérifiez votre connexion',
+    }
+    return errorMessages[error.message] || '❌ Erreur lors de la recherche'
   }
 
   const searchImages = async () => {
     if (!query.trim()) return
 
     setLoading(true)
+    setError('')
     try {
       let results: UnifiedImage[] = []
+      const errors: Error[] = []
 
       if (source === 'unsplash') {
-        results = await searchUnsplash()
+        try {
+          results = await searchUnsplash()
+        } catch (e) {
+          errors.push(e as Error)
+        }
       } else if (source === 'pexels') {
-        results = await searchPexels()
+        try {
+          results = await searchPexels()
+        } catch (e) {
+          errors.push(e as Error)
+        }
       } else {
-        // Les deux sources
-        const [unsplashResults, pexelsResults] = await Promise.all([
+        // Les deux sources - continuer même si l'une échoue
+        const [unsplashResults, pexelsResults] = await Promise.allSettled([
           searchUnsplash(),
           searchPexels(),
         ])
+
+        let unsplashImgs: UnifiedImage[] = []
+        let pexelsImgs: UnifiedImage[] = []
+
+        if (unsplashResults.status === 'fulfilled') {
+          unsplashImgs = unsplashResults.value
+        } else {
+          errors.push(unsplashResults.reason)
+        }
+
+        if (pexelsResults.status === 'fulfilled') {
+          pexelsImgs = pexelsResults.value
+        } else {
+          errors.push(pexelsResults.reason)
+        }
+
         // Mélanger les résultats (alterner)
-        results = []
-        const maxLen = Math.max(unsplashResults.length, pexelsResults.length)
+        const maxLen = Math.max(unsplashImgs.length, pexelsImgs.length)
         for (let i = 0; i < maxLen; i++) {
-          if (unsplashResults[i]) results.push(unsplashResults[i])
-          if (pexelsResults[i]) results.push(pexelsResults[i])
+          if (unsplashImgs[i]) results.push(unsplashImgs[i])
+          if (pexelsImgs[i]) results.push(pexelsImgs[i])
         }
       }
 
       setImages(results)
+
+      // Afficher erreur si aucun résultat et erreurs présentes
+      if (results.length === 0 && errors.length > 0) {
+        setError(errors.map(e => getErrorMessage(e)).join(' | '))
+      }
     } catch (error) {
       console.error('Erreur recherche images:', error)
+      setError(getErrorMessage(error as Error))
       setImages([])
     } finally {
       setLoading(false)
@@ -224,6 +294,23 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
           {source === 'pexels' && 'Powered by Pexels - Images libres de droits'}
         </p>
       </div>
+
+      {/* Message d'erreur */}
+      {error && (
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-sm text-red-800 dark:text-red-200 mb-2">
+            {error}
+          </p>
+          <a
+            href="https://github.com/salmenktata/quelyosSuite/blob/main/dashboard-client/OBTENIR_CLES_API_IMAGES.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-red-600 dark:text-red-400 underline hover:no-underline"
+          >
+            📖 Guide : Comment obtenir une clé API (2 minutes)
+          </a>
+        </div>
+      )}
 
       {/* Preview image actuelle */}
       {selectedUrl && (

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
 
-interface ToastProps {
+export interface ToastProps {
   id: string
   type: ToastType
   message: string
@@ -67,7 +67,7 @@ export function Toast({ id, type, message, duration = 3000, onClose }: ToastProp
   )
 }
 
-interface ToastContainerProps {
+export interface ToastContainerProps {
   toasts: Array<{
     id: string
     type: ToastType
