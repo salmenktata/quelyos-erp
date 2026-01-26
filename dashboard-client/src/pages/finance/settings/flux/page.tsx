@@ -211,8 +211,8 @@ export default function FluxSettingsPage() {
 
       {/* Types de flux par défaut */}
       <section className="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl shadow-xl space-y-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Types de flux par défaut</h2>
-          <p className="text-white/60 text-sm mb-6">
+        <h2 className="text-xl font-semibold">Types de flux par défaut</h2>
+        <p className="text-sm text-indigo-100/80">
             Activez ou désactivez les types de flux disponibles lors de la création de flux sur vos comptes.
           </p>
           
@@ -220,9 +220,9 @@ export default function FluxSettingsPage() {
             {flowTypeSettings.map((setting) => {
               const config = FLOW_TYPE_CONFIG[setting.type];
               return (
-                <GlassListItem
+                <div
                   key={setting.type}
-                  className="flex items-center justify-between p-4"
+                  className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/5"
                 >
                   <div className="flex items-center gap-4">
                     <div className={`p-2 rounded-lg ${setting.enabled ? 'bg-sky-500/20 text-sky-400' : 'bg-white/10 text-white/40'}`}>
@@ -241,18 +241,18 @@ export default function FluxSettingsPage() {
                     checked={setting.enabled}
                     onChange={() => toggleFlowType(setting.type)}
                   />
-                </GlassListItem>
+                </div>
               );
             })}
           </div>
-        </GlassCard>
+      </section>
 
-        {/* Types personnalisés */}
-        <GlassCard className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-white">Types personnalisés</h2>
-              <p className="text-white/60 text-sm">
+      {/* Types personnalisés */}
+      <section className="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl shadow-xl space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold">Types personnalisés</h2>
+            <p className="text-sm text-indigo-100/80">
                 Créez vos propres types de flux pour des besoins spécifiques.
               </p>
             </div>
@@ -348,7 +348,7 @@ export default function FluxSettingsPage() {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                </GlassListItem>
+                </div>
               ))}
             </div>
           )}
