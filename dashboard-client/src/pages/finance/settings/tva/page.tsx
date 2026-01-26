@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Check, Loader2, Shield, WalletCards } from "lucide-react";
-import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { logger } from '@quelyos/logger';
 
 const STORAGE_KEY = "qyl_vat_strategy";
@@ -25,7 +24,6 @@ const DEFAULT_SNAPSHOT: VatSnapshot = {
 };
 
 export default function TvaPage() {
-  useRequireAuth();
 
   const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
   const [stripe, setStripe] = useState<Stripe | null>(null);
@@ -82,24 +80,7 @@ export default function TvaPage() {
   };
 
   return (
-    <div className="space-y-6 text-white">
-      {/* Background blur orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/3 h-[350px] w-[350px] rounded-full bg-emerald-500/20 blur-[120px]" />
-      </div>
-
-      <div className="relative">
-        <div className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">TVA & tarification</p>
-          <h1 className="bg-gradient-to-r from-white via-indigo-100 to-purple-200 bg-clip-text text-3xl font-semibold text-transparent">TVA et stratégie de prix</h1>
-          <p className="text-sm text-indigo-100/80">
-            Branche Stripe si dispo, sinon snapshot local prêt pour l&apos;API.
-          </p>
-        </div>
-
-      <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <section className="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl shadow-xl space-y-6">
             <div className="flex items-center justify-between gap-3">
@@ -244,8 +225,6 @@ export default function TvaPage() {
             {JSON.stringify(snapshot, null, 2)}
           </div>
         </section>
-      </div>
-      </div>
     </div>
   );
 }

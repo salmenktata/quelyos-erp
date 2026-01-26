@@ -97,6 +97,7 @@ import FinanceSettingsIntegrations from './pages/finance/settings/integrations/p
 import FinanceSettingsSecurity from './pages/finance/settings/security/page'
 import FinanceStockValuation from './pages/finance/stock/valuation/page'
 import FinanceStockTurnover from './pages/finance/stock/turnover/page'
+import NoticeAnalytics from './pages/NoticeAnalytics'
 import { CurrencyProvider } from './lib/finance/CurrencyContext'
 import { FinanceErrorBoundary } from './components/finance/FinanceErrorBoundary'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
@@ -400,6 +401,14 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <ApiGuide />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/notice-analytics"
+                element={
+                  <ProtectedRoute>
+                    <NoticeAnalytics />
                   </ProtectedRoute>
                 }
               />

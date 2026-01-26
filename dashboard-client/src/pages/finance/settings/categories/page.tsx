@@ -1,7 +1,6 @@
 
 
 import { useEffect, useState } from "react";
-import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { api } from "@/lib/finance/api";
 import { Loader2, Plus, Trash2, Edit2, Tag, TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
 
@@ -47,8 +46,6 @@ const DEFAULT_CATEGORIES: Array<{ name: string; kind: CategoryKind; color: strin
 ];
 
 export default function CategoriesPage() {
-  useRequireAuth();
-
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -104,7 +101,7 @@ export default function CategoriesPage() {
     if (!confirm("Êtes-vous sûr de supprimer cette catégorie ?")) return;
     setDeleting(id);
     try {
-      await api(`/categories/${id}`, { method: "DELETE" });
+      await api(`/finance/categories/${id}`, { method: "DELETE" });
       setCategories((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Impossible de supprimer la catégorie");
@@ -151,24 +148,10 @@ export default function CategoriesPage() {
   const incomeCategories = categories.filter((c) => c.kind === "INCOME");
 
   return (
-    <div className="space-y-6 text-white">
-      {/* Background blur orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/3 h-[350px] w-[350px] rounded-full bg-emerald-500/20 blur-[120px]" />
-      </div>
-
-      <div className="relative">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">Organisation</p>
-            <h1 className="bg-gradient-to-r from-white via-indigo-100 to-purple-200 bg-clip-text text-3xl font-semibold text-transparent">Catégories</h1>
-            <p className="text-sm text-indigo-100/80">Créez et gérez les catégories de transactions.</p>
-          </div>
-
-          {/* Bouton pour créer les catégories par défaut */}
-          {categories.length === 0 && !loading && (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between">
+        {/* Bouton pour créer les catégories par défaut */}
+        {categories.length === 0 && !loading && (
             <button
               onClick={seedDefaultCategories}
               disabled={seedingDefaults}
