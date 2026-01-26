@@ -45,7 +45,7 @@ export async function GET(
         );
       }
       return NextResponse.json(
-        { success: false, error: `Odoo error: ${response.status}` },
+        { success: false, error: `Backend error: ${response.status}` },
         { status: response.status }
       );
     }

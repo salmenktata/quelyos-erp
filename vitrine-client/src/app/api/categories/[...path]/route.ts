@@ -44,7 +44,7 @@ export async function GET(
     });
 
     if (!response.ok) {
-      throw new Error(`Odoo API error: ${response.status}`);
+      throw new Error(`Backend API error: ${response.status}`);
     }
 
     const data = await response.json();

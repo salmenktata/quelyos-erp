@@ -464,7 +464,7 @@ const ContactForm: React.FC = () => {
     setStatus('loading');
 
     try {
-      const response = await fetch('/api/odoo/ecommerce/contact', {
+      const response = await fetch('/api/backend/ecommerce/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

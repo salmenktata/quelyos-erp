@@ -40,7 +40,7 @@ export async function POST(
     });
 
     if (!response.ok) {
-      throw new Error(`Odoo API error: ${response.status}`);
+      throw new Error(`Backend API error: ${response.status}`);
     }
 
     const data = await response.json();
@@ -50,7 +50,7 @@ export async function POST(
     const nextResponse = NextResponse.json(result);
 
     if (result.session_id) {
-      nextResponse.cookies.set('session_id', result.session_id, {
+      nextResponse.cookies.set('_auth_token', result.session_id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -100,7 +100,7 @@ export async function GET(
     });
 
     if (!response.ok) {
-      throw new Error(`Odoo API error: ${response.status}`);
+      throw new Error(`Backend API error: ${response.status}`);
     }
 
     const data = await response.json();

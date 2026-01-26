@@ -38,7 +38,7 @@ export async function POST(
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: `Odoo returned ${response.status}` },
+        { error: `Backend error ${response.status}` },
         { status: response.status }
       );
     }
@@ -105,7 +105,7 @@ export async function GET(
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: `Odoo returned ${response.status}` },
+        { error: `Backend error ${response.status}` },
         { status: response.status }
       );
     }

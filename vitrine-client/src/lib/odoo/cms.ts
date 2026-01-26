@@ -19,10 +19,10 @@ const getApiBase = () => {
   if (typeof window === 'undefined') {
     // Server-side: use absolute URL
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    return `${siteUrl}/api/odoo`;
+    return `${siteUrl}/api/backend`;
   }
   // Client-side: use relative URL
-  return '/api/odoo';
+  return '/api/backend';
 };
 
 /**

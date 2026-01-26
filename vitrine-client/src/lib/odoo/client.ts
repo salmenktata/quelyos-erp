@@ -18,15 +18,15 @@ import type {
 import { logger } from '@/lib/logger';
 
 // Use Next.js API proxy to avoid CORS issues
-// The proxy at /api/odoo/* forwards requests to Odoo server-side
+// The proxy at /api/backend/* forwards requests to backend server-side
 const getApiBase = () => {
   // Côté serveur (SSR), utiliser l'URL complète
   if (typeof window === 'undefined') {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    return `${baseUrl}/api/odoo`;
+    return `${baseUrl}/api/backend`;
   }
   // Côté client, utiliser le chemin relatif
-  return '/api/odoo';
+  return '/api/backend';
 };
 
 const DB = process.env.ODOO_DATABASE || 'quelyos';

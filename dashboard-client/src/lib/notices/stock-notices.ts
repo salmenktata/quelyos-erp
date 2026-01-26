@@ -12,11 +12,11 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Configurez des seuils min/max adaptés à la rotation : seuil min = stock sécurité + qté vendue pendant délai fournisseur',
-        'Utilisez les alertes "Stock faible" pour anticiper les ruptures avant qu'elles impactent les ventes',
-        'Exportez régulièrement l'état du stock (Excel/CSV) pour des analyses complémentaires ou audits',
-        'Ajustez via le modal pour tracer les mouvements : évitez les modifications directes dans l'interface d'administration',
-        'Activez l'inventaire périodique (mensuel ou trimestriel) pour corriger les écarts physique/théorique',
+        `Configurez des seuils min/max adaptés à la rotation : seuil min = stock sécurité + qté vendue pendant délai fournisseur`,
+        `Utilisez les alertes "Stock faible" pour anticiper les ruptures avant qu'elles impactent les ventes`,
+        `Exportez régulièrement l'état du stock (Excel/CSV) pour des analyses complémentaires ou audits`,
+        `Ajustez via le modal pour tracer les mouvements : évitez les modifications directes dans l'interface d'administration`,
+        `Activez l'inventaire périodique (mensuel ou trimestriel) pour corriger les écarts physique/théorique`,
       ]
     }]
   },
@@ -31,11 +31,11 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Planifiez des inventaires réguliers : inventaire complet annuel + inventaires tournants mensuels par zone',
-        'Imprimez les listes de comptage via export Excel pour faciliter le travail terrain',
-        'Saisissez les quantités réelles dans le backoffice : le système calcule automatiquement les écarts',
-        'Analysez les écarts avant validation : identifiez les causes (casse, vol, erreur saisie)',
-        'Validez l'inventaire pour ajuster le stock : les mouvements d'ajustement sont tracés automatiquement',
+        `Planifiez des inventaires réguliers : inventaire complet annuel + inventaires tournants mensuels par zone`,
+        `Imprimez les listes de comptage via export Excel pour faciliter le travail terrain`,
+        `Saisissez les quantités réelles dans le backoffice : le système calcule automatiquement les écarts`,
+        `Analysez les écarts avant validation : identifiez les causes (casse, vol, erreur saisie)`,
+        `Validez l'inventaire pour ajuster le stock : les mouvements d'ajustement sont tracés automatiquement`,
       ]
     }]
   },
@@ -50,11 +50,11 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Filtrez par période, produit ou emplacement pour analyser des flux spécifiques',
-        'Surveillez les types de mouvements : les ajustements fréquents révèlent des dysfonctionnements',
-        'Exportez les mouvements pour croiser avec la comptabilité ou les audits qualité',
-        'Vérifiez la cohérence : tout mouvement doit avoir une origine identifiée (commande, transfert, inventaire)',
-        'Utilisez les références de picking/livraison pour remonter aux documents sources',
+        `Filtrez par période, produit ou emplacement pour analyser des flux spécifiques`,
+        `Surveillez les types de mouvements : les ajustements fréquents révèlent des dysfonctionnements`,
+        `Exportez les mouvements pour croiser avec la comptabilité ou les audits qualité`,
+        `Vérifiez la cohérence : tout mouvement doit avoir une origine identifiée (commande, transfert, inventaire)`,
+        `Utilisez les références de picking/livraison pour remonter aux documents sources`,
       ]
     }]
   },
@@ -69,11 +69,11 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Créez un transfert pour tout mouvement entre sites : garantit la traçabilité complète',
-        'Validez la réception à l'arrivée : évite les décalages entre sites expéditeur et destinataire',
-        'Suivez les transferts "En transit" : alertez si délai anormal (perte, erreur logistique)',
-        'Utilisez les références uniques pour faciliter le suivi multi-sites',
-        'Analysez les flux inter-sites pour optimiser la répartition du stock',
+        `Créez un transfert pour tout mouvement entre sites : garantit la traçabilité complète`,
+        `Validez la réception à l'arrivée : évite les décalages entre sites expéditeur et destinataire`,
+        `Suivez les transferts "En transit" : alertez si délai anormal (perte, erreur logistique)`,
+        `Utilisez les références uniques pour faciliter le suivi multi-sites`,
+        `Analysez les flux inter-sites pour optimiser la répartition du stock`,
       ]
     }]
   },
@@ -88,11 +88,11 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Structurez vos entrepôts par fonction : stock principal, showroom, SAV, zones de picking',
-        'Configurez les routes et séquences de picking adaptées à votre activité',
-        'Définissez des règles de réapprovisionnement par entrepôt selon la demande locale',
-        'Suivez le taux de remplissage par entrepôt : évitez saturation ou sous-utilisation',
-        'Activez les emplacements hiérarchiques pour faciliter l'organisation physique',
+        `Structurez vos entrepôts par fonction : stock principal, showroom, SAV, zones de picking`,
+        `Configurez les routes et séquences de picking adaptées à votre activité`,
+        `Définissez des règles de réapprovisionnement par entrepôt selon la demande locale`,
+        `Suivez le taux de remplissage par entrepôt : évitez saturation ou sous-utilisation`,
+        `Activez les emplacements hiérarchiques pour faciliter l'organisation physique`,
       ]
     }]
   },
@@ -107,11 +107,11 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Créez une hiérarchie claire : Entrepôt > Zone > Allée > Rayon > Casier',
-        'Nommez les emplacements de façon logique : A01-R02-C03 pour faciliter le repérage',
-        'Affectez les produits à rotation rapide aux emplacements les plus accessibles',
-        'Utilisez les emplacements virtuels pour stock endommagé, en contrôle qualité, etc.',
-        'Scannez les emplacements lors des mouvements pour garantir la fiabilité',
+        `Créez une hiérarchie claire : Entrepôt > Zone > Allée > Rayon > Casier`,
+        `Nommez les emplacements de façon logique : A01-R02-C03 pour faciliter le repérage`,
+        `Affectez les produits à rotation rapide aux emplacements les plus accessibles`,
+        `Utilisez les emplacements virtuels pour stock endommagé, en contrôle qualité, etc.`,
+        `Scannez les emplacements lors des mouvements pour garantir la fiabilité`,
       ]
     }]
   },
@@ -126,11 +126,11 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Configurez min = stock sécurité + demande pendant délai fournisseur, max = min + lot économique',
-        'Activez le calcul automatique : le système suggère les règles selon historique de ventes',
-        'Révisez trimestriellement les règles : ajustez selon saisonnalité ou changements de rotation',
-        'Testez les règles sur quelques produits avant généralisation pour valider les paramètres',
-        'Surveillez les alertes de stock mini : déclenchent automatiquement les commandes fournisseurs',
+        `Configurez min = stock sécurité + demande pendant délai fournisseur, max = min + lot économique`,
+        `Activez le calcul automatique : le système suggère les règles selon historique de ventes`,
+        `Révisez trimestriellement les règles : ajustez selon saisonnalité ou changements de rotation`,
+        `Testez les règles sur quelques produits avant généralisation pour valider les paramètres`,
+        `Surveillez les alertes de stock mini : déclenchent automatiquement les commandes fournisseurs`,
       ]
     }]
   },
@@ -145,11 +145,11 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Suivez la valorisation par entrepôt pour identifier les sites sur ou sous-stockés',
-        'Analysez la répartition par catégorie : concentrez le capital sur les produits à forte rotation',
-        'Comparez régulièrement valorisation théorique vs inventaire physique pour détecter les écarts',
-        'Utilisez les exports CSV pour intégrer dans vos tableaux de bord financiers ou comptables',
-        'Identifiez les produits dormants (forte valeur, faible rotation) pour libérer du cash',
+        `Suivez la valorisation par entrepôt pour identifier les sites sur ou sous-stockés`,
+        `Analysez la répartition par catégorie : concentrez le capital sur les produits à forte rotation`,
+        `Comparez régulièrement valorisation théorique vs inventaire physique pour détecter les écarts`,
+        `Utilisez les exports CSV pour intégrer dans vos tableaux de bord financiers ou comptables`,
+        `Identifiez les produits dormants (forte valeur, faible rotation) pour libérer du cash`,
       ]
     }]
   },
@@ -165,21 +165,21 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
         title: 'Comprendre les statuts',
         icon: TrendingUp,
         items: [
-          'Excellent (≥12) : Rotation optimale - produit très demandé, minimisez le stock pour libérer du cash',
-          'Bon (6-12) : Performance saine - équilibre correct entre disponibilité et immobilisation',
-          'Lent (2-6) : À surveiller - vérifiez la demande réelle, ajustez les règles de réappro',
-          'Dormant (<2) : Action requise - envisagez promotions, déstockage ou arrêt de commercialisation',
+          `Excellent (≥12) : Rotation optimale - produit très demandé, minimisez le stock pour libérer du cash`,
+          `Bon (6-12) : Performance saine - équilibre correct entre disponibilité et immobilisation`,
+          `Lent (2-6) : À surveiller - vérifiez la demande réelle, ajustez les règles de réappro`,
+          `Dormant (<2) : Action requise - envisagez promotions, déstockage ou arrêt de commercialisation`,
         ]
       },
       {
         title: 'Bonnes pratiques',
         icon: Lightbulb,
         items: [
-          'Analysez sur 90 jours minimum pour lisser les variations saisonnières',
-          'Segmentez par catégorie : les ratios normaux varient selon le type de produit',
-          'Identifiez les produits dormants pour négocier retours fournisseurs ou promotions',
-          'Ajustez les seuils de réappro selon rotation : produits rapides = stock mini, produits lents = stock réduit',
-          'Exportez régulièrement pour suivre l'évolution et mesurer l'impact de vos actions',
+          `Analysez sur 90 jours minimum pour lisser les variations saisonnières`,
+          `Segmentez par catégorie : les ratios normaux varient selon le type de produit`,
+          `Identifiez les produits dormants pour négocier retours fournisseurs ou promotions`,
+          `Ajustez les seuils de réappro selon rotation : produits rapides = stock mini, produits lents = stock réduit`,
+          `Exportez régulièrement pour suivre l'évolution et mesurer l'impact de vos actions`,
         ]
       }
     ]

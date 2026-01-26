@@ -2,18 +2,13 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
-  // Configuration images Odoo
+  // Image proxy configuration
   images: {
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '8069',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.odoo.com',
         pathname: '/**',
       },
       {

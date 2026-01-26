@@ -482,7 +482,7 @@ function TopNavbar({
   const Icon = currentModule.icon
 
   // Show only 5 most used modules in quick access
-  const quickModules = MODULES.filter(m => ['home', 'finance', 'boutique', 'crm', 'stock'].includes(m.id))
+  const quickModules = MODULES.filter(m => ['home', 'finance', 'store', 'crm', 'stock'].includes(m.id))
 
   return (
     <header className="h-14 bg-gray-900 dark:bg-gray-950 border-b border-gray-800 flex items-center px-4 sticky top-0 z-30">
