@@ -21,13 +21,13 @@ import { GlassPanel, GlassCard } from "@/components/ui/glass";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { ReportingNav } from "@/components/finance/reporting/ReportingNav";
 import { ExportDropdown } from "@/components/finance/reporting/ExportDropdown";
-import { ReportNotice } from "@/components/finance/reporting/ReportNotice";
+import { PageNotice } from "@/components/common";
 import { ReliabilityBadge } from "@/components/kpis/ReliabilityBadge";
 import { reportingClient, type BreakEvenResponse, type BreakEvenHistoryPoint } from "@/lib/finance/reporting";
 import { useApiData } from "@/hooks/finance/useApiData";
 import { formatDateForExport } from "@/lib/utils/export";
 import { TrendChart } from "@/components/finance/charts/TrendChart";
-import { reportingNotices } from "@/lib/finance/reporting-notices";
+import { financeNotices } from "@/lib/notices";
 
 type TimeRange = "7" | "30" | "60" | "90";
 
@@ -102,13 +102,7 @@ export default function BreakEvenReportPage() {
         </motion.div>
 
         {/* Report Notice */}
-        <ReportNotice
-          title={reportingNotices.breakeven.title}
-          purpose={reportingNotices.breakeven.purpose}
-          tracking={reportingNotices.breakeven.tracking}
-          icon={Target}
-          reportId="breakeven"
-        />
+        <PageNotice config={financeNotices.breakeven} className="mb-6" />
 
         {/* Reliability Badge */}
         {apiData?.reliability && (

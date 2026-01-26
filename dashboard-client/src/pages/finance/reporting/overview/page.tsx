@@ -44,8 +44,8 @@ import {
   BarChart3,
 } from "lucide-react";
 import { ReportingNav } from "@/components/finance/reporting/ReportingNav";
-import { ReportNotice } from "@/components/finance/reporting/ReportNotice";
-import { reportingNotices } from "@/lib/finance/reporting-notices";
+import { PageNotice } from "@/components/common";
+import { financeNotices } from "@/lib/notices";
 
 type DrillTransaction = {
   id?: number;
@@ -381,13 +381,7 @@ export default function ReportingPage() {
         </div>
 
         {/* Report Notice */}
-        <ReportNotice
-          title={reportingNotices.overview.title}
-          purpose={reportingNotices.overview.purpose}
-          tracking={reportingNotices.overview.tracking}
-          icon={BarChart3}
-          reportId="overview"
-        />
+        <PageNotice config={financeNotices.overview} className="mb-6" />
 
         <div className="space-y-6">
           {/* Lien vers rapport par flux */}

@@ -20,10 +20,10 @@ import { ROUTES } from "@/lib/finance/compat/routes";
 import { GlassPanel, GlassCard } from "@/components/ui/glass";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { ReportingNav } from "@/components/finance/reporting/ReportingNav";
-import { ReportNotice } from "@/components/finance/reporting/ReportNotice";
+import { PageNotice } from "@/components/common";
 import { reportingClient, type ForecastEnhancedResponse } from "@/lib/finance/reporting";
 import { useApiData } from "@/hooks/finance/useApiData";
-import { reportingNotices } from "@/lib/finance/reporting-notices";
+import { financeNotices } from "@/lib/notices";
 
 type TimeHorizon = "30" | "60" | "90" | "180";
 
@@ -90,13 +90,7 @@ export default function ForecastReportPage() {
         </motion.div>
 
         {/* Report Notice */}
-        <ReportNotice
-          title={reportingNotices.forecast.title}
-          purpose={reportingNotices.forecast.purpose}
-          tracking={reportingNotices.forecast.tracking}
-          icon={TrendingUp}
-          reportId="forecast"
-        />
+        <PageNotice config={financeNotices.forecast} className="mb-6" />
 
         {/* Controls */}
         <motion.div

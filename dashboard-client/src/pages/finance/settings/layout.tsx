@@ -10,6 +10,8 @@ const navItems = [
   { href: "/finance/settings/devise", label: "Devise & formats" },
   { href: "/finance/settings/tva", label: "TVA & fiscalité" },
   { href: "/finance/settings/categories", label: "Catégories" },
+  { href: "/finance/settings/flux", label: "Flux de paiement" },
+  { href: "/finance/settings/billing", label: "Abonnement" },
   { href: "/finance/settings/security", label: "Sécurité" },
   { href: "/finance/settings/notifications", label: "Notifications & exports" },
   { href: "/finance/settings/integrations", label: "Intégrations" },
@@ -24,7 +26,14 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
 
   return (
-    <div className="space-y-6 text-white">
+    <div className="relative space-y-6 text-white">
+      {/* Background effects */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
+        <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
+        <div className="absolute bottom-0 left-1/3 h-[350px] w-[350px] rounded-full bg-emerald-500/20 blur-[120px]" />
+      </div>
+
       <div className="flex flex-col gap-3">
         <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">Paramètres</p>
         <h1 className="text-3xl font-semibold">Centre de configuration</h1>

@@ -1,17 +1,14 @@
 
 
 import { useEffect, useState } from "react";
-import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { ThemeSelector } from "@/components/ThemeToggle";
 import { Check, Loader2, Moon, Sun, Monitor, Globe, Building2 } from "lucide-react";
 import { logger } from '@quelyos/logger';
 
 const SETTINGS_KEY = "qyl_settings";
 
 export default function DeviseFormatsPage() {
-  useRequireAuth();
   const { currency, setCurrency, availableCurrencies, isLoading: currenciesLoading, baseCurrency } = useCurrency();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [lang, setLang] = useState("fr");
@@ -58,22 +55,7 @@ export default function DeviseFormatsPage() {
   }
 
   return (
-    <div className="space-y-6 text-white">
-      {/* Background blur orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/3 h-[350px] w-[350px] rounded-full bg-emerald-500/20 blur-[120px]" />
-      </div>
-
-      <div className="relative">
-        <div className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">Paramètres</p>
-          <h1 className="bg-gradient-to-r from-white via-indigo-100 to-purple-200 bg-clip-text text-3xl font-semibold text-transparent">Devise & formats</h1>
-          <p className="text-sm text-indigo-100/80">Thème, devise et langue pour toute l&apos;équipe.</p>
-        </div>
-
-      <div className="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl shadow-xl space-y-6">
+    <div className="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl shadow-xl space-y-6">
         <h2 className="text-xl font-semibold">Préférences utilisateur</h2>
 
         {/* F26 - Sélecteur de thème amélioré */}
@@ -195,8 +177,6 @@ export default function DeviseFormatsPage() {
             Paramètres sauvegardés avec succès
           </div>
         )}
-      </div>
-      </div>
     </div>
   );
 }

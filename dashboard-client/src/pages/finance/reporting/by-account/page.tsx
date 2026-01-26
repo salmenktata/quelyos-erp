@@ -20,10 +20,10 @@ import { ROUTES } from "@/lib/finance/compat/routes";
 import { GlassPanel, GlassCard } from "@/components/ui/glass";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { ReportingNav } from "@/components/finance/reporting/ReportingNav";
-import { ReportNotice } from "@/components/finance/reporting/ReportNotice";
+import { PageNotice } from "@/components/common";
 import { reportingClient, type ByAccountResponse, type AccountDetail } from "@/lib/finance/reporting";
 import { useApiData } from "@/hooks/finance/useApiData";
-import { reportingNotices } from "@/lib/finance/reporting-notices";
+import { financeNotices } from "@/lib/notices";
 
 type TimeRange = "7" | "30" | "60" | "90";
 
@@ -139,13 +139,7 @@ export default function ByAccountReportPage() {
         </motion.div>
 
         {/* Report Notice */}
-        <ReportNotice
-          title={reportingNotices["by-account"].title}
-          purpose={reportingNotices["by-account"].purpose}
-          tracking={reportingNotices["by-account"].tracking}
-          icon={Wallet}
-          reportId="by-account"
-        />
+        <PageNotice config={financeNotices.byAccount} className="mb-6" />
 
         {/* Controls */}
         <motion.div

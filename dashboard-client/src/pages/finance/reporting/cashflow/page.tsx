@@ -19,10 +19,10 @@ import { ROUTES } from "@/lib/finance/compat/routes";
 import { GlassPanel, GlassCard } from "@/components/ui/glass";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { ReportingNav } from "@/components/finance/reporting/ReportingNav";
-import { ReportNotice } from "@/components/finance/reporting/ReportNotice";
+import { PageNotice } from "@/components/common";
 import { reportingClient, type CombinedResponse, type DailyPoint } from "@/lib/finance/reporting";
 import { useApiData } from "@/hooks/finance/useApiData";
-import { reportingNotices } from "@/lib/finance/reporting-notices";
+import { financeNotices } from "@/lib/notices";
 
 type TimeRange = "7" | "30" | "60" | "90";
 
@@ -124,13 +124,7 @@ export default function CashflowReportPage() {
         </motion.div>
 
         {/* Report Notice */}
-        <ReportNotice
-          title={reportingNotices.cashflow.title}
-          purpose={reportingNotices.cashflow.purpose}
-          tracking={reportingNotices.cashflow.tracking}
-          icon={DollarSign}
-          reportId="cashflow"
-        />
+        <PageNotice config={financeNotices.cashflow} className="mb-6" />
 
         {/* Controls */}
         <motion.div

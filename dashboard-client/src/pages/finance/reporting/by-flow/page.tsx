@@ -14,8 +14,8 @@ import { ROUTES } from "@/lib/finance/compat/routes";
 import { Button } from "@/lib/finance/compat/ui";
 import type { FlowType } from "@/types/paymentFlow";
 import { ReportingNav } from "@/components/finance/reporting/ReportingNav";
-import { ReportNotice } from "@/components/finance/reporting/ReportNotice";
-import { reportingNotices } from "@/lib/finance/reporting-notices";
+import { PageNotice } from "@/components/common";
+import { financeNotices } from "@/lib/notices";
 
 // Icônes par type de flux
 const FLOW_ICONS: Record<FlowType, React.ReactNode> = {
@@ -157,13 +157,7 @@ export default function ReportingByFlowPage() {
         </div>
 
         {/* Report Notice */}
-        <ReportNotice
-          title={reportingNotices["by-flow"].title}
-          purpose={reportingNotices["by-flow"].purpose}
-          tracking={reportingNotices["by-flow"].tracking}
-          icon={TrendingUp}
-          reportId="by-flow"
-        />
+        <PageNotice config={financeNotices.byFlow} className="mb-6" />
 
         <div className="space-y-6">
           {error && (

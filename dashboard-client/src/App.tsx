@@ -85,6 +85,7 @@ import FinanceReportingBfr from './pages/finance/reporting/bfr/page'
 import FinanceReportingDso from './pages/finance/reporting/dso/page'
 import FinanceReportingBreakeven from './pages/finance/reporting/breakeven/page'
 import FinanceReportingDataQuality from './pages/finance/reporting/data-quality/page'
+import SettingsLayoutWrapper from './pages/finance/settings/SettingsLayoutWrapper'
 import FinanceSettings from './pages/finance/settings/page'
 import FinanceSettingsCategories from './pages/finance/settings/categories/page'
 import FinanceSettingsDevise from './pages/finance/settings/devise/page'
@@ -920,109 +921,21 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSettings />
-                      </CurrencyProvider>
+                      <SettingsLayoutWrapper />
                     </FinanceErrorBoundary>
                   </ProtectedRoute>
                 }
-              />
-              <Route
-                path="/finance/settings/categories"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSettingsCategories />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/settings/devise"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSettingsDevise />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/settings/flux"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSettingsFlux />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/settings/tva"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSettingsTva />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/settings/billing"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSettingsBilling />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/settings/notifications"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSettingsNotifications />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/settings/integrations"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSettingsIntegrations />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/settings/security"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSettingsSecurity />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
+              >
+                <Route index element={<FinanceSettings />} />
+                <Route path="devise" element={<FinanceSettingsDevise />} />
+                <Route path="tva" element={<FinanceSettingsTva />} />
+                <Route path="categories" element={<FinanceSettingsCategories />} />
+                <Route path="flux" element={<FinanceSettingsFlux />} />
+                <Route path="billing" element={<FinanceSettingsBilling />} />
+                <Route path="security" element={<FinanceSettingsSecurity />} />
+                <Route path="notifications" element={<FinanceSettingsNotifications />} />
+                <Route path="integrations" element={<FinanceSettingsIntegrations />} />
+              </Route>
               <Route
                 path="/finance/stock/valuation"
                 element={

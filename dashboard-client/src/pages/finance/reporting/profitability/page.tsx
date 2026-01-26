@@ -18,10 +18,10 @@ import { ROUTES } from "@/lib/finance/compat/routes";
 import { GlassPanel, GlassCard } from "@/components/ui/glass";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { ReportingNav } from "@/components/finance/reporting/ReportingNav";
-import { ReportNotice } from "@/components/finance/reporting/ReportNotice";
+import { PageNotice } from "@/components/common";
 import { reportingClient, type ProfitabilityResponse } from "@/lib/finance/reporting";
 import { useApiData } from "@/hooks/finance/useApiData";
-import { reportingNotices } from "@/lib/finance/reporting-notices";
+import { financeNotices } from "@/lib/notices";
 
 type TimeRange = "7" | "30" | "60" | "90";
 
@@ -93,13 +93,7 @@ export default function ProfitabilityReportPage() {
         </motion.div>
 
         {/* Report Notice */}
-        <ReportNotice
-          title={reportingNotices.profitability.title}
-          purpose={reportingNotices.profitability.purpose}
-          tracking={reportingNotices.profitability.tracking}
-          icon={Target}
-          reportId="profitability"
-        />
+        <PageNotice config={financeNotices.profitability} className="mb-6" />
 
         {/* Controls */}
         <motion.div
