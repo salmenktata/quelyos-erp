@@ -59,7 +59,7 @@ export async function api<T = unknown>(
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/ecommerce/finance${endpoint}`, fetchOptions)
+    const response = await fetch(`${API_BASE_URL}/api/ecommerce${endpoint}`, fetchOptions)
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))

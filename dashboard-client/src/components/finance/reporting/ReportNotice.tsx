@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Info, Lightbulb, ChevronDown, ChevronUp } from "lucide-react";
 import { GlassPanel } from "@/components/ui/glass";
+import { logger } from '@quelyos/logger';
 
 interface ReportNoticeProps {
   title: string;
@@ -37,7 +38,7 @@ export function ReportNotice({
         setIsCollapsed(stored === "true");
       }
     } catch (error) {
-      console.error("Failed to load notice preference:", error);
+      logger.error("Failed to load notice preference:", error);
     }
 
     setMounted(true);
@@ -51,7 +52,7 @@ export function ReportNotice({
     try {
       localStorage.setItem(storageKey, String(newState));
     } catch (error) {
-      console.error("Failed to save notice preference:", error);
+      logger.error("Failed to save notice preference:", error);
     }
   };
 

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Check, ArrowRight, ExternalLink, Loader2, CreditCard, Sparkles } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { API_BASE_URL } from "@/lib/api-base";
+import { logger } from '@quelyos/logger';
 
 type Plan = {
   id: "FREE" | "PRO" | "EXPERT";
@@ -86,7 +87,7 @@ export function BillingCard() {
       setPlans(plansData);
       setSubscription(subData);
     } catch (err) {
-      console.error("Error loading billing data:", err);
+      logger.error("Error loading billing data:", err);
       setError(err instanceof Error ? err.message : "Erreur de chargement");
     } finally {
       setLoading(false);
@@ -118,7 +119,7 @@ export function BillingCard() {
       // Redirect to Stripe checkout
       window.location.href = url;
     } catch (err) {
-      console.error("Error creating checkout:", err);
+      logger.error("Error creating checkout:", err);
       setError(err instanceof Error ? err.message : "Erreur lors du paiement");
       setCheckoutLoading(false);
     }
@@ -144,7 +145,7 @@ export function BillingCard() {
       // Redirect to Stripe customer portal
       window.location.href = url;
     } catch (err) {
-      console.error("Error opening portal:", err);
+      logger.error("Error opening portal:", err);
       setError(err instanceof Error ? err.message : "Erreur d'accès au portail");
       setCheckoutLoading(false);
     }

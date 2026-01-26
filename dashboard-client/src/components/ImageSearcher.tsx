@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from './common'
 import { Link } from 'react-router-dom'
+import { logger } from '@quelyos/logger';
 
 interface UnsplashImage {
   id: string
@@ -126,7 +127,7 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
         photographer_url: img.user.links.html,
       }))
     } catch (error) {
-      console.error('Erreur Unsplash:', error)
+      logger.error('Erreur Unsplash:', error)
       throw error
     }
   }
@@ -167,7 +168,7 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
         photographer_url: img.photographer_url,
       }))
     } catch (error) {
-      console.error('Erreur Pexels:', error)
+      logger.error('Erreur Pexels:', error)
       throw error
     }
   }
@@ -244,7 +245,7 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
         setError(errors.map(e => getErrorMessage(e)).join(' | '))
       }
     } catch (error) {
-      console.error('Erreur recherche images:', error)
+      logger.error('Erreur recherche images:', error)
       setError(getErrorMessage(error as Error))
       setImages([])
     } finally {

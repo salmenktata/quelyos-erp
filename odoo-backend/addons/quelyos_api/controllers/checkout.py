@@ -61,6 +61,9 @@ class QuelyosCheckout(http.Controller):
 
             _logger.info(f"Validating cart for guest_email: {guest_email}")
 
+            # SUDO justifié : Endpoint public permettant validation panier invité.
+            # sudo() nécessaire pour accéder aux paniers sans session utilisateur (guests).
+            # Sécurité : Filtrage strict sur guest_email ou session.uid (ligne 69-86)
             # Récupérer le panier
             Order = request.env['sale.order'].sudo()
 
@@ -69,6 +72,9 @@ class QuelyosCheckout(http.Controller):
             if request.session.uid:
                 domain.append(('partner_id', '=', request.session.uid))
             elif guest_email:
+                # SUDO justifié : Recherche partner par email pour panier invité.
+                # sudo() nécessaire car pas de session utilisateur (guest checkout).
+                # Sécurité : Email fourni par frontend, filtrage strict après sur partner.id
                 partner = request.env['res.partner'].sudo().search([('email', '=', guest_email)], limit=1)
                 if partner:
                     domain.append(('partner_id', '=', partner.id))
@@ -208,6 +214,9 @@ class QuelyosCheckout(http.Controller):
             if request.session.uid:
                 domain.append(('partner_id', '=', request.session.uid))
             elif guest_email:
+                # SUDO justifié : Recherche partner par email pour panier invité.
+                # sudo() nécessaire car pas de session utilisateur (guest checkout).
+                # Sécurité : Email fourni par frontend, filtrage strict après sur partner.id
                 partner = request.env['res.partner'].sudo().search([('email', '=', guest_email)], limit=1)
                 if partner:
                     domain.append(('partner_id', '=', partner.id))
@@ -296,6 +305,9 @@ class QuelyosCheckout(http.Controller):
             if request.session.uid:
                 domain.append(('partner_id', '=', request.session.uid))
             elif guest_email:
+                # SUDO justifié : Recherche partner par email pour panier invité.
+                # sudo() nécessaire car pas de session utilisateur (guest checkout).
+                # Sécurité : Email fourni par frontend, filtrage strict après sur partner.id
                 partner = request.env['res.partner'].sudo().search([('email', '=', guest_email)], limit=1)
                 if partner:
                     domain.append(('partner_id', '=', partner.id))

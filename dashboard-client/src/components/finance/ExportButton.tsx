@@ -12,6 +12,7 @@ import {
   Check
 } from "lucide-react";
 import { GlassPanel } from "@/components/ui/glass";
+import { logger } from '@quelyos/logger';
 
 type ExportFormat = "csv" | "pdf";
 type ExportScope = "all" | "month" | "quarter" | "year" | "custom";
@@ -109,7 +110,7 @@ export function ExportButton({ accountId, className = "" }: ExportButtonProps) {
         setIsOpen(false);
       }, 2000);
     } catch (err) {
-      console.error("Export error:", err);
+      logger.error("Export error:", err);
       alert(err instanceof Error ? err.message : "Erreur lors de l'export");
     } finally {
       setLoading(false);

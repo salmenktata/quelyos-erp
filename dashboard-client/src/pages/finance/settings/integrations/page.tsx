@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { Loader2, Zap, Check, AlertCircle } from "lucide-react";
+import { logger } from '@quelyos/logger';
 
 type Integration = {
   id: string;
@@ -79,7 +80,7 @@ export default function IntegrationsPage() {
         setIntegrations(items);
       }
     } catch (err) {
-      console.error("Impossible de charger les intégrations", err);
+      logger.error("Impossible de charger les intégrations", err);
       setIntegrations(
         AVAILABLE_INTEGRATIONS.map((base) => ({
           ...base,
@@ -112,7 +113,7 @@ export default function IntegrationsPage() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
       }
     } catch (err) {
-      console.error("Connexion échouée", err);
+      logger.error("Connexion échouée", err);
     } finally {
       setConnecting(null);
     }

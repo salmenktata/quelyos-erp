@@ -73,7 +73,7 @@ export default function VoteButton({ itemId, category }: VoteButtonProps) {
           }),
         });
       } catch (error) {
-        console.error("Error removing vote from API:", error);
+        logger.error("Error removing vote from API:", error);
       }
       return;
     }
@@ -111,7 +111,7 @@ export default function VoteButton({ itemId, category }: VoteButtonProps) {
         }),
       });
     } catch (error) {
-      console.error("Error sending vote to API:", error);
+      logger.error("Error sending vote to API:", error);
       // Le vote est déjà enregistré localement, on continue
     }
   };

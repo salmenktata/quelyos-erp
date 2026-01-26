@@ -26,6 +26,7 @@ import { ForecastExport } from "@/components/finance/forecast/ForecastExport";
 import { OptimizedForecastChart } from "@/components/finance/forecast/OptimizedForecastChart";
 import WhatIfSimulator from "@/components/finance/forecast/WhatIfSimulator";
 import { AccuracyMetrics } from "@/components/finance/forecast/AccuracyMetrics";
+import { logger } from '@quelyos/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -434,7 +435,7 @@ export default function ForecastPage() {
       });
       fetchForecast(selectedDays); // Reload to show new event
     } catch (err: any) {
-      console.error("Error adding event:", err);
+      logger.error("Error adding event:", err);
       alert("Erreur lors de l'ajout de l'événement");
     }
   }
@@ -446,7 +447,7 @@ export default function ForecastPage() {
       await api(`/forecast-events/${id}`, { method: "DELETE" });
       fetchForecast(selectedDays); // Reload to remove event
     } catch (err: any) {
-      console.error("Error deleting event:", err);
+      logger.error("Error deleting event:", err);
       alert("Erreur lors de la suppression de l'événement");
     }
   }
@@ -462,7 +463,7 @@ export default function ForecastPage() {
       fetchForecast(selectedDays); // Reload to show imported events
       alert(`${events.length} événements importés avec succès`);
     } catch (err: any) {
-      console.error("Error importing events:", err);
+      logger.error("Error importing events:", err);
       alert("Erreur lors de l'import des événements");
     }
   }
@@ -474,7 +475,7 @@ export default function ForecastPage() {
     try {
       localStorage.setItem("whatIfScenarios", JSON.stringify(scenarios));
     } catch (err) {
-      console.warn("Failed to save what-if scenarios to localStorage:", err);
+      logger.warn("Failed to save what-if scenarios to localStorage:", err);
     }
   }
 
@@ -484,7 +485,7 @@ export default function ForecastPage() {
     try {
       localStorage.removeItem("whatIfScenarios");
     } catch (err) {
-      console.warn("Failed to remove what-if scenarios from localStorage:", err);
+      logger.warn("Failed to remove what-if scenarios from localStorage:", err);
     }
   }
 
@@ -497,7 +498,7 @@ export default function ForecastPage() {
         setWhatIfScenarios(scenarios);
       }
     } catch (err) {
-      console.warn("Failed to load what-if scenarios from localStorage:", err);
+      logger.warn("Failed to load what-if scenarios from localStorage:", err);
     }
   }, []);
 

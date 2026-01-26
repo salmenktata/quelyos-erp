@@ -1050,7 +1050,7 @@ export default function BacklogPage() {
           window.localStorage.removeItem("backlogFuncStoriesV1");
         }
       } catch (e) {
-        console.error("Cannot parse backlog func storage", e);
+        logger.error("Cannot parse backlog func storage", e);
       }
     }
     return defaultStories;

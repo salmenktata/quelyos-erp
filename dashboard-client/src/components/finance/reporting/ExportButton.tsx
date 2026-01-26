@@ -3,6 +3,7 @@
 import { Download, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { downloadCSV, dateKey } from "@/lib/utils/export";
+import { logger } from '@quelyos/logger';
 
 interface ExportButtonProps {
   onExport: () => any[][] | Promise<any[][]>;
@@ -26,7 +27,7 @@ export function ExportButton({
       const filenameWithDate = `${filename}-${dateKey(new Date())}.csv`;
       downloadCSV(data, filenameWithDate);
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed:', error);
     } finally {
       setLoading(false);
     }

@@ -10,6 +10,7 @@ import { ColumnMappingTable } from "@/components/finance/import/ColumnMappingTab
 import { ValidationErrors } from "@/components/finance/import/ValidationErrors";
 import { ImportSummary } from "@/components/finance/import/ImportSummary";
 import { API_BASE_URL } from "@/lib/api-base";
+import { logger } from '@quelyos/logger';
 import type {
   ImportState,
   ImportAction,
@@ -184,7 +185,7 @@ export default function ImportPage() {
           }
         }
       } catch (error) {
-        console.error("Error fetching accounts:", error);
+        logger.error("Error fetching accounts:", error);
       }
     }
     fetchAccounts();

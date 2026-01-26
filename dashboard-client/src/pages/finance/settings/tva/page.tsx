@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Check, Loader2, Shield, WalletCards } from "lucide-react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
+import { logger } from '@quelyos/logger';
 
 const STORAGE_KEY = "qyl_vat_strategy";
 
@@ -44,7 +45,7 @@ export default function TvaPage() {
         const parsed = JSON.parse(raw) as VatSnapshot;
         setSnapshot({ ...DEFAULT_SNAPSHOT, ...parsed });
       } catch (err) {
-        console.error("Impossible de lire le snapshot TVA", err);
+        logger.error("Impossible de lire le snapshot TVA", err);
       }
     }
   }, []);

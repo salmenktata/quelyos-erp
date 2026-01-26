@@ -50,6 +50,9 @@ class ThemePresetController(BaseController):
         try:
             tenant_id = kwargs.get('tenant_id')
 
+            # SUDO justifié : Endpoint public doit lister les presets accessibles à tous
+            # sans vérification droits utilisateur (pas d'auth requise).
+            # Sécurité : Filtrage strict sur (public=True) ou tenant_id validé
             ThemePreset = request.env['quelyos.theme.preset'].sudo()
 
             if tenant_id:
@@ -146,6 +149,9 @@ class ThemePresetController(BaseController):
             # Préparer les valeurs
             values = self._prepare_preset_values(data)
 
+            # SUDO justifié : Après vérification has_group('base.group_system') ci-dessus,
+            # sudo() nécessaire pour créer records sans contraintes ACL spécifiques.
+            # Sécurité : Authentification admin validée (ligne 124-134)
             # Créer le preset
             ThemePreset = request.env['quelyos.theme.preset'].sudo()
             preset = ThemePreset.create(values)
@@ -197,6 +203,9 @@ class ThemePresetController(BaseController):
                     'error_code': 'FORBIDDEN'
                 }, status=403)
 
+            # SUDO justifié : Après vérification has_group('base.group_system') ci-dessus.
+            # Nécessaire pour accéder au record sans contraintes ACL lors de l'update.
+            # Sécurité : Admin validé (ligne 199-204)
             # Trouver le preset
             preset = request.env['quelyos.theme.preset'].sudo().browse(preset_id)
             if not preset.exists():
@@ -260,6 +269,9 @@ class ThemePresetController(BaseController):
                     'error_code': 'FORBIDDEN'
                 }, status=403)
 
+            # SUDO justifié : Après vérification has_group('base.group_system') ci-dessus.
+            # Nécessaire pour supprimer le record sans contraintes ACL.
+            # Sécurité : Admin validé (ligne 265-270)
             # Trouver le preset
             preset = request.env['quelyos.theme.preset'].sudo().browse(preset_id)
             if not preset.exists():

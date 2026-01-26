@@ -24,10 +24,12 @@ export default function ContactPage() {
     
     // Simulate form submission
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    
+
     // In production, send to API
-    console.log("Form submitted:", formData);
-    
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Form submitted:", formData);
+    }
+
     setIsSubmitting(false);
     setIsSubmitted(true);
   };

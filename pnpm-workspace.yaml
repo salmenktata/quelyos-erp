@@ -1,6 +1,10 @@
 packages:
-  - 'packages/*'
-  - 'api'
-  - 'dashboard-client'
-  - 'vitrine-quelyos'
-  - 'vitrine-client'
+  - packages/*
+  - api
+  - dashboard-client
+  - vitrine-quelyos
+  - vitrine-client
+
+overrides:
+  cookie@<0.7.0: '>=0.7.0'
+  tmp@<=0.2.3: '>=0.2.4'

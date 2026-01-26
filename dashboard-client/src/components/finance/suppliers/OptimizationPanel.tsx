@@ -17,6 +17,7 @@ import { Sparkles, TrendingUp, AlertTriangle, CheckCircle2, Loader2, Download, P
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import PaymentPlanChart from "./PaymentPlanChart";
+import { logger } from '@quelyos/logger';
 
 interface OptimizationResult {
   plan: PaymentPlanItem[];
@@ -177,7 +178,7 @@ export default function OptimizationPanel() {
           setSelectedAccountId(data.accounts[0].id.toString());
         }
       } catch (err) {
-        console.error("Error loading accounts:", err);
+        logger.error("Error loading accounts:", err);
       }
     };
     loadAccounts();
@@ -260,7 +261,7 @@ export default function OptimizationPanel() {
       // Recharger l'optimisation pour voir les nouveaux statuts
       handleOptimize();
     } catch (err: any) {
-      console.error("Error executing payments:", err);
+      logger.error("Error executing payments:", err);
       alert(`Erreur: ${err.message}`);
     } finally {
       setIsExecuting(false);

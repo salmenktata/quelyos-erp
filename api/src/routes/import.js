@@ -2,7 +2,7 @@ const logger = require("../../logger");
 const express = require('express');
 const multer = require('multer');
 const { parse } = require('csv-parse/sync');
-const XLSX = require('xlsx');
+const ExcelJS = require('exceljs');
 const { PrismaClient } = require('@prisma/client');
 const { z } = require('zod');
 const requireAuth = require('../middleware/auth');
@@ -49,15 +49,28 @@ async function parseCSV(buffer) {
   });
 }
 
-function parseXLSX(buffer) {
-  const workbook = XLSX.read(buffer, { type: 'buffer' });
-  const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  // On force la conversion des dates au format YYYY-MM-DD si possible
-  return XLSX.utils.sheet_to_json(sheet, {
-    defval: '',
-    raw: false,
-    dateNF: 'yyyy-mm-dd',
+async function parseXLSX(buffer) {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(buffer);
+  const worksheet = workbook.worksheets[0];
+
+  const rows = [];
+  const headers = [];
+
+  worksheet.eachRow((row, rowIndex) => {
+    if (rowIndex === 1) {
+      row.eachCell(cell => headers.push(cell.value));
+    } else {
+      const obj = {};
+      row.eachCell((cell, colIndex) => {
+        const header = headers[colIndex - 1];
+        obj[header] = cell.value || '';
+      });
+      rows.push(obj);
+    }
   });
+
+  return rows;
 }
 
 router.post('/company/import/transactions', requireAuth, upload.single('file'), async (req, res) => {
@@ -70,7 +83,7 @@ router.post('/company/import/transactions', requireAuth, upload.single('file'), 
     if (req.file.mimetype === 'text/csv') {
       rows = await parseCSV(req.file.buffer);
     } else if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-      rows = parseXLSX(req.file.buffer);
+      rows = await parseXLSX(req.file.buffer);
     } else {
       return res.status(415).json({ error: 'Type de fichier non supporté.' });
     }

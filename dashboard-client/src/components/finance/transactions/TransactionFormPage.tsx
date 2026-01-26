@@ -9,6 +9,7 @@ import { PaymentFlowSelector } from "@/components/PaymentFlowSelector";
 import { CategorySuggestionCard } from "./CategorySuggestionCard";
 import { DuplicateConfirmModal } from "./DuplicateConfirmModal";
 import type { CreateTransactionRequest, UpdateTransactionRequest } from "@/types/api";
+import { logger } from '@quelyos/logger';
 
 type Transaction = {
   id: number;
@@ -226,7 +227,7 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
             }
           } catch (err) {
             // Silently fail - duplicate check is optional
-            console.warn("Duplicate check failed:", err);
+            logger.warn("Duplicate check failed:", err);
           }
         }
 

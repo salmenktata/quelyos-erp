@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Action non reconnue' }, { status: 400 });
   } catch (error) {
-    console.error('Passkey proxy error:', error);
+    logger.error('Passkey proxy error:', error);
     return NextResponse.json(
       { error: 'Erreur de connexion au serveur' },
       { status: 500 }

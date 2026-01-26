@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { createApiLogger } from "@/lib/logger";
 
+const logger = createApiLogger('GET /api/votes/stats');
 const VOTES_FILE = path.join(process.cwd(), "data", "votes.json");
 
 // Lire les votes depuis le fichier
@@ -109,7 +111,7 @@ export async function GET() {
     const stats = calculateStats(votes);
     return NextResponse.json(stats);
   } catch (error) {
-    console.error("Error calculating stats:", error);
+    logger.error("Error calculating stats:", error);
     return NextResponse.json(
       { error: "Failed to calculate stats" },
       { status: 500 }

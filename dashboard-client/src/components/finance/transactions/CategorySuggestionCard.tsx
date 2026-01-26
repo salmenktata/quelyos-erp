@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { api } from "@/lib/finance/api";
 import { Sparkles, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { logger } from '@quelyos/logger';
 
 interface CategorySuggestion {
   categoryId: number;
@@ -92,7 +93,7 @@ export function CategorySuggestionCard({
       }
     } catch (err) {
       // Silently fail - ML suggestions are optional
-      console.error("Failed to fetch category suggestion:", err);
+      logger.error("Failed to fetch category suggestion:", err);
       setError(null); // Don't show error to user
     } finally {
       setLoading(false);

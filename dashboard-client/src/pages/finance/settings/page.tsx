@@ -7,6 +7,7 @@ import { api } from "@/lib/finance/api";
 import { GlassCard, GlassPanel, GlassListItem } from "@/components/ui/glass";
 import { ArrowRight, PlayCircle, StopCircle, AlertTriangle } from "lucide-react";
 import { ConfirmDialog } from "@/components/finance/ConfirmDialog";
+import { logger } from '@quelyos/logger';
 
 const sectionsGroups = [
   {
@@ -143,7 +144,7 @@ export default function SettingsOverviewPage() {
         const data = await api("/company/settings") as { isDemo?: boolean };
         setIsDemoActive(data.isDemo || false);
       } catch (e) {
-        console.error("Erreur lors de la vérification du statut démo:", e);
+        logger.error("Erreur lors de la vérification du statut démo:", e);
       } finally {
         setCheckingStatus(false);
       }

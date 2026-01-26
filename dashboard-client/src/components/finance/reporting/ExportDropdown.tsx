@@ -3,6 +3,7 @@
 import { Download, Loader2, FileText, FileSpreadsheet, FileDown, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { exportData, type ExportFormat } from "@/lib/utils/export";
+import { logger } from '@quelyos/logger';
 
 interface ExportDropdownProps {
   onExport: () => any[][] | Promise<any[][]>;
@@ -40,7 +41,7 @@ export function ExportDropdown({
       const data = await onExport();
       exportData(data, filename, format, reportTitle);
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed:', error);
     } finally {
       setLoading(false);
     }

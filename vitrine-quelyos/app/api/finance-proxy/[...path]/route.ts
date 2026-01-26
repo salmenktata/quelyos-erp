@@ -28,7 +28,7 @@ export async function GET(
       headers: response.headers,
     });
   } catch (error) {
-    console.error('Proxy error:', error);
+    logger.error('Proxy error:', error);
     return NextResponse.json(
       { error: 'Failed to proxy request' },
       { status: 500 }
@@ -63,7 +63,7 @@ export async function POST(
       headers: response.headers,
     });
   } catch (error) {
-    console.error('Proxy error:', error);
+    logger.error('Proxy error:', error);
     return NextResponse.json(
       { error: 'Failed to proxy request' },
       { status: 500 }

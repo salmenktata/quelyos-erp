@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, AlertTriangle, Building2, FileText } from "lucide-react";
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
 import { fr } from "date-fns/locale";
+import { logger } from '@quelyos/logger';
 
 interface Invoice {
   id: string;
@@ -49,7 +50,7 @@ export default function PaymentScheduleCalendar() {
         setOverdueInvoices(data.invoices || []);
       }
     } catch (error) {
-      console.error("Erreur lors du chargement des factures:", error);
+      logger.error("Erreur lors du chargement des factures:", error);
     } finally {
       setIsLoading(false);
     }

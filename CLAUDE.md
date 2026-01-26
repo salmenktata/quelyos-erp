@@ -9,6 +9,20 @@
 - **Ignorer** : node_modules/, dist/, .next/, types volumineux
 - Voir `.claude/OPTIMIZATION_MODE.md` et `.claude/GUIDE_ECONOMIE_TOKENS.md`
 
+## 📝 DOCUMENTATION - MINIMALISME STRICT
+**NE JAMAIS générer de documentation automatique**
+- **Fichiers MD** : Ne créer README/CHANGELOG/docs QUE si explicitement demandé
+- **JSDoc/docstrings** : Uniquement pour logique complexe/non-évidente
+- **Commentaires inline** : Seulement si le code n'est pas auto-explicatif
+- **Types TypeScript** : Préférer typage fort aux commentaires explicatifs
+- **Pas de duplication** : Documentation existante = source de vérité unique
+- **Commit messages** : Concis (1-2 phrases max), focus sur le "pourquoi"
+
+**Exceptions autorisées** :
+- Demande explicite utilisateur
+- Commande `/docs` pour sync documentation
+- Endpoints API complexes (voir `.claude/API_CONVENTIONS.md`)
+
 ## ⛔ RÈGLE PORTS - NE JAMAIS MODIFIER
 **INTERDICTION ABSOLUE** : Ne JAMAIS modifier les ports des services
 - **vitrine-quelyos** : Port **3000** FIXE

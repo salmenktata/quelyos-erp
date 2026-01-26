@@ -5,6 +5,7 @@ import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { Loader2, Bell, FileJson, Download, AlertCircle, CheckCircle2, Gauge } from "lucide-react";
 import { Switch } from "@/components/ui/Switch";
 import { API_BASE_URL } from "@/lib/api-base";
+import { logger } from '@quelyos/logger';
 
 type NotificationSettings = {
   emailOnTransaction: boolean;
@@ -61,7 +62,7 @@ export default function NotificationsPage() {
         }
       }
     } catch (err) {
-      console.error("Failed to fetch preferences:", err);
+      logger.error("Failed to fetch preferences:", err);
       // Fallback to localStorage
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {

@@ -3,6 +3,7 @@ import { api } from "@/lib/finance/api";
 import { AlertTriangle, ChevronRight, TrendingDown, Target, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
+import { logger } from '@quelyos/logger';
 
 type AlertTrigger = {
   id: number;
@@ -61,7 +62,7 @@ export default function AlertWidget() {
 
       setRecentTriggers(sorted.slice(0, 3));
     } catch (err) {
-      console.error("Failed to load alert triggers:", err);
+      logger.error("Failed to load alert triggers:", err);
     } finally {
       setLoading(false);
     }

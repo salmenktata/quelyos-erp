@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/Switch";
 import { ChevronLeft, Plus, Edit2, Trash2, CreditCard, Banknote, FileText, ArrowLeftRight, Landmark, Receipt, Briefcase, AlertCircle, MoreHorizontal, Check, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { FlowType } from "@/types/paymentFlow";
+import { logger } from '@quelyos/logger';
 
 // Types de flux avec labels et icônes
 const FLOW_TYPE_CONFIG: Record<FlowType, { label: string; icon: React.ReactNode; description: string }> = {
@@ -106,7 +107,7 @@ export default function FluxSettingsPage() {
       setFlowTypeSettings(defaultSettings);
       setCustomFlowTypes([]);
     } catch (e) {
-      console.error("Erreur chargement paramètres flux:", e);
+      logger.error("Erreur chargement paramètres flux:", e);
       setError("Impossible de charger les paramètres");
     } finally {
       setLoading(false);
@@ -177,7 +178,7 @@ export default function FluxSettingsPage() {
       setSuccess("Paramètres sauvegardés avec succès");
       setTimeout(() => setSuccess(null), 3000);
     } catch (e) {
-      console.error("Erreur sauvegarde:", e);
+      logger.error("Erreur sauvegarde:", e);
       setError("Erreur lors de la sauvegarde");
     } finally {
       setSaving(false);

@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const { parse: csvParse } = require('csv-parse/sync');
-const XLSX = require('xlsx');
+const ExcelJS = require('exceljs');
 const { PrismaClient } = require('@prisma/client');
 const { z } = require('zod');
 

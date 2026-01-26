@@ -634,7 +634,7 @@ export default function BacklogTechniquePage() {
           window.localStorage.removeItem("backlogTechStoriesV1");
         }
       } catch (e) {
-        console.error("Cannot parse backlog tech storage", e);
+        logger.error("Cannot parse backlog tech storage", e);
       }
     }
     return defaultStories;

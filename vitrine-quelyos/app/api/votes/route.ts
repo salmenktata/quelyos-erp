@@ -34,7 +34,7 @@ export async function GET() {
     const votes = readVotes();
     return NextResponse.json(votes);
   } catch (error) {
-    console.error("Error reading votes:", error);
+    logger.error("Error reading votes:", error);
     return NextResponse.json(
       { error: "Failed to read votes" },
       { status: 500 }
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data: votes[key] });
   } catch (error) {
-    console.error("Error saving vote:", error);
+    logger.error("Error saving vote:", error);
     return NextResponse.json({ error: "Failed to save vote" }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import { Component, ReactNode } from 'react'
+import { logger } from '@quelyos/logger';
 
 interface Props {
   children: ReactNode
@@ -20,7 +21,7 @@ export class FinanceErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Finance module error:', error, errorInfo)
+    logger.error('Finance module error:', error, errorInfo)
   }
 
   render() {

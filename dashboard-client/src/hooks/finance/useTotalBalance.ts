@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/lib/finance/compat/auth";
 import { api } from "@/lib/api";
+import { logger } from '@quelyos/logger';
 
 interface Account {
   id: number;
@@ -126,7 +127,7 @@ export function useTotalBalance(): BalanceData {
       
       setData(newData);
     } catch (err) {
-      console.error("[useTotalBalance] Error:", err);
+      logger.error("[useTotalBalance] Error:", err);
       setError(err instanceof Error ? err.message : "Erreur de chargement");
     } finally {
       setIsLoading(false);

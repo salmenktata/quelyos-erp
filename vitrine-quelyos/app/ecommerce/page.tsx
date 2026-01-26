@@ -124,7 +124,9 @@ export default function EcommercePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Envoyer à l'API
-    console.log("Waitlist email:", email);
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Waitlist email:", email);
+    }
     setSubmitted(true);
   };
 

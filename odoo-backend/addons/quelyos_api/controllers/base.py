@@ -35,7 +35,7 @@ class BaseController(http.Controller):
                     # Sinon retourner les données directement
                     return data
                 return {}
-            except:
+            except (ValueError, TypeError, KeyError):
                 return {}
 
     def _check_session(self):

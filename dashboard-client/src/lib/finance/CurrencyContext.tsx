@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { api, AuthenticationError } from "./api";
+import { logger } from '@quelyos/logger';
 
 const SETTINGS_KEY = "qyl_settings";
 const DEFAULT_CURRENCY = "EUR";
@@ -69,12 +70,12 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         settings.currency = data.displayCurrency;
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
       } catch (err) {
-        console.error("Erreur lors de la sauvegarde locale", err);
+        logger.error("Erreur lors de la sauvegarde locale", err);
       }
     } catch (err) {
       // Don't log auth errors (expected when not logged in)
       if (!(err instanceof AuthenticationError)) {
-        console.error("Erreur lors de la récupération de la devise utilisateur", err);
+        logger.error("Erreur lors de la récupération de la devise utilisateur", err);
       }
       // Fallback to localStorage if API fails
       try {
@@ -85,7 +86,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
           setCurrencyState(savedCurrency);
         }
       } catch (e) {
-        console.error("Erreur localStorage fallback", e);
+        logger.error("Erreur localStorage fallback", e);
       }
     }
   }, []);
@@ -102,7 +103,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       // Don't log auth errors (expected when not logged in)
       if (!(err instanceof AuthenticationError)) {
-        console.error("Erreur lors de la récupération des devises", err);
+        logger.error("Erreur lors de la récupération des devises", err);
       }
       // Fallback to a basic list
       setAvailableCurrencies([
@@ -125,7 +126,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       // Don't log auth errors (expected when not logged in)
       if (!(err instanceof AuthenticationError)) {
-        console.error("Erreur lors de la récupération des taux de change", err);
+        logger.error("Erreur lors de la récupération des taux de change", err);
       }
       // Set default rate of 1:1 as fallback
       setExchangeRates({});
@@ -175,7 +176,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
   const setCurrency = useCallback(async (newCurrency: string) => {
     if (!newCurrency || typeof newCurrency !== "string") {
-      console.warn("Devise invalide:", newCurrency);
+      logger.warn("Devise invalide:", newCurrency);
       return;
     }
 
@@ -189,7 +190,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       settings.currency = newCurrency;
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     } catch (err) {
-      console.error("Erreur lors de la sauvegarde locale", err);
+      logger.error("Erreur lors de la sauvegarde locale", err);
     }
 
     // Sync with backend
@@ -200,7 +201,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         body: { currency: newCurrency } as { currency: string },
       });
     } catch (err) {
-      console.error("Erreur lors de la sauvegarde backend de la devise", err);
+      logger.error("Erreur lors de la sauvegarde backend de la devise", err);
       // Revert on error
       await fetchUserCurrency();
     }
@@ -227,7 +228,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     const rate = exchangeRates[to];
 
     if (!rate) {
-      console.warn(`Taux de change non disponible pour ${from} → ${to}`);
+      logger.warn(`Taux de change non disponible pour ${from} → ${to}`);
       return amount;
     }
 
@@ -235,7 +236,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     if (from !== baseCurrency) {
       const fromRate = exchangeRates[from];
       if (!fromRate) {
-        console.warn(`Taux de change non disponible pour ${from}`);
+        logger.warn(`Taux de change non disponible pour ${from}`);
         return amount;
       }
       // Convert from source to base, then base to target

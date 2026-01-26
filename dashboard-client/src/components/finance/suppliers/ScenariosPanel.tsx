@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { logger } from '@quelyos/logger';
 
 interface Scenario {
   id: string;
@@ -104,7 +105,7 @@ export default function ScenariosPanel() {
         setScenarios(data.scenarios || []);
       }
     } catch (error) {
-      console.error("Erreur lors du chargement des scénarios:", error);
+      logger.error("Erreur lors du chargement des scénarios:", error);
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +119,7 @@ export default function ScenariosPanel() {
         setAvailableInvoices(data.invoices || []);
       }
     } catch (error) {
-      console.error("Erreur lors du chargement des factures:", error);
+      logger.error("Erreur lors du chargement des factures:", error);
     }
   };
 
@@ -172,7 +173,7 @@ export default function ScenariosPanel() {
 
       await fetchScenarios();
     } catch (error) {
-      console.error("Erreur lors de l'activation:", error);
+      logger.error("Erreur lors de l'activation:", error);
     }
   };
 
@@ -195,7 +196,7 @@ export default function ScenariosPanel() {
         setSelectedScenario(null);
       }
     } catch (error) {
-      console.error("Erreur lors de la suppression:", error);
+      logger.error("Erreur lors de la suppression:", error);
     }
   };
 

@@ -4,6 +4,7 @@ import { useSiteConfig, useUpdateSiteConfig } from '../hooks/useSiteConfig'
 import { Button, Breadcrumbs, Skeleton } from '../components/common'
 import { useToast } from '../contexts/ToastContext'
 import { z } from 'zod'
+import { logger } from '@quelyos/logger'
 import {
   contactSchema,
   shippingSchema,
@@ -89,7 +90,7 @@ export default function SiteConfig() {
           })
         }
       } catch (error) {
-        console.error('Erreur chargement clés API:', error)
+        logger.error('Erreur chargement clés API:', error)
       } finally {
         setApiKeysLoading(false)
       }

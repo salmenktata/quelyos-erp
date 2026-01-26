@@ -9,6 +9,7 @@ import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { currencies } from "@/lib/finance/currencies";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import type { CreateAccountRequest } from "@/types/api";
+import { logger } from '@quelyos/logger';
 
 // Types alignés avec la page comptes
 type AccountType =
@@ -74,7 +75,7 @@ export default function NewAccountPage() {
       const data = await api(withCompanyParam("/portfolios"));
       setPortfolios(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Erreur de chargement des portefeuilles", err);
+      logger.error("Erreur de chargement des portefeuilles", err);
     }
   }, [withCompanyParam]);
 

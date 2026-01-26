@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { api } from "@/lib/finance/api";
 import { GlassCard, GlassButton } from "@/components/ui/glass";
 import { X, AlertTriangle, Info } from "lucide-react";
+import { logger } from '@quelyos/logger';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -135,7 +136,7 @@ export default function AlertConfigForm({
 
       onSave();
     } catch (err) {
-      console.error("Failed to save alert:", err);
+      logger.error("Failed to save alert:", err);
       setError(
         err instanceof Error
           ? err.message

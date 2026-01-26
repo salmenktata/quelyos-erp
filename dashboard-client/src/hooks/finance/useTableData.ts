@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { logger } from '@quelyos/logger';
 
 export interface TableDataOptions<T> {
   /** Fonction de fetch des données */
@@ -106,7 +107,7 @@ export function useTableData<T = any>(
           });
         }
       } catch (err) {
-        console.error("[useTableData] Error:", err);
+        logger.error("[useTableData] Error:", err);
         setError(err instanceof Error ? err.message : "Erreur de chargement");
       } finally {
         setLoading(false);

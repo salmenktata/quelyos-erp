@@ -1,5 +1,5 @@
 const { fileTypeFromBuffer } = require('file-type');
-const XLSX = require('xlsx');
+// XLSX validation removed - using magic bytes only
 const { parse } = require('csv-parse/sync');
 const logger = require('../../logger');
 

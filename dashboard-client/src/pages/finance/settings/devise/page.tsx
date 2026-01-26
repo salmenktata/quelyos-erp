@@ -6,6 +6,7 @@ import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ThemeSelector } from "@/components/ThemeToggle";
 import { Check, Loader2, Moon, Sun, Monitor, Globe, Building2 } from "lucide-react";
+import { logger } from '@quelyos/logger';
 
 const SETTINGS_KEY = "qyl_settings";
 
@@ -24,7 +25,7 @@ export default function DeviseFormatsPage() {
       const parsed = JSON.parse(raw);
       setLang(parsed.lang ?? "fr");
     } catch (err) {
-      console.error("Lecture des préférences impossible", err);
+      logger.error("Lecture des préférences impossible", err);
     }
   }, []);
 
@@ -52,7 +53,7 @@ export default function DeviseFormatsPage() {
       }
       setSaved(true);
     } catch (err) {
-      console.error("Erreur sauvegarde langue:", err);
+      logger.error("Erreur sauvegarde langue:", err);
     }
   }
 

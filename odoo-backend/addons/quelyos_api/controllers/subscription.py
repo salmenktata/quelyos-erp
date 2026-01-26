@@ -23,6 +23,10 @@ class SubscriptionController(http.Controller):
         :return: Liste des abonnements avec stats
         """
         try:
+            # SUDO justifié : Endpoint auth='user' réservé aux utilisateurs connectés Odoo.
+            # sudo() nécessaire pour lister tous les abonnements sans restriction ACL
+            # (backoffice admin doit voir tous les subs, pas seulement ceux de son compte).
+            # Sécurité : auth='user' requis (ligne 16)
             Subscription = request.env['quelyos.subscription'].sudo()
 
             # Recherche avec pagination
@@ -74,6 +78,10 @@ class SubscriptionController(http.Controller):
         :return: Détails complets de l'abonnement
         """
         try:
+            # SUDO justifié : Endpoint auth='user' réservé aux utilisateurs connectés Odoo.
+            # sudo() nécessaire pour accéder aux détails complets de l'abonnement
+            # sans restriction ACL (backoffice admin doit voir toutes les infos).
+            # Sécurité : auth='user' requis (ligne 68)
             subscription = request.env['quelyos.subscription'].sudo().browse(subscription_id)
 
             if not subscription.exists():

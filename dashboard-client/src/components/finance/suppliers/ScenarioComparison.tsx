@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GitCompare, TrendingUp, AlertTriangle, CheckCircle2, Loader2, X } from "lucide-react";
+import { logger } from '@quelyos/logger';
 
 interface Scenario {
   id: string;
@@ -56,7 +57,7 @@ export default function ScenarioComparison() {
         setAvailableScenarios(data.scenarios || []);
       }
     } catch (error) {
-      console.error("Erreur lors du chargement des scénarios:", error);
+      logger.error("Erreur lors du chargement des scénarios:", error);
     }
   };
 
@@ -105,7 +106,7 @@ export default function ScenarioComparison() {
         }
       }
     } catch (error) {
-      console.error("Erreur lors du chargement du scénario:", error);
+      logger.error("Erreur lors du chargement du scénario:", error);
     } finally {
       setIsLoading(false);
     }

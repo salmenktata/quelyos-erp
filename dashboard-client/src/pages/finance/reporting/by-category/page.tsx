@@ -25,6 +25,7 @@ import { reportingClient, type TopCategoriesResponse, type CategoryTotal } from 
 import { api } from "@/lib/finance/api";
 import { useApiData } from "@/hooks/finance/useApiData";
 import { reportingNotices } from "@/lib/finance/reporting-notices";
+import { logger } from '@quelyos/logger';
 
 type TimeRange = "7" | "30" | "60" | "90";
 
@@ -165,7 +166,7 @@ export default function ByCategoryReportPage() {
       const txs = await api<Transaction[]>(`/transactions?${params.toString()}`);
       setCategoryTransactions(prev => ({ ...prev, [categoryId || 0]: txs }));
     } catch (err) {
-      console.error("Error loading transactions:", err);
+      logger.error("Error loading transactions:", err);
     } finally {
       setLoadingTransactions(prev => ({ ...prev, [categoryId || 0]: false }));
     }
