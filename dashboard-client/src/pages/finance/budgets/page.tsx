@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { GlassCard, GlassPanel, GlassButton } from "@/components/ui/glass";
 import { useCurrency } from "@/lib/finance/CurrencyContext";

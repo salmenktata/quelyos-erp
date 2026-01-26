@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useAuth } from "@/lib/finance/compat/auth";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { GlassCard, GlassPanel } from "@/components/ui/glass";
 import {
   Shield,

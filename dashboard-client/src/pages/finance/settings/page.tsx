@@ -3,7 +3,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { GlassCard, GlassPanel, GlassListItem } from "@/components/ui/glass";
 import { ArrowRight, PlayCircle, StopCircle, AlertTriangle } from "lucide-react";
 import { ConfirmDialog } from "@/components/finance/ConfirmDialog";

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos API',
-    'version': '19.0.1.0.38',
+    'version': '19.0.1.0.39',
     'category': 'Website',
     'summary': 'API REST pour frontend e-commerce et backoffice',
     'author': 'Quelyos',

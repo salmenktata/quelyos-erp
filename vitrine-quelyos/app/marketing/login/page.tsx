@@ -129,24 +129,27 @@ function LoginForm() {
     setError('');
 
     try {
-      const response = await fetch(`${config.api.marketing}/auth/login`, {
+      // Validate credentials against Odoo via proxy
+      const response = await fetch('/api/odoo-auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ login: email, password }),
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Erreur de connexion');
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Identifiants invalides');
       }
 
-      if (data.token) {
-        localStorage.setItem('marketing_token', data.token);
-      }
-
-      window.location.href = config.marketing.dashboard;
+      // Redirect to dashboard with session handoff params
+      const params = new URLSearchParams({
+        session_id: data.session_id || '',
+        uid: String(data.uid),
+        name: data.name || email,
+        from: 'marketing',
+      });
+      window.location.href = `http://localhost:5175/auth-callback?${params.toString()}`;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur de connexion');
     } finally {
@@ -342,13 +345,13 @@ function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-300" htmlFor="email">
-                Adresse email
+                Identifiant
               </label>
               <input
                 id="email"
-                type="email"
-                placeholder="vous@entreprise.com"
-                autoComplete="email"
+                type="text"
+                placeholder="admin"
+                autoComplete="username"
                 className="h-12 w-full rounded-xl border border-slate-700/50 bg-slate-900/50 px-4 text-white placeholder:text-slate-500 transition-all focus:border-fuchsia-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/20"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

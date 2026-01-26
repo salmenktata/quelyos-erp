@@ -60,9 +60,8 @@ export function useWarehouses(params: WarehousesParams = {}) {
         }
 
         // Le backend retourne { success, data: [...], total }
-        // On extrait juste le tableau data
-        const result = response.data as { success: boolean; data: Warehouse[]; total: number };
-        return result.data || [];
+        // response.data est directement le tableau
+        return (response.data as Warehouse[]) || [];
       } catch (error) {
         logger.error('[useWarehouses] Fetch error:', error);
         throw error;
@@ -80,6 +79,48 @@ export function useWarehouseDetail(warehouseId: number) {
         throw new Error(response.error || 'Failed to fetch warehouse detail');
       }
       return response.data as WarehouseDetail;
+    },
+    enabled: !!warehouseId,
+  });
+}
+
+export interface WarehouseStockProduct {
+  id: number;
+  name: string;
+  sku: string;
+  image_url: string | null;
+  qty_available: number;
+  reserved_qty: number;
+  free_qty: number;
+  reorder_min: number;
+  category: string;
+  list_price: number;
+}
+
+export interface WarehouseStockResponse {
+  warehouse: {
+    id: number;
+    name: string;
+    code: string;
+  };
+  products: WarehouseStockProduct[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export function useWarehouseStock(
+  warehouseId: number,
+  params?: { limit?: number; offset?: number; search?: string; low_stock_only?: boolean }
+) {
+  return useQuery({
+    queryKey: ['warehouse-stock', warehouseId, params],
+    queryFn: async () => {
+      const response = await odooRpc(`/api/ecommerce/warehouses/${warehouseId}/stock`, params || {});
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to fetch warehouse stock');
+      }
+      return response.data as WarehouseStockResponse;
     },
     enabled: !!warehouseId,
   });

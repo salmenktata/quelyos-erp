@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { GlassCard, GlassButton, GlassBadge, GlassPanel } from "@/components/ui/glass";
 import { Plus, Settings, Trash2, TestTube, ToggleLeft, ToggleRight, AlertTriangle, Clock, Mail, TrendingDown, Target } from "lucide-react";
 import { useCurrency } from "@/lib/finance/CurrencyContext";

@@ -78,7 +78,7 @@ export default function BreakEvenReportPage() {
           className="mb-8"
         >
           <Link
-            href={ROUTES.FINANCE.DASHBOARD.REPORTING}
+            to={ROUTES.FINANCE.DASHBOARD.REPORTING}
             className="mb-4 inline-flex items-center gap-2 text-sm text-indigo-300 hover:text-indigo-200 transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />

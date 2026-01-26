@@ -956,6 +956,44 @@ class ApiClient {
     )
   }
 
+  // ==================== STOCK TRANSFERS ====================
+
+  async getStockTransfers(params?: {
+    limit?: number
+    offset?: number
+    state?: string
+    warehouse_id?: number
+    search?: string
+  }) {
+    return this.request('/api/ecommerce/stock/transfers', params)
+  }
+
+  async getStockLocations(params?: {
+    warehouse_id?: number
+    usage?: string
+    internal_only?: boolean
+  }) {
+    return this.request('/api/ecommerce/stock/locations', params)
+  }
+
+  async createStockTransfer(params: {
+    product_id: number
+    quantity: number
+    from_location_id: number
+    to_location_id: number
+    note?: string
+  }) {
+    return this.request('/api/ecommerce/stock/transfer', params)
+  }
+
+  async validateStockTransfer(pickingId: number) {
+    return this.request(`/api/ecommerce/stock/transfers/${pickingId}/validate`, {})
+  }
+
+  async cancelStockTransfer(pickingId: number) {
+    return this.request(`/api/ecommerce/stock/transfers/${pickingId}/cancel`, {})
+  }
+
   // ==================== DELIVERY ====================
 
   async getDeliveryMethods() {

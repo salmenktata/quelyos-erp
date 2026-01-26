@@ -29,6 +29,53 @@ export interface StockMove {
   reference: string
 }
 
+// ==================== STOCK TRANSFERS ====================
+
+export type TransferState = 'draft' | 'waiting' | 'confirmed' | 'assigned' | 'done' | 'cancel'
+
+export interface TransferProduct {
+  id: number
+  name: string
+  sku: string
+  quantity: number
+  quantity_done: number
+}
+
+export interface StockTransfer {
+  id: number
+  name: string
+  state: TransferState
+  state_label: string
+  scheduled_date: string | null
+  date_done: string | null
+  from_location: string
+  to_location: string
+  from_warehouse: string | null
+  to_warehouse: string | null
+  products: TransferProduct[]
+  products_count: number
+  note: string
+  create_date: string | null
+  user_name: string | null
+}
+
+export interface StockLocation {
+  id: number
+  name: string
+  complete_name: string
+  warehouse_id: number | null
+  warehouse_name: string | null
+  usage: string
+}
+
+export interface CreateTransferParams {
+  product_id: number
+  quantity: number
+  from_location_id: number
+  to_location_id: number
+  note?: string
+}
+
 // ==================== DELIVERY ====================
 
 export interface DeliveryMethod {

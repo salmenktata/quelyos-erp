@@ -49,6 +49,12 @@ const Loader = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const Fingerprint = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+  </svg>
+);
+
 function LoginLoading() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950">
@@ -67,6 +73,22 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [passkeyLoading, setPasskeyLoading] = useState(false);
+  const [passkeySupported, setPasskeySupported] = useState(false);
+
+  // Check if passkey is supported
+  useState(() => {
+    if (typeof window !== 'undefined' && window.PublicKeyCredential) {
+      setPasskeySupported(true);
+    }
+  });
+
+  const odooUrl = process.env.NEXT_PUBLIC_ODOO_URL || 'http://localhost:8069';
+
+  function handlePasskeyLogin() {
+    // Redirect to Odoo passkey page (same origin as passkey registration)
+    window.location.href = `${odooUrl}/auth/passkey-page?redirect=/web`;
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -74,24 +96,48 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      // Super Admin uses a dedicated API endpoint
-      const response = await fetch(`${config.api.finance}/auth/admin/login`, {
+      // Use proxy API to authenticate against Odoo (avoids CORS)
+      const response = await fetch('/api/odoo-auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ login: email, password }),
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || !data.success) {
         setError(data.error || 'Identifiants invalides');
         return;
       }
 
-      // Redirect to Super Admin dashboard
-      const dashboardUrl = config.superadmin.app + '/dashboard';
-      window.location.href = dashboardUrl;
+      // Redirect via SSO endpoint (creates Odoo session and redirects)
+      const odooUrl = data.odooUrl || 'http://localhost:8069';
+
+      // Create form to POST to Odoo SSO endpoint
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `${odooUrl}/api/auth/sso-redirect`;
+
+      const loginInput = document.createElement('input');
+      loginInput.type = 'hidden';
+      loginInput.name = 'login';
+      loginInput.value = email;
+      form.appendChild(loginInput);
+
+      const passwordInput = document.createElement('input');
+      passwordInput.type = 'hidden';
+      passwordInput.name = 'password';
+      passwordInput.value = password;
+      form.appendChild(passwordInput);
+
+      const dbInput = document.createElement('input');
+      dbInput.type = 'hidden';
+      dbInput.name = 'db';
+      dbInput.value = 'quelyos';
+      form.appendChild(dbInput);
+
+      document.body.appendChild(form);
+      form.submit();
     } catch {
       setError('Impossible de se connecter. Vérifiez votre connexion.');
     } finally {
@@ -140,16 +186,16 @@ function LoginForm() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300" htmlFor="email">
-              Email administrateur
+            <label className="text-sm font-medium text-slate-300" htmlFor="login">
+              Identifiant
             </label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
               <input
-                id="email"
-                type="email"
-                placeholder="admin@quelyos.com"
-                autoComplete="email"
+                id="login"
+                type="text"
+                placeholder="admin"
+                autoComplete="username"
                 className="h-12 w-full rounded-xl border border-slate-700/50 bg-slate-900/50 pl-12 pr-4 text-white placeholder:text-slate-500 transition-all focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -193,7 +239,7 @@ function LoginForm() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || passkeyLoading}
             className="relative h-12 w-full overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 to-slate-700 font-semibold text-white shadow-lg shadow-violet-500/20 transition-all hover:shadow-violet-500/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
@@ -203,6 +249,36 @@ function LoginForm() {
               </span>
             ) : (
               'Accéder au panneau'
+            )}
+          </button>
+
+          {/* Divider */}
+          <div className="relative my-2">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-700/50" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-slate-950 px-3 text-slate-500">ou</span>
+            </div>
+          </div>
+
+          {/* Passkey button */}
+          <button
+            type="button"
+            onClick={handlePasskeyLogin}
+            disabled={loading || passkeyLoading}
+            className="relative flex h-12 w-full items-center justify-center gap-3 overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900/50 font-medium text-slate-300 transition-all hover:border-violet-500/50 hover:bg-slate-800/50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {passkeyLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader className="h-5 w-5 animate-spin" />
+                <span>Authentification...</span>
+              </span>
+            ) : (
+              <>
+                <Fingerprint className="h-5 w-5" />
+                <span>Utiliser un Passkey</span>
+              </>
             )}
           </button>
         </form>

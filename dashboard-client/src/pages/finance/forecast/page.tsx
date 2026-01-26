@@ -18,7 +18,7 @@ import {
   Zap,
   BarChart3
 } from "lucide-react";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { GlassCard, GlassPanel, GlassStatCard } from "@/components/ui/glass";

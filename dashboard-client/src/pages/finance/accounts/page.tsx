@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { currencies } from "@/lib/finance/currencies";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
@@ -94,6 +94,7 @@ export default function AccountsPage() {
   const [reassignTargetId, setReassignTargetId] = useState<number | "">("");
   const [resolvingConflict, setResolvingConflict] = useState(false);
   const [conflictError, setConflictError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const withCompanyParam = useCallback(
     (path: string) => {
@@ -206,7 +207,7 @@ export default function AccountsPage() {
   async function deleteAccount(id: number) {
     if (!confirm("Supprimer ce compte ?")) return;
     setDeletingId(id);
-    setError(null);
+    setDeleteError(null);
     try {
       await api(withCompanyParam(`/accounts/${id}`), { method: "DELETE" });
       if (editingId === id) {
@@ -221,7 +222,7 @@ export default function AccountsPage() {
         setReassignTargetId("");
         setConflictError(null);
       } else {
-        setError(message);
+        setDeleteError(message);
       }
     } finally {
       setDeletingId(null);
@@ -349,7 +350,7 @@ export default function AccountsPage() {
           </div>
           <div className="flex gap-2 md:gap-3">
             <Link
-              href={ROUTES.FINANCE.DASHBOARD.ACCOUNTS.NEW}
+              to={ROUTES.FINANCE.DASHBOARD.ACCOUNTS.NEW}
               className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-2.5 md:px-4 md:py-3 text-sm font-semibold shadow-lg transition hover:from-emerald-400 hover:to-teal-400"
             >
               <Plus size={18} />
@@ -357,7 +358,7 @@ export default function AccountsPage() {
               <span className="sm:hidden">Ajouter</span>
             </Link>
             <Link
-              href="/dashboard"
+              to="/dashboard"
               className="hidden md:flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm font-semibold backdrop-blur-sm transition hover:bg-white/10"
             >
               Retour dashboard

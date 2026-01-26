@@ -196,6 +196,25 @@ export function Layout({ children }: LayoutProps) {
     return location.pathname === path || location.pathname.startsWith(path + '/')
   }
 
+  const handleLogout = () => {
+    // Get auth source to redirect to correct login page
+    const authSource = localStorage.getItem('auth_source')
+
+    // Clear all auth data
+    localStorage.removeItem('session_id')
+    localStorage.removeItem('user')
+    localStorage.removeItem('auth_source')
+
+    // Redirect based on where the user came from
+    if (authSource === 'finance') {
+      window.location.href = 'http://localhost:3000/finance/login'
+    } else if (authSource === 'marketing') {
+      window.location.href = 'http://localhost:3000/marketing/login'
+    } else {
+      window.location.href = '/login'
+    }
+  }
+
   // Calculer les badges de notifications
   const stockAlerts = (analyticsData?.data?.totals?.out_of_stock_products || 0) +
                       (analyticsData?.data?.totals?.low_stock_products || 0)
@@ -355,6 +374,11 @@ export function Layout({ children }: LayoutProps) {
           name: 'Mouvements',
           path: '/stock/moves',
           icon: ArrowsRightLeftIcon,
+        },
+        {
+          name: 'Transferts',
+          path: '/stock/transfers',
+          icon: TruckIcon,
         },
         {
           name: 'Entrepôts',
@@ -567,14 +591,14 @@ export function Layout({ children }: LayoutProps) {
 
           <ThemeToggle compact={isCompact} />
 
-          <Link
-            to="/login"
-            className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200"
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200 w-full"
             title={isCompact ? 'Déconnexion' : undefined}
           >
             <ArrowLeftOnRectangleIcon className="w-[18px] h-[18px] flex-shrink-0" />
             {!isCompact && <span className="font-medium">Déconnexion</span>}
-          </Link>
+          </button>
         </div>
       </aside>
 

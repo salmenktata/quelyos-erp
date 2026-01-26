@@ -4,11 +4,10 @@ import { useEffect, useState, use } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { GlassCard, GlassPanel } from "@/components/ui/glass";
-import { PaymentFlowManager } from "@/components/PaymentFlowManager";
 import {
   ArrowLeft,
   Building2,
@@ -42,7 +41,7 @@ export default function AccountDetailPage({ params }: PageParams) {
   const accountId = parseInt(resolvedParams.id, 10);
   
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useRequireAuth();
+  const { user, isLoading: authLoading } = useRequireAuth();
   const { currency: globalCurrency } = useCurrency();
 
   const [account, setAccount] = useState<Account | null>(null);
@@ -121,7 +120,7 @@ export default function AccountDetailPage({ params }: PageParams) {
             <p>{error || "Compte non trouvé"}</p>
           </div>
           <Link
-            href={ROUTES.FINANCE.DASHBOARD.ACCOUNTS.HOME}
+            to={ROUTES.FINANCE.DASHBOARD.ACCOUNTS.HOME}
             className="mt-4 inline-flex items-center gap-2 text-sm text-indigo-400 hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -138,7 +137,7 @@ export default function AccountDetailPage({ params }: PageParams) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <Link
-            href={ROUTES.FINANCE.DASHBOARD.ACCOUNTS.HOME}
+            to={ROUTES.FINANCE.DASHBOARD.ACCOUNTS.HOME}
             className="mb-2 inline-flex items-center gap-1 text-sm text-slate-400 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -257,7 +256,7 @@ export default function AccountDetailPage({ params }: PageParams) {
                   {account.portfolios.map(({ portfolio }) => (
                     <Link
                       key={portfolio.id}
-                      href={`/dashboard/portfolios/${portfolio.id}`}
+                      to={`/dashboard/portfolios/${portfolio.id}`}
                       className="rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs text-violet-300 transition hover:bg-violet-500/20"
                     >
                       {portfolio.name}
@@ -274,7 +273,7 @@ export default function AccountDetailPage({ params }: PageParams) {
             
             <div className="grid gap-3">
               <Link
-                href={`/dashboard/expenses?accountId=${account.id}`}
+                to={`/dashboard/expenses?accountId=${account.id}`}
                 className="flex items-center gap-3 rounded-lg border border-white/10 p-4 transition hover:bg-white/5"
               >
                 <ArrowLeftRight className="h-5 w-5 text-indigo-400" />
@@ -300,7 +299,7 @@ export default function AccountDetailPage({ params }: PageParams) {
               </button>
 
               <Link
-                href={`/dashboard/accounts?edit=${account.id}`}
+                to={`/dashboard/accounts?edit=${account.id}`}
                 className="flex items-center gap-3 rounded-lg border border-white/10 p-4 transition hover:bg-white/5"
               >
                 <Edit2 className="h-5 w-5 text-amber-400" />

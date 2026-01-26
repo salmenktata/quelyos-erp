@@ -61,7 +61,7 @@ export default function DataQualityPage() {
 
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <Link
-            href={ROUTES.FINANCE.DASHBOARD.REPORTING}
+            to={ROUTES.FINANCE.DASHBOARD.REPORTING}
             className="mb-4 inline-flex items-center gap-2 text-sm text-indigo-300 hover:text-indigo-200"
           >
             <ChevronLeft className="h-4 w-4" />Retour au hub

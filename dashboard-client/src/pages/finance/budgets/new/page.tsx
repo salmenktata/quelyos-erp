@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { GlassCard, GlassPanel } from "@/components/ui/glass";
@@ -126,7 +126,7 @@ export default function NewBudgetPage() {
         <div className="flex items-center justify-between">
           <div>
             <Link
-              href={ROUTES.FINANCE.DASHBOARD.BUDGETS.HOME}
+              to={ROUTES.FINANCE.DASHBOARD.BUDGETS.HOME}
               className="mb-2 inline-flex items-center gap-2 text-sm text-indigo-300 hover:text-indigo-200"
             >
               <ArrowLeft size={16} />
@@ -280,7 +280,7 @@ export default function NewBudgetPage() {
                     {editId ? "Mettre à jour" : "Créer le budget"}
                   </button>
                   <Link
-                    href={ROUTES.FINANCE.DASHBOARD.BUDGETS.HOME}
+                    to={ROUTES.FINANCE.DASHBOARD.BUDGETS.HOME}
                     className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10"
                   >
                     Annuler

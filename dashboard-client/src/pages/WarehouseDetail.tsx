@@ -1,177 +1,372 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useWarehouseDetail } from '../hooks/useWarehouses';
+import { useState } from 'react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { Layout } from '../components/Layout'
+import { useWarehouseDetail, useWarehouseStock } from '../hooks/useWarehouses'
+import { Badge, Button, Breadcrumbs, SkeletonTable } from '../components/common'
+import {
+  ArrowLeftIcon,
+  BuildingStorefrontIcon,
+  MapPinIcon,
+  CubeIcon,
+  MagnifyingGlassIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/outline'
+
+type TabType = 'locations' | 'stock'
 
 export default function WarehouseDetail() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const warehouseId = parseInt(id || '0', 10);
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const warehouseId = parseInt(id || '0', 10)
 
-  const { data: warehouse, isLoading, error } = useWarehouseDetail(warehouseId);
+  const [activeTab, setActiveTab] = useState<TabType>('stock')
+  const [stockPage, setStockPage] = useState(0)
+  const [stockSearch, setStockSearch] = useState('')
+  const [stockSearchInput, setStockSearchInput] = useState('')
+  const [lowStockOnly, setLowStockOnly] = useState(false)
+  const stockLimit = 20
+
+  const { data: warehouse, isLoading, error } = useWarehouseDetail(warehouseId)
+  const {
+    data: stockData,
+    isLoading: stockLoading,
+  } = useWarehouseStock(warehouseId, {
+    limit: stockLimit,
+    offset: stockPage * stockLimit,
+    search: stockSearch || undefined,
+    low_stock_only: lowStockOnly || undefined,
+  })
+
+  const handleStockSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    setStockSearch(stockSearchInput)
+    setStockPage(0)
+  }
+
+  const getStockStatus = (freeQty: number, reorderMin: number) => {
+    if (freeQty <= 0) return { label: 'Rupture', variant: 'error' as const }
+    if (freeQty < reorderMin || freeQty < 10) return { label: 'Stock faible', variant: 'warning' as const }
+    return { label: 'En stock', variant: 'success' as const }
+  }
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+      <Layout>
+        <div className="p-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
+          </div>
+        </div>
+      </Layout>
+    )
   }
 
   if (error || !warehouse) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-800">Erreur : Entrepôt introuvable</p>
-        <button
-          onClick={() => navigate('/warehouses')}
-          className="mt-4 text-blue-600 hover:text-blue-800"
-        >
-          ← Retour aux entrepôts
-        </button>
-      </div>
-    );
+      <Layout>
+        <div className="p-8">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+            <p className="text-red-800 dark:text-red-200">Entrepôt introuvable</p>
+            <Button
+              variant="secondary"
+              onClick={() => navigate('/warehouses')}
+              className="mt-4"
+            >
+              <ArrowLeftIcon className="h-4 w-4 mr-2" />
+              Retour aux entrepôts
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    )
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Back button */}
-      <button
-        onClick={() => navigate('/warehouses')}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-white"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        Retour aux entrepôts
-      </button>
+  const stockProducts = stockData?.products || []
+  const stockTotal = stockData?.total || 0
 
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{warehouse.name}</h1>
-              {warehouse.active ? (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                  Actif
-                </span>
-              ) : (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                  Inactif
-                </span>
-              )}
+  return (
+    <Layout>
+      <div className="p-8">
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Stock', href: '/stock' },
+            { label: 'Entrepôts', href: '/warehouses' },
+            { label: warehouse.name },
+          ]}
+        />
+
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-2">
+            <BuildingStorefrontIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                {warehouse.name}
+                <Badge variant={warehouse.active ? 'success' : 'neutral'}>
+                  {warehouse.active ? 'Actif' : 'Inactif'}
+                </Badge>
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400">
+                Code: {warehouse.code} • {warehouse.company_name || 'Aucune société'}
+              </p>
             </div>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Code: {warehouse.code}</p>
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Entreprise</p>
-            <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Locations</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{warehouse.location_count}</p>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Produits en stock</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stockTotal}</p>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Société</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
               {warehouse.company_name || 'N/A'}
             </p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Nombre de locations</p>
-            <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">{warehouse.location_count}</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <Link
+              to="/stock/transfers"
+              className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              Créer un transfert →
+            </Link>
           </div>
         </div>
-      </div>
 
-      {/* Locations */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Locations de stock</h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {warehouse.location_count} location(s) dans cet entrepôt
-          </p>
+        {/* Tabs */}
+        <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+          <nav className="flex gap-6">
+            <button
+              onClick={() => setActiveTab('stock')}
+              className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'stock'
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
+              }`}
+            >
+              <CubeIcon className="h-5 w-5 inline mr-2" />
+              Stock ({stockTotal})
+            </button>
+            <button
+              onClick={() => setActiveTab('locations')}
+              className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'locations'
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
+              }`}
+            >
+              <MapPinIcon className="h-5 w-5 inline mr-2" />
+              Locations ({warehouse.location_count})
+            </button>
+          </nav>
         </div>
 
-        <div className="p-6">
-          {warehouse.locations && warehouse.locations.length > 0 ? (
-            <div className="space-y-3">
-              {warehouse.locations.map((location) => (
-                <div
-                  key={location.id}
-                  className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <svg
-                        className="w-5 h-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+        {/* Tab Content: Stock */}
+        {activeTab === 'stock' && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            {/* Filtres */}
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-wrap gap-4 items-center">
+              <form onSubmit={handleStockSearch} className="flex gap-2 flex-1 min-w-[200px] max-w-md">
+                <div className="relative flex-1">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={stockSearchInput}
+                    onChange={(e) => setStockSearchInput(e.target.value)}
+                    placeholder="Rechercher un produit..."
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <Button type="submit" variant="secondary" size="sm">
+                  Rechercher
+                </Button>
+              </form>
+
+              <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <input
+                  type="checkbox"
+                  checked={lowStockOnly}
+                  onChange={(e) => {
+                    setLowStockOnly(e.target.checked)
+                    setStockPage(0)
+                  }}
+                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                Stock faible uniquement
+              </label>
+            </div>
+
+            {/* Table */}
+            {stockLoading ? (
+              <div className="p-4">
+                <SkeletonTable rows={5} columns={5} />
+              </div>
+            ) : stockProducts.length === 0 ? (
+              <div className="p-12 text-center">
+                <CubeIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="mt-4 text-gray-500 dark:text-gray-400">
+                  {stockSearch || lowStockOnly
+                    ? 'Aucun produit ne correspond à vos critères'
+                    : 'Aucun produit en stock dans cet entrepôt'}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead className="bg-gray-50 dark:bg-gray-900">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                          Produit
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                          SKU
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                          Disponible
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                          Réservé
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                          État
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {stockProducts.map((product) => {
+                        const status = getStockStatus(product.free_qty, product.reorder_min)
+                        return (
+                          <tr
+                            key={product.id}
+                            className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                          >
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                {product.image_url ? (
+                                  <img
+                                    src={product.image_url}
+                                    alt={product.name}
+                                    className="w-10 h-10 object-cover rounded"
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                                    <CubeIcon className="h-5 w-5 text-gray-400" />
+                                  </div>
+                                )}
+                                <div>
+                                  <Link
+                                    to={`/products/${product.id}`}
+                                    className="font-medium text-gray-900 dark:text-white hover:text-indigo-600"
+                                  >
+                                    {product.name}
+                                  </Link>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    {product.category}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                              {product.sku || '-'}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <span className="font-semibold text-gray-900 dark:text-white">
+                                {product.free_qty}
+                              </span>
+                              {product.free_qty < 10 && (
+                                <ExclamationTriangleIcon className="inline ml-1 h-4 w-4 text-amber-500" />
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">
+                              {product.reserved_qty}
+                            </td>
+                            <td className="px-6 py-4">
+                              <Badge variant={status.variant}>{status.label}</Badge>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination */}
+                {stockTotal > stockLimit && (
+                  <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {stockPage * stockLimit + 1} - {Math.min((stockPage + 1) * stockLimit, stockTotal)} sur {stockTotal}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        disabled={stockPage === 0}
+                        onClick={() => setStockPage((p) => p - 1)}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{location.complete_name}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Type: {location.usage}</p>
-                      </div>
+                        Précédent
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        disabled={(stockPage + 1) * stockLimit >= stockTotal}
+                        onClick={() => setStockPage((p) => p + 1)}
+                      >
+                        Suivant
+                      </Button>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">ID: {location.id}</div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center py-12">
-              <svg
-                className="w-12 h-12 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                />
-              </svg>
-              <p className="mt-4 text-gray-500 dark:text-gray-400">Aucune location dans cet entrepôt</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex gap-3">
-          <svg
-            className="w-5 h-5 text-blue-600 flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <div className="text-sm text-blue-800">
-            <p className="font-medium">Gestion multi-entrepôts</p>
-            <p className="mt-1">
-              Utilisez la page <strong>Produits</strong> pour voir le stock détaillé par location.
-              Vous pouvez également créer des transferts de stock entre entrepôts depuis la page{' '}
-              <strong>Mouvements de Stock</strong>.
-            </p>
+                )}
+              </>
+            )}
           </div>
-        </div>
+        )}
+
+        {/* Tab Content: Locations */}
+        {activeTab === 'locations' && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            {warehouse.locations && warehouse.locations.length > 0 ? (
+              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                {warehouse.locations.map((location) => (
+                  <div
+                    key={location.id}
+                    className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <MapPinIcon className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {location.complete_name}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Type: {location.usage}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      ID: {location.id}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-12 text-center">
+                <MapPinIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="mt-4 text-gray-500 dark:text-gray-400">
+                  Aucune location dans cet entrepôt
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </div>
-  );
+    </Layout>
+  )
 }

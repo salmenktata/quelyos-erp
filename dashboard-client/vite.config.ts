@@ -33,6 +33,12 @@ export default defineConfig({
           });
         },
       },
+      '/api/finance': {
+        target: 'http://localhost:3004',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/finance/, ''),
+      },
       '/web': {
         target: 'http://localhost:8069',
         changeOrigin: true,

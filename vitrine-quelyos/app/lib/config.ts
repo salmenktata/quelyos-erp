@@ -21,10 +21,10 @@ const SUPER_ADMIN_BASE =
 
 const API_FINANCE_BASE =
   process.env.NEXT_PUBLIC_API_FINANCE_URL ||
-  (isDev ? "http://localhost:3005" : "https://api.quelyos.com");
+  (isDev ? "http://localhost:3004" : "https://api.quelyos.com");
 const API_MARKETING_BASE =
   process.env.NEXT_PUBLIC_API_MARKETING_URL ||
-  (isDev ? "http://localhost:3003" : "https://api-marketing.quelyos.com");
+  (isDev ? "http://localhost:3004" : "https://api-marketing.quelyos.com");
 
 export const config = {
   // URLs Finance

@@ -21,7 +21,7 @@ import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { ReportingNav } from "@/components/finance/reporting/ReportingNav";
 import { ReportNotice } from "@/components/finance/reporting/ReportNotice";
 import { reportingClient, type TopCategoriesResponse, type CategoryTotal } from "@/lib/finance/reporting";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { useApiData } from "@/hooks/finance/useApiData";
 import { reportingNotices } from "@/lib/finance/reporting-notices";
 
@@ -192,7 +192,7 @@ export default function ByCategoryReportPage() {
           className="mb-8"
         >
           <Link
-            href={ROUTES.FINANCE.DASHBOARD.REPORTING}
+            to={ROUTES.FINANCE.DASHBOARD.REPORTING}
             className="mb-4 inline-flex items-center gap-2 text-sm text-indigo-300 hover:text-indigo-200 transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from . import auth
 from . import base
 from . import main
 from . import cms

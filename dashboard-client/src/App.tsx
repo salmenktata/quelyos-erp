@@ -6,6 +6,7 @@ import { useSessionManager } from './hooks/useSessionManager'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
+import AuthCallback from './pages/AuthCallback'
 import Orders from './pages/Orders'
 import OrderDetail from './pages/OrderDetail'
 import Customers from './pages/Customers'
@@ -19,6 +20,7 @@ import CouponForm from './pages/CouponForm'
 import Stock from './pages/Stock'
 import Inventory from './pages/Inventory'
 import StockMoves from './pages/StockMoves'
+import StockTransfers from './pages/StockTransfers'
 import DeliveryMethods from './pages/DeliveryMethods'
 import SiteConfig from './pages/SiteConfig'
 import Payments from './pages/Payments'
@@ -41,7 +43,16 @@ import TrustBadges from './pages/TrustBadges'
 import SeoMetadata from './pages/SeoMetadata'
 import MarketingPopups from './pages/MarketingPopups'
 import StaticPages from './pages/StaticPages'
+// Finance module
 import FinanceDashboard from './pages/finance/FinanceDashboard'
+import FinanceAccounts from './pages/finance/accounts/page'
+import FinanceTransactions from './pages/finance/transactions/page'
+import FinanceBudgets from './pages/finance/budgets/page'
+import FinanceForecast from './pages/finance/forecast/page'
+import FinanceArchives from './pages/finance/archives/page'
+import FinancePaymentPlanning from './pages/finance/payment-planning/page'
+import { CurrencyProvider } from './lib/finance/CurrencyContext'
+import { FinanceErrorBoundary } from './components/finance/FinanceErrorBoundary'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,10 +83,11 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <ToastProvider>
-          <SessionManager />
-          <Routes>
+            <SessionManager />
+            <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/auth-callback" element={<AuthCallback />} />
               <Route
                 path="/dashboard"
                 element={
@@ -193,6 +205,14 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <StockMoves />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/stock/transfers"
+                element={
+                  <ProtectedRoute>
+                    <StockTransfers />
                   </ProtectedRoute>
                 }
               />
@@ -365,11 +385,88 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* Finance routes */}
               <Route
                 path="/finance"
                 element={
                   <ProtectedRoute>
-                    <FinanceDashboard />
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceDashboard />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/accounts"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceAccounts />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/transactions"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceTransactions />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/budgets"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceBudgets />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/forecast"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceForecast />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/archives"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceArchives />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/payment-planning"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinancePaymentPlanning />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
                   </ProtectedRoute>
                 }
               />

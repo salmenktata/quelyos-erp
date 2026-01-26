@@ -1,7 +1,7 @@
 
 
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import type { CreateCategoryRequest } from "@/types/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { GlassCard, GlassPanel, GlassBadge, GlassListItem } from "@/components/ui/glass";

@@ -139,38 +139,29 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${config.api.finance}/auth/login`, {
+      // Validate credentials against Odoo via proxy
+      const response = await fetch('/api/odoo-auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          email,
-          password,
-          ...(requires2FA && { twoFACode }),
-        }),
+        body: JSON.stringify({ login: email, password }),
       });
 
       const data = await response.json();
 
-      if (data.requires2FA) {
-        setRequires2FA(true);
+      if (!response.ok || !data.success) {
+        setError(data.error || 'Identifiants invalides');
         setLoading(false);
         return;
       }
 
-      if (!response.ok) {
-        setError(data.error || 'Email ou mot de passe incorrect');
-        setLoading(false);
-        return;
-      }
-
-      // Stocker le token si retourné
-      if (data.token) {
-        localStorage.setItem('finance_token', data.token);
-      }
-
-      // Rediriger vers le dashboard Finance
-      window.location.href = config.finance.dashboard;
+      // Redirect to dashboard with session handoff params
+      const params = new URLSearchParams({
+        session_id: data.session_id || '',
+        uid: String(data.uid),
+        name: data.name || email,
+        from: 'finance',
+      });
+      window.location.href = `http://localhost:5175/auth-callback?${params.toString()}`;
     } catch {
       setError('Impossible de se connecter. Vérifiez votre connexion.');
       setLoading(false);
@@ -400,16 +391,16 @@ function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {!requires2FA ? (
               <>
-                {/* Email */}
+                {/* Identifiant */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-300" htmlFor="email">
-                    Adresse email
+                    Identifiant
                   </label>
                   <input
                     id="email"
-                    type="email"
-                    placeholder="vous@entreprise.com"
-                    autoComplete="email"
+                    type="text"
+                    placeholder="admin"
+                    autoComplete="username"
                     className="h-12 w-full rounded-xl border border-slate-700/50 bg-slate-900/50 px-4 text-white placeholder:text-slate-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

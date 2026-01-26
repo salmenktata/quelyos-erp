@@ -13,7 +13,7 @@ import {
   type ForecastResponse,
   type CombinedResponse,
 } from "@/lib/finance/reporting";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import {
   GlassCard,
   GlassStatCard,

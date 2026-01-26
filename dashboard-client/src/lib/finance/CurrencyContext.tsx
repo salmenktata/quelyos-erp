@@ -127,7 +127,8 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const init = async () => {
       setIsLoading(true);
-      await Promise.all([
+      // Use allSettled to prevent crash if API fails
+      await Promise.allSettled([
         fetchUserCurrency(),
         fetchCurrencies(),
         fetchExchangeRates(),

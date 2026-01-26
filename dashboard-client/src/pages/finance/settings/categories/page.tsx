@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { Loader2, Plus, Trash2, Edit2, Tag, TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
 
 type CategoryKind = "INCOME" | "EXPENSE";

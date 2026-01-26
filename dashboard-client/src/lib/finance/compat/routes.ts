@@ -1,11 +1,58 @@
 /**
  * Adaptateur de compatibilité @quelyos/config/routes
  * Routes finance pour le backoffice
+ * Supporte la structure imbriquée legacy (ROUTES.FINANCE.DASHBOARD.ACCOUNTS.HOME)
  */
 
-// Routes Finance imbriquées
+// Structure imbriquée pour compatibilité avec le code migré de quelyos-finance
+const FINANCE_DASHBOARD = {
+  HOME: '/finance',
+  ACCOUNTS: {
+    HOME: '/finance/accounts',
+    NEW: '/finance/accounts/new',
+    DETAIL: (id: number | string) => `/finance/accounts/${id}`,
+  },
+  TRANSACTIONS: {
+    HOME: '/finance/transactions',
+    NEW: '/finance/transactions/new',
+  },
+  EXPENSES: {
+    HOME: '/finance/expenses',
+    NEW: '/finance/expenses/new',
+  },
+  INCOMES: {
+    HOME: '/finance/incomes',
+    NEW: '/finance/incomes/new',
+  },
+  BUDGETS: {
+    HOME: '/finance/budgets',
+    NEW: '/finance/budgets/new',
+    DETAIL: (id: number | string) => `/finance/budgets/${id}`,
+  },
+  CATEGORIES: '/finance/categories',
+  PAYMENT_PLANNING: '/finance/payment-planning',
+  FORECAST: '/finance/forecast',
+  SCENARIOS: '/finance/scenarios',
+  PORTFOLIOS: {
+    HOME: '/finance/portfolios',
+    DETAIL: (id: number | string) => `/finance/portfolios/${id}`,
+  },
+  REPORTING: '/finance/reporting',
+  SUPPLIERS: {
+    HOME: '/finance/suppliers',
+    NEW: '/finance/suppliers/new',
+    DETAIL: (id: number | string) => `/finance/suppliers/${id}`,
+  },
+  ALERTS: '/finance/alerts',
+  CHARTS: '/finance/charts',
+  IMPORT: '/finance/import',
+  ARCHIVES: '/finance/archives',
+  SETTINGS: '/finance/settings',
+}
+
+// Routes Finance plates (pour accès direct)
 const FINANCE_ROUTES = {
-  DASHBOARD: '/finance',
+  DASHBOARD: FINANCE_DASHBOARD,
   ACCOUNTS: '/finance/accounts',
   ACCOUNT_DETAIL: (id: number | string) => `/finance/accounts/${id}`,
   ACCOUNT_NEW: '/finance/accounts/new',
@@ -49,7 +96,7 @@ const FINANCE_ROUTES = {
   SETTINGS: '/finance/settings',
   SETTINGS_SECURITY: '/finance/settings/security',
   SETTINGS_FLUX: '/finance/settings/flux',
-} as const
+}
 
 export const ROUTES = {
   // Sous-objet FINANCE pour compatibilité
@@ -61,6 +108,6 @@ export const ROUTES = {
   // Legacy (backoffice existant)
   INVOICES: '/invoices',
   PAYMENTS: '/payments',
-} as const
+}
 
 export type RouteKey = keyof typeof ROUTES

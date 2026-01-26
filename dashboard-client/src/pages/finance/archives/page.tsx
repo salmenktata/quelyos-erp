@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { GlassCard, GlassPanel, GlassBadge, GlassListItem } from "@/components/ui/glass";
@@ -138,7 +138,7 @@ export default function ArchivesPage() {
             <p className="text-sm text-indigo-100/80">Consultation des lignes masquées (hors calculs).</p>
           </div>
           <Link
-            href={ROUTES.FINANCE.DASHBOARD.HOME}
+            to={ROUTES.FINANCE.DASHBOARD.HOME}
             className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-indigo-50 backdrop-blur-sm transition hover:border-white/30 hover:bg-white/10"
           >
             <ArrowUpRight size={16} /> Retour dashboard

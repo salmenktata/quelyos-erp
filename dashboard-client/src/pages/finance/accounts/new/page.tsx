@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
 import { useNavigate } from "react-router-dom";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { currencies } from "@/lib/finance/currencies";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
@@ -133,7 +133,7 @@ export default function NewAccountPage() {
           </div>
           <div className="flex gap-3">
             <Link
-              href="/dashboard/accounts"
+              to="/dashboard/accounts"
               className="rounded-lg border border-white/20 px-4 py-2 text-sm text-indigo-50 transition hover:border-white/40"
             >
               Retour à la liste
@@ -304,7 +304,7 @@ export default function NewAccountPage() {
             {loading ? "Création..." : "Créer le compte"}
           </button>
           <Link
-            href="/dashboard/accounts"
+            to="/dashboard/accounts"
             className="rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-indigo-50 transition hover:border-white/40"
           >
             Annuler

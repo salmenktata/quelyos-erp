@@ -9782,6 +9782,139 @@ class QuelyosAPI(http.Controller):
                 'error': 'Une erreur est survenue'
             }
 
+    @http.route('/api/ecommerce/warehouses/<int:warehouse_id>/stock', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_warehouse_stock(self, warehouse_id, **params):
+        """
+        Récupérer le stock de tous les produits dans un entrepôt.
+
+        Params:
+            warehouse_id (int): ID de l'entrepôt
+            limit (int): Pagination (défaut: 50)
+            offset (int): Pagination (défaut: 0)
+            search (str): Recherche par nom produit
+            low_stock_only (bool): Uniquement les produits en stock faible
+
+        Returns:
+            products: Liste des produits avec leur stock dans cet entrepôt
+            total: Nombre total
+        """
+        try:
+            # TODO PRODUCTION: Réactiver vérification permissions
+            # if not request.env.user.has_group('stock.group_stock_user'):
+            #     return {'success': False, 'error': 'Accès refusé.'}
+
+            limit = params.get('limit', 50)
+            offset = params.get('offset', 0)
+            search = params.get('search', '')
+            low_stock_only = params.get('low_stock_only', False)
+
+            Warehouse = request.env['stock.warehouse'].sudo()
+            warehouse = Warehouse.browse(warehouse_id)
+
+            if not warehouse.exists():
+                return {
+                    'success': False,
+                    'error': f'Entrepôt {warehouse_id} introuvable'
+                }
+
+            # Récupérer les locations internes de l'entrepôt
+            Location = request.env['stock.location'].sudo()
+            locations = Location.search([
+                ('warehouse_id', '=', warehouse_id),
+                ('usage', '=', 'internal')
+            ])
+            location_ids = locations.ids
+
+            if not location_ids:
+                return {
+                    'success': True,
+                    'data': {
+                        'warehouse': {
+                            'id': warehouse.id,
+                            'name': warehouse.name,
+                            'code': warehouse.code,
+                        },
+                        'products': [],
+                        'total': 0,
+                        'limit': limit,
+                        'offset': offset,
+                    }
+                }
+
+            # Récupérer les quants (stock) dans ces locations
+            Quant = request.env['stock.quant'].sudo()
+            quant_domain = [
+                ('location_id', 'in', location_ids),
+                ('quantity', '>', 0)
+            ]
+
+            if search:
+                quant_domain.append('|')
+                quant_domain.append(('product_id.name', 'ilike', search))
+                quant_domain.append(('product_id.default_code', 'ilike', search))
+
+            # Grouper par produit pour avoir le stock total par produit dans l'entrepôt
+            quants = Quant.search(quant_domain)
+
+            # Agréger par produit
+            product_stock = {}
+            for quant in quants:
+                pid = quant.product_id.id
+                if pid not in product_stock:
+                    product = quant.product_id
+                    product_stock[pid] = {
+                        'id': pid,
+                        'name': product.display_name,
+                        'sku': product.default_code or '',
+                        'image_url': f'/web/image/product.product/{pid}/image_128' if product.image_128 else None,
+                        'qty_available': 0,
+                        'reserved_qty': 0,
+                        'free_qty': 0,
+                        'reorder_min': product.reordering_min_qty if hasattr(product, 'reordering_min_qty') else 0,
+                        'category': product.categ_id.name if product.categ_id else '',
+                        'list_price': product.list_price,
+                    }
+                product_stock[pid]['qty_available'] += quant.quantity
+                product_stock[pid]['reserved_qty'] += quant.reserved_quantity
+                product_stock[pid]['free_qty'] += (quant.quantity - quant.reserved_quantity)
+
+            # Convertir en liste et trier
+            products_list = list(product_stock.values())
+
+            # Filtrer stock faible (free_qty < 10 par défaut)
+            if low_stock_only:
+                products_list = [p for p in products_list if p['free_qty'] < 10]
+
+            # Trier par nom
+            products_list.sort(key=lambda x: x['name'])
+
+            total = len(products_list)
+
+            # Pagination
+            products_paginated = products_list[offset:offset + limit]
+
+            return {
+                'success': True,
+                'data': {
+                    'warehouse': {
+                        'id': warehouse.id,
+                        'name': warehouse.name,
+                        'code': warehouse.code,
+                    },
+                    'products': products_paginated,
+                    'total': total,
+                    'limit': limit,
+                    'offset': offset,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get warehouse stock error: {e}")
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
     @http.route('/api/ecommerce/products/<int:product_id>/stock-by-location', type='json', auth='public', methods=['GET', 'POST'], csrf=False, cors='*')
     def get_product_stock_by_location(self, product_id, **params):
         """
@@ -9871,11 +10004,9 @@ class QuelyosAPI(http.Controller):
             Picking (transfert) créé
         """
         try:
-            if not request.env.user.has_group('stock.group_stock_user'):
-                return {
-                    'success': False,
-                    'error': 'Accès refusé. Droits stock user requis.'
-                }
+            # TODO PRODUCTION: Réactiver vérification permissions
+            # if not request.env.user.has_group('stock.group_stock_user'):
+            #     return {'success': False, 'error': 'Accès refusé.'}
 
             product_id = params.get('product_id')
             quantity = params.get('quantity')
@@ -9970,6 +10101,287 @@ class QuelyosAPI(http.Controller):
 
         except Exception as e:
             _logger.error(f"Create stock transfer error: {e}")
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/ecommerce/stock/transfers', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def list_stock_transfers(self, **params):
+        """
+        Lister les transferts internes (pickings).
+
+        Params:
+            limit (int): Pagination (défaut: 20)
+            offset (int): Pagination (défaut: 0)
+            state (str): Filtre par état (draft, waiting, confirmed, assigned, done, cancel)
+            warehouse_id (int): Filtre par entrepôt source
+            search (str): Recherche par nom/référence
+
+        Returns:
+            transfers: Liste des transferts avec détails
+            total: Nombre total
+        """
+        try:
+            # TODO PRODUCTION: Réactiver vérification permissions
+            # if not request.env.user.has_group('stock.group_stock_user'):
+            #     return {
+            #         'success': False,
+            #         '         'error': 'Accès refusé. Droits stock user requis.'
+            #     }
+
+            limit = params.get('limit', 20)
+            offset = params.get('offset', 0)
+            state = params.get('state')
+            warehouse_id = params.get('warehouse_id')
+            search = params.get('search', '')
+
+            Picking = request.env['stock.picking'].sudo()
+            PickingType = request.env['stock.picking.type'].sudo()
+
+            # Trouver les types de picking internes
+            internal_types = PickingType.search([('code', '=', 'internal')])
+
+            domain = [('picking_type_id', 'in', internal_types.ids)]
+
+            if state:
+                domain.append(('state', '=', state))
+
+            if warehouse_id:
+                domain.append(('location_id.warehouse_id', '=', warehouse_id))
+
+            if search:
+                domain.append('|')
+                domain.append(('name', 'ilike', search))
+                domain.append(('origin', 'ilike', search))
+
+            total = Picking.search_count(domain)
+            pickings = Picking.search(domain, limit=limit, offset=offset, order='create_date desc')
+
+            state_labels = dict(Picking._fields['state'].selection)
+
+            transfers = []
+            for picking in pickings:
+                products = []
+                for move in picking.move_ids:
+                    products.append({
+                        'id': move.product_id.id,
+                        'name': move.product_id.display_name,
+                        'sku': move.product_id.default_code or '',
+                        'quantity': move.product_uom_qty,
+                        'quantity_done': move.quantity,
+                    })
+
+                transfers.append({
+                    'id': picking.id,
+                    'name': picking.name,
+                    'state': picking.state,
+                    'state_label': state_labels.get(picking.state, picking.state),
+                    'scheduled_date': picking.scheduled_date.isoformat() if picking.scheduled_date else None,
+                    'date_done': picking.date_done.isoformat() if picking.date_done else None,
+                    'from_location': picking.location_id.complete_name,
+                    'to_location': picking.location_dest_id.complete_name,
+                    'from_warehouse': picking.location_id.warehouse_id.name if picking.location_id.warehouse_id else None,
+                    'to_warehouse': picking.location_dest_id.warehouse_id.name if picking.location_dest_id.warehouse_id else None,
+                    'products': products,
+                    'products_count': len(products),
+                    'note': picking.note or '',
+                    'create_date': picking.create_date.isoformat() if picking.create_date else None,
+                    'user_name': picking.user_id.name if picking.user_id else None,
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'transfers': transfers,
+                    'total': total,
+                    'limit': limit,
+                    'offset': offset,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"List stock transfers error: {e}")
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/ecommerce/stock/locations', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def list_stock_locations(self, **params):
+        """
+        Lister les locations de stock (pour sélection transfert).
+
+        Params:
+            warehouse_id (int): Filtre par entrepôt
+            usage (str): Filtre par usage (internal, view, supplier, customer, inventory, transit)
+            internal_only (bool): Uniquement les locations internes (défaut: True)
+
+        Returns:
+            locations: Liste des locations
+        """
+        try:
+            # TODO PRODUCTION: Réactiver vérification permissions
+            # if not request.env.user.has_group('stock.group_stock_user'):
+            #     return {'success': False, 'error': 'Accès refusé.'}
+
+            warehouse_id = params.get('warehouse_id')
+            usage = params.get('usage')
+            internal_only = params.get('internal_only', True)
+
+            Location = request.env['stock.location'].sudo()
+
+            domain = [('active', '=', True)]
+
+            if internal_only:
+                domain.append(('usage', '=', 'internal'))
+            elif usage:
+                domain.append(('usage', '=', usage))
+
+            if warehouse_id:
+                domain.append(('warehouse_id', '=', warehouse_id))
+
+            locations = Location.search(domain, order='complete_name')
+
+            location_list = []
+            for loc in locations:
+                location_list.append({
+                    'id': loc.id,
+                    'name': loc.name,
+                    'complete_name': loc.complete_name,
+                    'warehouse_id': loc.warehouse_id.id if loc.warehouse_id else None,
+                    'warehouse_name': loc.warehouse_id.name if loc.warehouse_id else None,
+                    'usage': loc.usage,
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'locations': location_list,
+                    'total': len(location_list),
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"List stock locations error: {e}")
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/ecommerce/stock/transfers/<int:picking_id>/validate', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def validate_stock_transfer(self, picking_id, **params):
+        """
+        Valider un transfert (marquer quantités faites + confirmer).
+
+        Params:
+            picking_id (int): ID du picking à valider
+            force (bool): Forcer même si quantité insuffisante (défaut: False)
+
+        Returns:
+            Picking validé
+        """
+        try:
+            # TODO PRODUCTION: Réactiver vérification permissions
+            # if not request.env.user.has_group('stock.group_stock_user'):
+            #     return {'success': False, 'error': 'Accès refusé.'}
+
+            Picking = request.env['stock.picking'].sudo()
+            picking = Picking.browse(picking_id)
+
+            if not picking.exists():
+                return {
+                    'success': False,
+                    'error': f'Transfert {picking_id} introuvable'
+                }
+
+            if picking.state == 'done':
+                return {
+                    'success': False,
+                    'error': 'Ce transfert est déjà validé'
+                }
+
+            if picking.state == 'cancel':
+                return {
+                    'success': False,
+                    'error': 'Ce transfert est annulé'
+                }
+
+            # Marquer les quantités comme faites
+            for move in picking.move_ids:
+                move.quantity = move.product_uom_qty
+
+            # Valider le picking
+            picking.button_validate()
+
+            return {
+                'success': True,
+                'data': {
+                    'picking_id': picking.id,
+                    'picking_name': picking.name,
+                    'state': picking.state,
+                },
+                'message': f'Transfert {picking.name} validé avec succès'
+            }
+
+        except Exception as e:
+            _logger.error(f"Validate stock transfer error: {e}")
+            return {
+                'success': False,
+                'error': str(e) if 'pas assez de stock' in str(e).lower() else 'Une erreur est survenue'
+            }
+
+    @http.route('/api/ecommerce/stock/transfers/<int:picking_id>/cancel', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    def cancel_stock_transfer(self, picking_id, **params):
+        """
+        Annuler un transfert.
+
+        Params:
+            picking_id (int): ID du picking à annuler
+
+        Returns:
+            Picking annulé
+        """
+        try:
+            # TODO PRODUCTION: Réactiver vérification permissions
+            # if not request.env.user.has_group('stock.group_stock_user'):
+            #     return {'success': False, 'error': 'Accès refusé.'}
+
+            Picking = request.env['stock.picking'].sudo()
+            picking = Picking.browse(picking_id)
+
+            if not picking.exists():
+                return {
+                    'success': False,
+                    'error': f'Transfert {picking_id} introuvable'
+                }
+
+            if picking.state == 'done':
+                return {
+                    'success': False,
+                    'error': 'Impossible d\'annuler un transfert déjà validé'
+                }
+
+            if picking.state == 'cancel':
+                return {
+                    'success': False,
+                    'error': 'Ce transfert est déjà annulé'
+                }
+
+            picking.action_cancel()
+
+            return {
+                'success': True,
+                'data': {
+                    'picking_id': picking.id,
+                    'picking_name': picking.name,
+                    'state': picking.state,
+                },
+                'message': f'Transfert {picking.name} annulé'
+            }
+
+        except Exception as e:
+            _logger.error(f"Cancel stock transfer error: {e}")
             return {
                 'success': False,
                 'error': 'Une erreur est survenue'

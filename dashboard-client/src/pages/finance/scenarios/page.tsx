@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
-import { api } from "@/lib/api";
+import { api } from "@/lib/finance/api";
 import { GlassCard, GlassStatCard, GlassPanel, GlassButton, GlassBadge, GlassProgress } from "@/components/ui/glass";
 import {
   AreaChart,

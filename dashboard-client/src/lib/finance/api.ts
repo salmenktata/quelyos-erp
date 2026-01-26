@@ -3,7 +3,9 @@
  * Compatible avec le pattern api('/endpoint', options) du repo quelyos-finance
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8069'
+// Utiliser des URLs relatives pour passer par le proxy Vite
+// Le proxy redirige /api/finance vers http://localhost:3000
+const API_BASE_URL = ''
 
 interface ApiOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
