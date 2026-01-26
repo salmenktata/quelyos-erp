@@ -1,5 +1,5 @@
 /**
- * API Route Proxy pour les catégories Odoo
+ * API Route Proxy pour les catégories backend
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -9,7 +9,7 @@ const ODOO_URL = process.env.NEXT_PUBLIC_ODOO_URL || 'http://localhost:8069';
 
 export async function GET(request: NextRequest) {
   try {
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}/api/ecommerce/categories`, {
       method: 'POST',
       headers: {

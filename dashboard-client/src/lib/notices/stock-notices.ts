@@ -13,10 +13,10 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       icon: Lightbulb,
       items: [
         'Configurez des seuils min/max adaptés à la rotation : seuil min = stock sécurité + qté vendue pendant délai fournisseur',
-        'Utilisez les alertes "Stock faible" pour anticiper les ruptures avant qu\'elles impactent les ventes',
-        'Exportez régulièrement l\'état du stock (Excel/CSV) pour des analyses complémentaires ou audits',
+        'Utilisez les alertes "Stock faible" pour anticiper les ruptures avant qu'elles impactent les ventes',
+        'Exportez régulièrement l'état du stock (Excel/CSV) pour des analyses complémentaires ou audits',
         'Ajustez via le modal pour tracer les mouvements : évitez les modifications directes dans l'interface d'administration',
-        'Activez l\'inventaire périodique (mensuel ou trimestriel) pour corriger les écarts physique/théorique',
+        'Activez l'inventaire périodique (mensuel ou trimestriel) pour corriger les écarts physique/théorique',
       ]
     }]
   },
@@ -35,7 +35,7 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
         'Imprimez les listes de comptage via export Excel pour faciliter le travail terrain',
         'Saisissez les quantités réelles dans le backoffice : le système calcule automatiquement les écarts',
         'Analysez les écarts avant validation : identifiez les causes (casse, vol, erreur saisie)',
-        'Validez l\'inventaire pour ajuster le stock : les mouvements d\'ajustement sont tracés automatiquement',
+        'Validez l'inventaire pour ajuster le stock : les mouvements d'ajustement sont tracés automatiquement',
       ]
     }]
   },
@@ -70,7 +70,7 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       icon: Lightbulb,
       items: [
         'Créez un transfert pour tout mouvement entre sites : garantit la traçabilité complète',
-        'Validez la réception à l\'arrivée : évite les décalages entre sites expéditeur et destinataire',
+        'Validez la réception à l'arrivée : évite les décalages entre sites expéditeur et destinataire',
         'Suivez les transferts "En transit" : alertez si délai anormal (perte, erreur logistique)',
         'Utilisez les références uniques pour faciliter le suivi multi-sites',
         'Analysez les flux inter-sites pour optimiser la répartition du stock',
@@ -92,7 +92,7 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
         'Configurez les routes et séquences de picking adaptées à votre activité',
         'Définissez des règles de réapprovisionnement par entrepôt selon la demande locale',
         'Suivez le taux de remplissage par entrepôt : évitez saturation ou sous-utilisation',
-        'Activez les emplacements hiérarchiques pour faciliter l\'organisation physique',
+        'Activez les emplacements hiérarchiques pour faciliter l'organisation physique',
       ]
     }]
   },
@@ -179,7 +179,7 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
           'Segmentez par catégorie : les ratios normaux varient selon le type de produit',
           'Identifiez les produits dormants pour négocier retours fournisseurs ou promotions',
           'Ajustez les seuils de réappro selon rotation : produits rapides = stock mini, produits lents = stock réduit',
-          'Exportez régulièrement pour suivre l\'évolution et mesurer l\'impact de vos actions',
+          'Exportez régulièrement pour suivre l'évolution et mesurer l'impact de vos actions',
         ]
       }
     ]

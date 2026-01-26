@@ -48,6 +48,17 @@
 ## Langue
 Français pour communications. Code en anglais.
 
+## 🛣️ CONVENTIONS ROUTING - RÈGLE ABSOLUE
+**TOUJOURS utiliser l'anglais pour les routes et identifiants techniques**
+- **Routes/URLs** : `/store/products`, `/crm/customers`, `/hr/employees` (anglais)
+- **Module IDs** : `'store'`, `'crm'`, `'hr'` (anglais)
+- **Dossiers/fichiers** : `pages/store/`, `crm/` (anglais)
+- **UI/Labels** : `name: 'Boutique'`, `'Clients'`, `'Employés'` (français)
+
+**Voir** : `.claude/ROUTING_CONVENTIONS.md` pour détails complets
+
+**7 modules** : `home`, `finance`, `store`, `stock`, `crm`, `marketing`, `hr`
+
 ## Architecture
 - `vitrine-quelyos/` : Next.js 14 (site vitrine : 3000)
 - `vitrine-client/` : Next.js 16 (e-commerce : 3001)

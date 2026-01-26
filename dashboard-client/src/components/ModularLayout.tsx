@@ -71,7 +71,7 @@ import {
 // TYPES
 // ============================================================================
 
-type ModuleId = 'home' | 'finance' | 'boutique' | 'stock' | 'crm' | 'marketing' | 'rh'
+type ModuleId = 'home' | 'finance' | 'store' | 'stock' | 'crm' | 'marketing' | 'hr'
 
 interface SubMenuItem {
   name: string
@@ -226,45 +226,45 @@ const MODULES: Module[] = [
     ],
   },
   {
-    id: 'boutique',
+    id: 'store',
     name: 'Boutique',
     shortName: 'Boutique',
     icon: Store,
     color: 'text-indigo-600',
     bgColor: 'bg-indigo-100 dark:bg-indigo-900/30',
     description: 'E-commerce',
-    basePath: '/ecms',
+    basePath: '/store',
     sections: [
       {
         title: 'Gestion',
         items: [
-          { name: 'Ma Boutique', path: '/ecms/my-shop', icon: Store },
-          { name: 'Commandes', path: '/ecms/orders', icon: ShoppingCart },
-          { name: 'Produits', path: '/ecms/products', icon: Package },
-          { name: 'Catégories', path: '/ecms/categories', icon: Tag },
-          { name: 'Paniers Abandonnés', path: '/ecms/abandoned-carts', icon: ShoppingCart },
+          { name: 'Ma Boutique', path: '/store/my-shop', icon: Store },
+          { name: 'Commandes', path: '/store/orders', icon: ShoppingCart },
+          { name: 'Produits', path: '/store/products', icon: Package },
+          { name: 'Catégories', path: '/store/categories', icon: Tag },
+          { name: 'Paniers Abandonnés', path: '/store/abandoned-carts', icon: ShoppingCart },
         ],
       },
       {
         title: 'Marketing',
         items: [
-          { name: 'Produits Vedette', path: '/ecms/featured', icon: Sparkles },
-          { name: 'Codes Promo', path: '/ecms/coupons', icon: Ticket },
-          { name: 'Bannières', path: '/ecms/promo-banners', icon: Image },
-          { name: 'Hero Slides', path: '/ecms/hero-slides', icon: Image },
+          { name: 'Produits Vedette', path: '/store/featured', icon: Sparkles },
+          { name: 'Codes Promo', path: '/store/coupons', icon: Ticket },
+          { name: 'Bannières', path: '/store/promo-banners', icon: Image },
+          { name: 'Hero Slides', path: '/store/hero-slides', icon: Image },
         ],
       },
       {
         title: 'Configuration',
         items: [
-          { name: 'Livraison', path: '/ecms/delivery', icon: Truck },
-          { name: 'Configuration Site', path: '/ecms/site-config', icon: Settings },
-          { name: 'Pages Statiques', path: '/ecms/static-pages', icon: FileText },
-          { name: 'Menus Navigation', path: '/ecms/menus', icon: List },
-          { name: 'Messages Promo', path: '/ecms/promo-messages', icon: MessageSquare },
-          { name: 'Badges Confiance', path: '/ecms/trust-badges', icon: Award },
-          { name: 'SEO Métadonnées', path: '/ecms/seo-metadata', icon: Globe },
-          { name: 'Popups Marketing', path: '/ecms/marketing-popups', icon: Zap },
+          { name: 'Livraison', path: '/store/delivery', icon: Truck },
+          { name: 'Configuration Site', path: '/store/site-config', icon: Settings },
+          { name: 'Pages Statiques', path: '/store/static-pages', icon: FileText },
+          { name: 'Menus Navigation', path: '/store/menus', icon: List },
+          { name: 'Messages Promo', path: '/store/promo-messages', icon: MessageSquare },
+          { name: 'Badges Confiance', path: '/store/trust-badges', icon: Award },
+          { name: 'SEO Métadonnées', path: '/store/seo-metadata', icon: Globe },
+          { name: 'Popups Marketing', path: '/store/marketing-popups', icon: Zap },
         ],
       },
     ],
@@ -355,7 +355,7 @@ const MODULES: Module[] = [
     ],
   },
   {
-    id: 'rh',
+    id: 'hr',
     name: 'RH',
     shortName: 'RH',
     icon: UsersRound,
@@ -674,9 +674,9 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
     if (path.startsWith('/finance')) return MODULES.find(m => m.id === 'finance')!
     if (path.startsWith('/stock') || path.startsWith('/warehouses') || path.startsWith('/inventory')) return MODULES.find(m => m.id === 'stock')!
     if (path.startsWith('/crm') || path.startsWith('/invoices') || path.startsWith('/payments') || path.startsWith('/pricelists')) return MODULES.find(m => m.id === 'crm')!
-    if (path.startsWith('/ecms')) return MODULES.find(m => m.id === 'boutique')!
+    if (path.startsWith('/store')) return MODULES.find(m => m.id === 'store')!
     if (path.startsWith('/marketing')) return MODULES.find(m => m.id === 'marketing')!
-    if (path.startsWith('/hr')) return MODULES.find(m => m.id === 'rh')!
+    if (path.startsWith('/hr')) return MODULES.find(m => m.id === 'hr')!
     return MODULES.find(m => m.id === 'home')!
   }
 

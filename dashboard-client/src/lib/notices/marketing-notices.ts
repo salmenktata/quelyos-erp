@@ -109,7 +109,7 @@ export const marketingNotices: Record<string, PageNoticeConfig> = {
       items: [
         'Pages obligatoires légales : Mentions légales, CGV, Politique confidentialité RGPD, Cookies (conformité e-commerce)',
         'FAQ structurée avec schema markup : questions/réponses indexables Google, augmente trafic organique longue traîne',
-        'Page "À propos" storytelling : histoire marque, valeurs, équipe, raison d\'être pour humaniser entreprise',
+        'Page "À propos" storytelling : histoire marque, valeurs, équipe, raison d'être pour humaniser entreprise',
         'Contact multi-canal : formulaire + email + téléphone + adresse + horaires, temps réponse < 24h',
         'SEO pages statiques : optimisez title/description, maillage interne vers produits, call-to-action bottom page',
       ]

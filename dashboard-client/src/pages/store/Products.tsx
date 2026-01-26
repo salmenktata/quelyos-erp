@@ -453,7 +453,7 @@ export default function Products() {
             >
               Exporter CSV
             </Button>
-            <Link to="/ecms/products/create">
+            <Link to="/store/products/create">
               <Button
                 variant="primary"
                 icon={
@@ -844,7 +844,7 @@ export default function Products() {
                   Réinitialiser les filtres
                 </Button>
               ) : (
-                <Link to="/ecms/products/create">
+                <Link to="/store/products/create">
                   <Button variant="primary">Créer un produit</Button>
                 </Link>
               )}

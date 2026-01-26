@@ -1,5 +1,5 @@
 /**
- * API Route Proxy dynamique pour les produits Odoo
+ * API Route Proxy dynamique pour les produits backend
  * Gère tous les endpoints /api/products/*
  */
 
@@ -28,7 +28,7 @@ export async function GET(
       requestParams[key] = value;
     });
 
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}${endpoint}`, {
       method: 'POST',
       headers: {

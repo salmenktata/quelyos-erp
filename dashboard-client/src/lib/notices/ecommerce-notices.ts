@@ -12,11 +12,11 @@ export const ecommerceNotices: Record<string, PageNoticeConfig> = {
       title: 'Optimisation du catalogue',
       icon: Lightbulb,
       items: [
-        'Complétez les fiches avec images HD (min 1200x1200px), descriptions SEO-friendly et attributs détaillés',
-        'Utilisez les variantes pour produits déclinables (tailles, couleurs) : évite la multiplication de fiches',
-        'Importez massivement via Excel/CSV : gain de temps majeur pour catalogues volumineux',
-        'Gérez les prix par liste (particuliers, B2B, revendeurs) : tarification différenciée automatique',
-        'Archivez plutôt que supprimer : préserve historique commandes et permet réactivation rapide',
+        "Complétez les fiches avec images HD (min 1200x1200px), descriptions SEO-friendly et attributs détaillés",
+        "Utilisez les variantes pour produits déclinables (tailles, couleurs) : évite la multiplication de fiches",
+        "Importez massivement via Excel/CSV : gain de temps majeur pour catalogues volumineux",
+        "Gérez les prix par liste (particuliers, B2B, revendeurs) : tarification différenciée automatique",
+        "Archivez plutôt que supprimer : préserve historique commandes et permet réactivation rapide",
       ]
     }]
   },
@@ -31,11 +31,11 @@ export const ecommerceNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Traitez quotidiennement les nouvelles commandes : délai de traitement < 24h améliore satisfaction client',
-        'Mettez à jour les statuts en temps réel : le client reçoit des notifications automatiques',
-        'Exportez les commandes pour préparation entrepôt ou intégration transporteur',
-        'Surveillez les commandes "Paiement en attente" : relancez ou annulez après 48-72h',
-        'Analysez les taux d\'abandon par étape du tunnel pour identifier les frictions',
+        "Traitez quotidiennement les nouvelles commandes : délai de traitement < 24h améliore satisfaction client",
+        "Mettez à jour les statuts en temps réel : le client reçoit des notifications automatiques",
+        "Exportez les commandes pour préparation entrepôt ou intégration transporteur",
+        "Surveillez les commandes \"Paiement en attente\" : relancez ou annulez après 48-72h",
+        "Analysez les taux d'abandon par étape du tunnel pour identifier les frictions",
       ]
     }]
   },
@@ -51,7 +51,7 @@ export const ecommerceNotices: Record<string, PageNoticeConfig> = {
       icon: Lightbulb,
       items: [
         'Segmentez par valeur : VIP (>X€/an), Réguliers, Occasionnels, Inactifs (>6 mois)',
-        'Analysez le LTV (Lifetime Value) et fréquence d\'achat pour cibler les actions marketing',
+        'Analysez le LTV (Lifetime Value) et fréquence d'achat pour cibler les actions marketing',
         'Exportez les segments pour campagnes emailing/SMS ciblées',
         'Surveillez les clients à risque : inactifs depuis longtemps, première commande non répétée',
         'Enrichissez les profils avec tags comportementaux (panier moyen, catégories préférées)',
@@ -71,7 +71,7 @@ export const ecommerceNotices: Record<string, PageNoticeConfig> = {
       items: [
         'Limitez la profondeur : 3 niveaux max (Homme > Vêtements > T-shirts) pour éviter de perdre le client',
         'Optimisez SEO : URL propres, méta-descriptions uniques, mots-clés stratégiques par catégorie',
-        'Ajoutez des visuels attractifs : bannières catégories améliorent l\'engagement de 30%+',
+        'Ajoutez des visuels attractifs : bannières catégories améliorent l'engagement de 30%+',
         'Équilibrez le nombre de produits : ni catégories surchargées (>100 produits), ni vides (<3 produits)',
         'Créez des catégories saisonnières temporaires (Soldes, Nouveautés, Best-sellers)',
       ]
@@ -88,7 +88,7 @@ export const ecommerceNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Définissez des conditions claires : montant minimum, catégories/produits éligibles, limite d\'utilisation',
+        'Définissez des conditions claires : montant minimum, catégories/produits éligibles, limite d'utilisation',
         'Utilisez des codes mémorables pour campagnes génériques (BIENVENUE10, SOLDES20)',
         'Générez des codes uniques pour partenaires/influenceurs : trackez la performance par source',
         'Limitez la durée : urgence booste conversions (ex: 72h pour Black Friday)',
@@ -110,7 +110,7 @@ export const ecommerceNotices: Record<string, PageNoticeConfig> = {
         'Limitez à 6-12 produits vedette : trop de choix diminue le taux de conversion',
         'Renouvelez régulièrement (hebdomadaire/mensuel) : évite la lassitude des visiteurs récurrents',
         'Priorisez mix stratégique : 50% bestsellers (conversion facile) + 50% nouveautés/forte marge',
-        'Testez l\'ordre d\'affichage : les 3 premiers captent 70% de l\'attention',
+        'Testez l'ordre d'affichage : les 3 premiers captent 70% de l'attention',
         'Mesurez impact : trackez CTR, conversion et CA généré par produit vedette',
       ]
     }]
@@ -127,8 +127,8 @@ export const ecommerceNotices: Record<string, PageNoticeConfig> = {
       icon: Lightbulb,
       items: [
         'Respectez les formats recommandés : desktop 1920x600px, mobile 768x600px pour éviter déformations',
-        'Utilisez des CTA clairs et visibles : boutons contrastés avec verbes d\'action ("Découvrir", "Profiter")',
-        'Planifiez les campagnes à l\'avance : changements automatiques selon calendrier commercial',
+        'Utilisez des CTA clairs et visibles : boutons contrastés avec verbes d'action ("Découvrir", "Profiter")',
+        'Planifiez les campagnes à l'avance : changements automatiques selon calendrier commercial',
         'Testez A/B : comparez performance de 2 visuels/messages sur même période',
         'Optimisez poids images (<200Ko) : vitesse chargement critique pour conversion',
       ]
@@ -145,9 +145,9 @@ export const ecommerceNotices: Record<string, PageNoticeConfig> = {
       title: 'Bonnes pratiques',
       icon: Lightbulb,
       items: [
-        'Analysez les motifs d\'abandon : prix total trop élevé, frais de port, processus trop long',
+        'Analysez les motifs d'abandon : prix total trop élevé, frais de port, processus trop long',
         'Configurez relances email automatiques : 1h, 24h, 72h après abandon avec incentive croissant',
-        'Proposez réduction progressive : 5% après 24h, 10% après 72h pour débloquer l\'achat',
+        'Proposez réduction progressive : 5% après 24h, 10% après 72h pour débloquer l'achat',
         'Simplifiez tunnel : checkout en 3 étapes max, paiement express (PayPal, Apple Pay)',
         'Surveillez taux abandon global : cible <70%, alertez si dégradation soudaine',
       ]

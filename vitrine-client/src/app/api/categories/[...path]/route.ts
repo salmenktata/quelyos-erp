@@ -1,5 +1,5 @@
 /**
- * API Route Proxy dynamique pour les catégories Odoo
+ * API Route Proxy dynamique pour les catégories backend
  * Gère tous les endpoints /api/categories/*
  */
 
@@ -28,7 +28,7 @@ export async function GET(
       requestParams[key] = value;
     });
 
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}${endpoint}`, {
       method: 'POST',
       headers: {

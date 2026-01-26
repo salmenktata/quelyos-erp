@@ -56,7 +56,7 @@ export const crmNotices: Record<string, PageNoticeConfig> = {
       icon: Lightbulb,
       items: [
         'Rapprochement bancaire quotidien : associez paiements reçus aux factures pour suivi trésorerie fiable temps réel',
-        'Alertes retards automatiques : notification J+1 échéance pour relance proactive avant que dette ne s\'aggrave',
+        'Alertes retards automatiques : notification J+1 échéance pour relance proactive avant que dette ne s'aggrave',
         'Multipliez moyens paiement : CB, virement, prélèvement, PayPal - facilite règlement = réduit impayés de 30%',
         'Fractionnez si nécessaire : 3x 4x sans frais pour gros montants - augmente taux conversion et réduit abandon',
         'Tableaux de bord DSO : Days Sales Outstanding (délai moyen paiement) pour identifier clients problématiques',

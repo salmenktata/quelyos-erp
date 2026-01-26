@@ -31,8 +31,8 @@ export const financeNotices: Record<string, PageNoticeConfig> = {
       {
         title: 'Pour un suivi fiable',
         items: [
-          'Suivez l'évolution du DSO mensuellement pour détecter les dégradations',
-          'Identifiez les clients avec des retards récurrents et mettez en place des relances systématiques',
+          "Suivez l'évolution du DSO mensuellement pour détecter les dégradations",
+          "Identifiez les clients avec des retards récurrents et mettez en place des relances systématiques",
           'Comparez votre DSO aux conditions de paiement négociées (ex: Net 30, Net 45)',
           'Visez un DSO < 45 jours pour maintenir une trésorerie saine',
           'Analysez les factures en retard et intensifiez les actions de recouvrement',
@@ -52,11 +52,11 @@ export const financeNotices: Record<string, PageNoticeConfig> = {
       {
         title: 'Pour un suivi fiable',
         items: [
-          'Suivez l'évolution mensuelle de la marge EBITDA (EBITDA / CA)',
-          'Comparez votre marge EBITDA au benchmark sectoriel TPE/PME (cible > 15%)',
-          'Analysez les variations pour identifier les leviers d'amélioration (prix, coûts)',
-          'Utilisez l'EBITDA pour anticiper votre capacité d'investissement et de remboursement',
-          'Surveillez la cohérence entre croissance du CA et amélioration de l'EBITDA',
+          "Suivez l'évolution mensuelle de la marge EBITDA (EBITDA / CA)",
+          "Comparez votre marge EBITDA au benchmark sectoriel TPE/PME (cible > 15%)",
+          "Analysez les variations pour identifier les leviers d'amélioration (prix, coûts)",
+          "Utilisez l'EBITDA pour anticiper votre capacité d'investissement et de remboursement",
+          "Surveillez la cohérence entre croissance du CA et amélioration de l'EBITDA",
         ],
       },
     ],
@@ -73,8 +73,8 @@ export const financeNotices: Record<string, PageNoticeConfig> = {
       {
         title: 'Pour un suivi fiable',
         items: [
-          'Suivez l'évolution du BFR en jours de CA (cible < 30 jours)',
-          'Surveillez les trois composantes: DSO (créances), rotation stock, DPO (dettes)',
+          "Suivez l'évolution du BFR en jours de CA (cible < 30 jours)",
+          "Surveillez les trois composantes: DSO (créances), rotation stock, DPO (dettes)",
           'Analysez les tendances: un BFR croissant dégrade la trésorerie',
           'Identifiez les actions prioritaires: réduire DSO, négocier DPO, optimiser stock',
           'Anticipez les pics de BFR (saisonnalité, forte croissance) pour sécuriser le financement',
@@ -95,9 +95,9 @@ export const financeNotices: Record<string, PageNoticeConfig> = {
         title: 'Pour un suivi fiable',
         items: [
           'Classifiez correctement vos catégories de dépenses en FIXED (loyer, salaires) ou VARIABLE (achats, commissions)',
-          'Suivez mensuellement l'écart entre votre CA réel et votre seuil de rentabilité',
-          'Calculez votre marge de sécurité (cible > 20%) pour absorber les variations',
-          'Simulez l'impact des décisions: embauche, nouveau local, baisse de prix',
+          "Suivez mensuellement l'écart entre votre CA réel et votre seuil de rentabilité",
+          "Calculez votre marge de sécurité (cible > 20%) pour absorber les variations",
+          "Simulez l'impact des décisions: embauche, nouveau local, baisse de prix",
           'Identifiez les leviers pour réduire le point mort: baisser coûts fixes, améliorer marge variable',
         ],
       },
@@ -160,8 +160,8 @@ export const financeNotices: Record<string, PageNoticeConfig> = {
           'Suivez le poids des revenus récurrents (abonnements, contrats) vs one-shot (projets)',
           'Analysez la part de charges fixes (incompressibles) vs variables (liées au CA)',
           'Visez à augmenter les revenus récurrents pour plus de stabilité',
-          'Surveillez l'évolution du ratio charges fixes/variables pour maintenir la flexibilité',
-          'Identifiez les opportunités de transformer du one-shot en récurrent',
+          "Surveillez l'évolution du ratio charges fixes/variables pour maintenir la flexibilité",
+          "Identifiez les opportunités de transformer du one-shot en récurrent",
         ],
       },
     ],

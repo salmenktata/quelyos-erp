@@ -1,5 +1,5 @@
 /**
- * API Route Proxy pour le panier Odoo
+ * API Route Proxy pour le panier backend
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     // Récupérer les cookies pour la session
     const cookieHeader = request.headers.get('cookie') || '';
 
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}/api/ecommerce/cart`, {
       method: 'POST',
       headers: {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const cookieHeader = request.headers.get('cookie') || '';
 
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}/api/ecommerce/cart`, {
       method: 'POST',
       headers: {

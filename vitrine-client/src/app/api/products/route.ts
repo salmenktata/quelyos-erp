@@ -1,6 +1,6 @@
 /**
- * API Route Proxy pour les produits Odoo
- * Proxie les requêtes vers l'API Odoo
+ * API Route Proxy pour les produits backend
+ * Proxie les requêtes vers l'API backend
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
-    // Construire les paramètres pour Odoo
+    // Construire les paramètres pour le backend
     const params: any = {};
 
     if (searchParams.get('category_id')) {
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       params.sort = searchParams.get('sort');
     }
 
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}/api/ecommerce/products`, {
       method: 'POST',
       headers: {

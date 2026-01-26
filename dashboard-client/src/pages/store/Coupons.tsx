@@ -152,7 +152,7 @@ export default function Coupons() {
               Gerer les coupons et promotions
             </p>
           </div>
-          <Link to="/ecms/coupons/create">
+          <Link to="/store/coupons/create">
             <Button variant="primary">Creer un coupon</Button>
           </Link>
         </div>
@@ -329,7 +329,7 @@ export default function Coupons() {
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
                   Creez votre premier code promo pour booster vos ventes
                 </p>
-                <Link to="/ecms/coupons/create">
+                <Link to="/store/coupons/create">
                   <Button variant="primary">Creer un coupon</Button>
                 </Link>
               </div>

@@ -1,5 +1,5 @@
 /**
- * API Route Proxy dynamique pour le panier Odoo
+ * API Route Proxy dynamique pour le panier backend
  * Gère tous les endpoints /api/cart/*
  */
 
@@ -22,7 +22,7 @@ export async function GET(
     const pathString = path.join('/');
     const endpoint = `/api/ecommerce/cart/${pathString}`;
 
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}${endpoint}`, {
       method: 'POST',
       headers: {
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const pathString = path.join('/');
     const endpoint = `/api/ecommerce/cart/${pathString}`;
 
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}${endpoint}`, {
       method: 'POST',
       headers: {
@@ -109,7 +109,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const pathString = path.join('/');
     const endpoint = `/api/ecommerce/cart/${pathString}`;
 
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}${endpoint}`, {
       method: 'POST',
       headers: {

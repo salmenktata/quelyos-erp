@@ -1,5 +1,5 @@
 /**
- * API Route Proxy pour l'authentification Odoo
+ * API Route Proxy pour l'authentification backend
  * Gère tous les endpoints /api/auth/*
  */
 
@@ -23,7 +23,7 @@ export async function POST(
     const pathString = path.join('/');
     const endpoint = `/api/ecommerce/auth/${pathString}`;
 
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}${endpoint}`, {
       method: 'POST',
       headers: {
@@ -83,7 +83,7 @@ export async function GET(
     const pathString = path.join('/');
     const endpoint = `/api/ecommerce/auth/${pathString}`;
 
-    // Appeler l'API Odoo
+    // Appeler l'API backend
     const response = await fetch(`${ODOO_URL}${endpoint}`, {
       method: 'POST',
       headers: {
