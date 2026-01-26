@@ -1,13 +1,8 @@
 
 
-import React, { useEffect, useState, useCallback } from "react";
-import { useRequireAuth } from "@/lib/finance/compat/auth";
-import { ROUTES } from "@/lib/finance/compat/routes";
-import { GlassCard, GlassPanel, GlassListItem } from "@/components/ui/glass";
-import { Button, Input } from "@/lib/finance/compat/ui";
+import { useEffect, useState, useCallback } from "react";
 import { Switch } from "@/components/ui/Switch";
-import { ChevronLeft, Plus, Edit2, Trash2, CreditCard, Banknote, FileText, ArrowLeftRight, Landmark, Receipt, Briefcase, AlertCircle, MoreHorizontal, Check, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Plus, Trash2, CreditCard, Banknote, FileText, ArrowLeftRight, Landmark, Receipt, Briefcase, AlertCircle, MoreHorizontal, Check, X } from "lucide-react";
 import type { FlowType } from "@/types/paymentFlow";
 import { logger } from '@quelyos/logger';
 
@@ -73,8 +68,6 @@ interface CustomFlowType {
 }
 
 export default function FluxSettingsPage() {
-  useRequireAuth();
-  
   // État des types de flux par défaut (activés/désactivés pour l'entreprise)
   const [flowTypeSettings, setFlowTypeSettings] = useState<FlowTypeSettings[]>([]);
   const [customFlowTypes, setCustomFlowTypes] = useState<CustomFlowType[]>([]);
@@ -203,37 +196,21 @@ export default function FluxSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#18181b] via-[#1e293b] to-[#0f172a] p-4 md:p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Link to={ROUTES.FINANCE.DASHBOARD.SETTINGS}>
-            <Button variant="ghost" size="icon" className="text-white/70 hover:text-white">
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Flux de paiement</h1>
-            <p className="text-white/60 text-sm">
-              Configurez les types de flux disponibles pour vos comptes
-            </p>
-          </div>
+    <div className="space-y-6">
+      {/* Messages */}
+      {error && (
+        <div className="rounded-lg border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+          {error}
         </div>
+      )}
+      {success && (
+        <div className="rounded-lg border border-emerald-300/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+          {success}
+        </div>
+      )}
 
-        {/* Messages */}
-        {error && (
-          <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="bg-green-500/20 border border-green-500/50 text-green-200 px-4 py-3 rounded-lg">
-            {success}
-          </div>
-        )}
-
-        {/* Types de flux par défaut */}
-        <GlassCard className="p-6">
+      {/* Types de flux par défaut */}
+      <section className="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl shadow-xl space-y-6">
           <h2 className="text-lg font-semibold text-white mb-4">Types de flux par défaut</h2>
           <p className="text-white/60 text-sm mb-6">
             Activez ou désactivez les types de flux disponibles lors de la création de flux sur vos comptes.

@@ -149,33 +149,31 @@ export default function CategoriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        {/* Bouton pour créer les catégories par défaut */}
-        {categories.length === 0 && !loading && (
-            <button
-              onClick={seedDefaultCategories}
-              disabled={seedingDefaults}
-              className="flex items-center gap-2 rounded-xl bg-emerald-600/80 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:opacity-60"
-            >
-              {seedingDefaults ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4" />
-              )}
-              Créer catégories par défaut
-            </button>
+      {/* Bouton pour créer les catégories par défaut */}
+      {categories.length === 0 && !loading && (
+        <button
+          onClick={seedDefaultCategories}
+          disabled={seedingDefaults}
+          className="flex items-center gap-2 rounded-xl bg-emerald-600/80 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:opacity-60"
+        >
+          {seedingDefaults ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4" />
           )}
+          Créer catégories par défaut
+        </button>
+      )}
+
+      {error && (
+        <div className="rounded-lg border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+          {error}
         </div>
+      )}
 
-        {error && (
-          <div className="mt-4 rounded-lg border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-            {error}
-          </div>
-        )}
-
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          {/* Liste des catégories */}
-          <div className="lg:col-span-2 space-y-6">
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Liste des catégories */}
+        <div className="lg:col-span-2 space-y-6">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-indigo-300" />
@@ -384,6 +382,5 @@ export default function CategoriesPage() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

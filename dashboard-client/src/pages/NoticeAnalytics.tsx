@@ -248,10 +248,10 @@ export default function NoticeAnalyticsPage() {
           </h3>
           <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
             <li><strong>Vues</strong> : Nombre de fois où la page contenant la notice a été chargée</li>
-            <li><strong>Expansions</strong> : Nombre de fois où l'utilisateur a déplié la notice</li>
-            <li><strong>Collapses</strong> : Nombre de fois où l'utilisateur a replié la notice</li>
+            <li><strong>Expansions</strong> : Nombre de fois où l&apos;utilisateur a déplié la notice</li>
+            <li><strong>Collapses</strong> : Nombre de fois où l&apos;utilisateur a replié la notice</li>
             <li><strong>Feedback</strong> : Vert = Utile (👍) / Rouge = Pas utile (👎)</li>
-            <li><strong>% Utilité</strong> : Pourcentage de feedback positif (Vert ≥80%, Jaune ≥50%, Rouge <50%)</li>
+            <li><strong>% Utilité</strong> : Pourcentage de feedback positif (Vert ≥80%, Jaune ≥50%, Rouge &lt;50%)</li>
           </ul>
         </div>
       </div>
