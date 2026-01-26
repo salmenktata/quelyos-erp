@@ -52,6 +52,53 @@ export default defineConfig({
           });
         },
       },
+      '/api/settings': {
+        target: 'http://localhost:8069',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: '',
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+          });
+        },
+      },
+      '/currencies': {
+        target: 'http://localhost:8069',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: '',
+        rewrite: (path) => path.replace(/^\/currencies/, '/api/ecommerce/currencies'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+          });
+        },
+      },
+      '/dashboard': {
+        target: 'http://localhost:8069',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: '',
+        rewrite: (path) => path.replace(/^\/dashboard/, '/api/ecommerce/dashboard'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+          });
+        },
+      },
+      '/reporting': {
+        target: 'http://localhost:8069',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: '',
+        rewrite: (path) => path.replace(/^\/reporting/, '/api/ecommerce/reporting'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+          });
+        },
+      },
       '/web': {
         target: 'http://localhost:8069',
         changeOrigin: true,

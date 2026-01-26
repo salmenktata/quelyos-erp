@@ -8661,6 +8661,175 @@ class QuelyosAPI(http.Controller):
                 'error': 'Une erreur est survenue'
             }
 
+    @http.route('/api/ecommerce/currencies/user/currency-preference', type='http', auth='public', methods=['GET'], csrf=False, cors='*')
+    def get_user_currency_preference(self, **kwargs):
+        """
+        Récupérer la préférence de devise de l'utilisateur.
+
+        Returns:
+            Préférence de devise avec displayCurrency, baseCurrency, isCustom
+        """
+        try:
+            # Récupérer la devise de la compagnie principale (base currency)
+            company = request.env.company.sudo()
+            base_currency = company.currency_id
+
+            # Si utilisateur authentifié, récupérer sa préférence
+            if request.env.user and request.env.user.id != request.env.ref('base.public_user').id:
+                user = request.env.user
+                # Vérifier si l'utilisateur a une devise préférée (via partner)
+                display_currency = user.partner_id.currency_id if user.partner_id.currency_id else base_currency
+                is_custom = bool(user.partner_id.currency_id)
+            else:
+                # Utilisateur non authentifié : utiliser devise de base
+                display_currency = base_currency
+                is_custom = False
+
+            response_data = {
+                'displayCurrency': display_currency.name,
+                'baseCurrency': base_currency.name,
+                'isCustom': is_custom
+            }
+
+            return request.make_json_response(response_data, headers={
+                'Cache-Control': 'private, max-age=300',  # 5 minutes cache
+            })
+
+        except Exception as e:
+            _logger.error(f"Get user currency preference error: {e}")
+            return request.make_json_response({
+                'displayCurrency': 'EUR',
+                'baseCurrency': 'EUR',
+                'isCustom': False
+            })
+
+    @http.route('/api/ecommerce/currencies/exchange-rates', type='http', auth='public', methods=['GET'], csrf=False, cors='*')
+    def get_exchange_rates(self, **kwargs):
+        """
+        Récupérer les taux de change actuels pour toutes les devises actives.
+
+        Returns:
+            Taux de change avec baseCurrency et rates dict
+        """
+        try:
+            company = request.env.company.sudo()
+            base_currency = company.currency_id
+            Currency = request.env['res.currency'].sudo()
+
+            # Récupérer toutes les devises actives
+            currencies = Currency.search([('active', '=', True)])
+
+            # Construire le dictionnaire des taux
+            rates = {}
+            for currency in currencies:
+                if currency.rate and currency.rate > 0:
+                    # Le taux dans Odoo est généralement inverse (1 EUR = X USD)
+                    # On stocke le taux direct pour faciliter les conversions
+                    rates[currency.name] = float(1.0 / currency.rate) if currency.name != base_currency.name else 1.0
+                else:
+                    rates[currency.name] = 1.0
+
+            response_data = {
+                'baseCurrency': base_currency.name,
+                'rates': rates,
+                'lastUpdate': str(fields.Date.today())
+            }
+
+            return request.make_json_response(response_data, headers={
+                'Cache-Control': 'public, max-age=3600',  # 1 hour cache
+            })
+
+        except Exception as e:
+            _logger.error(f"Get exchange rates error: {e}")
+            return request.make_json_response({
+                'baseCurrency': 'EUR',
+                'rates': {'EUR': 1.0, 'USD': 1.1, 'GBP': 0.85},
+                'lastUpdate': str(fields.Date.today())
+            })
+
+    @http.route('/api/ecommerce/dashboard/overview', type='http', auth='public', methods=['GET'], csrf=False, cors='*')
+    def get_dashboard_overview(self, **kwargs):
+        """
+        Récupérer les données du tableau de bord financier.
+
+        Query params:
+            days (int): Nombre de jours d'historique (défaut: 30)
+
+        Returns:
+            Données du dashboard avec balances, KPIs, transactions, insights, etc.
+        """
+        try:
+            params = self._get_http_params()
+            days = int(params.get('days', 30))
+
+            # TODO: Implémenter la logique complète avec données réelles
+            # Pour l'instant, retourner structure vide pour éviter erreurs 500
+
+            response_data = {
+                'balances': {
+                    'total': 0.0,
+                    'accounts': []
+                },
+                'kpis': {
+                    'dso': {
+                        'value': 0.0,
+                        'trend': 'stable',
+                        'reliability': 'low'
+                    },
+                    'ebitda': {
+                        'value': 0.0,
+                        'margin': 0.0,
+                        'trend': 'stable',
+                        'reliability': 'low'
+                    },
+                    'bfr': {
+                        'value': 0.0,
+                        'trend': 'stable',
+                        'reliability': 'low'
+                    },
+                    'breakEven': {
+                        'value': 0.0,
+                        'reachedPercent': 0.0,
+                        'trend': 'stable',
+                        'reliability': 'low'
+                    }
+                },
+                'recentTransactions': [],
+                'insights': [],
+                'actions': [],
+                'forecast': {
+                    'historical': [],
+                    'forecast': []
+                },
+                'metadata': {
+                    'days': days,
+                    'accountCount': 0,
+                    'hasData': False,
+                    'generatedAt': fields.Datetime.now().isoformat()
+                }
+            }
+
+            return request.make_json_response(response_data, headers={
+                'Cache-Control': 'private, no-cache',
+            })
+
+        except Exception as e:
+            _logger.error(f"Get dashboard overview error: {e}")
+            return request.make_json_response({
+                'balances': {'total': 0.0, 'accounts': []},
+                'kpis': {
+                    'dso': {'value': 0.0, 'trend': 'stable', 'reliability': 'low'},
+                    'ebitda': {'value': 0.0, 'margin': 0.0, 'trend': 'stable', 'reliability': 'low'},
+                    'bfr': {'value': 0.0, 'trend': 'stable', 'reliability': 'low'},
+                    'breakEven': {'value': 0.0, 'reachedPercent': 0.0, 'trend': 'stable', 'reliability': 'low'}
+                },
+                'recentTransactions': [],
+                'insights': [],
+                'actions': [],
+                'forecast': {'historical': [], 'forecast': []},
+                'metadata': {'days': 30, 'accountCount': 0, 'hasData': False}
+            }, status=200)
+
     # ===================================================================
     # PRICELISTS & CUSTOMER CATEGORIES - Segmentation clients (Issue #21)
     # ===================================================================

@@ -73,10 +73,14 @@ export default function SiteConfig() {
     const fetchApiKeys = async () => {
       try {
         const response = await fetch('/api/settings/images', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({})
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
         })
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`)
+        }
+
         const data = await response.json()
         if (data.success) {
           setApiKeys({
