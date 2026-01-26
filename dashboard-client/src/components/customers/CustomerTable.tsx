@@ -108,7 +108,7 @@ export function CustomerTable({ customers, sortField, sortOrder, onSort }: Custo
               <tr key={customer.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
                 <td className="px-6 py-4">
                   <Link
-                    to={`/customers/${customer.id}`}
+                    to={`/crm/customers/${customer.id}`}
                     className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded block truncate max-w-xs"
                     title={customer.name}
                   >
@@ -161,7 +161,7 @@ export function CustomerTable({ customers, sortField, sortOrder, onSort }: Custo
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right">
                   <Link
-                    to={`/customers/${customer.id}`}
+                    to={`/crm/customers/${customer.id}`}
                     className="inline-flex items-center gap-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded px-2 py-1"
                     aria-label={`Voir les détails de ${customer.name}`}
                   >
@@ -184,7 +184,7 @@ export function CustomerTable({ customers, sortField, sortOrder, onSort }: Custo
           >
             <div className="flex items-start justify-between mb-3">
               <Link
-                to={`/customers/${customer.id}`}
+                to={`/crm/customers/${customer.id}`}
                 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
               >
                 {customer.name}
@@ -227,7 +227,7 @@ export function CustomerTable({ customers, sortField, sortOrder, onSort }: Custo
             </div>
 
             <Link
-              to={`/customers/${customer.id}`}
+              to={`/crm/customers/${customer.id}`}
               className="mt-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-lg font-medium text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
               aria-label={`Voir les détails de ${customer.name}`}
             >

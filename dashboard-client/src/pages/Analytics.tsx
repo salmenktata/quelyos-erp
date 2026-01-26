@@ -8,7 +8,8 @@ import {
   useConversionFunnel,
   useTopCategories,
 } from '../hooks/useAnalytics'
-import { Breadcrumbs, Skeleton } from '../components/common'
+import { Breadcrumbs, Skeleton, PageNotice } from '../components/common'
+import { crmNotices } from '@/lib/notices'
 import {
   LineChart,
   Line,
@@ -75,6 +76,8 @@ export default function Analytics() {
             { label: 'Analytiques' },
           ]}
         />
+
+        <PageNotice config={crmNotices.analytics} className="mb-6" />
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analytiques</h1>
@@ -190,7 +193,7 @@ export default function Analytics() {
                   </div>
                 </div>
                 <Link
-                  to="/customers"
+                  to="/crm/customers"
                   className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-2 inline-block"
                 >
                   Voir tous les clients →
@@ -575,7 +578,7 @@ export default function Analytics() {
                 </div>
                 <div className="p-4 border-t border-gray-200 dark:border-gray-700">
                   <Link
-                    to="/products"
+                    to="/ecms/products"
                     className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
                   >
                     Voir tous les produits →

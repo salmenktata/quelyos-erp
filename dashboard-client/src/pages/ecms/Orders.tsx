@@ -462,7 +462,7 @@ export default function Orders() {
                           {order.customer ? (
                             <div>
                               <Link
-                                to={`/customers/${order.customer.id}`}
+                                to={`/crm/customers/${order.customer.id}`}
                                 className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
                               >
                                 {order.customer.name}

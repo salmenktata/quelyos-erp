@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { useMarketingPopups, useCreateMarketingPopup, useUpdateMarketingPopup, useDeleteMarketingPopup, MarketingPopup } from '../hooks/useMarketingPopups'
-import { Button, SkeletonTable } from '../components/common'
+import { Button, SkeletonTable, PageNotice } from '../components/common'
 import { useToast } from '../hooks/useToast'
+import { marketingNotices } from '@/lib/notices'
 
 export default function MarketingPopupsPage() {
   const [editingPopup, setEditingPopup] = useState<MarketingPopup | null>(null)
@@ -147,6 +148,8 @@ export default function MarketingPopupsPage() {
   return (
     <Layout>
       <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
+        <PageNotice config={marketingNotices.popups} className="mb-6" />
+
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Popups Marketing</h1>

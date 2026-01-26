@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { usePromoMessages, useCreatePromoMessage, useUpdatePromoMessage, useDeletePromoMessage, PromoMessage } from '../hooks/usePromoMessages'
-import { Button, SkeletonTable } from '../components/common'
+import { Button, SkeletonTable, PageNotice } from '../components/common'
 import { useToast } from '../hooks/useToast'
+import { marketingNotices } from '@/lib/notices'
 
 const ICON_OPTIONS = [
   { value: 'truck', label: 'Camion (Livraison)' },
@@ -86,6 +87,8 @@ export default function PromoMessages() {
   return (
     <Layout>
       <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
+        <PageNotice config={marketingNotices.promoMessages} className="mb-6" />
+
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Messages PromoBar</h1>
           {!showForm && <Button onClick={handleNew}>Nouveau</Button>}

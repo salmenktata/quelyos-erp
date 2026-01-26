@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useInvoices, useSendInvoiceEmail, useDownloadInvoicePDF } from '../hooks/useInvoices'
-import { Badge, Button, Breadcrumbs, SkeletonTable } from '../components/common'
+import { Badge, Button, Breadcrumbs, SkeletonTable, PageNotice } from '../components/common'
+import { crmNotices } from '@/lib/notices'
 import { FileTextIcon, DownloadIcon, MailIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -157,6 +158,8 @@ export default function Invoices() {
             Gérer et suivre toutes les factures clients
           </p>
         </div>
+
+        <PageNotice config={crmNotices.invoices} className="mb-6" />
 
         {/* Statistiques */}
         {stats && (

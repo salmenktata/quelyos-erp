@@ -233,38 +233,38 @@ const MODULES: Module[] = [
     color: 'text-indigo-600',
     bgColor: 'bg-indigo-100 dark:bg-indigo-900/30',
     description: 'E-commerce',
-    basePath: '/my-shop',
+    basePath: '/ecms',
     sections: [
       {
         title: 'Gestion',
         items: [
-          { name: 'Ma Boutique', path: '/my-shop', icon: Store },
-          { name: 'Commandes', path: '/orders', icon: ShoppingCart },
-          { name: 'Produits', path: '/products', icon: Package },
-          { name: 'Catégories', path: '/categories', icon: Tag },
-          { name: 'Paniers Abandonnés', path: '/abandoned-carts', icon: ShoppingCart },
+          { name: 'Ma Boutique', path: '/ecms/my-shop', icon: Store },
+          { name: 'Commandes', path: '/ecms/orders', icon: ShoppingCart },
+          { name: 'Produits', path: '/ecms/products', icon: Package },
+          { name: 'Catégories', path: '/ecms/categories', icon: Tag },
+          { name: 'Paniers Abandonnés', path: '/ecms/abandoned-carts', icon: ShoppingCart },
         ],
       },
       {
         title: 'Marketing',
         items: [
-          { name: 'Produits Vedette', path: '/featured', icon: Sparkles },
-          { name: 'Codes Promo', path: '/coupons', icon: Ticket },
-          { name: 'Bannières', path: '/promo-banners', icon: Image },
-          { name: 'Hero Slides', path: '/hero-slides', icon: Image },
+          { name: 'Produits Vedette', path: '/ecms/featured', icon: Sparkles },
+          { name: 'Codes Promo', path: '/ecms/coupons', icon: Ticket },
+          { name: 'Bannières', path: '/ecms/promo-banners', icon: Image },
+          { name: 'Hero Slides', path: '/ecms/hero-slides', icon: Image },
         ],
       },
       {
         title: 'Configuration',
         items: [
-          { name: 'Livraison', path: '/delivery', icon: Truck },
-          { name: 'Configuration Site', path: '/site-config', icon: Settings },
-          { name: 'Pages Statiques', path: '/static-pages', icon: FileText },
-          { name: 'Menus Navigation', path: '/menus', icon: List },
-          { name: 'Messages Promo', path: '/promo-messages', icon: MessageSquare },
-          { name: 'Badges Confiance', path: '/trust-badges', icon: Award },
-          { name: 'SEO Métadonnées', path: '/seo-metadata', icon: Globe },
-          { name: 'Popups Marketing', path: '/marketing-popups', icon: Zap },
+          { name: 'Livraison', path: '/ecms/delivery', icon: Truck },
+          { name: 'Configuration Site', path: '/ecms/site-config', icon: Settings },
+          { name: 'Pages Statiques', path: '/ecms/static-pages', icon: FileText },
+          { name: 'Menus Navigation', path: '/ecms/menus', icon: List },
+          { name: 'Messages Promo', path: '/ecms/promo-messages', icon: MessageSquare },
+          { name: 'Badges Confiance', path: '/ecms/trust-badges', icon: Award },
+          { name: 'SEO Métadonnées', path: '/ecms/seo-metadata', icon: Globe },
+          { name: 'Popups Marketing', path: '/ecms/marketing-popups', icon: Zap },
         ],
       },
     ],
@@ -308,13 +308,13 @@ const MODULES: Module[] = [
     color: 'text-violet-600',
     bgColor: 'bg-violet-100 dark:bg-violet-900/30',
     description: 'Clients & Ventes',
-    basePath: '/customers',
+    basePath: '/crm',
     sections: [
       {
         title: 'Clients',
         items: [
-          { name: 'Clients', path: '/customers', icon: UserCircle },
-          { name: 'Catégories Clients', path: '/customer-categories', icon: Tag },
+          { name: 'Clients', path: '/crm/customers', icon: UserCircle },
+          { name: 'Catégories Clients', path: '/crm/customer-categories', icon: Tag },
           { name: 'Listes de Prix', path: '/pricelists', icon: ClipboardList },
         ],
       },
@@ -669,12 +669,14 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
   // Detect current module from URL
   const detectModule = (): Module => {
     const path = location.pathname
+    // IMPORTANT: Check /finance/stock BEFORE /finance
+    if (path.startsWith('/finance/stock')) return MODULES.find(m => m.id === 'stock')!
     if (path.startsWith('/finance')) return MODULES.find(m => m.id === 'finance')!
-    if (path.startsWith('/stock') || path.startsWith('/warehouses')) return MODULES.find(m => m.id === 'stock')!
-    if (path.startsWith('/customers') || path.startsWith('/invoices') || path.startsWith('/payments') || path.startsWith('/pricelists')) return MODULES.find(m => m.id === 'crm')!
+    if (path.startsWith('/stock') || path.startsWith('/warehouses') || path.startsWith('/inventory')) return MODULES.find(m => m.id === 'stock')!
+    if (path.startsWith('/crm') || path.startsWith('/invoices') || path.startsWith('/payments') || path.startsWith('/pricelists')) return MODULES.find(m => m.id === 'crm')!
+    if (path.startsWith('/ecms')) return MODULES.find(m => m.id === 'boutique')!
     if (path.startsWith('/marketing')) return MODULES.find(m => m.id === 'marketing')!
     if (path.startsWith('/hr')) return MODULES.find(m => m.id === 'rh')!
-    if (path.startsWith('/my-shop') || path.startsWith('/orders') || path.startsWith('/products') || path.startsWith('/categories') || path.startsWith('/coupons') || path.startsWith('/delivery') || path.startsWith('/featured') || path.startsWith('/abandoned') || path.startsWith('/promo') || path.startsWith('/hero') || path.startsWith('/site-config') || path.startsWith('/static-pages')) return MODULES.find(m => m.id === 'boutique')!
     return MODULES.find(m => m.id === 'home')!
   }
 

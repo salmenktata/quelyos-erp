@@ -1,4 +1,4 @@
-import { Boxes, ClipboardList, ArrowLeftRight, Truck, Warehouse, MapPin, RefreshCcw, Lightbulb } from 'lucide-react';
+import { Boxes, ClipboardList, ArrowLeftRight, Truck, Warehouse, MapPin, RefreshCcw, Lightbulb, Layers, Shuffle, TrendingUp } from 'lucide-react';
 import type { PageNoticeConfig } from './types';
 
 export const stockNotices: Record<string, PageNoticeConfig> = {
@@ -133,5 +133,55 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
         'Surveillez les alertes de stock mini : déclenchent automatiquement les commandes fournisseurs',
       ]
     }]
+  },
+
+  valuation: {
+    pageId: 'stock-valuation',
+    title: 'Valorisation du Stock',
+    purpose: "Analysez la valeur financière de votre inventaire en temps réel. La valorisation est calculée en multipliant le stock disponible par le coût unitaire de chaque produit, vous permettant d'identifier où votre capital est immobilisé et d'optimiser vos niveaux de stock.",
+    icon: Layers,
+    moduleColor: 'orange',
+    sections: [{
+      title: 'Bonnes pratiques',
+      icon: Lightbulb,
+      items: [
+        'Suivez la valorisation par entrepôt pour identifier les sites sur ou sous-stockés',
+        'Analysez la répartition par catégorie : concentrez le capital sur les produits à forte rotation',
+        'Comparez régulièrement valorisation théorique vs inventaire physique pour détecter les écarts',
+        'Utilisez les exports CSV pour intégrer dans vos tableaux de bord financiers ou comptables',
+        'Identifiez les produits dormants (forte valeur, faible rotation) pour libérer du cash',
+      ]
+    }]
+  },
+
+  turnover: {
+    pageId: 'stock-turnover',
+    title: 'Rotation du Stock',
+    purpose: "Mesurez la vitesse de rotation de vos produits pour optimiser les achats et réduire les coûts de stockage. Le ratio de rotation (Quantité vendue ÷ Stock moyen) révèle les produits performants et identifie le stock dormant.",
+    icon: Shuffle,
+    moduleColor: 'orange',
+    sections: [
+      {
+        title: 'Comprendre les statuts',
+        icon: TrendingUp,
+        items: [
+          'Excellent (≥12) : Rotation optimale - produit très demandé, minimisez le stock pour libérer du cash',
+          'Bon (6-12) : Performance saine - équilibre correct entre disponibilité et immobilisation',
+          'Lent (2-6) : À surveiller - vérifiez la demande réelle, ajustez les règles de réappro',
+          'Dormant (<2) : Action requise - envisagez promotions, déstockage ou arrêt de commercialisation',
+        ]
+      },
+      {
+        title: 'Bonnes pratiques',
+        icon: Lightbulb,
+        items: [
+          'Analysez sur 90 jours minimum pour lisser les variations saisonnières',
+          'Segmentez par catégorie : les ratios normaux varient selon le type de produit',
+          'Identifiez les produits dormants pour négocier retours fournisseurs ou promotions',
+          'Ajustez les seuils de réappro selon rotation : produits rapides = stock mini, produits lents = stock réduit',
+          'Exportez régulièrement pour suivre l\'évolution et mesurer l\'impact de vos actions',
+        ]
+      }
+    ]
   },
 };

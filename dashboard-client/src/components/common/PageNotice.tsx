@@ -2,20 +2,31 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Info, ChevronDown, ChevronUp } from "lucide-react";
+import { Info, ChevronDown, ChevronUp, ThumbsUp, ThumbsDown } from "lucide-react";
 import { GlassPanel } from "@/components/ui/glass";
 import { logger } from '@quelyos/logger';
 import type { PageNoticeConfig } from "@/lib/notices/types";
 import { MODULE_COLOR_CONFIGS } from "@/lib/notices/types";
+import {
+  trackNoticeView,
+  trackNoticeExpansion,
+  trackNoticeCollapse,
+  trackNoticeFeedback,
+  hasFeedback,
+  getNoticeFeedback,
+} from "@/lib/notices/analytics";
 
 interface PageNoticeProps {
   config: PageNoticeConfig;
   className?: string;
+  enableFeedback?: boolean; // Activer le système de feedback (default: true)
 }
 
-export function PageNotice({ config, className = "" }: PageNoticeProps) {
+export function PageNotice({ config, className = "", enableFeedback = true }: PageNoticeProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [feedbackGiven, setFeedbackGiven] = useState(false);
+  const [feedbackValue, setFeedbackValue] = useState<boolean | null>(null);
 
   const Icon = config.icon || Info;
   const colorConfig = MODULE_COLOR_CONFIGS[config.moduleColor || 'gray'];
@@ -30,22 +41,53 @@ export function PageNotice({ config, className = "" }: PageNoticeProps) {
       if (stored !== null) {
         setIsCollapsed(stored === "true");
       }
+
+      // Charger feedback existant
+      if (enableFeedback) {
+        const existingFeedback = getNoticeFeedback(config.pageId);
+        if (existingFeedback) {
+          setFeedbackGiven(true);
+          setFeedbackValue(existingFeedback.isHelpful);
+        }
+      }
+
+      // Tracker la vue
+      trackNoticeView(config.pageId);
     } catch (error) {
       logger.error("Failed to load notice preference:", error);
     }
 
     setMounted(true);
-  }, [storageKey]);
+  }, [storageKey, config.pageId, enableFeedback]);
 
-  // Toggle handler with persistence
+  // Toggle handler with persistence + analytics
   const handleToggle = () => {
     const newState = !isCollapsed;
     setIsCollapsed(newState);
 
     try {
       localStorage.setItem(storageKey, String(newState));
+
+      // Tracker l'action
+      if (newState) {
+        trackNoticeCollapse(config.pageId);
+      } else {
+        trackNoticeExpansion(config.pageId);
+      }
     } catch (error) {
       logger.error("Failed to save notice preference:", error);
+    }
+  };
+
+  // Handler feedback utilisateur
+  const handleFeedback = (isHelpful: boolean) => {
+    try {
+      trackNoticeFeedback(config.pageId, isHelpful);
+      setFeedbackGiven(true);
+      setFeedbackValue(isHelpful);
+      logger.info(`Notice feedback: ${config.pageId} - ${isHelpful ? 'helpful' : 'not helpful'}`);
+    } catch (error) {
+      logger.error("Failed to submit feedback:", error);
     }
   };
 
@@ -146,6 +188,59 @@ export function PageNotice({ config, className = "" }: PageNoticeProps) {
                       </div>
                     );
                   })}
+
+                  {/* Feedback Section */}
+                  {enableFeedback && (
+                    <div className="mt-4 pt-3 border-t border-white/10">
+                      {!feedbackGiven ? (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-slate-300">
+                            Ces informations vous sont-elles utiles ?
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleFeedback(true)}
+                              aria-label="Oui, c'est utile"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 transition-colors group"
+                            >
+                              <ThumbsUp className="h-3.5 w-3.5 text-slate-400 group-hover:text-green-400 transition-colors" />
+                              <span className="text-xs text-slate-400 group-hover:text-green-400 transition-colors">
+                                Oui
+                              </span>
+                            </button>
+                            <button
+                              onClick={() => handleFeedback(false)}
+                              aria-label="Non, pas utile"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 transition-colors group"
+                            >
+                              <ThumbsDown className="h-3.5 w-3.5 text-slate-400 group-hover:text-red-400 transition-colors" />
+                              <span className="text-xs text-slate-400 group-hover:text-red-400 transition-colors">
+                                Non
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          {feedbackValue ? (
+                            <>
+                              <ThumbsUp className="h-3.5 w-3.5 text-green-400" />
+                              <span className="text-xs text-green-400">
+                                Merci pour votre retour positif !
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <ThumbsDown className="h-3.5 w-3.5 text-red-400" />
+                              <span className="text-xs text-red-400">
+                                Merci pour votre retour. Nous travaillons à améliorer ce contenu.
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </GlassPanel>

@@ -1,14 +1,16 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Layout } from '../components/Layout';
+import { Layout } from '../../components/Layout';
 import {
   useCustomerCategories,
   useCreateCustomerCategory,
   useUpdateCustomerCategory,
   useDeleteCustomerCategory,
   type CustomerCategory,
-} from '../hooks/useCustomerCategories';
-import { SkeletonGrid } from '../components/common/Skeleton';
-import { useToast } from '../contexts/ToastContext';
+} from '../../hooks/useCustomerCategories';
+import { SkeletonGrid } from '../../components/common/Skeleton';
+import { PageNotice } from '../../components/common';
+import { crmNotices } from '@/lib/notices';
+import { useToast } from '../../contexts/ToastContext';
 import { logger } from '@quelyos/logger';
 
 export default function CustomerCategories() {
@@ -257,6 +259,8 @@ export default function CustomerCategories() {
             Nouvelle catégorie
           </button>
         </div>
+
+        <PageNotice config={crmNotices.customerCategories} className="mb-6" />
 
         {/* Search & Filters */}
         <div id="main-content" className="flex flex-col lg:flex-row gap-4">

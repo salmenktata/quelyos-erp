@@ -20,11 +20,11 @@ import { ROUTES } from "@/lib/finance/compat/routes";
 import { GlassPanel, GlassCard } from "@/components/ui/glass";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { ReportingNav } from "@/components/finance/reporting/ReportingNav";
-import { ReportNotice } from "@/components/finance/reporting/ReportNotice";
+import { PageNotice } from "@/components/common";
+import { financeNotices } from "@/lib/notices";
 import { reportingClient, type TopCategoriesResponse, type CategoryTotal } from "@/lib/finance/reporting";
 import { api } from "@/lib/finance/api";
 import { useApiData } from "@/hooks/finance/useApiData";
-import { reportingNotices } from "@/lib/finance/reporting-notices";
 import { logger } from '@quelyos/logger';
 
 type TimeRange = "7" | "30" | "60" | "90";
@@ -215,13 +215,7 @@ export default function ByCategoryReportPage() {
         </motion.div>
 
         {/* Report Notice */}
-        <ReportNotice
-          title={reportingNotices["by-category"].title}
-          purpose={reportingNotices["by-category"].purpose}
-          tracking={reportingNotices["by-category"].tracking}
-          icon={PieChart}
-          reportId="by-category"
-        />
+        <PageNotice config={financeNotices.byCategory} className="mb-6" />
 
         {/* Controls */}
         <motion.div

@@ -20,21 +20,21 @@ const quickActions: QuickAction[] = [
   {
     title: 'Produits',
     description: 'Gérer le catalogue de produits, catégories et stocks',
-    href: '/products',
+    href: '/ecms/products',
     icon: <ShoppingBagIcon className="w-5 h-5 md:w-6 md:h-6" />,
     colorClass: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
   },
   {
     title: 'Commandes',
     description: 'Suivre et gérer les commandes clients',
-    href: '/orders',
+    href: '/ecms/orders',
     icon: <ClipboardDocumentListIcon className="w-5 h-5 md:w-6 md:h-6" />,
     colorClass: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
   },
   {
     title: 'Clients',
     description: 'Gérer les comptes clients et leur historique',
-    href: '/customers',
+    href: '/crm/customers',
     icon: <UserGroupIcon className="w-5 h-5 md:w-6 md:h-6" />,
     colorClass: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
   },
@@ -48,7 +48,7 @@ const quickActions: QuickAction[] = [
   {
     title: 'Coupons',
     description: 'Gérer les codes promo et réductions',
-    href: '/coupons',
+    href: '/ecms/coupons',
     icon: <TicketIcon className="w-5 h-5 md:w-6 md:h-6" />,
     colorClass: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
   },

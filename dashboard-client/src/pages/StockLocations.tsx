@@ -117,8 +117,6 @@ export default function StockLocations() {
           ]}
         />
 
-        <PageNotice config={stockNotices.locations} className="mb-6" />
-
         {/* Header */}
         <div className="mb-8 flex items-start justify-between">
           <div>
@@ -137,6 +135,8 @@ export default function StockLocations() {
             Créer Emplacement
           </button>
         </div>
+
+        <PageNotice config={stockNotices.locations} className="mb-6" />
 
         {/* Filtres et actions */}
         <div className="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">

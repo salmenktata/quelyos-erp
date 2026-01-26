@@ -18,6 +18,8 @@ import { useNavigate } from 'react-router-dom';
 import { usePricelists, useDeletePricelist, type Pricelist } from '../hooks/usePricelists';
 import { Layout } from '../components/Layout';
 import { SkeletonGrid } from '../components/common/Skeleton';
+import { PageNotice } from '../components/common';
+import { crmNotices } from '@/lib/notices';
 import { PricelistFormModal } from '../components/pricelists/PricelistFormModal';
 import {
   CurrencyDollarIcon,
@@ -234,6 +236,8 @@ export default function Pricelists() {
             </div>
           </div>
         </div>
+
+        <PageNotice config={crmNotices.pricelists} className="mb-6" />
 
         {/* Filtres */}
         <div className="flex flex-col sm:flex-row gap-4">

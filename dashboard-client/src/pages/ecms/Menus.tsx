@@ -8,6 +8,8 @@ import {
   useReorderMenus,
   type MenuItem,
 } from '../hooks/useMenus'
+import { PageNotice } from '../components/common'
+import { marketingNotices } from '@/lib/notices'
 import { Badge, Button, SkeletonTable } from '../components/common'
 import { useToast } from '../hooks/useToast'
 
@@ -149,6 +151,8 @@ export default function Menus() {
   return (
     <Layout>
       <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
+        <PageNotice config={marketingNotices.menus} className="mb-6" />
+
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Menus Navigation</h1>

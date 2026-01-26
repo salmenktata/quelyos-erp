@@ -302,8 +302,6 @@ export default function Stock() {
           ]}
         />
 
-        <PageNotice config={stockNotices.products} className="mb-6" />
-
         <div className="mb-8 flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestion du Stock</h1>
@@ -329,6 +327,8 @@ export default function Stock() {
             </Link>
           </div>
         </div>
+
+        <PageNotice config={stockNotices.products} className="mb-6" />
 
         {/* Tabs */}
         <div className="mb-6">

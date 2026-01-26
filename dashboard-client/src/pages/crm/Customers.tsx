@@ -1,15 +1,15 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Layout } from '../components/Layout'
-import { useCustomers } from '../hooks/useCustomers'
-import { useExportCustomers } from '../hooks/useExportCustomers'
+import { Layout } from '../../components/Layout'
+import { useCustomers } from '../../hooks/useCustomers'
+import { useExportCustomers } from '../../hooks/useExportCustomers'
 import type { CustomerListItem } from '@/types'
-import { Button, Breadcrumbs, SkeletonTable, PageNotice } from '../components/common'
-import { ecommerceNotices } from '@/lib/notices'
-import { CustomerStats } from '../components/customers/CustomerStats'
-import { CustomerFilters } from '../components/customers/CustomerFilters'
-import { CustomerTable } from '../components/customers/CustomerTable'
-import { CustomerEmpty } from '../components/customers/CustomerEmpty'
-import { useToast } from '../contexts/ToastContext'
+import { Button, Breadcrumbs, SkeletonTable, PageNotice } from '../../components/common'
+import { crmNotices } from '@/lib/notices'
+import { CustomerStats } from '../../components/customers/CustomerStats'
+import { CustomerFilters } from '../../components/customers/CustomerFilters'
+import { CustomerTable } from '../../components/customers/CustomerTable'
+import { CustomerEmpty } from '../../components/customers/CustomerEmpty'
+import { useToast } from '../../contexts/ToastContext'
 
 type SortField = 'name' | 'email' | 'orders_count' | 'total_spent' | 'create_date'
 type SortOrder = 'asc' | 'desc'
@@ -143,8 +143,6 @@ export default function Customers() {
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: 'Tableau de bord', href: '/dashboard' }, { label: 'Clients' }]} />
 
-        <PageNotice config={ecommerceNotices.customers} className="mb-6" />
-
         {/* Header */}
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Clients</h1>
@@ -153,6 +151,8 @@ export default function Customers() {
             <span className="hidden md:inline"> • Cmd+E pour exporter</span>
           </p>
         </div>
+
+        <PageNotice config={crmNotices.customers} className="mb-6" />
 
         {/* KPI Cards */}
         {!isLoading && data?.data && (

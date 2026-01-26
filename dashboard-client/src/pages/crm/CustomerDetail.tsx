@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Layout } from '../components/Layout'
-import { useCustomer, useUpdateCustomer } from '../hooks/useCustomerDetail'
-import { Badge, Button, Breadcrumbs, Skeleton, Modal } from '../components/common'
-import { useToast } from '../hooks/useToast'
+import { Layout } from '../../components/Layout'
+import { useCustomer, useUpdateCustomer } from '../../hooks/useCustomerDetail'
+import { Badge, Button, Breadcrumbs, Skeleton, Modal } from '../../components/common'
+import { useToast } from '../../hooks/useToast'
 
 export default function CustomerDetail() {
   const { id } = useParams<{ id: string }>()
@@ -138,7 +138,7 @@ export default function CustomerDetail() {
           <Breadcrumbs
             items={[
               { label: 'Tableau de bord', href: '/dashboard' },
-              { label: 'Clients', href: '/customers' },
+              { label: 'Clients', href: '/crm/customers' },
               { label: 'Erreur' },
             ]}
           />
@@ -162,7 +162,7 @@ export default function CustomerDetail() {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Le client demande n'existe pas ou a ete supprime.
             </p>
-            <Link to="/customers">
+            <Link to="/crm/customers">
               <Button variant="primary">Retour aux clients</Button>
             </Link>
           </div>
@@ -177,7 +177,7 @@ export default function CustomerDetail() {
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
-            { label: 'Clients', href: '/customers' },
+            { label: 'Clients', href: '/crm/customers' },
             { label: customer.name },
           ]}
         />

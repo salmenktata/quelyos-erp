@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Layout } from "@/components/Layout"
-import { Breadcrumbs } from "@/components/common"
+import { Breadcrumbs, PageNotice } from "@/components/common"
+import { stockNotices } from "@/lib/notices"
 import {
   Package,
   TrendingUp,
@@ -91,6 +92,9 @@ export default function StockValuationPage() {
             Export CSV
           </button>
         </div>
+
+        {/* Notice */}
+        <PageNotice config={stockNotices.valuation} className="mb-6" />
 
         {/* Filtres */}
         <div className="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">

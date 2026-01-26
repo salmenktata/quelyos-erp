@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { useHeroSlides, useCreateHeroSlide, useUpdateHeroSlide, useDeleteHeroSlide, HeroSlide } from '../hooks/useHeroSlides'
-import { Button, ToastContainer } from '../components/common'
+import { Button, ToastContainer, PageNotice } from '../components/common'
 import { useToast } from '../hooks/useToast'
+import { marketingNotices } from '@/lib/notices'
 import { HeroSlideTable } from '../components/HeroSlideTable'
 import { HeroSlideForm, HeroSlideFormData } from '../components/HeroSlideForm'
 
@@ -93,6 +94,8 @@ export default function HeroSlides() {
       <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
 
       <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
+        <PageNotice config={marketingNotices.heroSlides} className="mb-6" />
+
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Hero Slides</h1>
           {!showForm && <Button onClick={handleNew}>Nouveau</Button>}

@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { usePaymentTransactions, useRefundTransaction, PaymentTransaction } from '../hooks/usePayments'
-import { Badge, Button, Breadcrumbs, SkeletonTable, Modal } from '../components/common'
+import { Badge, Button, Breadcrumbs, SkeletonTable, Modal, PageNotice } from '../components/common'
+import { crmNotices } from '@/lib/notices'
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
 
 export default function Payments() {
@@ -118,6 +119,8 @@ export default function Payments() {
             Visualiser et suivre toutes les transactions de paiement
           </p>
         </div>
+
+        <PageNotice config={crmNotices.payments} className="mb-6" />
 
         {/* Statistiques */}
         {stats && (

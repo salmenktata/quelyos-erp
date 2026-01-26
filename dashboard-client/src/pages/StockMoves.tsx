@@ -204,8 +204,6 @@ export default function StockMoves() {
           ]}
         />
 
-        <PageNotice config={stockNotices.moves} className="mb-6" />
-
         <div className="mt-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -241,6 +239,8 @@ export default function StockMoves() {
               </Button>
             </div>
           </div>
+
+          <PageNotice config={stockNotices.moves} className="mb-6" />
 
           {/* Filters Panel */}
           {showFilters && (

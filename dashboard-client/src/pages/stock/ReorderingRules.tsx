@@ -93,8 +93,6 @@ export default function ReorderingRules() {
           ]}
         />
 
-        <PageNotice config={stockNotices.reorderingRules} className="mb-6" />
-
         {/* Header */}
         <div className="mb-8 flex items-start justify-between">
           <div>
@@ -113,6 +111,8 @@ export default function ReorderingRules() {
             Créer Règle
           </button>
         </div>
+
+        <PageNotice config={stockNotices.reorderingRules} className="mb-6" />
 
         {/* KPI Summary */}
         <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">

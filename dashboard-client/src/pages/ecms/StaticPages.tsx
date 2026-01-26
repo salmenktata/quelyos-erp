@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { useStaticPages, useCreateStaticPage, useUpdateStaticPage, useDeleteStaticPage, StaticPage } from '../hooks/useStaticPages'
-import { Button, SkeletonTable } from '../components/common'
+import { Button, SkeletonTable, PageNotice } from '../components/common'
 import { useToast } from '../hooks/useToast'
+import { marketingNotices } from '@/lib/notices'
 
 export default function StaticPagesPage() {
   const [editingPage, setEditingPage] = useState<StaticPage | null>(null)
@@ -122,6 +123,8 @@ export default function StaticPagesPage() {
   return (
     <Layout>
       <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
+        <PageNotice config={marketingNotices.staticPages} className="mb-6" />
+
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Pages Statiques</h1>

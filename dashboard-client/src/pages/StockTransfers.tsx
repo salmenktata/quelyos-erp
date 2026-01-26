@@ -137,8 +137,6 @@ export default function StockTransfers() {
           ]}
         />
 
-        <PageNotice config={stockNotices.transfers} className="mb-6" />
-
         {/* Header */}
         <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -159,6 +157,8 @@ export default function StockTransfers() {
             Nouveau transfert
           </Button>
         </div>
+
+        <PageNotice config={stockNotices.transfers} className="mb-6" />
 
         {/* Filtres */}
         <div className="mb-6 space-y-4">

@@ -178,8 +178,6 @@ export default function Inventory() {
           ]}
         />
 
-        <PageNotice config={stockNotices.inventory} className="mb-6" />
-
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Inventaire Physique
@@ -188,6 +186,8 @@ export default function Inventory() {
             Comptage et ajustement des quantités en stock
           </p>
         </div>
+
+        <PageNotice config={stockNotices.inventory} className="mb-6" />
 
         {renderStepsIndicator()}
 

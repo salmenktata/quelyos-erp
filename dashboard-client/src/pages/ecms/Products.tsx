@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Layout } from '../components/Layout'
+import { Layout } from '../../components/Layout'
 import {
   useProducts,
   useDeleteProduct,
@@ -9,8 +9,8 @@ import {
   useDuplicateProduct,
   useExportProducts,
   useImportProducts,
-} from '../hooks/useProducts'
-import { useCategories } from '../hooks/useCategories'
+} from '../../hooks/useProducts'
+import { useCategories } from '../../hooks/useCategories'
 import {
   Button,
   Badge,
@@ -25,9 +25,9 @@ import {
   PageNotice,
   type SearchSuggestion,
   type Attribute,
-} from '../components/common'
+} from '../../components/common'
 import { ecommerceNotices } from '@/lib/notices'
-import { useToast } from '../hooks/useToast'
+import { useToast } from '../../hooks/useToast'
 import { ToastContainer } from '../components/common/Toast'
 import { api } from '../lib/api'
 import { logger } from '@quelyos/logger'
@@ -411,8 +411,6 @@ export default function Products() {
           ]}
         />
 
-        <PageNotice config={ecommerceNotices.products} className="mb-6" />
-
         {/* En-tête */}
         <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -455,7 +453,7 @@ export default function Products() {
             >
               Exporter CSV
             </Button>
-            <Link to="/products/create">
+            <Link to="/ecms/products/create">
               <Button
                 variant="primary"
                 icon={
@@ -474,6 +472,8 @@ export default function Products() {
             </Link>
           </div>
         </div>
+
+        <PageNotice config={ecommerceNotices.products} className="mb-6" />
 
         {/* Filtres et Recherche */}
         <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
@@ -844,7 +844,7 @@ export default function Products() {
                   Réinitialiser les filtres
                 </Button>
               ) : (
-                <Link to="/products/create">
+                <Link to="/ecms/products/create">
                   <Button variant="primary">Créer un produit</Button>
                 </Link>
               )}

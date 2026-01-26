@@ -201,8 +201,6 @@ export default function Warehouses() {
           Aller à la liste des entrepôts
         </a>
 
-        <PageNotice config={stockNotices.warehouses} className="mb-6" />
-
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -219,6 +217,8 @@ export default function Warehouses() {
             Créer Entrepôt
           </button>
         </div>
+
+        <PageNotice config={stockNotices.warehouses} className="mb-6" />
 
         {/* Modal Création Entrepôt */}
         <WarehouseFormModal
