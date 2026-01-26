@@ -257,15 +257,13 @@ export default function FluxSettingsPage() {
               </p>
             </div>
             {!showAddCustom && (
-              <Button
+              <button
                 onClick={() => setShowAddCustom(true)}
-                variant="outline"
-                size="sm"
-                className="border-sky-500/50 text-sky-400 hover:bg-sky-500/20"
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-2 text-sm font-semibold shadow-lg transition hover:from-indigo-400 hover:to-violet-400"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4" />
                 Ajouter
-              </Button>
+              </button>
             )}
           </div>
 
@@ -276,33 +274,31 @@ export default function FluxSettingsPage() {
                 Nom du type personnalisé
               </label>
               <div className="flex gap-2">
-                <Input
+                <input
                   id="customName"
+                  type="text"
                   value={newCustomName}
                   onChange={(e) => setNewCustomName(e.target.value)}
                   placeholder="Ex: PayPal, Crypto, Mobile Money..."
-                  className="flex-1 bg-white/10 border-white/20 text-white"
+                  className="flex-1 rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-indigo-100/40 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
                   onKeyDown={(e) => e.key === "Enter" && addCustomType()}
                 />
-                <Button
+                <button
                   onClick={addCustomType}
                   disabled={!newCustomName.trim()}
-                  size="icon"
-                  className="bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                  className="flex items-center justify-center rounded-xl bg-emerald-500/20 px-4 py-3 text-emerald-400 transition hover:bg-emerald-500/30 disabled:opacity-50"
                 >
-                  <Check className="h-4 w-4" />
-                </Button>
-                <Button
+                  <Check className="h-5 w-5" />
+                </button>
+                <button
                   onClick={() => {
                     setShowAddCustom(false);
                     setNewCustomName("");
                   }}
-                  variant="ghost"
-                  size="icon"
-                  className="text-white/60 hover:text-white"
+                  className="flex items-center justify-center rounded-xl px-4 py-3 text-indigo-100/60 transition hover:bg-white/5 hover:text-white"
                 >
-                  <X className="h-4 w-4" />
-                </Button>
+                  <X className="h-5 w-5" />
+                </button>
               </div>
             </div>
           )}
@@ -339,27 +335,25 @@ export default function FluxSettingsPage() {
                       checked={custom.enabled}
                       onChange={() => toggleCustomType(custom.id)}
                     />
-                    <Button
+                    <button
                       onClick={() => handleDeleteCustom(custom.id)}
-                      variant="ghost"
-                      size="icon"
-                      className="text-red-400/60 hover:text-red-400 hover:bg-red-500/20"
+                      className="flex items-center justify-center rounded-xl px-3 py-2 text-red-400/60 transition hover:bg-red-500/20 hover:text-red-400"
                     >
                       <Trash2 className="h-4 w-4" />
-                    </Button>
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </GlassCard>
+      </section>
 
-        {/* Info */}
-        <GlassPanel className="p-4 border-sky-500/30 bg-sky-500/10">
+      {/* Info */}
+      <div className="rounded-xl border border-indigo-300/30 bg-indigo-500/10 p-4">
           <div className="flex gap-3">
-            <AlertCircle className="h-5 w-5 text-sky-400 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-indigo-300 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-white/80">
-              <p className="font-medium text-sky-300 mb-1">Comment ça fonctionne ?</p>
+              <p className="font-medium text-indigo-200 mb-1">Comment ça fonctionne ?</p>
               <p>
                 Ces paramètres définissent les types de flux disponibles lors de la création 
                 d&apos;un nouveau flux sur un compte. Les flux déjà créés ne sont pas affectés 
@@ -367,23 +361,17 @@ export default function FluxSettingsPage() {
               </p>
             </div>
           </div>
-        </GlassPanel>
+      </div>
 
-        {/* Actions */}
-        <div className="flex justify-end gap-3">
-          <Link to={ROUTES.FINANCE.DASHBOARD.SETTINGS}>
-            <Button variant="ghost" className="text-white/70 hover:text-white">
-              Annuler
-            </Button>
-          </Link>
-          <Button
-            onClick={saveSettings}
-            disabled={saving}
-            className="bg-sky-500 hover:bg-sky-600 text-white"
-          >
-            {saving ? "Sauvegarde..." : "Sauvegarder"}
-          </Button>
-        </div>
+      {/* Actions */}
+      <div className="flex justify-end">
+        <button
+          onClick={saveSettings}
+          disabled={saving}
+          className="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-3 text-sm font-semibold shadow-lg transition hover:from-indigo-400 hover:to-violet-400 disabled:opacity-50"
+        >
+          {saving ? "Sauvegarde..." : "Sauvegarder"}
+        </button>
       </div>
 
       {/* Modal de confirmation de suppression */}
@@ -400,22 +388,21 @@ export default function FluxSettingsPage() {
               Êtes-vous sûr de vouloir supprimer ce type personnalisé ? Les flux existants utilisant ce type ne seront pas affectés.
             </p>
             <div className="flex justify-end gap-3">
-              <Button
-                variant="ghost"
+              <button
                 onClick={() => {
                   setShowDeleteConfirm(false);
                   setDeleteTarget(null);
                 }}
-                className="text-white/70 hover:text-white"
+                className="rounded-xl px-4 py-2 text-sm text-indigo-100/70 transition hover:bg-white/5 hover:text-white"
               >
                 Annuler
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={confirmDeleteCustom}
-                className="bg-red-500 hover:bg-red-600 text-white"
+                className="rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
               >
                 Supprimer
-              </Button>
+              </button>
             </div>
           </div>
         </div>
