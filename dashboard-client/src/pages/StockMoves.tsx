@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useStockMoves } from '../hooks/useStock'
-import { Badge, Button, Breadcrumbs, SkeletonTable, Input } from '../components/common'
+import { Badge, Button, Breadcrumbs, SkeletonTable, Input, PageNotice } from '../components/common'
+import { stockNotices } from '@/lib/notices'
 import { useToast } from '../contexts/ToastContext'
 import { api } from '../lib/api'
 import { logger } from '@quelyos/logger'
@@ -202,6 +203,8 @@ export default function StockMoves() {
             { label: 'Mouvements' },
           ]}
         />
+
+        <PageNotice config={stockNotices.moves} className="mb-6" />
 
         <div className="mt-6">
           <div className="flex items-center justify-between mb-6">

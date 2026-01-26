@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useOrders } from '../hooks/useOrders'
-import { Badge, Button, Breadcrumbs, SkeletonTable } from '../components/common'
+import { Badge, Button, Breadcrumbs, SkeletonTable, PageNotice } from '../components/common'
+import { ecommerceNotices } from '@/lib/notices'
 import { OrdersKanban } from '../components/OrdersKanban'
 import { Squares2X2Icon, TableCellsIcon } from '@heroicons/react/24/outline'
 
@@ -105,6 +106,8 @@ export default function Orders() {
             { label: 'Commandes' },
           ]}
         />
+
+        <PageNotice config={ecommerceNotices.orders} className="mb-6" />
 
         <div className="mb-8 flex items-center justify-between">
           <div>

@@ -54,3 +54,5 @@ export { ImageUpload } from './ImageUpload'
 export type { ImageUploadProps } from './ImageUpload'
 
 export { ErrorBoundary } from './ErrorBoundary'
+
+export { PageNotice } from './PageNotice'

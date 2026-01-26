@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { usePromoBanners, useCreatePromoBanner, useUpdatePromoBanner, useDeletePromoBanner, PromoBanner } from '../hooks/usePromoBanners'
-import { Button, SkeletonTable } from '../components/common'
+import { Button, SkeletonTable, PageNotice } from '../components/common'
+import { ecommerceNotices } from '@/lib/notices'
 import { useToast } from '../hooks/useToast'
 
 export default function PromoBanners() {
@@ -84,6 +85,8 @@ export default function PromoBanners() {
   return (
     <Layout>
       <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
+        <PageNotice config={ecommerceNotices.promoBanners} className="mb-6" />
+
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Bannières Promo</h1>
           {!showForm && <Button onClick={handleNew}>Nouveau</Button>}

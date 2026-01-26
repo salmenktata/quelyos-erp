@@ -22,9 +22,11 @@ import {
   ImportProductsModal,
   SearchAutocomplete,
   AttributeFilter,
+  PageNotice,
   type SearchSuggestion,
   type Attribute,
 } from '../components/common'
+import { ecommerceNotices } from '@/lib/notices'
 import { useToast } from '../hooks/useToast'
 import { ToastContainer } from '../components/common/Toast'
 import { api } from '../lib/api'
@@ -408,6 +410,8 @@ export default function Products() {
             { label: 'Produits' },
           ]}
         />
+
+        <PageNotice config={ecommerceNotices.products} className="mb-6" />
 
         {/* En-tête */}
         <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

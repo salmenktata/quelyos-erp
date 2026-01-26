@@ -66,7 +66,7 @@ export default function BudgetsPage() {
     data: categories,
     loading: categoriesLoading
   } = useApiData<Category[]>({
-    fetcher: () => api<Category[]>("/categories"),
+    fetcher: () => api<Category[]>("/finance/categories"),
     cacheKey: "categories",
     cacheTime: 10 * 60 * 1000, // 10 minutes cache (categories change less frequently)
   });

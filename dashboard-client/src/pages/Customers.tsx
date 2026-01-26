@@ -3,7 +3,8 @@ import { Layout } from '../components/Layout'
 import { useCustomers } from '../hooks/useCustomers'
 import { useExportCustomers } from '../hooks/useExportCustomers'
 import type { CustomerListItem } from '@/types'
-import { Button, Breadcrumbs, SkeletonTable } from '../components/common'
+import { Button, Breadcrumbs, SkeletonTable, PageNotice } from '../components/common'
+import { ecommerceNotices } from '@/lib/notices'
 import { CustomerStats } from '../components/customers/CustomerStats'
 import { CustomerFilters } from '../components/customers/CustomerFilters'
 import { CustomerTable } from '../components/customers/CustomerTable'
@@ -141,6 +142,8 @@ export default function Customers() {
       <div className="p-4 md:p-8">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: 'Tableau de bord', href: '/dashboard' }, { label: 'Clients' }]} />
+
+        <PageNotice config={ecommerceNotices.customers} className="mb-6" />
 
         {/* Header */}
         <div className="mb-6 md:mb-8">

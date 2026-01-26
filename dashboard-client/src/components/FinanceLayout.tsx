@@ -34,8 +34,9 @@ interface FinanceLayoutProps {
 
 interface SubMenuItem {
   name: string
-  path: string
+  path?: string
   badge?: string
+  separator?: boolean
 }
 
 interface MenuItem {
@@ -76,7 +77,7 @@ function MenuItemComponent({
 }) {
   const Icon = item.icon
   const hasSubItems = item.subItems && item.subItems.length > 0
-  const isCurrentlyActive = item.path ? isActive(item.path) : item.subItems?.some(sub => isActive(sub.path))
+  const isCurrentlyActive = item.path ? isActive(item.path) : item.subItems?.some(sub => sub.path && isActive(sub.path))
 
   if (hasSubItems) {
     return (
@@ -100,24 +101,36 @@ function MenuItemComponent({
         {isOpen && (
           <div className="ml-4 mt-1 border-l-2 border-indigo-200 dark:border-indigo-500/30 pl-3">
             <div className="space-y-0.5">
-              {item.subItems?.map((subItem) => (
-                <Link
-                  key={subItem.path}
-                  to={subItem.path}
-                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-xs transition-all ${
-                    isActive(subItem.path)
-                      ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-medium'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  <span>{subItem.name}</span>
-                  {subItem.badge && (
-                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
-                      {subItem.badge}
-                    </span>
-                  )}
-                </Link>
-              ))}
+              {item.subItems?.map((subItem, idx) => {
+                if (subItem.separator) {
+                  return (
+                    <div
+                      key={`separator-${idx}`}
+                      className="px-3 pt-3 pb-1 text-[9px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-600 border-b border-gray-200 dark:border-gray-700 mt-2"
+                    >
+                      {subItem.name}
+                    </div>
+                  )
+                }
+                return (
+                  <Link
+                    key={subItem.path}
+                    to={subItem.path!}
+                    className={`flex items-center gap-2 rounded-md px-3 py-2 text-xs transition-all ${
+                      isActive(subItem.path!)
+                        ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-medium'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <span>{subItem.name}</span>
+                    {subItem.badge && (
+                      <span className="rounded-full bg-emerald-100 dark:bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
+                        {subItem.badge}
+                      </span>
+                    )}
+                  </Link>
+                )
+              })}
             </div>
           </div>
         )}
@@ -222,10 +235,26 @@ export function FinanceLayout({ children }: FinanceLayoutProps) {
       name: 'Rapports',
       icon: BarChart3,
       subItems: [
-        { name: 'Vue d\'ensemble', path: '/finance/reporting' },
+        { name: 'Tableau de bord', separator: true },
+        { name: 'Hub', path: '/finance/reporting' },
+        { name: 'Vue d\'ensemble', path: '/finance/reporting/overview' },
+        { name: 'Trésorerie', separator: true },
+        { name: 'Trésorerie', path: '/finance/reporting/cashflow' },
+        { name: 'Prévisions', path: '/finance/reporting/forecast' },
+        { name: 'Analyses prév.', path: '/finance/reporting/forecasts' },
+        { name: 'Analyses', separator: true },
         { name: 'Par catégorie', path: '/finance/reporting/by-category' },
+        { name: 'Par flux', path: '/finance/reporting/by-flow' },
         { name: 'Par compte', path: '/finance/reporting/by-account' },
-        { name: 'Cashflow', path: '/finance/reporting/cashflow' },
+        { name: 'Par portefeuille', path: '/finance/reporting/by-portfolio' },
+        { name: 'Indicateurs', separator: true },
+        { name: 'Rentabilité', path: '/finance/reporting/profitability' },
+        { name: 'EBITDA', path: '/finance/reporting/ebitda' },
+        { name: 'DSO', path: '/finance/reporting/dso' },
+        { name: 'BFR', path: '/finance/reporting/bfr' },
+        { name: 'Point mort', path: '/finance/reporting/breakeven' },
+        { name: 'Qualité', separator: true },
+        { name: 'Qualité données', path: '/finance/reporting/data-quality' },
       ],
     },
   ]

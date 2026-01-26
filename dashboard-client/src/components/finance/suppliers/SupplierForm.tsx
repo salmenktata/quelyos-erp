@@ -83,8 +83,8 @@ export default function SupplierForm({ initialData, supplierId, mode }: Supplier
       };
 
       const url = mode === "create"
-        ? "/api/v1/finance/suppliers"
-        : `/api/v1/finance/suppliers/${supplierId}`;
+        ? "/api/ecommerce/suppliers"
+        : `/api/ecommerce/suppliers/${supplierId}`;
 
       const method = mode === "create" ? "POST" : "PUT";
 

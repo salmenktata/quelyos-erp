@@ -126,8 +126,8 @@ export default function AlertConfigForm({
       };
 
       const url = alert
-        ? `/api/v1/finance/alerts/${alert.id}`
-        : "/api/v1/finance/alerts";
+        ? `/alerts/${alert.id}`
+        : "/alerts";
 
       await api(url, {
         method: alert ? "PATCH" : "POST",

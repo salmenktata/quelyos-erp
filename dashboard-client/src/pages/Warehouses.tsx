@@ -22,6 +22,8 @@ import { Layout } from '../components/Layout';
 import { SkeletonGrid } from '../components/common/Skeleton';
 import { BuildingStorefrontIcon, CheckCircleIcon, MagnifyingGlassIcon, XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { WarehouseFormModal } from '../components/stock/WarehouseFormModal';
+import { PageNotice } from '../components/common';
+import { stockNotices } from '@/lib/notices';
 
 // Tri options
 type SortOption = 'name' | 'code' | 'company';
@@ -198,6 +200,8 @@ export default function Warehouses() {
         >
           Aller à la liste des entrepôts
         </a>
+
+        <PageNotice config={stockNotices.warehouses} className="mb-6" />
 
         {/* Header */}
         <div className="flex items-center justify-between">

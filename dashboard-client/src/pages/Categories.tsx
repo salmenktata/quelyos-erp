@@ -17,7 +17,9 @@ import {
   Badge,
   CategoryTree,
   ImageUpload,
+  PageNotice,
 } from '../components/common'
+import { ecommerceNotices } from '@/lib/notices'
 import { useToast } from '../hooks/useToast'
 import { useDebounce } from '../hooks/useDebounce'
 import { ToastContainer } from '../components/common/Toast'
@@ -263,6 +265,8 @@ export default function Categories() {
             { label: 'Catégories' },
           ]}
         />
+
+        <PageNotice config={ecommerceNotices.categories} className="mb-6" />
 
         {/* En-tête */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { usePrepareInventory, useValidateInventory } from '../hooks/useStock'
-import { Badge, Button, Breadcrumbs, Input } from '../components/common'
+import { Badge, Button, Breadcrumbs, Input, PageNotice } from '../components/common'
+import { stockNotices } from '@/lib/notices'
 import { useToast } from '../contexts/ToastContext'
 import {
   ClipboardDocumentListIcon,
@@ -176,6 +177,8 @@ export default function Inventory() {
             { label: 'Inventaire physique' },
           ]}
         />
+
+        <PageNotice config={stockNotices.inventory} className="mb-6" />
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">

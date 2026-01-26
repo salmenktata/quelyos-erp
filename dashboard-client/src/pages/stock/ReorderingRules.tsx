@@ -11,10 +11,11 @@
 
 import { useState } from 'react'
 import { Layout } from '../../components/Layout'
-import { Breadcrumbs, Badge } from '../../components/common'
-import { useReorderingRules, useDeleteReorderingRule, useToggleReorderingRule } from '../hooks/finance/useReorderingRules'
-import { useWarehouses } from '../hooks/useWarehouses'
-import { ReorderingRuleFormModal } from '../components/stock/ReorderingRuleFormModal'
+import { Breadcrumbs, Badge, PageNotice } from '../../components/common'
+import { stockNotices } from '@/lib/notices'
+import { useReorderingRules, useDeleteReorderingRule, useToggleReorderingRule } from '../../hooks/finance/useReorderingRules'
+import { useWarehouses } from '../../hooks/useWarehouses'
+import { ReorderingRuleFormModal } from '../../components/stock/ReorderingRuleFormModal'
 import { Plus, Filter, MoreVertical, Pencil, Power, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import type { ReorderingRule } from '@/types/stock'
 import { logger } from '@quelyos/logger'
@@ -91,6 +92,8 @@ export default function ReorderingRules() {
             { label: 'Règles de réapprovisionnement' },
           ]}
         />
+
+        <PageNotice config={stockNotices.reorderingRules} className="mb-6" />
 
         {/* Header */}
         <div className="mb-8 flex items-start justify-between">

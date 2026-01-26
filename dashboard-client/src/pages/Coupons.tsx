@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useCoupons, useUpdateCoupon, useDeleteCoupon } from '../hooks/useCoupons'
-import { Button, Badge, Breadcrumbs, SkeletonTable, Modal } from '../components/common'
+import { Button, Badge, Breadcrumbs, SkeletonTable, Modal, PageNotice } from '../components/common'
+import { ecommerceNotices } from '@/lib/notices'
 import { useToast } from '../hooks/useToast'
 
 interface EditFormData {
@@ -141,6 +142,8 @@ export default function Coupons() {
             { label: 'Codes Promo' },
           ]}
         />
+
+        <PageNotice config={ecommerceNotices.coupons} className="mb-6" />
 
         <div className="mb-8 flex items-center justify-between">
           <div>

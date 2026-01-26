@@ -172,14 +172,14 @@ export default function ForecastReportPage() {
         {!loading && !error && apiData && (
         <>
         {/* Alerts */}
-        {(apiData.alerts.lowCash || apiData.alerts.negativeBalance) && (
+        {(apiData.alerts?.lowCash || apiData.alerts?.negativeBalance) && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="mb-6"
           >
-            {apiData.alerts.negativeBalance && (
+            {apiData.alerts?.negativeBalance && (
               <GlassCard className="border-red-400/40 bg-red-500/10 p-4 mb-3">
                 <div className="flex items-center gap-3">
                   <AlertCircle className="h-5 w-5 text-red-400" />
@@ -187,21 +187,21 @@ export default function ForecastReportPage() {
                     <p className="font-semibold text-red-100">Alerte : Solde négatif prévu</p>
                     <p className="text-sm text-red-200/80">
                       Votre solde descendra en dessous de zéro dans les {horizon} prochains jours.
-                      Minimum projeté : {formatAmount(apiData.minBalance)}
+                      {apiData.minBalance !== undefined && ` Minimum projeté : ${formatAmount(apiData.minBalance)}`}
                     </p>
                   </div>
                 </div>
               </GlassCard>
             )}
 
-            {apiData.alerts.lowCash && apiData.alerts.runwayDays !== null && (
+            {apiData.alerts?.lowCash && apiData.alerts?.runwayDays !== null && (
               <GlassCard className="border-amber-400/40 bg-amber-500/10 p-4">
                 <div className="flex items-center gap-3">
                   <AlertTriangle className="h-5 w-5 text-amber-400" />
                   <div>
                     <p className="font-semibold text-amber-100">Trésorerie faible</p>
                     <p className="text-sm text-amber-200/80">
-                      À ce rythme, votre trésorerie sera épuisée dans environ {apiData.alerts.runwayDays} jours.
+                      À ce rythme, votre trésorerie sera épuisée dans environ {apiData.alerts?.runwayDays} jours.
                     </p>
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export default function ForecastReportPage() {
               <div>
                 <p className="mb-1 text-sm text-purple-200">Solde actuel</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {formatAmount(apiData.currentBalance)}
+                  {formatAmount(apiData.currentBalance ?? apiData.baseBalance ?? 0)}
                 </p>
               </div>
               <DollarSign className="h-8 w-8 text-purple-300" />
@@ -257,7 +257,7 @@ export default function ForecastReportPage() {
             </div>
           </GlassCard>
 
-          {apiData.runwayDays !== null && (
+          {apiData.runwayDays !== null && apiData.runwayDays !== undefined && (
             <GlassCard className="p-4" gradient="amber">
               <div className="flex items-center justify-between">
                 <div>
@@ -273,6 +273,7 @@ export default function ForecastReportPage() {
         </motion.div>
 
         {/* Trends Panel */}
+        {apiData.trends && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -282,32 +283,33 @@ export default function ForecastReportPage() {
           <GlassPanel className="p-6">
             <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Tendances historiques ({apiData.trends.historicalDays} derniers jours)
+              Tendances historiques ({apiData.trends?.historicalDays} derniers jours)
             </h2>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="rounded-lg bg-emerald-500/10 p-4">
                 <p className="text-sm text-emerald-200 mb-1">Revenus moyens / jour</p>
                 <p className="text-xl font-bold text-emerald-400">
-                  {formatAmount(apiData.trends.avgDailyIncome)}
+                  {formatAmount(apiData.trends?.avgDailyIncome)}
                 </p>
               </div>
               <div className="rounded-lg bg-rose-500/10 p-4">
                 <p className="text-sm text-rose-200 mb-1">Dépenses moyennes / jour</p>
                 <p className="text-xl font-bold text-rose-400">
-                  {formatAmount(apiData.trends.avgDailyExpense)}
+                  {formatAmount(apiData.trends?.avgDailyExpense)}
                 </p>
               </div>
-              <div className={`rounded-lg p-4 ${apiData.trends.avgDailyNet >= 0 ? 'bg-cyan-500/10' : 'bg-amber-500/10'}`}>
-                <p className={`text-sm mb-1 ${apiData.trends.avgDailyNet >= 0 ? 'text-cyan-200' : 'text-amber-200'}`}>
+              <div className={`rounded-lg p-4 ${apiData.trends?.avgDailyNet >= 0 ? 'bg-cyan-500/10' : 'bg-amber-500/10'}`}>
+                <p className={`text-sm mb-1 ${apiData.trends?.avgDailyNet >= 0 ? 'text-cyan-200' : 'text-amber-200'}`}>
                   Solde net moyen / jour
                 </p>
-                <p className={`text-xl font-bold ${apiData.trends.avgDailyNet >= 0 ? 'text-cyan-400' : 'text-amber-400'}`}>
-                  {apiData.trends.avgDailyNet >= 0 ? '+' : ''}{formatAmount(apiData.trends.avgDailyNet)}
+                <p className={`text-xl font-bold ${apiData.trends?.avgDailyNet >= 0 ? 'text-cyan-400' : 'text-amber-400'}`}>
+                  {apiData.trends?.avgDailyNet >= 0 ? '+' : ''}{formatAmount(apiData.trends?.avgDailyNet)}
                 </p>
               </div>
             </div>
           </GlassPanel>
         </motion.div>
+        )}
 
         {/* Forecast Chart - Simplified Text View */}
         <motion.div
@@ -321,12 +323,12 @@ export default function ForecastReportPage() {
               Projection de trésorerie
             </h2>
             <div className="space-y-2 max-h-96 overflow-y-auto">
-              {apiData.forecast.slice(0, 30).map((day, idx) => (
+              {(apiData.forecast ?? apiData.daily ?? []).slice(0, 30).map((day, idx) => (
                 <div
                   key={day.date}
                   className={`flex items-center justify-between rounded-lg p-3 ${
                     day.projectedBalance < 0 ? 'bg-red-500/10' :
-                    day.projectedBalance < apiData.currentBalance * 0.3 ? 'bg-amber-500/10' :
+                    day.projectedBalance < (apiData.currentBalance ?? apiData.baseBalance ?? 0) * 0.3 ? 'bg-amber-500/10' :
                     'bg-gray-100 dark:bg-gray-800'
                   }`}
                 >

@@ -37,7 +37,7 @@ export default function NewBudgetPage() {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const data = await api<Category[]>("/categories");
+      const data = await api<Category[]>("/finance/categories");
       setCategories(data.filter(c => c.kind === "EXPENSE"));
     } catch {
       // Ignorer l'erreur, les catégories sont optionnelles

@@ -166,7 +166,7 @@ export function TransactionListPage({ type }: TransactionListPageProps) {
     try {
       const [txData, catData] = await Promise.all([
         api("/transactions") as Promise<Transaction[]>,
-        api(`/categories?kind=${config.categoryKind}`) as Promise<Category[]>,
+        api(`/finance/categories?kind=${config.categoryKind}`) as Promise<Category[]>,
       ]);
       setTransactions(txData);
       setCategories(catData);

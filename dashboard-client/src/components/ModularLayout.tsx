@@ -43,6 +43,7 @@ import {
   Warehouse,
   ClipboardList,
   MapPin,
+  RefreshCw,
   // CRM
   UserCircle,
   Receipt,
@@ -51,6 +52,19 @@ import {
   Megaphone,
   UsersRound,
   ExternalLink,
+  // Additional icons
+  List,
+  MessageSquare,
+  Award,
+  Globe,
+  Zap,
+  Coins,
+  Layers,
+  DollarSign,
+  Lock,
+  Plug,
+  BellRing,
+  Shuffle,
 } from 'lucide-react'
 
 // ============================================================================
@@ -61,8 +75,9 @@ type ModuleId = 'home' | 'finance' | 'boutique' | 'stock' | 'crm' | 'marketing' 
 
 interface SubMenuItem {
   name: string
-  path: string
+  path?: string
   badge?: string
+  separator?: boolean
 }
 
 interface MenuItem {
@@ -157,12 +172,29 @@ const MODULES: Module[] = [
             name: 'Rapports',
             icon: BarChart3,
             subItems: [
-              { name: 'Vue d\'ensemble', path: '/finance/reporting' },
+              { name: 'Tableau de bord', separator: true },
+              { name: 'Hub', path: '/finance/reporting' },
+              { name: 'Vue d\'ensemble', path: '/finance/reporting/overview' },
+              { name: 'Trésorerie', separator: true },
+              { name: 'Trésorerie', path: '/finance/reporting/cashflow' },
+              { name: 'Prévisions', path: '/finance/reporting/forecast' },
+              { name: 'Analyses prév.', path: '/finance/reporting/forecasts' },
+              { name: 'Analyses', separator: true },
               { name: 'Par catégorie', path: '/finance/reporting/by-category' },
+              { name: 'Par flux', path: '/finance/reporting/by-flow' },
               { name: 'Par compte', path: '/finance/reporting/by-account' },
-              { name: 'Cashflow', path: '/finance/reporting/cashflow' },
+              { name: 'Par portefeuille', path: '/finance/reporting/by-portfolio' },
+              { name: 'Indicateurs', separator: true },
+              { name: 'Rentabilité', path: '/finance/reporting/profitability' },
+              { name: 'EBITDA', path: '/finance/reporting/ebitda' },
+              { name: 'DSO', path: '/finance/reporting/dso' },
+              { name: 'BFR', path: '/finance/reporting/bfr' },
+              { name: 'Point mort', path: '/finance/reporting/breakeven' },
+              { name: 'Qualité', separator: true },
+              { name: 'Qualité données', path: '/finance/reporting/data-quality' },
             ],
           },
+          { name: 'Plan Comptable', path: '/finance/charts', icon: Coins },
         ],
       },
       {
@@ -174,6 +206,21 @@ const MODULES: Module[] = [
           { name: 'Planification', path: '/finance/payment-planning', icon: Calendar },
           { name: 'Import', path: '/finance/import', icon: Upload },
           { name: 'Archives', path: '/finance/archives', icon: Archive },
+          {
+            name: 'Paramètres',
+            icon: Settings,
+            subItems: [
+              { name: 'Général', path: '/finance/settings' },
+              { name: 'Catégories', path: '/finance/settings/categories' },
+              { name: 'Devise', path: '/finance/settings/devise' },
+              { name: 'Flux', path: '/finance/settings/flux' },
+              { name: 'TVA', path: '/finance/settings/tva' },
+              { name: 'Facturation', path: '/finance/settings/billing' },
+              { name: 'Notifications', path: '/finance/settings/notifications' },
+              { name: 'Intégrations', path: '/finance/settings/integrations' },
+              { name: 'Sécurité', path: '/finance/settings/security' },
+            ],
+          },
         ],
       },
     ],
@@ -213,6 +260,11 @@ const MODULES: Module[] = [
           { name: 'Livraison', path: '/delivery', icon: Truck },
           { name: 'Configuration Site', path: '/site-config', icon: Settings },
           { name: 'Pages Statiques', path: '/static-pages', icon: FileText },
+          { name: 'Menus Navigation', path: '/menus', icon: List },
+          { name: 'Messages Promo', path: '/promo-messages', icon: MessageSquare },
+          { name: 'Badges Confiance', path: '/trust-badges', icon: Award },
+          { name: 'SEO Métadonnées', path: '/seo-metadata', icon: Globe },
+          { name: 'Popups Marketing', path: '/marketing-popups', icon: Zap },
         ],
       },
     ],
@@ -236,6 +288,14 @@ const MODULES: Module[] = [
           { name: 'Transferts', path: '/stock/transfers', icon: Truck },
           { name: 'Entrepôts', path: '/warehouses', icon: Warehouse },
           { name: 'Emplacements', path: '/stock/locations', icon: MapPin },
+          { name: 'Règles Réapprovisionnement', path: '/stock/reordering-rules', icon: RefreshCw },
+        ],
+      },
+      {
+        title: 'Analyse',
+        items: [
+          { name: 'Valorisation', path: '/finance/stock/valuation', icon: Layers },
+          { name: 'Rotation', path: '/finance/stock/turnover', icon: Shuffle },
         ],
       },
     ],
@@ -525,7 +585,7 @@ function MenuItemComponent({
 }) {
   const Icon = item.icon
   const hasSubItems = item.subItems && item.subItems.length > 0
-  const isCurrentlyActive = item.path ? isActive(item.path) : item.subItems?.some(sub => isActive(sub.path))
+  const isCurrentlyActive = item.path ? isActive(item.path) : item.subItems?.some(sub => sub.path && isActive(sub.path))
 
   if (hasSubItems) {
     return (
@@ -544,24 +604,36 @@ function MenuItemComponent({
         </button>
         {isOpen && (
           <div className="ml-4 mt-1 border-l-2 border-gray-200 dark:border-gray-600 pl-3">
-            {item.subItems?.map((subItem) => (
-              <Link
-                key={subItem.path}
-                to={subItem.path}
-                className={`flex items-center gap-2 rounded-md px-3 py-2 text-xs transition-all ${
-                  isActive(subItem.path)
-                    ? `bg-gray-100 dark:bg-gray-700 ${moduleColor} font-medium`
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                <span>{subItem.name}</span>
-                {subItem.badge && (
-                  <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
-                    {subItem.badge}
-                  </span>
-                )}
-              </Link>
-            ))}
+            {item.subItems?.map((subItem, idx) => {
+              if (subItem.separator) {
+                return (
+                  <div
+                    key={`separator-${idx}`}
+                    className="px-3 pt-3 pb-1 text-[9px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-600 border-b border-gray-200 dark:border-gray-700 mt-2"
+                  >
+                    {subItem.name}
+                  </div>
+                )
+              }
+              return (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path!}
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-xs transition-all ${
+                    isActive(subItem.path!)
+                      ? `bg-gray-100 dark:bg-gray-700 ${moduleColor} font-medium`
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <span>{subItem.name}</span>
+                  {subItem.badge && (
+                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
+                      {subItem.badge}
+                    </span>
+                  )}
+                </Link>
+              )
+            })}
           </div>
         )}
       </div>

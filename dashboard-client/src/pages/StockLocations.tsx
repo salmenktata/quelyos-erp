@@ -11,7 +11,8 @@
 
 import { useState, useMemo } from 'react'
 import { Layout } from '../components/Layout'
-import { Breadcrumbs, Badge } from '../components/common'
+import { Breadcrumbs, Badge, PageNotice } from '../components/common'
+import { stockNotices } from '@/lib/notices'
 import { useLocationsTree, useMoveLocation, useArchiveLocation } from '../hooks/finance/useStockLocations'
 import { useWarehouses } from '../hooks/useWarehouses'
 import { LocationTreeView } from '../components/stock/LocationTreeView'
@@ -115,6 +116,8 @@ export default function StockLocations() {
             { label: 'Emplacements' },
           ]}
         />
+
+        <PageNotice config={stockNotices.locations} className="mb-6" />
 
         {/* Header */}
         <div className="mb-8 flex items-start justify-between">

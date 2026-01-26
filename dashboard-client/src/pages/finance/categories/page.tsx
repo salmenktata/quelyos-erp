@@ -41,7 +41,7 @@ export default function CategoriesPage() {
     setError(null);
 
     try {
-      await api("/categories", {
+      await api("/finance/categories", {
         method: "POST",
         body: { name, kind } as CreateCategoryRequest,
       });

@@ -67,7 +67,7 @@ export default function CategoriesPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await api("/categories");
+      const data = await api("/finance/categories");
       const cats = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
       setCategories(cats);
     } catch (err) {
@@ -82,7 +82,7 @@ export default function CategoriesPage() {
     setCreating(true);
     setError(null);
     try {
-      const newCategory = await api("/categories", {
+      const newCategory = await api("/finance/categories", {
         method: "POST",
         body: {
           name: newCategoryName,
@@ -126,7 +126,7 @@ export default function CategoriesPage() {
       const created: Category[] = [];
       for (const cat of toCreate) {
         try {
-          const newCat = await api("/categories", {
+          const newCat = await api("/finance/categories", {
             method: "POST",
             body: cat as any,
           }) as Category;

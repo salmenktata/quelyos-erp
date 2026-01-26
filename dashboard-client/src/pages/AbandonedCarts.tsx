@@ -6,7 +6,8 @@ import {
   useSendCartReminder,
   useCartRecoveryStats,
 } from '../hooks/useAbandonedCarts'
-import { Button, Breadcrumbs, SkeletonTable } from '../components/common'
+import { Button, Breadcrumbs, SkeletonTable, PageNotice } from '../components/common'
+import { ecommerceNotices } from '@/lib/notices'
 import { EnvelopeIcon, ShoppingCartIcon } from '@heroicons/react/24/outline'
 
 export default function AbandonedCarts() {
@@ -92,6 +93,8 @@ export default function AbandonedCarts() {
             { label: 'Paniers abandonnés' },
           ]}
         />
+
+        <PageNotice config={ecommerceNotices.abandonedCarts} className="mb-6" />
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">

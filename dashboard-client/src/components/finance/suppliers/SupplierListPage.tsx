@@ -62,7 +62,7 @@ export default function SupplierListPage() {
       if (filters.importance !== "all") params.append("importance", filters.importance);
       if (filters.search) params.append("search", filters.search);
 
-      const response = await fetch(`/api/v1/finance/suppliers?${params}`);
+      const response = await fetch(`/api/ecommerce/suppliers?${params}`);
       if (!response.ok) {
         throw new Error("Erreur lors du chargement des fournisseurs");
       }

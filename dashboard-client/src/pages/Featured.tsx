@@ -7,7 +7,8 @@ import {
   useRemoveFeaturedProduct,
   useReorderFeaturedProducts,
 } from '../hooks/useFeatured'
-import { Badge, Button, Breadcrumbs, SkeletonTable, Modal, OdooImage } from '../components/common'
+import { Badge, Button, Breadcrumbs, SkeletonTable, Modal, OdooImage, PageNotice } from '../components/common'
+import { ecommerceNotices } from '@/lib/notices'
 import { useToast } from '../hooks/useToast'
 import { ToastContainer } from '../components/common/Toast'
 
@@ -154,6 +155,8 @@ export default function Featured() {
             { label: 'Produits mis en avant' },
           ]}
         />
+
+        <PageNotice config={ecommerceNotices.featured} className="mb-6" />
 
         <div className="mb-8 flex items-center justify-between">
           <div>

@@ -6,7 +6,8 @@ import {
   useUpdateDeliveryMethod,
   useDeleteDeliveryMethod,
 } from '../hooks/useDelivery'
-import { Badge, Breadcrumbs, Skeleton, Button, Modal } from '../components/common'
+import { Badge, Breadcrumbs, Skeleton, Button, Modal, PageNotice } from '../components/common'
+import { ecommerceNotices } from '@/lib/notices'
 import { useToast } from '../hooks/useToast'
 
 interface FormData {
@@ -143,6 +144,8 @@ export default function DeliveryMethods() {
             { label: 'Methodes de livraison' },
           ]}
         />
+
+        <PageNotice config={ecommerceNotices.delivery} className="mb-6" />
 
         <div className="mb-8 flex items-center justify-between">
           <div>

@@ -109,7 +109,7 @@ export default function OptimizationPanel() {
     setError(null);
 
     try {
-      const response = await fetch("/api/v1/finance/payment-planning/optimize", {
+      const response = await fetch("/api/ecommerce/payment-planning/optimize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -136,7 +136,7 @@ export default function OptimizationPanel() {
     if (!result) return;
 
     try {
-      const response = await fetch("/api/v1/finance/payment-planning/export-excel", {
+      const response = await fetch("/api/ecommerce/payment-planning/export-excel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -171,7 +171,7 @@ export default function OptimizationPanel() {
   useEffect(() => {
     const loadAccounts = async () => {
       try {
-        const response = await fetch("/accounts");
+        const response = await fetch("/api/ecommerce/accounts");
         const data = await response.json();
         setAccounts(data.accounts || []);
         if (data.accounts && data.accounts.length > 0) {
@@ -188,7 +188,7 @@ export default function OptimizationPanel() {
     if (!result) return;
 
     try {
-      const response = await fetch("/api/v1/finance/payment-planning/export-pdf", {
+      const response = await fetch("/api/ecommerce/payment-planning/export-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -243,7 +243,7 @@ export default function OptimizationPanel() {
           paymentMethod: "VIREMENT",
         }));
 
-      const response = await fetch("/api/v1/finance/payment-planning/execute-batch", {
+      const response = await fetch("/api/ecommerce/payment-planning/execute-batch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ payments: scheduledPayments }),

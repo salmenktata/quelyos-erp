@@ -5,7 +5,8 @@ import {
   useValidateTransfer,
   useCancelTransfer,
 } from '../hooks/useStockTransfers'
-import { Badge, Button, Breadcrumbs, SkeletonTable, Modal } from '../components/common'
+import { Badge, Button, Breadcrumbs, SkeletonTable, Modal, PageNotice } from '../components/common'
+import { stockNotices } from '@/lib/notices'
 import { useToast } from '../contexts/ToastContext'
 import { TransferModal } from '../components/stock/TransferModal'
 import type { StockTransfer, TransferState } from '@/types'
@@ -135,6 +136,8 @@ export default function StockTransfers() {
             { label: 'Transferts' },
           ]}
         />
+
+        <PageNotice config={stockNotices.transfers} className="mb-6" />
 
         {/* Header */}
         <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

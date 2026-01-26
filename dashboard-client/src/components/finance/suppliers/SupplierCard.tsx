@@ -84,7 +84,7 @@ export default function SupplierCard({ supplier, onRefresh }: SupplierCardProps)
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/v1/finance/suppliers/${supplier.id}`, {
+      const response = await fetch(`/api/ecommerce/suppliers/${supplier.id}`, {
         method: "DELETE",
       });
 

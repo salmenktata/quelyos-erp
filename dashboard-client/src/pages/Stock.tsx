@@ -8,7 +8,7 @@ import {
   useUpdateProductStock,
   useProductVariants,
 } from '../hooks/useStock'
-import { Badge, Button, Breadcrumbs, SkeletonTable, Input } from '../components/common'
+import { Badge, Button, Breadcrumbs, SkeletonTable, Input, PageNotice } from '../components/common'
 import { useToast } from '../contexts/ToastContext'
 import { api } from '../lib/api'
 import { logger } from '@quelyos/logger'
@@ -25,6 +25,7 @@ import {
   ArrowLeftIcon,
 } from '@heroicons/react/24/outline'
 import type { StockProduct } from '@/types'
+import { stockNotices } from '@/lib/notices'
 
 type TabType = 'products' | 'alerts' | 'variants'
 
@@ -300,6 +301,8 @@ export default function Stock() {
             { label: 'Stock' },
           ]}
         />
+
+        <PageNotice config={stockNotices.products} className="mb-6" />
 
         <div className="mb-8 flex items-start justify-between">
           <div>

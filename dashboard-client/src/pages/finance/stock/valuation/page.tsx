@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react"
-import { ModularLayout } from "@/components/ModularLayout"
+import { useState } from "react"
+import { Layout } from "@/components/Layout"
+import { Breadcrumbs } from "@/components/common"
 import {
   Package,
   TrendingUp,
@@ -11,12 +12,7 @@ import {
 } from "lucide-react"
 import { useStockValuation } from "@/hooks/finance/useStockValuation"
 import { useCurrency } from "@/lib/finance/CurrencyContext"
-import { GlassCard, GlassStatCard } from "@/components/ui/glass"
 import { logger } from '@quelyos/logger'
-
-// ═══════════════════════════════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════════════════════════════
 
 interface TimeRange {
   label: string
@@ -29,10 +25,6 @@ const TIME_RANGES: TimeRange[] = [
   { label: "Il y a 7 jours", value: new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0] },
   { label: "Il y a 30 jours", value: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0] },
 ]
-
-// ═══════════════════════════════════════════════════════════════════════════
-// COMPOSANT PRINCIPAL
-// ═══════════════════════════════════════════════════════════════════════════
 
 export default function StockValuationPage() {
   const { formatAmount } = useCurrency()
@@ -50,7 +42,6 @@ export default function StockValuationPage() {
   const byWarehouse = data?.by_warehouse || []
   const byCategory = data?.by_category || []
 
-  // Export CSV
   const handleExportCSV = () => {
     if (!data) return
 
@@ -71,20 +62,30 @@ export default function StockValuationPage() {
   }
 
   return (
-    <ModularLayout>
-      <div className="space-y-6">
+    <Layout>
+      <div className="p-4 md:p-8">
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Stock', href: '/stock' },
+            { label: 'Valorisation' },
+          ]}
+        />
+
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Valorisation du Stock</h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Valorisation du Stock
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
               Vue d'ensemble de la valeur du stock par entrepôt et catégorie
             </p>
           </div>
           <button
             onClick={handleExportCSV}
             disabled={isLoading || !data}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           >
             <Download className="mr-2 h-4 w-4" />
             Export CSV
@@ -92,17 +93,17 @@ export default function StockValuationPage() {
         </div>
 
         {/* Filtres */}
-        <GlassCard>
+        <div className="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 <Calendar className="inline mr-2 h-4 w-4" />
                 Date
               </label>
               <select
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               >
                 {TIME_RANGES.map(range => (
                   <option key={range.value} value={range.value}>
@@ -111,89 +112,101 @@ export default function StockValuationPage() {
                 ))}
               </select>
             </div>
-            {/* TODO: Ajouter filtres entrepôt et catégorie */}
           </div>
-        </GlassCard>
+        </div>
 
         {/* KPI Cards */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="h-32 bg-gray-200 rounded-lg" />
-              </div>
+              <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-800 rounded-lg h-32" />
             ))}
           </div>
         ) : error ? (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800">Erreur: {error.message}</p>
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+            <p className="text-red-800 dark:text-red-200">Erreur : {error.message}</p>
           </div>
         ) : kpis ? (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <GlassStatCard
-              title="Valeur Totale"
-              value={formatAmount(kpis.total_value)}
-              icon={<DollarSign className="h-5 w-5 text-green-600" />}
-              trend={{ value: 0, isPositive: true }}
-            />
-            <GlassStatCard
-              title="Quantité Totale"
-              value={`${kpis.total_qty.toFixed(0)} unités`}
-              icon={<Package className="h-5 w-5 text-blue-600" />}
-            />
-            <GlassStatCard
-              title="Valeur Moyenne / Produit"
-              value={formatAmount(kpis.avg_value_per_product)}
-              icon={<TrendingUp className="h-5 w-5 text-purple-600" />}
-            />
-            <GlassStatCard
-              title="Nombre de Produits"
-              value={kpis.product_count.toString()}
-              icon={<Tag className="h-5 w-5 text-orange-600" />}
-            />
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Valeur Totale</p>
+                <DollarSign className="h-5 w-5 text-green-600" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+                {formatAmount(kpis.total_value)}
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Quantité Totale</p>
+                <Package className="h-5 w-5 text-blue-600" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+                {kpis.total_qty.toFixed(0)} unités
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Valeur Moy. / Produit</p>
+                <TrendingUp className="h-5 w-5 text-purple-600" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+                {formatAmount(kpis.avg_value_per_product)}
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Nombre de Produits</p>
+                <Tag className="h-5 w-5 text-orange-600" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+                {kpis.product_count}
+              </p>
+            </div>
           </div>
         ) : null}
 
         {/* Breakdown par Entrepôt */}
         {byWarehouse.length > 0 && (
-          <GlassCard>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+          <div className="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
                 <Warehouse className="mr-2 h-5 w-5 text-blue-600" />
                 Valorisation par Entrepôt
               </h3>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead>
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Entrepôt
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Valeur Totale
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Quantité
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Produits
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                   {byWarehouse.map((warehouse) => (
-                    <tr key={warehouse.warehouse_id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={warehouse.warehouse_id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                         {warehouse.warehouse_name}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 font-semibold">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100 font-semibold">
                         {formatAmount(warehouse.total_value)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
                         {warehouse.total_qty.toFixed(0)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
                         {warehouse.product_count}
                       </td>
                     </tr>
@@ -201,49 +214,49 @@ export default function StockValuationPage() {
                 </tbody>
               </table>
             </div>
-          </GlassCard>
+          </div>
         )}
 
         {/* Breakdown par Catégorie */}
         {byCategory.length > 0 && (
-          <GlassCard>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
                 <Tag className="mr-2 h-5 w-5 text-purple-600" />
                 Valorisation par Catégorie
               </h3>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead>
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Catégorie
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Valeur Totale
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Quantité
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Produits
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                   {byCategory.map((category) => (
-                    <tr key={category.category_id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={category.category_id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                         {category.category_name}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 font-semibold">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100 font-semibold">
                         {formatAmount(category.total_value)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
                         {category.total_qty.toFixed(0)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
                         {category.product_count}
                       </td>
                     </tr>
@@ -251,9 +264,9 @@ export default function StockValuationPage() {
                 </tbody>
               </table>
             </div>
-          </GlassCard>
+          </div>
         )}
       </div>
-    </ModularLayout>
+    </Layout>
   )
 }

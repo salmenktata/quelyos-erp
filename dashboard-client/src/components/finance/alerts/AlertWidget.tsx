@@ -37,7 +37,7 @@ export default function AlertWidget() {
   async function loadRecentTriggers() {
     try {
       const data = await api<{ alerts: CashAlert[] }>(
-        "/api/v1/finance/alerts",
+        "/alerts",
         { method: "GET" }
       );
 

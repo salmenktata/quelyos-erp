@@ -99,7 +99,7 @@ export default function ScenariosPanel() {
   const fetchScenarios = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/v1/finance/payment-planning/scenarios");
+      const response = await fetch("/api/ecommerce/payment-planning/scenarios");
       if (response.ok) {
         const data = await response.json();
         setScenarios(data.scenarios || []);
@@ -113,7 +113,7 @@ export default function ScenariosPanel() {
 
   const fetchAvailableInvoices = async () => {
     try {
-      const response = await fetch("/api/v1/finance/supplier-invoices/upcoming?days=90");
+      const response = await fetch("/api/ecommerce/supplier-invoices/upcoming?days=90");
       if (response.ok) {
         const data = await response.json();
         setAvailableInvoices(data.invoices || []);
@@ -133,7 +133,7 @@ export default function ScenariosPanel() {
     setError(null);
 
     try {
-      const response = await fetch("/api/v1/finance/payment-planning/scenarios", {
+      const response = await fetch("/api/ecommerce/payment-planning/scenarios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -163,7 +163,7 @@ export default function ScenariosPanel() {
   const handleActivateScenario = async (scenarioId: string) => {
     try {
       const response = await fetch(
-        `/api/v1/finance/payment-planning/scenarios/${scenarioId}/activate`,
+        `/api/ecommerce/payment-planning/scenarios/${scenarioId}/activate`,
         { method: "PUT" }
       );
 
@@ -183,7 +183,7 @@ export default function ScenariosPanel() {
     }
 
     try {
-      const response = await fetch(`/api/v1/finance/payment-planning/scenarios/${scenarioId}`, {
+      const response = await fetch(`/api/ecommerce/payment-planning/scenarios/${scenarioId}`, {
         method: "DELETE",
       });
 

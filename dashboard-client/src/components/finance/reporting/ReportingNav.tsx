@@ -9,6 +9,13 @@ import {
   Target,
   LayoutGrid,
   Briefcase,
+  Activity,
+  Calculator,
+  TrendingDown,
+  LineChart,
+  Zap,
+  CheckCircle,
+  CalendarRange,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +37,18 @@ const reports = [
     title: "Trésorerie",
     href: "/finance/reporting/cashflow",
     icon: DollarSign,
+  },
+  {
+    id: "forecast",
+    title: "Prévisions",
+    href: "/finance/reporting/forecast",
+    icon: LineChart,
+  },
+  {
+    id: "forecasts",
+    title: "Analyses prévision.",
+    href: "/finance/reporting/forecasts",
+    icon: CalendarRange,
   },
   {
     id: "by-category",
@@ -60,6 +79,36 @@ const reports = [
     title: "Rentabilité",
     href: "/finance/reporting/profitability",
     icon: Target,
+  },
+  {
+    id: "ebitda",
+    title: "EBITDA",
+    href: "/finance/reporting/ebitda",
+    icon: Activity,
+  },
+  {
+    id: "dso",
+    title: "DSO",
+    href: "/finance/reporting/dso",
+    icon: Calculator,
+  },
+  {
+    id: "bfr",
+    title: "BFR",
+    href: "/finance/reporting/bfr",
+    icon: TrendingDown,
+  },
+  {
+    id: "breakeven",
+    title: "Point mort",
+    href: "/finance/reporting/breakeven",
+    icon: Zap,
+  },
+  {
+    id: "data-quality",
+    title: "Qualité données",
+    href: "/finance/reporting/data-quality",
+    icon: CheckCircle,
   },
 ];
 

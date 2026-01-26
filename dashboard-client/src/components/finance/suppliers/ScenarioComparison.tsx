@@ -51,7 +51,7 @@ export default function ScenarioComparison() {
 
   const fetchScenarios = async () => {
     try {
-      const response = await fetch("/api/v1/finance/payment-planning/scenarios");
+      const response = await fetch("/api/ecommerce/payment-planning/scenarios");
       if (response.ok) {
         const data = await response.json();
         setAvailableScenarios(data.scenarios || []);
@@ -76,12 +76,12 @@ export default function ScenarioComparison() {
   const loadScenarioData = async (scenarioId: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/v1/finance/payment-planning/scenarios/${scenarioId}`);
+      const response = await fetch(`/api/ecommerce/payment-planning/scenarios/${scenarioId}`);
       if (response.ok) {
         const scenario = await response.json();
 
         // Simuler l'optimisation pour obtenir les métriques
-        const optimizeResponse = await fetch("/api/v1/finance/payment-planning/optimize", {
+        const optimizeResponse = await fetch("/api/ecommerce/payment-planning/optimize", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

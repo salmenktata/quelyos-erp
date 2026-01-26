@@ -96,7 +96,7 @@ export default function ByCategoryReportPage() {
   const categoryData: CategoryData[] = useMemo(() => {
     if (!apiData) return [];
 
-    const incomeCategories = apiData.income.map((cat, i) => ({
+    const incomeCategories = (apiData.income || []).map((cat, i) => ({
       name: cat.name,
       color: categoryColors[i % 10] || "slate",
       total: cat.total,
@@ -106,9 +106,9 @@ export default function ByCategoryReportPage() {
       isIncome: true,
     }));
 
-    const expenseCategories = apiData.expense.map((cat, i) => ({
+    const expenseCategories = (apiData.expense || []).map((cat, i) => ({
       name: cat.name,
-      color: categoryColors[(i + apiData.income.length) % 10] || "slate",
+      color: categoryColors[(i + (apiData.income?.length || 0)) % 10] || "slate",
       total: cat.total,
       count: cat.count,
       percentage: 0,
