@@ -1,8 +1,7 @@
 
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
 import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
@@ -20,7 +19,7 @@ type Category = {
 export default function NewBudgetPage() {
   useRequireAuth();
   const navigate = useNavigate();
-  const searchParams = useSearchParams();
+  const [searchParams] = useSearchParams();
   const editId = searchParams.get("id");
   const { currency } = useCurrency();
 

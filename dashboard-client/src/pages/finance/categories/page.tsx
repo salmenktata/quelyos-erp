@@ -1,10 +1,11 @@
-
-
 import { useEffect, useState } from "react";
+import { ModularLayout } from "@/components/ModularLayout";
 import { api } from "@/lib/finance/api";
 import type { CreateCategoryRequest } from "@/types/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
-import { GlassCard, GlassPanel, GlassBadge, GlassListItem } from "@/components/ui/glass";
+import { PageHeader } from "@/components/finance/PageHeader";
+import { Button } from "@/components/ui/button";
+import { TagIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 type Category = {
   id: number;
@@ -20,6 +21,7 @@ export default function CategoriesPage() {
   const [kind, setKind] = useState<"INCOME" | "EXPENSE">("EXPENSE");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   async function fetchCategories() {
     try {
@@ -46,6 +48,7 @@ export default function CategoriesPage() {
 
       setName("");
       setKind("EXPENSE");
+      setShowForm(false);
       await fetchCategories();
     } catch (err) {
       setError(
@@ -60,99 +63,164 @@ export default function CategoriesPage() {
     fetchCategories();
   }, []);
 
+  const incomeCategories = categories.filter((c) => c.kind === "INCOME");
+  const expenseCategories = categories.filter((c) => c.kind === "EXPENSE");
+
   return (
-    <div className="relative space-y-6 text-white">
-      {/* Background effects */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-40 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-      </div>
-
-      <div className="relative space-y-1">
-        <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">Catégories</p>
-        <h1 className="bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-3xl font-semibold text-transparent">
-          Organisez vos catégories
-        </h1>
-        <p className="text-sm text-indigo-100/80">Classez vos transactions pour un suivi clair.</p>
-      </div>
-
-      <div className="relative grid gap-6 lg:grid-cols-2">
-        <GlassPanel gradient="indigo">
-          <form onSubmit={createCategory} className="space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold">Créer une catégorie</h2>
-              <p className="text-sm text-indigo-100/80">Ajoutez des catégories adaptées à votre activité.</p>
-            </div>
-
-            <label className="text-sm text-indigo-100" htmlFor="category-name">Nom de la catégorie</label>
-            <input
-              id="category-name"
-              type="text"
-              placeholder="Ex: Charges fixes"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-indigo-100/60 backdrop-blur-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-              required
-            />
-
-            <label className="text-sm text-indigo-100" htmlFor="category-kind">Type</label>
-            <select
-              id="category-kind"
-              className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white backdrop-blur-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-              value={kind}
-              onChange={(e) => setKind(e.target.value as "INCOME" | "EXPENSE")}
+    <ModularLayout>
+      <div className="p-8 space-y-6">
+        <PageHeader
+          icon={TagIcon}
+          title="Catégories"
+          description="Organisez vos transactions par catégories pour un suivi clair"
+          breadcrumbs={[
+            { label: "Finance", href: "/finance" },
+            { label: "Catégories" },
+          ]}
+          actions={
+            <Button
+              variant="primary"
+              className="gap-2"
+              onClick={() => setShowForm(!showForm)}
             >
-              <option value="EXPENSE">Dépense</option>
-              <option value="INCOME">Revenu</option>
-            </select>
+              <PlusIcon className="h-5 w-5" />
+              {showForm ? "Annuler" : "Nouvelle catégorie"}
+            </Button>
+          }
+        />
 
-            <button
-              type="submit"
-              className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:from-indigo-400 hover:to-violet-400 disabled:opacity-60"
-              disabled={loading}
-            >
-              {loading ? "Création..." : "Créer la catégorie"}
-            </button>
+        {/* Formulaire de création */}
+        {showForm && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <form onSubmit={createCategory} className="space-y-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Créer une catégorie
+              </h2>
 
-            {error && (
-              <GlassCard variant="subtle" className="border-rose-500/30 bg-rose-500/10 px-4 py-3">
-                <p className="text-sm text-rose-200">{error}</p>
-              </GlassCard>
-            )}
-          </form>
-        </GlassPanel>
-
-        <GlassPanel gradient="purple">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold">Liste des catégories</h2>
-              <p className="text-sm text-indigo-100/80">Retrouvez toutes vos catégories existantes.</p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            {categories.map((cat) => (
-              <GlassListItem key={cat.id} className="px-4 py-3">
-                <div className="space-y-1">
-                  <span className="font-medium">{cat.name}</span>
-                  <div className="text-xs text-indigo-100/70 flex items-center gap-2">
-                    <GlassBadge variant={cat.kind === "INCOME" ? "success" : "default"}>
-                      {cat.kind === "INCOME" ? "Revenu" : "Dépense"}
-                    </GlassBadge>
-                    <span>ID: {cat.id}</span>
-                  </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    htmlFor="category-name"
+                  >
+                    Nom de la catégorie
+                  </label>
+                  <input
+                    id="category-name"
+                    type="text"
+                    placeholder="Ex: Charges fixes"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    required
+                  />
                 </div>
-              </GlassListItem>
-            ))}
 
-            {categories.length === 0 && (
-              <GlassCard variant="subtle" className="px-4 py-3 text-sm text-indigo-100/80">
-                Aucune catégorie pour le moment.
-              </GlassCard>
-            )}
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    htmlFor="category-kind"
+                  >
+                    Type
+                  </label>
+                  <select
+                    id="category-kind"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    value={kind}
+                    onChange={(e) => setKind(e.target.value as "INCOME" | "EXPENSE")}
+                  >
+                    <option value="EXPENSE">Dépense</option>
+                    <option value="INCOME">Revenu</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button type="submit" variant="primary" disabled={loading}>
+                  {loading ? "Création..." : "Créer la catégorie"}
+                </Button>
+              </div>
+
+              {error && (
+                <div className="rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 px-4 py-3">
+                  <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+                </div>
+              )}
+            </form>
           </div>
-        </GlassPanel>
+        )}
+
+        {/* Liste des catégories */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Catégories de revenus */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+            <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Revenus
+                </h2>
+                <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                  {incomeCategories.length} catégorie{incomeCategories.length > 1 ? "s" : ""}
+                </span>
+              </div>
+            </div>
+            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+              {incomeCategories.map((cat) => (
+                <div
+                  key={cat.id}
+                  className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
+                >
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {cat.name}
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    ID: {cat.id}
+                  </span>
+                </div>
+              ))}
+              {incomeCategories.length === 0 && (
+                <div className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                  Aucune catégorie de revenus
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Catégories de dépenses */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+            <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Dépenses
+                </h2>
+                <span className="rounded-full bg-red-100 dark:bg-red-900/30 px-3 py-1 text-xs font-medium text-red-700 dark:text-red-300">
+                  {expenseCategories.length} catégorie{expenseCategories.length > 1 ? "s" : ""}
+                </span>
+              </div>
+            </div>
+            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+              {expenseCategories.map((cat) => (
+                <div
+                  key={cat.id}
+                  className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
+                >
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {cat.name}
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    ID: {cat.id}
+                  </span>
+                </div>
+              ))}
+              {expenseCategories.length === 0 && (
+                <div className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                  Aucune catégorie de dépenses
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </ModularLayout>
   );
 }

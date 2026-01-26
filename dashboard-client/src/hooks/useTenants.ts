@@ -70,6 +70,121 @@ export interface Tenant {
   meta_description?: string
 }
 
+export type TenantColors = {
+  primary: string
+  primaryDark: string
+  primaryLight: string
+  secondary: string
+  secondaryDark: string
+  secondaryLight: string
+  accent: string
+  background: string
+  foreground: string
+  muted: string
+  mutedForeground: string
+  border: string
+  ring: string
+}
+
+export type TenantConfig = {
+  id: number
+  code: string
+  name: string
+  domain: string
+  domains?: string[]
+
+  branding?: {
+    logoUrl?: string
+    faviconUrl?: string
+    slogan?: string
+    description?: string
+  }
+
+  theme?: {
+    colors?: TenantColors
+    typography?: {
+      fontFamily?: string
+    }
+    darkMode?: {
+      enabled?: boolean
+      defaultDark?: boolean
+    }
+  }
+
+  contact?: {
+    email?: string
+    phone?: string
+    phoneFormatted?: string
+    whatsapp?: string
+  }
+
+  social?: Record<string, string>
+
+  seo?: {
+    title?: string
+    description?: string
+  }
+
+  features?: {
+    wishlist?: boolean
+    comparison?: boolean
+    reviews?: boolean
+    newsletter?: boolean
+    guestCheckout?: boolean
+  }
+}
+
+export type TenantFormData = {
+  name?: string
+  slogan?: string
+  description?: string
+
+  // Couleurs (format snake_case pour API)
+  primary_color?: string
+  primary_dark?: string
+  primary_light?: string
+  secondary_color?: string
+  secondary_dark?: string
+  secondary_light?: string
+  accent_color?: string
+  background_color?: string
+  foreground_color?: string
+  muted_color?: string
+  muted_foreground?: string
+  border_color?: string
+  ring_color?: string
+
+  // Typographie
+  font_family?: string
+
+  // Contact
+  email?: string
+  phone?: string
+  whatsapp?: string
+
+  // Social
+  social?: Record<string, string>
+
+  // SEO
+  meta_title?: string
+  meta_description?: string
+
+  // Options
+  enable_dark_mode?: boolean
+  default_dark?: boolean
+  feature_wishlist?: boolean
+  feature_comparison?: boolean
+  feature_reviews?: boolean
+  feature_newsletter?: boolean
+  feature_guest_checkout?: boolean
+
+  // Assets (base64)
+  logo?: string
+  logo_filename?: string
+  favicon?: string
+  favicon_filename?: string
+}
+
 export interface TenantThemeUpdate {
   colors?: {
     primary?: string
@@ -100,7 +215,7 @@ export function useTenants() {
     queryKey: ['tenants'],
     queryFn: async () => {
       const response = await odooRpc<{ tenants: Tenant[]; total: number }>('/api/ecommerce/tenant/list')
-      return response.tenants || []
+      return response.data?.tenants || []
     },
   })
 }
@@ -110,7 +225,7 @@ export function useTenant(id: number) {
     queryKey: ['tenants', id],
     queryFn: async () => {
       const response = await odooRpc<{ tenant: Tenant }>(`/api/ecommerce/tenant/${id}`)
-      return response.tenant
+      return response.data?.tenant
     },
     enabled: !!id,
   })

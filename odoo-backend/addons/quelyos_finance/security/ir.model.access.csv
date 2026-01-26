@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_quelyos_category_user,quelyos.category.user,model_quelyos_category,base.group_user,1,1,1,1
+access_quelyos_category_public,quelyos.category.public,model_quelyos_category,base.group_public,1,0,0,0
+access_quelyos_portfolio_user,quelyos.portfolio.user,model_quelyos_portfolio,base.group_user,1,1,1,1
+access_quelyos_portfolio_public,quelyos.portfolio.public,model_quelyos_portfolio,base.group_public,1,0,0,0
+access_quelyos_payment_flow_user,quelyos.payment.flow.user,model_quelyos_payment_flow,base.group_user,1,1,1,1
+access_quelyos_payment_flow_public,quelyos.payment.flow.public,model_quelyos_payment_flow,base.group_public,1,0,0,0
+access_quelyos_budget_user,quelyos.budget.user,model_quelyos_budget,base.group_user,1,1,1,1
+access_quelyos_budget_public,quelyos.budget.public,model_quelyos_budget,base.group_public,1,0,0,0
+access_quelyos_cash_alert_user,quelyos.cash.alert.user,model_quelyos_cash_alert,base.group_user,1,1,1,1
+access_quelyos_cash_alert_public,quelyos.cash.alert.public,model_quelyos_cash_alert,base.group_public,1,0,0,0

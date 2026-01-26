@@ -3,6 +3,7 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import {
   Wallet,
   ChevronLeft,
@@ -68,7 +69,8 @@ export default function BFRReportPage() {
   });
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         <ReportingNav />
 
@@ -87,10 +89,10 @@ export default function BFRReportPage() {
           </Link>
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-amber-500 to-orange-600 p-3 shadow-lg shadow-amber-500/30">
-              <Wallet className="h-6 w-6 text-white" />
+              <Wallet className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 BFR - Besoin en Fonds de Roulement
               </h1>
               <p className="text-sm text-slate-400">
@@ -142,8 +144,8 @@ export default function BFRReportPage() {
                     disabled={loading}
                     className={`rounded-lg px-3 py-1 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       timeRange === range
-                        ? "bg-amber-500 text-white"
-                        : "text-slate-400 hover:bg-white/5"
+                        ? "bg-amber-500 text-gray-900 dark:text-white"
+                        : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                     }`}
                   >
                     {range}j
@@ -234,7 +236,7 @@ export default function BFRReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-amber-200">BFR Total</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(apiData.bfr)}
                 </p>
                 <p className="text-xs text-amber-300 mt-1">
@@ -251,7 +253,7 @@ export default function BFRReportPage() {
                 <p className="mb-1 text-sm text-emerald-200">
                   Créances clients
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(apiData.components.receivables)}
                 </p>
                 <p className="text-xs text-emerald-300 mt-1">
@@ -268,7 +270,7 @@ export default function BFRReportPage() {
                 <p className="mb-1 text-sm text-rose-200">
                   Dettes fournisseurs
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(apiData.components.payables)}
                 </p>
                 <p className="text-xs text-rose-300 mt-1">
@@ -285,7 +287,7 @@ export default function BFRReportPage() {
                 <p className="mb-1 text-sm text-indigo-200">
                   Stock
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(apiData.components.inventory)}
                 </p>
                 <p className="text-xs text-indigo-300 mt-1">
@@ -347,7 +349,7 @@ export default function BFRReportPage() {
                 <TrendingDown className="h-6 w-6 text-rose-400 flex-shrink-0" />
               )}
               <div>
-                <h3 className="mb-1 font-semibold text-white">
+                <h3 className="mb-1 font-semibold text-gray-900 dark:text-white">
                   {apiData.bfrDays < 30
                     ? "✅ BFR Sain"
                     : apiData.bfrDays < 60
@@ -373,7 +375,7 @@ export default function BFRReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Calcul du BFR
             </h2>
             <div className="space-y-4">
@@ -381,7 +383,7 @@ export default function BFRReportPage() {
               <div className="flex items-center justify-between rounded-lg bg-emerald-500/10 p-4">
                 <div className="flex items-center gap-3">
                   <Users className="h-5 w-5 text-emerald-400" />
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-gray-900 dark:text-white">
                     Créances clients
                   </span>
                 </div>
@@ -394,7 +396,7 @@ export default function BFRReportPage() {
               <div className="flex items-center justify-between rounded-lg bg-indigo-500/10 p-4">
                 <div className="flex items-center gap-3">
                   <Package className="h-5 w-5 text-indigo-400" />
-                  <span className="font-medium text-white">Stock</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Stock</span>
                 </div>
                 <span className="text-xl font-bold text-indigo-400">
                   +{formatAmount(apiData.components.inventory)}
@@ -405,7 +407,7 @@ export default function BFRReportPage() {
               <div className="flex items-center justify-between rounded-lg bg-rose-500/10 p-4">
                 <div className="flex items-center gap-3">
                   <Building2 className="h-5 w-5 text-rose-400" />
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-gray-900 dark:text-white">
                     Dettes fournisseurs
                   </span>
                 </div>
@@ -418,7 +420,7 @@ export default function BFRReportPage() {
               <div className="flex items-center justify-between rounded-lg bg-gradient-to-r from-amber-500/20 to-orange-500/20 p-5 border-2 border-amber-500/50">
                 <div className="flex items-center gap-3">
                   <Wallet className="h-6 w-6 text-amber-400" />
-                  <span className="text-lg font-bold text-white">
+                  <span className="text-lg font-bold text-gray-900 dark:text-white">
                     BFR = Créances + Stock - Dettes
                   </span>
                 </div>
@@ -438,19 +440,19 @@ export default function BFRReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Métriques BFR
             </h2>
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-lg bg-white/5 p-4">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-4">
                 <p className="mb-2 text-sm text-slate-400">BFR en jours de CA</p>
-                <p className="text-4xl font-bold text-white mb-2">
+                <p className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                   {apiData.bfrDays}
                 </p>
                 <p className="text-xs text-slate-400">
                   Nombre de jours de chiffre d&apos;affaires immobilisés
                 </p>
-                <div className="mt-3 h-2 rounded-full bg-white/10">
+                <div className="mt-3 h-2 rounded-full bg-gray-100 dark:bg-gray-700">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-400"
                     style={{ width: `${Math.min((apiData.bfrDays / 90) * 100, 100)}%` }}
@@ -458,15 +460,15 @@ export default function BFRReportPage() {
                 </div>
               </div>
 
-              <div className="rounded-lg bg-white/5 p-4">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-4">
                 <p className="mb-2 text-sm text-slate-400">Ratio BFR / CA</p>
-                <p className="text-4xl font-bold text-white mb-2">
+                <p className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                   {apiData.ratio.toFixed(1)}%
                 </p>
                 <p className="text-xs text-slate-400">
                   Pourcentage du CA immobilisé dans le cycle d&apos;exploitation
                 </p>
-                <div className="mt-3 h-2 rounded-full bg-white/10">
+                <div className="mt-3 h-2 rounded-full bg-gray-100 dark:bg-gray-700">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-400"
                     style={{ width: `${Math.min(apiData.ratio, 100)}%` }}
@@ -485,13 +487,13 @@ export default function BFRReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Cycle d&apos;exploitation
             </h2>
             <div className="space-y-3">
-              <div className="rounded-lg bg-white/5 p-4">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white font-medium">1. Achats fournisseurs</span>
+                  <span className="text-gray-900 dark:text-white font-medium">1. Achats fournisseurs</span>
                   <span className="text-slate-400">Délai de paiement DPO</span>
                 </div>
                 <p className="text-xs text-slate-400">
@@ -499,9 +501,9 @@ export default function BFRReportPage() {
                 </p>
               </div>
 
-              <div className="rounded-lg bg-white/5 p-4">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white font-medium">2. Stock (si applicable)</span>
+                  <span className="text-gray-900 dark:text-white font-medium">2. Stock (si applicable)</span>
                   <span className="text-slate-400">Rotation des stocks</span>
                 </div>
                 <p className="text-xs text-slate-400">
@@ -509,9 +511,9 @@ export default function BFRReportPage() {
                 </p>
               </div>
 
-              <div className="rounded-lg bg-white/5 p-4">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white font-medium">3. Ventes clients</span>
+                  <span className="text-gray-900 dark:text-white font-medium">3. Ventes clients</span>
                   <span className="text-slate-400">Délai d&apos;encaissement DSO</span>
                 </div>
                 <p className="text-xs text-slate-400">
@@ -520,7 +522,7 @@ export default function BFRReportPage() {
               </div>
             </div>
             <div className="mt-4 p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
-              <p className="text-sm text-white">
+              <p className="text-sm text-gray-900 dark:text-white">
                 <strong>BFR = DSO + Rotation stock - DPO</strong>
               </p>
               <p className="text-xs text-amber-200 mt-1">
@@ -537,27 +539,27 @@ export default function BFRReportPage() {
           transition={{ delay: 0.7 }}
         >
           <GlassPanel className="p-6" gradient="violet">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               💡 Comment optimiser le BFR
             </h2>
             <div className="space-y-3">
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>1. Réduire le DSO</strong> - Relances clients, pénalités de retard, acomptes, facturation immédiate.
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>2. Négocier le DPO</strong> - Allonger les délais de paiement fournisseurs (sans dégrader la relation).
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>3. Optimiser le stock</strong> - Flux tendu, rotation rapide, commandes just-in-time.
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>4. Affacturage</strong> - Céder les créances clients à un factor pour encaisser immédiatement.
                 </p>
               </div>
@@ -568,5 +570,6 @@ export default function BFRReportPage() {
         )}
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

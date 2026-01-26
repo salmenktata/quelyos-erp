@@ -51,7 +51,7 @@ Frontend (Next.js 16 - E-commerce)
 **Analyser les contrôleurs API Odoo** :
 
 ```bash
-backend/addons/quelyos_api/controllers/
+odoo-backend/addons/quelyos_api/controllers/
 ├── main.py                    # Controller principal
 ├── products.py                # Endpoints produits
 ├── orders.py                  # Endpoints commandes
@@ -614,11 +614,11 @@ Total : XXh
 
 #### 1. Endpoints Orphelins (Code Mort)
 
-1. **POST /api/ecommerce/legacy/old_endpoint** (backend/addons/quelyos_api/controllers/main.py:456)
+1. **POST /api/ecommerce/legacy/old_endpoint** (odoo-backend/addons/quelyos_api/controllers/main.py:456)
    - Aucun appel trouvé
    - Action : Supprimer après validation (possible dead code post-refactoring)
 
-2. **GET /api/ecommerce/debug/stats** (backend/addons/quelyos_api/controllers/main.py:789)
+2. **GET /api/ecommerce/debug/stats** (odoo-backend/addons/quelyos_api/controllers/main.py:789)
    - Endpoint debug exposé en production
    - Action : Déplacer vers `/internal/` ou supprimer
 
@@ -795,7 +795,7 @@ Lance un audit sur les modules Produits et Commandes uniquement
 grep -r "fetch.*api/ecommerce" frontend/src/ --include="*.ts" --include="*.tsx"
 
 # Trouver tous les endpoints Backend
-grep -r "@http.route" backend/addons/quelyos_api/controllers/ --include="*.py"
+grep -r "@http.route" odoo-backend/addons/quelyos_api/controllers/ --include="*.py"
 
 # Trouver définitions types TypeScript
 grep -r "interface Product" frontend/src/types/ backoffice/src/types/

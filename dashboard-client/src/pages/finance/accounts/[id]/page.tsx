@@ -1,13 +1,13 @@
 
 
-import { useEffect, useState, use } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
 import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { GlassCard, GlassPanel } from "@/components/ui/glass";
+import { PaymentFlowManager } from "@/components/PaymentFlowManager";
 import {
   ArrowLeft,
   Building2,
@@ -32,13 +32,9 @@ type Account = {
   portfolios?: Array<{ portfolio: { id: number; name: string } }>;
 };
 
-type PageParams = {
-  params: Promise<{ id: string }>;
-};
-
-export default function AccountDetailPage({ params }: PageParams) {
-  const resolvedParams = use(params);
-  const accountId = parseInt(resolvedParams.id, 10);
+export default function AccountDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const accountId = parseInt(id || '0', 10);
   
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useRequireAuth();
@@ -256,7 +252,7 @@ export default function AccountDetailPage({ params }: PageParams) {
                   {account.portfolios.map(({ portfolio }) => (
                     <Link
                       key={portfolio.id}
-                      to={`/dashboard/portfolios/${portfolio.id}`}
+                      to={`/finance/portfolios/${portfolio.id}`}
                       className="rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs text-violet-300 transition hover:bg-violet-500/20"
                     >
                       {portfolio.name}
@@ -273,7 +269,7 @@ export default function AccountDetailPage({ params }: PageParams) {
             
             <div className="grid gap-3">
               <Link
-                to={`/dashboard/expenses?accountId=${account.id}`}
+                to={`/finance/expenses?accountId=${account.id}`}
                 className="flex items-center gap-3 rounded-lg border border-white/10 p-4 transition hover:bg-white/5"
               >
                 <ArrowLeftRight className="h-5 w-5 text-indigo-400" />
@@ -299,7 +295,7 @@ export default function AccountDetailPage({ params }: PageParams) {
               </button>
 
               <Link
-                to={`/dashboard/accounts?edit=${account.id}`}
+                to={`/finance/accounts?edit=${account.id}`}
                 className="flex items-center gap-3 rounded-lg border border-white/10 p-4 transition hover:bg-white/5"
               >
                 <Edit2 className="h-5 w-5 text-amber-400" />

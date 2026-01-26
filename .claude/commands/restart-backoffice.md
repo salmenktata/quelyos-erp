@@ -17,7 +17,7 @@ Relance le serveur de développement Vite pour le backoffice (port 5175).
 3. Vérifier que le port est libéré
 
 ### Étape 2 : Relancer le serveur
-1. Se placer dans le dossier `backoffice/`
+1. Se placer dans le dossier `dashboard-client/`
 2. Exécuter `npm run dev` en arrière-plan
 3. Attendre que le serveur soit prêt (message "Local: http://localhost:5175/")
 4. Confirmer que le serveur est accessible

@@ -27,7 +27,7 @@ Exemples :
 
 ### Phase 1 : Exploration du code frontend
 
-1. **Identifier le fichier page** dans `frontend/src/app/`
+1. **Identifier le fichier page** dans `vitrine-quelyos/app/` ou `vitrine-client/app/`
    - Trouver le fichier `page.tsx` correspondant à la route
    - Identifier les composants importés
 
@@ -60,14 +60,14 @@ Catégories de types :
 
 ### Phase 3 : Analyse du backoffice
 
-Vérifier dans `backoffice/src/pages/` :
+Vérifier dans `dashboard-client/src/pages/` :
 - Quelles pages/formulaires existent pour ce module ?
 - Quels champs sont éditables ?
 - Que manque-t-il ?
 
 ### Phase 4 : Analyse de l'API Odoo
 
-Vérifier dans `backend/addons/quelyos_api/controllers/` :
+Vérifier dans `odoo-backend/addons/quelyos_api/controllers/` :
 - Quels endpoints existent ?
 - Quels champs sont exposés ?
 - Quels champs manquent ?
@@ -127,8 +127,8 @@ Vérifier dans `backend/addons/quelyos_api/controllers/` :
 
 | Fichier | Modifications |
 |---------|--------------|
-| `backend/.../main.py` | Ajouter champs X, Y |
-| `backoffice/.../ProductForm.tsx` | UI pour X, Y |
+| `odoo-backend/.../main.py` | Ajouter champs X, Y |
+| `dashboard-client/.../ProductForm.tsx` | UI pour X, Y |
 | ... | ... |
 
 ### Estimation effort

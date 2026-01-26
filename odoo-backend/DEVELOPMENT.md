@@ -9,7 +9,7 @@
 
 ## 📝 Checklist Modification de Modèle
 
-Quand vous modifiez un fichier dans `backend/addons/quelyos_api/models/` :
+Quand vous modifiez un fichier dans `odoo-backend/addons/quelyos_api/models/` :
 
 ### 1. Modification du Code
 - [ ] Ajouter/modifier le champ dans le modèle Python
@@ -17,7 +17,7 @@ Quand vous modifiez un fichier dans `backend/addons/quelyos_api/models/` :
 - [ ] Vérifier la cohérence avec les conventions Odoo
 
 ### 2. Incrémenter la Version du Module
-Éditer `backend/addons/quelyos_api/__manifest__.py` :
+Éditer `odoo-backend/addons/quelyos_api/__manifest__.py` :
 ```python
 {
     'name': 'Quelyos API',
@@ -74,7 +74,7 @@ curl -X POST http://localhost:8069/api/ecommerce/products \
 ## 🔧 Scripts de Développement
 
 ### Script d'upgrade rapide
-Créer `backend/upgrade.sh` :
+Créer `odoo-backend/upgrade.sh` :
 ```bash
 #!/bin/bash
 set -e
@@ -96,12 +96,12 @@ curl -s http://localhost:8069/web/health | grep -q "pass" && echo "✅ Odoo is h
 
 Usage :
 ```bash
-chmod +x backend/upgrade.sh
-./backend/upgrade.sh quelyos_api
+chmod +x odoo-backend/upgrade.sh
+./odoo-backend/upgrade.sh quelyos_api
 ```
 
 ### Script de vérification des champs
-Créer `backend/check_fields.sh` :
+Créer `odoo-backend/check_fields.sh` :
 ```bash
 #!/bin/bash
 # Vérifie que tous les champs du modèle existent en DB
@@ -130,7 +130,7 @@ done
 
 Usage :
 ```bash
-./backend/check_fields.sh backend/addons/quelyos_api/models/stock_quant.py product_template
+./odoo-backend/check_fields.sh odoo-backend/addons/quelyos_api/models/stock_quant.py product_template
 ```
 
 ---
@@ -138,7 +138,7 @@ Usage :
 ## 🧪 Tests Automatisés
 
 ### Test de Parité Modèle ↔ DB
-Créer `backend/tests/test_model_db_parity.py` :
+Créer `odoo-backend/tests/test_model_db_parity.py` :
 ```python
 # -*- coding: utf-8 -*-
 from odoo.tests import TransactionCase
@@ -181,7 +181,7 @@ Pour les changements complexes, utiliser le système de migrations Odoo.
 
 ### Structure
 ```
-backend/addons/quelyos_api/
+odoo-backend/addons/quelyos_api/
 └── migrations/
     └── 19.0.1.0.1/
         ├── pre-migrate.py
@@ -247,10 +247,10 @@ def migrate(cr, version):
 git diff --name-only | grep "models/"
 
 # 2. Si OUI → Vérifier que la version a été incrémentée
-git diff backend/addons/quelyos_api/__manifest__.py | grep version
+git diff odoo-backend/addons/quelyos_api/__manifest__.py | grep version
 
 # 3. Upgrader le module localement
-./backend/upgrade.sh quelyos_api
+./odoo-backend/upgrade.sh quelyos_api
 
 # 4. Tester l'API
 curl -X POST http://localhost:8069/api/ecommerce/products \
@@ -291,7 +291,7 @@ docker logs quelyos-odoo --tail 100 | grep -i "error\|exception\|traceback"
 ## 📚 Ressources
 
 - [Odoo Development Documentation](https://www.odoo.com/documentation/19.0/developer.html)
-- [Odoo ORM Documentation](https://www.odoo.com/documentation/19.0/developer/reference/backend/orm.html)
+- [Odoo ORM Documentation](https://www.odoo.com/documentation/19.0/developer/reference/odoo-backend/orm.html)
 - [Odoo Migration Guide](https://www.odoo.com/documentation/19.0/developer/howtos/upgrade_custom_db.html)
 
 ---

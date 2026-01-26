@@ -72,7 +72,7 @@ Actions requises :
 **Scanner fichiers models/ du module :**
 
 ```bash
-cd backend/addons/quelyos_api/models
+cd odoo-backend/addons/quelyos_api/models
 grep -r "class.*models\\.Model" *.py
 ```
 
@@ -88,7 +88,7 @@ stock_quant.py:    _inherit = 'stock.quant'
 
 ```bash
 # Exemple : product.template
-grep -A 1 "fields\\..*(" backend/addons/quelyos_api/models/product.py | \
+grep -A 1 "fields\\..*(" odoo-backend/addons/quelyos_api/models/product.py | \
   grep -v "^--$" | \
   sed 's/.*fields\.\(.*\)(/\1/' | \
   cut -d'(' -f1
@@ -116,7 +116,7 @@ docker-compose exec db psql -U odoo -d quelyos -c \
 
 #### 2.3. Utiliser Script check_fields.sh
 
-**Le projet dispose déjà du script `backend/check_fields.sh` :**
+**Le projet dispose déjà du script `odoo-backend/check_fields.sh` :**
 
 ```bash
 cd backend
@@ -171,7 +171,7 @@ WHERE table_name = 'product_template' AND column_name = 'price';
 **Lister champs Python avec `required=True` :**
 
 ```bash
-grep -r "required=True" backend/addons/quelyos_api/models/*.py -B 1
+grep -r "required=True" odoo-backend/addons/quelyos_api/models/*.py -B 1
 ```
 
 **Vérifier contrainte NOT NULL en DB :**
@@ -190,7 +190,7 @@ WHERE table_name = 'product_template'
 **Parser contraintes SQL dans modèles :**
 
 ```bash
-grep -A 5 "_sql_constraints" backend/addons/quelyos_api/models/*.py
+grep -A 5 "_sql_constraints" odoo-backend/addons/quelyos_api/models/*.py
 ```
 
 **Exemple :**
@@ -217,7 +217,7 @@ WHERE conrelid = 'product_template'::regclass
 
 ```bash
 grep -rE "fields\\.Many2one|fields\\.One2many|fields\\.Many2many" \
-  backend/addons/quelyos_api/models/*.py
+  odoo-backend/addons/quelyos_api/models/*.py
 ```
 
 **Exemple :**
@@ -252,7 +252,7 @@ WHERE tc.constraint_type = 'FOREIGN KEY'
 #### 6.1. Lister Champs avec index=True
 
 ```bash
-grep -r "index=True" backend/addons/quelyos_api/models/*.py -B 1
+grep -r "index=True" odoo-backend/addons/quelyos_api/models/*.py -B 1
 ```
 
 #### 6.2. Vérifier Indexes en DB
@@ -310,7 +310,7 @@ HAVING COUNT(*) > 1;
 **Lister champs computed (`compute=`) :**
 
 ```bash
-grep -r "compute=" backend/addons/quelyos_api/models/*.py -B 2
+grep -r "compute=" odoo-backend/addons/quelyos_api/models/*.py -B 2
 ```
 
 **Exemple :**
@@ -608,7 +608,7 @@ Après corrections, le statut devrait être :
 - **Toujours** créer backup DB avant migrations manuelles
 - **Toujours** upgrader module après modification modèles
 - **Automatiser** cette vérification en CI/CD (pre-commit hook)
-- **Documenter** migrations custom dans `backend/migrations/`
+- **Documenter** migrations custom dans `odoo-backend/migrations/`
 ```
 
 ### 10. Actions Automatisables (Bonus)
@@ -678,7 +678,7 @@ cd backend && ./upgrade.sh quelyos_api && ./check_fields.sh addons/quelyos_api/m
 ## Scripts Réutilisables
 
 **Le projet dispose déjà de :**
-- `backend/upgrade.sh` : Upgrade module + redémarrage + santé
-- `backend/check_fields.sh` : Vérification champs modèle vs DB
+- `odoo-backend/upgrade.sh` : Upgrade module + redémarrage + santé
+- `odoo-backend/check_fields.sh` : Vérification champs modèle vs DB
 
 **Cette commande les orchestre intelligemment.**

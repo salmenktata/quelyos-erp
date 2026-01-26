@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { GlassCard, GlassBadge } from "@/components/ui/glass";
 import { BudgetProgressBar } from "./BudgetProgressBar";
 import { BudgetActionMenu } from "./BudgetActionMenu";
 
@@ -41,25 +40,25 @@ const statusLabels: Record<BudgetStatus, string> = {
   EXCEEDED: "Dépassé"
 };
 
-const statusVariants: Record<BudgetStatus, "success" | "warning" | "error"> = {
-  ON_TRACK: "success",
-  WARNING: "warning",
-  EXCEEDED: "error"
+const statusStyles: Record<BudgetStatus, string> = {
+  ON_TRACK: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300",
+  WARNING: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
+  EXCEEDED: "bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300"
 };
 
 export function BudgetCard({ budget, formatCurrency, onEdit, onDuplicate, onDelete }: BudgetCardProps) {
   const navigate = useNavigate();
 
   return (
-    <GlassCard
+    <div
       data-testid="budget-card"
       data-status={budget.status ? budget.status.toLowerCase() : undefined}
-      onClick={() => navigate(`/dashboard/budgets/${budget.id}`)}
-      className={`p-4 cursor-pointer hover:bg-white/5 transition-all ${
+      onClick={() => navigate(`/finance/budgets/${budget.id}`)}
+      className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md transition-all ${
         budget.status === "EXCEEDED"
-          ? "budget-exceeded"
+          ? "ring-1 ring-rose-200 dark:ring-rose-800"
           : budget.status === "WARNING"
-            ? "budget-warning"
+            ? "ring-1 ring-amber-200 dark:ring-amber-800"
             : ""
       }`}
     >
@@ -67,13 +66,13 @@ export function BudgetCard({ budget, formatCurrency, onEdit, onDuplicate, onDele
         {/* Header: Name + Status */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-white truncate">{budget.name}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white truncate">{budget.name}</h3>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {budget.status && (
-              <GlassBadge variant={statusVariants[budget.status]} className="text-xs">
+              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyles[budget.status]}`}>
                 {statusLabels[budget.status]}
-              </GlassBadge>
+              </span>
             )}
             <BudgetActionMenu
               budget={budget}
@@ -87,14 +86,14 @@ export function BudgetCard({ budget, formatCurrency, onEdit, onDuplicate, onDele
         {/* Category + Period */}
         <div className="flex items-center gap-2 flex-wrap">
           {budget.category ? (
-            <GlassBadge variant="info" className="text-xs">
+            <span className="inline-flex items-center rounded-full bg-indigo-100 dark:bg-indigo-900/30 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:text-indigo-300">
               {budget.category.name}
-            </GlassBadge>
+            </span>
           ) : (
-            <span className="text-xs text-indigo-100/60">Toutes catégories</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Toutes catégories</span>
           )}
           {budget.period && (
-            <span className="text-xs text-indigo-100/70">
+            <span className="text-xs text-gray-600 dark:text-gray-400">
               • {periodLabels[budget.period]}
             </span>
           )}
@@ -104,7 +103,7 @@ export function BudgetCard({ budget, formatCurrency, onEdit, onDuplicate, onDele
         {budget.percentageUsed !== undefined && budget.status && (
           <div className="space-y-1">
             <BudgetProgressBar percentage={budget.percentageUsed} status={budget.status} />
-            <div className="flex items-center justify-between text-xs text-indigo-100/70">
+            <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
               <span>
                 {formatCurrency(budget.currentSpending || 0)} / {formatCurrency(budget.amount)}
               </span>
@@ -118,15 +117,15 @@ export function BudgetCard({ budget, formatCurrency, onEdit, onDuplicate, onDele
         {/* Amounts (if no progress data) */}
         {budget.percentageUsed === undefined && (
           <div className="text-sm">
-            <div className="text-white font-medium">
+            <div className="text-gray-900 dark:text-white font-medium">
               Budget: {formatCurrency(budget.amount)}
             </div>
-            <div className="text-indigo-100/60">
+            <div className="text-gray-500 dark:text-gray-400">
               Dépensé: {formatCurrency(budget.currentSpending || 0)}
             </div>
           </div>
         )}
       </div>
-    </GlassCard>
+    </div>
   );
 }

@@ -1,10 +1,10 @@
 /**
  * API Finance - Wrapper pour les appels API du module finance
- * Compatible avec le pattern api('/endpoint', options) du repo quelyos-finance
+ * Appelle le backend Odoo via le proxy Vite
  */
 
 // Utiliser des URLs relatives pour passer par le proxy Vite
-// Le proxy redirige /api/finance vers http://localhost:3000
+// Le proxy redirige /api/finance vers http://localhost:8069/api/ecommerce/finance
 const API_BASE_URL = ''
 
 interface ApiOptions {
@@ -24,11 +24,25 @@ interface ApiResponse<T = unknown> {
  * Fonction API callable pour le module finance
  * Usage: api('/endpoint') ou api('/endpoint', { method: 'POST', body: {...} })
  */
+// Custom error for authentication issues
+export class AuthenticationError extends Error {
+  constructor(message: string = 'Authentication required') {
+    super(message)
+    this.name = 'AuthenticationError'
+  }
+}
+
 export async function api<T = unknown>(
   endpoint: string,
   options: ApiOptions = {}
 ): Promise<T> {
-  const token = localStorage.getItem('odoo_session_token')
+  // Utiliser session_id pour l'auth Odoo
+  const sessionId = localStorage.getItem('session_id')
+
+  // Skip API call if no session - throw silently catchable error
+  if (!sessionId) {
+    throw new AuthenticationError()
+  }
 
   const { method = 'GET', body, headers = {} } = options
 
@@ -36,9 +50,12 @@ export async function api<T = unknown>(
     method,
     headers: {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
+      // Header d'authentification Odoo
+      ...(sessionId && { 'X-Session-Id': sessionId }),
       ...headers,
     },
+    // Inclure les credentials pour les cookies de session Odoo
+    credentials: 'include',
   }
 
   if (body && method !== 'GET') {
@@ -50,13 +67,45 @@ export async function api<T = unknown>(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.message || `API Error: ${response.status}`)
+      const errorMessage = errorData.error || errorData.message || `API Error: ${response.status}`
+      // Convert auth errors from backend to AuthenticationError
+      if (response.status === 401 || errorMessage.includes('Authentication required')) {
+        throw new AuthenticationError(errorMessage)
+      }
+      throw new Error(errorMessage)
     }
 
-    const data = await response.json()
-    return data as T
+    const json = await response.json()
+
+    // Gérer le format de réponse Odoo
+    // Les endpoints HTTP retournent {success, data} directement
+    // Les endpoints JSON-RPC retournent {result: {success, data}}
+    if (json.result !== undefined) {
+      // Format JSON-RPC
+      if (json.result.success === false) {
+        const errorMessage = json.result.error || 'API Error'
+        if (errorMessage.includes('Authentication required')) {
+          throw new AuthenticationError(errorMessage)
+        }
+        throw new Error(errorMessage)
+      }
+      return (json.result.data ?? json.result) as T
+    }
+
+    // Format HTTP direct
+    if (json.success === false) {
+      const errorMessage = json.error || 'API Error'
+      if (errorMessage.includes('Authentication required')) {
+        throw new AuthenticationError(errorMessage)
+      }
+      throw new Error(errorMessage)
+    }
+    return (json.data ?? json) as T
   } catch (error) {
-    console.error('Finance API Error:', error)
+    // Don't log authentication errors (expected when not logged in)
+    if (!(error instanceof AuthenticationError)) {
+      console.error('Finance API Error:', error)
+    }
     throw error
   }
 }

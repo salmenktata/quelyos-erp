@@ -228,6 +228,32 @@ class TenantController(BaseController):
                 ('active', '=', True)
             ], limit=1)
 
+            # Exception pour l'admin : créer un tenant par défaut s'il n'existe pas
+            if not tenant and user.login == 'admin':
+                _logger.info("Création automatique d'un tenant pour l'admin")
+                try:
+                    # Utiliser un code unique basé sur la company ID
+                    unique_code = f'admin-{company_id}'
+
+                    # Vérifier si le tenant existe déjà (par code)
+                    existing = request.env['quelyos.tenant'].sudo().search([
+                        ('code', '=', unique_code)
+                    ], limit=1)
+
+                    if existing:
+                        tenant = existing
+                        _logger.info(f"Tenant admin existant récupéré : {tenant.id}")
+                    else:
+                        tenant = request.env['quelyos.tenant'].sudo().create({
+                            'name': 'Admin Shop',
+                            'code': unique_code,
+                            'domain': f'localhost-admin-{company_id}',
+                            'company_id': company_id,
+                        })
+                        _logger.info(f"Tenant admin créé avec succès : {tenant.id}")
+                except Exception as e:
+                    _logger.error(f"Erreur création tenant admin : {e}")
+
             if not tenant:
                 return request.make_json_response({
                     'success': False,

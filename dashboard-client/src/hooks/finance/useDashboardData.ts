@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { reportingClient } from "@/lib/finance/reporting";
+import { AuthenticationError } from "@/lib/finance/api";
 import type { DashboardOverviewResponse, ReportingFilters } from "@/lib/finance/reporting";
 
 interface UseDashboardDataOptions extends ReportingFilters {
@@ -33,12 +34,18 @@ export function useDashboardData(options: UseDashboardDataOptions = {}) {
     ...filters
   } = options;
 
+  // Check if user is authenticated
+  const isAuthenticated = typeof window !== 'undefined' && !!localStorage.getItem('session_id');
+
   return useQuery<DashboardOverviewResponse, Error>({
     // Query key includes all filter parameters for proper cache invalidation
     queryKey: ["dashboard", "overview", { days, ...filters }],
 
     // Fetch function
     queryFn: () => reportingClient.dashboardOverview({ days, ...filters }),
+
+    // Only run query if user is authenticated
+    enabled: isAuthenticated,
 
     // Auto-refetch every 5 minutes (or custom interval) - disabled by default
     refetchInterval: enableAutoRefetch ? refetchInterval : false,
@@ -58,8 +65,11 @@ export function useDashboardData(options: UseDashboardDataOptions = {}) {
     // Cache data for 10 minutes after last use
     gcTime: 10 * 60 * 1000,
 
-    // Retry configuration
-    retry: 2,
+    // Retry configuration - don't retry on auth errors
+    retry: (failureCount, error) => {
+      if (error instanceof AuthenticationError) return false;
+      return failureCount < 2;
+    },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 }

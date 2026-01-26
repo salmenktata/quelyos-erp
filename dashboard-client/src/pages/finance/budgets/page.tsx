@@ -1,12 +1,12 @@
-
-
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { ModularLayout } from "@/components/ModularLayout";
 import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
-import { GlassCard, GlassPanel, GlassButton } from "@/components/ui/glass";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { useApiData } from "@/hooks/finance/useApiData";
+import { PageHeader } from "@/components/finance/PageHeader";
+import { Button } from "@/components/ui/button";
 import { BudgetStatsCards } from "@/components/finance/budgets/BudgetStatsCards";
 import { BudgetFilters, type BudgetFilterState } from "@/components/finance/budgets/BudgetFilters";
 import { BudgetTable } from "@/components/finance/budgets/BudgetTable";
@@ -14,7 +14,11 @@ import { BudgetCard } from "@/components/finance/budgets/BudgetCard";
 import { BudgetAnalytics } from "@/components/finance/budgets/BudgetAnalytics";
 import { BudgetExport } from "@/components/finance/budgets/BudgetExport";
 import { BudgetFormModal } from "@/components/finance/budgets/BudgetFormModal";
-import { Plus, Sparkles } from "lucide-react";
+import {
+  PlusIcon,
+  SparklesIcon,
+  CurrencyDollarIcon,
+} from "@heroicons/react/24/outline";
 import type { CreateBudgetRequest, UpdateBudgetRequest } from "@/types/api";
 
 type Budget = {
@@ -307,64 +311,57 @@ export default function BudgetsPage() {
   }, [editingBudget, refetchBudgets]);
 
   return (
-    <div className="relative space-y-6 text-white">
-      {/* Background effects */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-40 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-      </div>
-
-      {/* Header */}
-      <div className="relative space-y-1">
-        <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">Budgets</p>
-        <h1 className="bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-2xl md:text-3xl font-semibold text-transparent">
-          Pilotez vos enveloppes
-        </h1>
-        <p className="text-sm text-indigo-100/80 hidden md:block">Créez, ajustez et suivez vos budgets par période.</p>
-      </div>
+    <ModularLayout>
+      <div className="p-8 space-y-6">
+        <PageHeader
+          icon={CurrencyDollarIcon}
+          title="Budgets"
+          description="Créez, ajustez et suivez vos budgets par période"
+          breadcrumbs={[
+            { label: "Finance", href: "/finance" },
+            { label: "Budgets" },
+          ]}
+          actions={
+            <Button
+              variant="primary"
+              className="gap-2"
+              onClick={() => setShowCreateForm(!showCreateForm)}
+            >
+              <PlusIcon className="h-5 w-5" />
+              {showCreateForm ? "Annuler" : "Créer un budget"}
+            </Button>
+          }
+        />
 
       {/* Stats KPIs Section */}
       {budgets && budgets.length > 0 && (
-        <div className="relative">
-          <BudgetStatsCards budgets={budgets} formatCurrency={formatAmount} />
-        </div>
+        <BudgetStatsCards budgets={budgets} formatCurrency={formatAmount} />
       )}
 
       {/* Filters Section */}
       {budgets && budgets.length > 0 && (
-        <div className="relative">
-          <BudgetFilters
-            filters={filters}
-            onFilterChange={setFilters}
-            categories={categories || []}
-          />
-        </div>
+        <BudgetFilters
+          filters={filters}
+          onFilterChange={setFilters}
+          categories={categories || []}
+        />
       )}
 
       {/* Action Bar */}
-      <div className="relative flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-lg md:text-xl font-semibold text-white">Mes budgets</h2>
-          <p className="text-sm text-indigo-100/80">
+          <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Mes budgets</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {budgets?.length || 0} budget{(budgets?.length || 0) > 1 ? "s" : ""} créé{(budgets?.length || 0) > 1 ? "s" : ""} • {sortedBudgets.length} affiché{sortedBudgets.length > 1 ? "s" : ""}
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {budgets && budgets.length > 0 && (
-            <BudgetExport
-              allBudgets={budgets}
-              filteredBudgets={sortedBudgets}
-              formatCurrency={formatAmount}
-            />
-          )}
-          <GlassButton
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            {showCreateForm ? "Annuler" : "Créer un budget"}
-          </GlassButton>
-        </div>
+        {budgets && budgets.length > 0 && (
+          <BudgetExport
+            allBudgets={budgets}
+            filteredBudgets={sortedBudgets}
+            formatCurrency={formatAmount}
+          />
+        )}
       </div>
 
       {/* Inline Budget Creation Form (collapsible) */}
@@ -379,93 +376,91 @@ export default function BudgetsPage() {
       )}
 
       {/* Budgets List - Desktop Table View */}
-      <div className="relative hidden md:block">
-        <GlassPanel gradient="purple">
-          {loading ? (
-            <div className="space-y-3 py-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-4 px-4 py-3 bg-white/5 rounded-xl animate-pulse">
-                  <div className="h-4 bg-white/10 rounded w-32" />
-                  <div className="h-4 bg-white/10 rounded w-24" />
-                  <div className="h-4 bg-white/10 rounded w-20" />
-                  <div className="flex-1 h-4 bg-white/10 rounded" />
-                  <div className="h-4 bg-white/10 rounded w-16" />
-                </div>
-              ))}
-            </div>
-          ) : !budgets || budgets.length === 0 ? (
-            <div className="py-16 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-500/20 mb-4">
-                <Sparkles className="w-8 h-8 text-indigo-400" />
+      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="space-y-3 p-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-4 px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg animate-pulse">
+                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-20" />
+                <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-600 rounded" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-16" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Aucun budget pour le moment</h3>
-              <p className="text-sm text-indigo-100/60 mb-6">Créez votre premier budget pour commencer à piloter vos dépenses</p>
-              <GlassButton
-                onClick={() => setShowCreateForm(true)}
-                className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Créer mon premier budget
-              </GlassButton>
+            ))}
+          </div>
+        ) : !budgets || budgets.length === 0 ? (
+          <div className="py-16 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 mb-4">
+              <SparklesIcon className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
             </div>
-          ) : (
-            <BudgetTable
-              budgets={sortedBudgets}
-              formatCurrency={formatAmount}
-              sortBy={sortBy}
-              sortDir={sortDir}
-              onSort={handleSort}
-              onEdit={handleEdit}
-              onDuplicate={handleDuplicate}
-              onDelete={handleDelete}
-            />
-          )}
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Aucun budget pour le moment</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Créez votre premier budget pour commencer à piloter vos dépenses</p>
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="inline-flex items-center rounded-lg bg-indigo-600 hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition"
+            >
+              <PlusIcon className="w-4 h-4 mr-2" />
+              Créer mon premier budget
+            </button>
+          </div>
+        ) : (
+          <BudgetTable
+            budgets={sortedBudgets}
+            formatCurrency={formatAmount}
+            sortBy={sortBy}
+            sortDir={sortDir}
+            onSort={handleSort}
+            onEdit={handleEdit}
+            onDuplicate={handleDuplicate}
+            onDelete={handleDelete}
+          />
+        )}
 
-          {!loading && budgets && budgets.length > 0 && sortedBudgets.length === 0 && (
-            <div className="py-8 text-center text-indigo-100/60">
-              Aucun budget ne correspond aux filtres sélectionnés.
-            </div>
-          )}
-        </GlassPanel>
+        {!loading && budgets && budgets.length > 0 && sortedBudgets.length === 0 && (
+          <div className="py-8 text-center text-gray-500 dark:text-gray-400">
+            Aucun budget ne correspond aux filtres sélectionnés.
+          </div>
+        )}
       </div>
 
       {/* Budgets List - Mobile Card View */}
-      <div className="relative md:hidden space-y-3">
+      <div className="md:hidden space-y-3">
         {loading && (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <GlassCard key={i} className="p-4 animate-pulse">
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 animate-pulse">
                 <div className="space-y-3">
-                  <div className="h-4 bg-white/10 rounded w-3/4" />
-                  <div className="h-2 bg-white/10 rounded w-full" />
-                  <div className="h-3 bg-white/10 rounded w-1/2" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
                 </div>
-              </GlassCard>
+              </div>
             ))}
           </div>
         )}
 
         {!loading && (!budgets || budgets.length === 0) && (
-          <GlassCard className="py-12 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-500/20 mb-4">
-              <Sparkles className="w-8 h-8 text-indigo-400" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm py-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 mb-4">
+              <SparklesIcon className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Aucun budget</h3>
-            <p className="text-sm text-indigo-100/60 mb-4 px-4">Créez votre premier budget pour commencer</p>
-            <GlassButton
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Aucun budget</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 px-4">Créez votre premier budget pour commencer</p>
+            <button
               onClick={() => setShowCreateForm(true)}
-              className="bg-gradient-to-r from-indigo-500 to-violet-500"
+              className="inline-flex items-center rounded-lg bg-indigo-600 hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <PlusIcon className="w-4 h-4 mr-2" />
               Créer un budget
-            </GlassButton>
-          </GlassCard>
+            </button>
+          </div>
         )}
 
         {!loading && budgets && budgets.length > 0 && sortedBudgets.length === 0 && (
-          <GlassCard variant="subtle" className="px-4 py-3 text-sm text-indigo-100/80">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
             Aucun budget ne correspond aux filtres sélectionnés.
-          </GlassCard>
+          </div>
         )}
 
         {!loading &&
@@ -509,7 +504,7 @@ export default function BudgetsPage() {
           formatCurrency={formatAmount}
         />
       )}
-
-    </div>
+      </div>
+    </ModularLayout>
   );
 }

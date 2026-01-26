@@ -123,11 +123,11 @@ export default function SupplierCard({ supplier, onRefresh }: SupplierCardProps)
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => router.push(`/dashboard/suppliers/${supplier.id}`)}>
+            <DropdownMenuItem onClick={() => router.push(`/finance/suppliers/${supplier.id}`)}>
               <Eye className="mr-2 h-4 w-4" />
               Voir les détails
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push(`/dashboard/suppliers/${supplier.id}/edit`)}>
+            <DropdownMenuItem onClick={() => router.push(`/finance/suppliers/${supplier.id}/edit`)}>
               <Edit className="mr-2 h-4 w-4" />
               Modifier
             </DropdownMenuItem>
@@ -190,14 +190,14 @@ export default function SupplierCard({ supplier, onRefresh }: SupplierCardProps)
           variant="outline"
           size="sm"
           className="flex-1"
-          onClick={() => router.push(`/dashboard/suppliers/${supplier.id}`)}
+          onClick={() => router.push(`/finance/suppliers/${supplier.id}`)}
         >
           Voir détails
         </Button>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => router.push(`/dashboard/suppliers/${supplier.id}/invoices/new`)}
+          onClick={() => router.push(`/finance/suppliers/${supplier.id}/invoices/new`)}
         >
           <FileText className="h-4 w-4" />
         </Button>

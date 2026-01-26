@@ -101,7 +101,7 @@ export default function SupplierForm({ initialData, supplierId, mode }: Supplier
         throw new Error(data.error || "Erreur lors de l'enregistrement");
       }
 
-      router.push("/dashboard/suppliers");
+      router.push("/finance/suppliers");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue");

@@ -26,16 +26,20 @@ Remplacer les interfaces Odoo (site e-commerce, gestion produits) par des vues m
 ## Structure
 
 ```
-frontend/          → Next.js (boutique e-commerce)
-backoffice/        → React + Vite (administration)
-backend/
+vitrine-quelyos/   → Next.js 14 (site vitrine : marketing, finance, superadmin)
+vitrine-client/    → Next.js 16 (boutique e-commerce)
+dashboard-client/  → React 19 + Vite (backoffice admin)
+odoo-backend/
   ├── addons/
   │   └── quelyos_api/  → Module Odoo (API REST)
   ├── docker-compose.yml
   └── reset.sh          → Script reset installation
+scripts/           → Scripts de gestion (dev-start.sh, dev-stop.sh)
 config/            → Configuration Odoo
 nginx/             → Config production
 ```
+
+**Voir [ARCHITECTURE.md](ARCHITECTURE.md)** pour la documentation complète des services et ports.
 
 ## Stack
 
@@ -51,40 +55,48 @@ nginx/             → Config production
 
 ### Prérequis
 - Docker & Docker Compose
-- Node.js 20+ (frontend/backoffice)
+- Node.js 20+
 - Git
 
-### Installation
+### Installation et Démarrage
 
 ```bash
 # Cloner le projet
 git clone https://github.com/votre-compte/QuelyosSuite.git
 cd QuelyosSuite
 
-# Backend Odoo (démarrage complet)
-cd backend
-docker-compose up -d
-./reset.sh  # Installation complète (Odoo + module quelyos_api + données démo)
+# Installation des dépendances
+pnpm install  # ou npm install dans chaque dossier
 
-# Frontend (boutique e-commerce)
-cd ../frontend
-npm install
-npm run dev  # http://localhost:3000
+# Option 1 : Script automatique (recommandé)
+./scripts/dev-start.sh all
 
-# Backoffice (administration)
-cd ../backoffice
-npm install
-npm run dev  # http://localhost:5175
+# Option 2 : Démarrage manuel
+cd odoo-backend && docker-compose up -d
+cd ../dashboard-client && npm run dev &
+cd ../vitrine-quelyos && npm run dev &
+cd ../vitrine-client && npm run dev &
 ```
 
 ### Accès
 
-- **Frontend** : http://localhost:3000
-- **Backoffice** : http://localhost:5175
+- **Site Vitrine** : http://localhost:3000 (marketing, finance, superadmin)
+- **E-commerce** : http://localhost:3001 (boutique en ligne)
+- **Backoffice** : http://localhost:5175 (administration)
 - **API Odoo** : http://localhost:8069/api/ecommerce/*
 - **Interface Odoo** : http://localhost:8069 (admin / admin)
 
-**Documentation complète** : Voir [backend/DEVELOPMENT.md](backend/DEVELOPMENT.md) pour les détails techniques et workflows Odoo.
+### Gestion des Services
+
+```bash
+./scripts/dev-start.sh all     # Démarrer tous les services
+./scripts/dev-stop.sh all      # Arrêter tous les services
+/restart-all                   # Via Claude Code
+```
+
+**Documentation complète** :
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Architecture détaillée et ports
+- [odoo-backend/DEVELOPMENT.md](odoo-backend/DEVELOPMENT.md) - Workflows Odoo
 
 ---
 

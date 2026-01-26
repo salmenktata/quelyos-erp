@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
-import { useTheme } from "@/lib/ThemeContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { ThemeSelector } from "@/components/ThemeToggle";
 import { Check, Loader2, Moon, Sun, Monitor, Globe, Building2 } from "lucide-react";
 

@@ -46,11 +46,51 @@ import StaticPages from './pages/StaticPages'
 // Finance module
 import FinanceDashboard from './pages/finance/FinanceDashboard'
 import FinanceAccounts from './pages/finance/accounts/page'
+import FinanceAccountNew from './pages/finance/accounts/new/page'
+import FinanceAccountDetail from './pages/finance/accounts/[id]/page'
 import FinanceTransactions from './pages/finance/transactions/page'
 import FinanceBudgets from './pages/finance/budgets/page'
+import FinanceBudgetNew from './pages/finance/budgets/new/page'
+import FinanceBudgetDetail from './pages/finance/budgets/[id]/page'
 import FinanceForecast from './pages/finance/forecast/page'
 import FinanceArchives from './pages/finance/archives/page'
 import FinancePaymentPlanning from './pages/finance/payment-planning/page'
+import FinanceExpenses from './pages/finance/expenses/page'
+import FinanceExpenseNew from './pages/finance/expenses/new/page'
+import FinanceIncomes from './pages/finance/incomes/page'
+import FinanceIncomeNew from './pages/finance/incomes/new/page'
+import FinanceCategories from './pages/finance/categories/page'
+import FinanceSuppliers from './pages/finance/suppliers/page'
+import FinanceSupplierNew from './pages/finance/suppliers/new/page'
+import FinancePortfolios from './pages/finance/portfolios/page'
+import FinanceScenarios from './pages/finance/scenarios/page'
+import FinanceAlerts from './pages/finance/alerts/page'
+import FinanceCharts from './pages/finance/charts/page'
+import FinanceImport from './pages/finance/import/page'
+import FinanceReporting from './pages/finance/reporting/page'
+import FinanceReportingOverview from './pages/finance/reporting/overview/page'
+import FinanceReportingCashflow from './pages/finance/reporting/cashflow/page'
+import FinanceReportingByCategory from './pages/finance/reporting/by-category/page'
+import FinanceReportingByAccount from './pages/finance/reporting/by-account/page'
+import FinanceReportingByPortfolio from './pages/finance/reporting/by-portfolio/page'
+import FinanceReportingByFlow from './pages/finance/reporting/by-flow/page'
+import FinanceReportingForecast from './pages/finance/reporting/forecast/page'
+import FinanceReportingForecasts from './pages/finance/reporting/forecasts/page'
+import FinanceReportingProfitability from './pages/finance/reporting/profitability/page'
+import FinanceReportingEbitda from './pages/finance/reporting/ebitda/page'
+import FinanceReportingBfr from './pages/finance/reporting/bfr/page'
+import FinanceReportingDso from './pages/finance/reporting/dso/page'
+import FinanceReportingBreakeven from './pages/finance/reporting/breakeven/page'
+import FinanceReportingDataQuality from './pages/finance/reporting/data-quality/page'
+import FinanceSettings from './pages/finance/settings/page'
+import FinanceSettingsCategories from './pages/finance/settings/categories/page'
+import FinanceSettingsDevise from './pages/finance/settings/devise/page'
+import FinanceSettingsFlux from './pages/finance/settings/flux/page'
+import FinanceSettingsTva from './pages/finance/settings/tva/page'
+import FinanceSettingsBilling from './pages/finance/settings/billing/page'
+import FinanceSettingsNotifications from './pages/finance/settings/notifications/page'
+import FinanceSettingsIntegrations from './pages/finance/settings/integrations/page'
+import FinanceSettingsSecurity from './pages/finance/settings/security/page'
 import { CurrencyProvider } from './lib/finance/CurrencyContext'
 import { FinanceErrorBoundary } from './components/finance/FinanceErrorBoundary'
 
@@ -465,6 +505,486 @@ export default function App() {
                     <FinanceErrorBoundary>
                       <CurrencyProvider>
                         <FinancePaymentPlanning />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/expenses"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceExpenses />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/incomes"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceIncomes />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/expenses/new"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceExpenseNew />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/incomes/new"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceIncomeNew />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/accounts/new"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceAccountNew />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/accounts/:id"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceAccountDetail />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/budgets/new"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceBudgetNew />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/budgets/:id"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceBudgetDetail />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/categories"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceCategories />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/suppliers"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSuppliers />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/suppliers/new"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSupplierNew />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/portfolios"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinancePortfolios />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/scenarios"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceScenarios />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/alerts"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceAlerts />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/charts"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceCharts />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/import"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceImport />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReporting />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/overview"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingOverview />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/cashflow"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingCashflow />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/by-category"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingByCategory />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/by-account"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingByAccount />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/by-portfolio"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingByPortfolio />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/by-flow"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingByFlow />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/forecast"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingForecast />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/forecasts"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingForecasts />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/profitability"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingProfitability />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/ebitda"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingEbitda />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/bfr"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingBfr />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/dso"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingDso />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/breakeven"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingBreakeven />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/data-quality"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceReportingDataQuality />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/settings"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSettings />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/settings/categories"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSettingsCategories />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/settings/devise"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSettingsDevise />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/settings/flux"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSettingsFlux />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/settings/tva"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSettingsTva />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/settings/billing"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSettingsBilling />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/settings/notifications"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSettingsNotifications />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/settings/integrations"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSettingsIntegrations />
+                      </CurrencyProvider>
+                    </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/settings/security"
+                element={
+                  <ProtectedRoute>
+                    <FinanceErrorBoundary>
+                      <CurrencyProvider>
+                        <FinanceSettingsSecurity />
                       </CurrencyProvider>
                     </FinanceErrorBoundary>
                   </ProtectedRoute>

@@ -78,7 +78,7 @@ Puis relancer : /upgrade-odoo
 **1.2. Vérifier le module existe**
 
 ```bash
-ls -d backend/addons/$MODULE
+ls -d odoo-backend/addons/$MODULE
 ```
 
 **Si module introuvable :**

@@ -62,7 +62,7 @@ Actions requises :
 
 **Vérifier fichiers .env existent :**
 ```bash
-ls -la backend/.env.production
+ls -la odoo-backend/.env.production
 ls -la frontend/.env.production
 ls -la backoffice/.env.production
 ```
@@ -275,7 +275,7 @@ docker-compose exec -T db pg_dump -U odoo -d quelyos | gzip > backups/quelyos_$(
 ```
 
 **Vérifier :**
-- [ ] Fichier backup créé dans `backend/backups/`
+- [ ] Fichier backup créé dans `odoo-backend/backups/`
 - [ ] Taille backup > 0 (non vide)
 - [ ] Backup compressé (.gz)
 
@@ -389,7 +389,7 @@ EOF
 - Vérifier succès (aucune erreur dans logs)
 
 **Migrations custom (si applicable) :**
-- Lister scripts migration dans `backend/migrations/`
+- Lister scripts migration dans `odoo-backend/migrations/`
 - Exécuter dans l'ordre (par date/version)
 - Vérifier succès de chaque migration
 
@@ -674,7 +674,7 @@ curl -f https://quelyos.com/api/health
 
 ## 📝 Notes
 
-- Backup DB sauvegardé dans `backend/backups/` (conserver 3 versions)
+- Backup DB sauvegardé dans `odoo-backend/backups/` (conserver 3 versions)
 - Aucune migration DB breaking (compatibilité arrière OK)
 - Monitoring post-déploiement recommandé (24h)
 - Next release prévue : v1.3.0 (2026-02-08)

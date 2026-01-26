@@ -498,7 +498,7 @@ export default function ImportPage() {
           {state.currentStep === "complete" && state.importResults && (
             <ImportSummary
               results={state.importResults}
-              onViewTransactions={() => navigate("/dashboard/transactions")}
+              onViewTransactions={() => navigate("/finance/transactions")}
               onImportAnother={() => dispatch({ type: "RESET_WIZARD" })}
             />
           )}

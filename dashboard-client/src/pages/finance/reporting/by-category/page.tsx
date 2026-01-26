@@ -3,6 +3,7 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import {
   PieChart,
   ChevronLeft,
@@ -180,7 +181,8 @@ export default function ByCategoryReportPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
         <ReportingNav />
@@ -200,10 +202,10 @@ export default function ByCategoryReportPage() {
           </Link>
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-amber-500 to-orange-600 p-3 shadow-lg shadow-amber-500/30">
-              <PieChart className="h-6 w-6 text-white" />
+              <PieChart className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Analyse par catégorie</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analyse par catégorie</h1>
               <p className="text-sm text-slate-400">
                 Répartition détaillée des revenus et dépenses par catégorie
               </p>
@@ -237,8 +239,8 @@ export default function ByCategoryReportPage() {
                     disabled={loading}
                     className={`rounded-lg px-3 py-1 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       timeRange === range
-                        ? "bg-amber-500 text-white"
-                        : "text-slate-400 hover:bg-white/5"
+                        ? "bg-amber-500 text-gray-900 dark:text-white"
+                        : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                     }`}
                   >
                     {range}j
@@ -246,15 +248,15 @@ export default function ByCategoryReportPage() {
                 ))}
               </div>
 
-              <div className="h-8 w-px bg-white/10" />
+              <div className="h-8 w-px bg-gray-100 dark:bg-gray-700" />
 
               <div className="flex gap-2">
                 <button
                   onClick={() => setViewType("all")}
                   className={`rounded-lg px-3 py-1 text-sm font-medium transition-all ${
                     viewType === "all"
-                      ? "bg-indigo-500 text-white"
-                      : "text-slate-400 hover:bg-white/5"
+                      ? "bg-indigo-500 text-gray-900 dark:text-white"
+                      : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                   }`}
                 >
                   Tous
@@ -263,8 +265,8 @@ export default function ByCategoryReportPage() {
                   onClick={() => setViewType("income")}
                   className={`rounded-lg px-3 py-1 text-sm font-medium transition-all ${
                     viewType === "income"
-                      ? "bg-emerald-500 text-white"
-                      : "text-slate-400 hover:bg-white/5"
+                      ? "bg-emerald-500 text-gray-900 dark:text-white"
+                      : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                   }`}
                 >
                   Revenus
@@ -273,8 +275,8 @@ export default function ByCategoryReportPage() {
                   onClick={() => setViewType("expense")}
                   className={`rounded-lg px-3 py-1 text-sm font-medium transition-all ${
                     viewType === "expense"
-                      ? "bg-rose-500 text-white"
-                      : "text-slate-400 hover:bg-white/5"
+                      ? "bg-rose-500 text-gray-900 dark:text-white"
+                      : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                   }`}
                 >
                   Dépenses
@@ -337,7 +339,7 @@ export default function ByCategoryReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-emerald-200">Total revenus</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(totalIncome)}
                 </p>
               </div>
@@ -349,7 +351,7 @@ export default function ByCategoryReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-rose-200">Total dépenses</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(totalExpense)}
                 </p>
               </div>
@@ -361,7 +363,7 @@ export default function ByCategoryReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-indigo-200">Solde net</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(totalIncome - totalExpense)}
                 </p>
               </div>
@@ -378,7 +380,7 @@ export default function ByCategoryReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-6 text-lg font-semibold text-white">
+            <h2 className="mb-6 text-lg font-semibold text-gray-900 dark:text-white">
               Répartition par catégorie
             </h2>
             <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:justify-around">
@@ -484,12 +486,12 @@ export default function ByCategoryReportPage() {
                       }}
                     />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-white">{cat.name}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{cat.name}</p>
                       <p className="text-xs text-slate-400">
                         {cat.percentage.toFixed(1)}%
                       </p>
                     </div>
-                    <p className="text-sm font-semibold text-white">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
                       {formatAmount(cat.total)}
                     </p>
                   </div>
@@ -506,7 +508,7 @@ export default function ByCategoryReportPage() {
           transition={{ delay: 0.4 }}
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Détail par catégorie
             </h2>
             <div className="space-y-3">
@@ -521,7 +523,7 @@ export default function ByCategoryReportPage() {
                     onClick={() => toggleCategory(cat.categoryId)}
                     className="w-full"
                   >
-                    <div className="flex items-center justify-between rounded-lg bg-white/5 p-4 transition-all hover:bg-white/10">
+                    <div className="flex items-center justify-between rounded-lg bg-gray-100 dark:bg-gray-800 p-4 transition-all hover:bg-gray-100 dark:bg-gray-700">
                       <div className="flex items-center gap-3">
                         <div
                           className="h-4 w-4 rounded-full"
@@ -551,7 +553,7 @@ export default function ByCategoryReportPage() {
                           }}
                         />
                         <div className="text-left">
-                          <p className="font-medium text-white">{cat.name}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{cat.name}</p>
                           {cat.count !== undefined && (
                             <p className="text-xs text-slate-400">
                               {cat.count} transaction{cat.count > 1 ? "s" : ""}
@@ -561,7 +563,7 @@ export default function ByCategoryReportPage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="font-semibold text-white">
+                          <p className="font-semibold text-gray-900 dark:text-white">
                             {formatAmount(cat.total)}
                           </p>
                           <p className="text-xs text-slate-400">
@@ -599,17 +601,17 @@ export default function ByCategoryReportPage() {
                         {!isLoading && txs.slice(0, 10).map((tx) => (
                           <div
                             key={tx.id}
-                            className="flex items-center justify-between rounded-lg bg-white/5 p-3"
+                            className="flex items-center justify-between rounded-lg bg-gray-100 dark:bg-gray-800 p-3"
                           >
                             <div>
-                              <p className="text-sm font-medium text-white">
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">
                                 {tx.description || "Sans description"}
                               </p>
                               <p className="text-xs text-slate-400">
                                 {new Date(tx.occurredAt).toLocaleDateString('fr-FR')}
                               </p>
                             </div>
-                            <p className="font-semibold text-white">
+                            <p className="font-semibold text-gray-900 dark:text-white">
                               {formatAmount(tx.amount)}
                             </p>
                           </div>
@@ -632,5 +634,6 @@ export default function ByCategoryReportPage() {
         )}
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

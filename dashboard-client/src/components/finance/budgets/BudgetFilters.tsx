@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { GlassPanel, GlassButton } from "@/components/ui/glass";
 import { Search, Filter, X, ChevronDown } from "lucide-react";
 
 type BudgetStatus = "ALL" | "ON_TRACK" | "WARNING" | "EXCEEDED";
@@ -58,18 +57,18 @@ export function BudgetFilters({ filters, onFilterChange, categories }: BudgetFil
   };
 
   return (
-    <GlassPanel>
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
       {/* Quick Filters Row */}
       <div className="flex flex-wrap gap-3 items-center">
         {/* Search */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-300" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder="Rechercher un budget..."
             value={filters.search}
             onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/15 bg-white/10 text-white placeholder:text-indigo-100/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 backdrop-blur-sm"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           />
         </div>
 
@@ -77,7 +76,7 @@ export function BudgetFilters({ filters, onFilterChange, categories }: BudgetFil
         <select
           value={filters.status}
           onChange={(e) => onFilterChange({ ...filters, status: e.target.value as BudgetStatus })}
-          className="px-4 py-2.5 rounded-xl border border-white/15 bg-white/10 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 backdrop-blur-sm"
+          className="px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         >
           <option value="ALL">Tous statuts</option>
           <option value="ON_TRACK">Sur la bonne voie</option>
@@ -89,56 +88,56 @@ export function BudgetFilters({ filters, onFilterChange, categories }: BudgetFil
         <select
           value={filters.period}
           onChange={(e) => onFilterChange({ ...filters, period: e.target.value as BudgetPeriod })}
-          className="px-4 py-2.5 rounded-xl border border-white/15 bg-white/10 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 backdrop-blur-sm"
+          className="px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         >
           <option value="ALL">Toutes périodes</option>
           <option value="WEEKLY">Hebdomadaire</option>
           <option value="MONTHLY">Mensuel</option>
           <option value="QUARTERLY">Trimestriel</option>
-          <option value="QUARTERLY">Annuel</option>
+          <option value="YEARLY">Annuel</option>
           <option value="CUSTOM">Personnalisé</option>
         </select>
 
         {/* Extended Filters Toggle */}
-        <GlassButton
-          variant="subtle"
+        <button
+          type="button"
           onClick={() => setShowExtended(!showExtended)}
-          className="flex items-center gap-2"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
         >
           <Filter className="h-4 w-4" />
           Filtres
           {activeFilterCount > 0 && (
-            <span className="px-2 py-0.5 rounded-full bg-indigo-500 text-xs font-semibold">
+            <span className="px-2 py-0.5 rounded-full bg-indigo-500 text-white text-xs font-semibold">
               {activeFilterCount}
             </span>
           )}
           <ChevronDown className={`h-4 w-4 transition-transform ${showExtended ? "rotate-180" : ""}`} />
-        </GlassButton>
+        </button>
 
         {/* Reset Filters */}
         {activeFilterCount > 0 && (
-          <GlassButton
-            variant="ghost"
+          <button
+            type="button"
             onClick={resetFilters}
-            className="flex items-center gap-2"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <X className="h-4 w-4" />
             Réinitialiser
-          </GlassButton>
+          </button>
         )}
       </div>
 
       {/* Extended Filters Panel */}
       {showExtended && (
-        <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
           {/* Category Multi-Select */}
           <div>
-            <label className="block text-sm font-medium text-indigo-100 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Catégories
             </label>
             <div className="flex flex-wrap gap-2">
               {categories.length === 0 ? (
-                <p className="text-sm text-indigo-100/60">Aucune catégorie disponible</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Aucune catégorie disponible</p>
               ) : (
                 categories.map(category => (
                   <button
@@ -148,7 +147,7 @@ export function BudgetFilters({ filters, onFilterChange, categories }: BudgetFil
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                       filters.categoryIds.includes(category.id)
                         ? "bg-indigo-500 text-white"
-                        : "bg-white/10 text-indigo-100 hover:bg-white/20"
+                        : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                     }`}
                   >
                     {category.name}
@@ -161,30 +160,30 @@ export function BudgetFilters({ filters, onFilterChange, categories }: BudgetFil
           {/* Date Range */}
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-indigo-100 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Période active - Du
               </label>
               <input
                 type="date"
                 value={filters.dateFrom}
                 onChange={(e) => onFilterChange({ ...filters, dateFrom: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-white/15 bg-white/10 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 backdrop-blur-sm"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-indigo-100 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Au
               </label>
               <input
                 type="date"
                 value={filters.dateTo}
                 onChange={(e) => onFilterChange({ ...filters, dateTo: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-white/15 bg-white/10 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 backdrop-blur-sm"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
           </div>
         </div>
       )}
-    </GlassPanel>
+    </div>
   );
 }

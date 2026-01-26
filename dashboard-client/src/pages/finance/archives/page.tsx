@@ -1,12 +1,10 @@
-
-
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { ModularLayout } from "@/components/ModularLayout";
 import { ROUTES } from "@/lib/finance/compat/routes";
 import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
-import { GlassCard, GlassPanel, GlassBadge, GlassListItem } from "@/components/ui/glass";
 import { ArrowUpRight, Loader2, Trash2, Undo2 } from "lucide-react";
 import type { BulkDeleteRequest } from "@/types/api";
 
@@ -120,99 +118,92 @@ export default function ArchivesPage() {
   }
 
   return (
-    <div className="relative min-h-screen text-white">
-      {/* Background blur orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/3 h-[350px] w-[350px] rounded-full bg-amber-500/20 blur-[120px]" />
-      </div>
-
-      <div className="relative space-y-6">
+    <ModularLayout>
+      <div className="p-4 md:p-8 space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">Archives</p>
-            <h1 className="bg-gradient-to-r from-white via-indigo-100 to-amber-200 bg-clip-text text-3xl font-semibold text-transparent">
+            <p className="text-xs uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400">Archives</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
               Transactions archivées
             </h1>
-            <p className="text-sm text-indigo-100/80">Consultation des lignes masquées (hors calculs).</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Consultation des lignes masquées (hors calculs).</p>
           </div>
           <Link
             to={ROUTES.FINANCE.DASHBOARD.HOME}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-indigo-50 backdrop-blur-sm transition hover:border-white/30 hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 transition hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             <ArrowUpRight size={16} /> Retour dashboard
           </Link>
         </div>
 
         {error && (
-          <GlassCard className="border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg px-4 py-3 text-sm text-red-700 dark:text-red-300">
             {error}
-          </GlassCard>
+          </div>
         )}
 
-        <GlassPanel gradient="indigo" className="grid gap-3 p-4 text-sm text-indigo-50 md:grid-cols-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 grid gap-3 md:grid-cols-4">
           <div className="space-y-1">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-indigo-200">Type</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Type</p>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
-              className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
-              <option className="text-slate-900" value="ALL">Tous</option>
-              <option className="text-slate-900" value="debit">Dépenses</option>
-              <option className="text-slate-900" value="credit">Revenus</option>
+              <option value="ALL">Tous</option>
+              <option value="debit">Dépenses</option>
+              <option value="credit">Revenus</option>
             </select>
           </div>
           <div className="space-y-1">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-indigo-200">Statut</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Statut</p>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-              className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
-              <option className="text-slate-900" value="ALL">Tous</option>
+              <option value="ALL">Tous</option>
               {statusOptions.map((opt) => (
-                <option key={opt.value} value={opt.value} className="text-slate-900">
+                <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>
               ))}
             </select>
           </div>
           <div className="space-y-1 md:col-span-2">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-indigo-200">Recherche</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Recherche</p>
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Description, tag, compte"
-              className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-indigo-100/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
-        </GlassPanel>
+        </div>
 
-        <GlassPanel gradient="purple" className="overflow-hidden p-0">
-          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 text-sm text-indigo-100/80">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4 py-3 text-sm">
             <div className="flex items-center gap-3">
-              <span>Archives</span>
-              <GlassBadge variant="default">{filtered.length} lignes</GlassBadge>
+              <span className="font-medium text-gray-900 dark:text-white">Archives</span>
+              <span className="rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-300">{filtered.length} lignes</span>
               {selectedIds.length > 0 && (
-                <GlassBadge variant="warning">
+                <span className="rounded-full bg-amber-100 dark:bg-amber-900/30 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
                   {selectedIds.length} sélectionnées
-                </GlassBadge>
+                </span>
               )}
             </div>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={unarchiveSelected}
               disabled={selectedIds.length === 0}
-              className="inline-flex items-center justify-center gap-1 rounded-lg border border-emerald-300/60 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-100 transition hover:border-emerald-200/80 disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-1 rounded-lg border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-2 text-xs font-medium text-emerald-700 dark:text-emerald-300 transition hover:bg-emerald-100 dark:hover:bg-emerald-900/50 disabled:opacity-50"
             >
               <Undo2 size={14} /> Restaurer
             </button>
             <button
               onClick={deleteSelected}
               disabled={selectedIds.length === 0}
-              className="inline-flex items-center justify-center gap-1 rounded-lg border border-red-300/60 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-100 transition hover:border-red-200/80 disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-1 rounded-lg border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/30 px-3 py-2 text-xs font-medium text-red-700 dark:text-red-300 transition hover:bg-red-100 dark:hover:bg-red-900/50 disabled:opacity-50"
             >
               <Trash2 size={14} /> Supprimer
             </button>
@@ -220,16 +211,16 @@ export default function ArchivesPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-white/10 text-sm">
-            <thead className="bg-white/5 text-indigo-100">
-              <tr>
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+            <thead className="bg-gray-50 dark:bg-gray-700/50">
+              <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 <th className="px-4 py-3 text-left">
                   <input
                     type="checkbox"
                     aria-label="Tout sélectionner"
                     checked={filtered.length > 0 && filtered.every((tx) => selectedIds.includes(tx.id))}
                     onChange={toggleSelectAll}
-                    className="h-4 w-4 rounded border-white/30 bg-transparent text-indigo-400 focus:ring-indigo-400"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-indigo-600"
                   />
                 </th>
                 <th className="px-4 py-3 text-left">Type</th>
@@ -240,10 +231,10 @@ export default function ArchivesPage() {
                 <th className="px-4 py-3 text-left">Description</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {loading && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-4 text-center text-indigo-100/80">
+                  <td colSpan={7} className="px-4 py-4 text-center text-gray-500 dark:text-gray-400">
                     <Loader2 size={16} className="mx-auto animate-spin" />
                   </td>
                 </tr>
@@ -251,50 +242,50 @@ export default function ArchivesPage() {
 
               {!loading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-4 text-center text-indigo-100/80">
+                  <td colSpan={7} className="px-4 py-4 text-center text-gray-500 dark:text-gray-400">
                     Aucune transaction archivée.
                   </td>
                 </tr>
               )}
 
               {!loading && filtered.map((tx) => (
-                <tr key={tx.id} className="hover:bg-white/5">
+                <tr key={tx.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                   <td className="px-4 py-3 align-top">
                     <input
                       type="checkbox"
                       aria-label="Sélectionner la transaction"
                       checked={selectedIds.includes(tx.id)}
                       onChange={() => toggleSelect(tx.id)}
-                      className="h-4 w-4 rounded border-white/30 bg-transparent text-indigo-400 focus:ring-indigo-400"
+                      className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-indigo-600"
                     />
                   </td>
                   <td className="px-4 py-3 align-top">
-                    <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${
-                      tx.type === "debit" ? "bg-rose-500/15 text-rose-100 border border-rose-200/40" : "bg-emerald-500/15 text-emerald-100 border border-emerald-200/40"
+                    <span className={`rounded-full px-2 py-1 text-xs font-medium ${
+                      tx.type === "debit" ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300" : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300"
                     }`}>
                       {tx.type === "debit" ? "Dépense" : "Revenu"}
                     </span>
                   </td>
                   <td className="px-4 py-3 align-top">
-                    <div className="font-medium text-white">{tx.account?.name || `Compte #${tx.accountId}`}</div>
-                    <div className="text-xs text-indigo-100/70">ID {tx.accountId}</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{tx.account?.name || `Compte #${tx.accountId}`}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">ID {tx.accountId}</div>
                   </td>
-                  <td className={`px-4 py-3 align-top font-semibold ${tx.type === "debit" ? "text-rose-200" : "text-emerald-200"}`}>
+                  <td className={`px-4 py-3 align-top font-semibold ${tx.type === "debit" ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}>
                     {tx.type === "debit" ? "-" : "+"}{tx.amount} {currency}
                   </td>
-                  <td className="px-4 py-3 align-top text-indigo-100/80">
+                  <td className="px-4 py-3 align-top text-gray-600 dark:text-gray-400">
                     {new Date(tx.occurredAt).toLocaleDateString("fr-FR")}
                   </td>
                   <td className="px-4 py-3 align-top">
                     {tx.status ? (
-                      <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-indigo-50">
+                      <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-300">
                         {statusLabels[tx.status] || tx.status}
                       </span>
                     ) : (
                       "-"
                     )}
                   </td>
-                  <td className="px-4 py-3 align-top text-indigo-50/90 whitespace-pre-wrap max-w-xs">
+                  <td className="px-4 py-3 align-top text-gray-700 dark:text-gray-300 whitespace-pre-wrap max-w-xs">
                     {tx.description || ""}
                   </td>
                 </tr>
@@ -302,8 +293,8 @@ export default function ArchivesPage() {
             </tbody>
           </table>
         </div>
-      </GlassPanel>
       </div>
-    </div>
+      </div>
+    </ModularLayout>
   );
 }

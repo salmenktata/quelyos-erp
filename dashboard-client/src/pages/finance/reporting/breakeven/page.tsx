@@ -3,6 +3,7 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import {
   Target,
   ChevronLeft,
@@ -67,7 +68,8 @@ export default function BreakEvenReportPage() {
   });
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         <ReportingNav />
 
@@ -86,10 +88,10 @@ export default function BreakEvenReportPage() {
           </Link>
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 p-3 shadow-lg shadow-purple-500/30">
-              <Target className="h-6 w-6 text-white" />
+              <Target className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Point Mort - Seuil de Rentabilité
               </h1>
               <p className="text-sm text-slate-400">
@@ -141,8 +143,8 @@ export default function BreakEvenReportPage() {
                     disabled={loading}
                     className={`rounded-lg px-3 py-1 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       timeRange === range
-                        ? "bg-purple-500 text-white"
-                        : "text-slate-400 hover:bg-white/5"
+                        ? "bg-purple-500 text-gray-900 dark:text-white"
+                        : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                     }`}
                   >
                     {range}j
@@ -261,7 +263,7 @@ export default function BreakEvenReportPage() {
                 <p className={`mb-1 text-sm ${apiData.breakEvenReached ? "text-emerald-200" : "text-rose-200"}`}>
                   Statut
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {apiData.breakEvenReached ? "✅ Atteint" : "❌ Non atteint"}
                 </p>
                 <p className={`text-xs mt-1 ${apiData.breakEvenReached ? "text-emerald-300" : "text-rose-300"}`}>
@@ -282,7 +284,7 @@ export default function BreakEvenReportPage() {
                 <p className="mb-1 text-sm text-indigo-200">
                   CA Point Mort
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(apiData.breakEvenRevenue)}
                 </p>
                 <p className="text-xs text-indigo-300 mt-1">
@@ -299,7 +301,7 @@ export default function BreakEvenReportPage() {
                 <p className="mb-1 text-sm text-emerald-200">
                   CA Actuel
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(apiData.currentRevenue)}
                 </p>
                 <p className="text-xs text-emerald-300 mt-1">
@@ -316,7 +318,7 @@ export default function BreakEvenReportPage() {
                 <p className="mb-1 text-sm text-purple-200">
                   Marge de sécurité
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {apiData.safetyMargin >= 0 ? apiData.safetyMargin.toFixed(1) : "0"}%
                 </p>
                 <p className="text-xs text-purple-300 mt-1">
@@ -343,7 +345,7 @@ export default function BreakEvenReportPage() {
                 <AlertCircle className="h-6 w-6 text-rose-400 flex-shrink-0" />
               )}
               <div className="flex-1">
-                <h3 className="mb-1 font-semibold text-white">
+                <h3 className="mb-1 font-semibold text-gray-900 dark:text-white">
                   {apiData.breakEvenReached ? "✅ Point mort atteint" : "❌ Point mort non atteint"}
                 </h3>
                 <p className="text-sm text-slate-300">
@@ -352,7 +354,7 @@ export default function BreakEvenReportPage() {
                     : `Il vous manque ${formatAmount(Math.abs(apiData.revenueGap))} de CA pour atteindre le point mort. Vous devez générer ${formatAmount(apiData.breakEvenRevenue)} de CA pour couvrir vos charges fixes.`}
                 </p>
                 {apiData.breakEvenReached && (
-                  <div className="mt-3 h-2 rounded-full bg-white/10">
+                  <div className="mt-3 h-2 rounded-full bg-gray-100 dark:bg-gray-700">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400"
                       style={{ width: `${Math.min((apiData.currentRevenue / (apiData.breakEvenRevenue * 1.5)) * 100, 100)}%` }}
@@ -411,14 +413,14 @@ export default function BreakEvenReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Structure des coûts
             </h2>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-lg bg-indigo-500/10 p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <PieChart className="h-5 w-5 text-indigo-400" />
-                  <span className="font-semibold text-white">Coûts fixes</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">Coûts fixes</span>
                 </div>
                 <p className="text-3xl font-bold text-indigo-400 mb-1">
                   {formatAmount(apiData.fixedCosts)}
@@ -431,7 +433,7 @@ export default function BreakEvenReportPage() {
               <div className="rounded-lg bg-emerald-500/10 p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingUp className="h-5 w-5 text-emerald-400" />
-                  <span className="font-semibold text-white">Coûts variables</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">Coûts variables</span>
                 </div>
                 <p className="text-3xl font-bold text-emerald-400 mb-1">
                   {formatAmount(apiData.variableCosts)}
@@ -452,13 +454,13 @@ export default function BreakEvenReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Calcul du point mort
             </h2>
             <div className="space-y-4">
-              <div className="rounded-lg bg-white/5 p-4">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-4">
                 <p className="text-sm text-slate-400 mb-2">1. Marge sur coûts variables</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {(apiData.contributionMargin * 100).toFixed(1)}%
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
@@ -468,7 +470,7 @@ export default function BreakEvenReportPage() {
 
               <div className="rounded-lg bg-purple-500/10 p-4 border border-purple-500/30">
                 <p className="text-sm text-purple-200 mb-2">2. Point mort (CA)</p>
-                <p className="text-3xl font-bold text-white mb-2">
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                   {formatAmount(apiData.breakEvenRevenue)}
                 </p>
                 <p className="text-sm text-slate-300">
@@ -479,9 +481,9 @@ export default function BreakEvenReportPage() {
                 </p>
               </div>
 
-              <div className="rounded-lg bg-white/5 p-4">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-4">
                 <p className="text-sm text-slate-400 mb-2">3. Marge de sécurité</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {apiData.safetyMargin >= 0 ? apiData.safetyMargin.toFixed(1) : "0"}%
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
@@ -501,7 +503,7 @@ export default function BreakEvenReportPage() {
         >
           {/* Fixed Costs */}
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Coûts fixes (FIXED)
             </h2>
             {apiData.categoriesBreakdown.fixed.length === 0 ? (
@@ -510,7 +512,7 @@ export default function BreakEvenReportPage() {
               <div className="space-y-2">
                 {apiData.categoriesBreakdown.fixed.slice(0, 10).map((cat) => (
                   <div key={cat.categoryId} className="flex items-center justify-between rounded-lg bg-indigo-500/10 p-3">
-                    <span className="text-sm text-white">{cat.categoryName}</span>
+                    <span className="text-sm text-gray-900 dark:text-white">{cat.categoryName}</span>
                     <span className="text-sm font-semibold text-indigo-400">
                       {formatAmount(cat.amount)}
                     </span>
@@ -522,7 +524,7 @@ export default function BreakEvenReportPage() {
 
           {/* Variable Costs */}
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Coûts variables (VARIABLE)
             </h2>
             {apiData.categoriesBreakdown.variable.length === 0 ? (
@@ -531,7 +533,7 @@ export default function BreakEvenReportPage() {
               <div className="space-y-2">
                 {apiData.categoriesBreakdown.variable.slice(0, 10).map((cat) => (
                   <div key={cat.categoryId} className="flex items-center justify-between rounded-lg bg-emerald-500/10 p-3">
-                    <span className="text-sm text-white">{cat.categoryName}</span>
+                    <span className="text-sm text-gray-900 dark:text-white">{cat.categoryName}</span>
                     <span className="text-sm font-semibold text-emerald-400">
                       {formatAmount(cat.amount)}
                     </span>
@@ -553,7 +555,7 @@ export default function BreakEvenReportPage() {
             <GlassPanel className="p-6 border-amber-500/30">
               <div className="flex items-center gap-2 mb-4">
                 <AlertCircle className="h-5 w-5 text-amber-400" />
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Coûts non classifiés ({apiData.categoriesBreakdown.unclassified.length})
                 </h2>
               </div>
@@ -563,7 +565,7 @@ export default function BreakEvenReportPage() {
               <div className="space-y-2">
                 {apiData.categoriesBreakdown.unclassified.slice(0, 10).map((cat) => (
                   <div key={cat.categoryId} className="flex items-center justify-between rounded-lg bg-amber-500/10 p-3">
-                    <span className="text-sm text-white">{cat.categoryName}</span>
+                    <span className="text-sm text-gray-900 dark:text-white">{cat.categoryName}</span>
                     <span className="text-sm font-semibold text-amber-400">
                       {formatAmount(cat.amount)}
                     </span>
@@ -581,27 +583,27 @@ export default function BreakEvenReportPage() {
           transition={{ delay: 0.8 }}
         >
           <GlassPanel className="p-6" gradient="violet">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               💡 Recommandations
             </h2>
             <div className="space-y-3">
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>1. Classifier les catégories</strong> - Allez dans les paramètres pour classifier chaque catégorie de dépense en FIXED ou VARIABLE.
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>2. Réduire les coûts fixes</strong> - Les coûts fixes pèsent sur le point mort. Privilégiez les charges variables quand c&apos;est possible.
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>3. Améliorer la marge sur coûts variables</strong> - Augmentez vos prix ou réduisez les coûts variables pour atteindre le point mort plus facilement.
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>4. Marge de sécurité cible</strong> - Visez au moins 20% de marge de sécurité pour absorber les variations d&apos;activité.
                 </p>
               </div>
@@ -612,5 +614,6 @@ export default function BreakEvenReportPage() {
         )}
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

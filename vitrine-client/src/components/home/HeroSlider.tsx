@@ -18,6 +18,8 @@ interface Slide {
 }
 
 const SLIDE_DURATION = 5000; // 5 seconds per slide
+const TRANSITION_DURATION = 300; // Transition animation duration (ms)
+const AUTO_RESUME_DELAY = 10000; // Resume auto-play after manual navigation (ms)
 
 // Fallback slides si aucune donnée backend
 const fallbackSlides: Slide[] = [
@@ -77,43 +79,35 @@ export function HeroSlider() {
       setTimeout(() => {
         setCurrentSlide((prev) => (prev + 1) % slides.length);
         setIsTransitioning(false);
-      }, 300);
+      }, TRANSITION_DURATION);
     }, SLIDE_DURATION);
 
     return () => clearInterval(interval);
   }, [isAutoPlaying, slides.length]);
 
-  const goToSlide = useCallback((index: number) => {
-    if (index === currentSlide) return;
+  // Utility function to handle slide transitions with animation and auto-play resume
+  const performTransition = useCallback((slideIndexCalculator: (current: number) => number) => {
     setIsTransitioning(true);
     setTimeout(() => {
-      setCurrentSlide(index);
+      setCurrentSlide(slideIndexCalculator);
       setIsTransitioning(false);
-    }, 300);
+    }, TRANSITION_DURATION);
     setIsAutoPlaying(false);
-    // Resume auto-play after 10 seconds
-    setTimeout(() => setIsAutoPlaying(true), 10000);
-  }, [currentSlide]);
+    setTimeout(() => setIsAutoPlaying(true), AUTO_RESUME_DELAY);
+  }, []);
 
   const nextSlide = useCallback(() => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-      setIsTransitioning(false);
-    }, 300);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000);
-  }, [slides.length]);
+    performTransition((prev) => (prev + 1) % slides.length);
+  }, [performTransition, slides.length]);
 
   const prevSlide = useCallback(() => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-      setIsTransitioning(false);
-    }, 300);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 10000);
-  }, [slides.length]);
+    performTransition((prev) => (prev - 1 + slides.length) % slides.length);
+  }, [performTransition, slides.length]);
+
+  const goToSlide = useCallback((index: number) => {
+    if (index === currentSlide) return;
+    performTransition(() => index);
+  }, [performTransition, currentSlide]);
 
   // ⚠️ EARLY RETURNS APRÈS TOUS LES HOOKS
 

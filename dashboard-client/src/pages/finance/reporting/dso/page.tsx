@@ -3,6 +3,7 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import {
   Clock,
   ChevronLeft,
@@ -67,7 +68,8 @@ export default function DSOReportPage() {
   });
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         <ReportingNav />
 
@@ -86,10 +88,10 @@ export default function DSOReportPage() {
           </Link>
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 p-3 shadow-lg shadow-cyan-500/30">
-              <Clock className="h-6 w-6 text-white" />
+              <Clock className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 DSO - Délai d&apos;Encaissement Client
               </h1>
               <p className="text-sm text-slate-400">
@@ -141,8 +143,8 @@ export default function DSOReportPage() {
                     disabled={loading}
                     className={`rounded-lg px-3 py-1 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       timeRange === range
-                        ? "bg-cyan-500 text-white"
-                        : "text-slate-400 hover:bg-white/5"
+                        ? "bg-cyan-500 text-gray-900 dark:text-white"
+                        : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                     }`}
                   >
                     {range}j
@@ -239,7 +241,7 @@ export default function DSOReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-cyan-200">DSO Moyen</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {apiData.dso} jours
                 </p>
                 <p className="text-xs text-cyan-300 mt-1">
@@ -256,7 +258,7 @@ export default function DSOReportPage() {
                 <p className="mb-1 text-sm text-emerald-200">
                   Créances en cours
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(apiData.totalReceivables)}
                 </p>
                 <p className="text-xs text-emerald-300 mt-1">
@@ -273,7 +275,7 @@ export default function DSOReportPage() {
                 <p className="mb-1 text-sm text-amber-200">
                   Factures en retard
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {apiData.invoices.overdue}
                 </p>
                 <p className="text-xs text-amber-300 mt-1">
@@ -290,7 +292,7 @@ export default function DSOReportPage() {
                 <p className="mb-1 text-sm text-indigo-200">
                   Délai moy. paiement
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {apiData.avgPaymentDelay} jours
                 </p>
                 <p className="text-xs text-indigo-300 mt-1">
@@ -317,7 +319,7 @@ export default function DSOReportPage() {
                 <TrendingDown className="h-6 w-6 text-rose-400 flex-shrink-0" />
               )}
               <div>
-                <h3 className="mb-1 font-semibold text-white">
+                <h3 className="mb-1 font-semibold text-gray-900 dark:text-white">
                   {apiData.dso <= 45 ? "✅ DSO Sain" : apiData.dso <= 60 ? "⚠️ DSO Modéré" : "❌ DSO Élevé"}
                 </h3>
                 <p className="text-sm text-slate-300">
@@ -370,7 +372,7 @@ export default function DSOReportPage() {
           <GlassPanel className="p-6">
             <div className="mb-4 flex items-center gap-2">
               <Users className="h-5 w-5 text-indigo-400" />
-              <h2 className="text-lg font-semibold text-white">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Top 10 Clients - Créances en cours
               </h2>
             </div>
@@ -383,7 +385,7 @@ export default function DSOReportPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-white/10">
+                    <tr className="border-b border-gray-200 dark:border-gray-700">
                       <th className="pb-3 text-left text-sm font-medium text-slate-400">Client</th>
                       <th className="pb-3 text-right text-sm font-medium text-slate-400">Créances</th>
                       <th className="pb-3 text-right text-sm font-medium text-slate-400">Factures</th>
@@ -391,9 +393,9 @@ export default function DSOReportPage() {
                   </thead>
                   <tbody>
                     {apiData.byCustomer.map((customer, idx) => (
-                      <tr key={customer.customerId} className="border-b border-white/5">
-                        <td className="py-3 text-white">{customer.customerName}</td>
-                        <td className="py-3 text-right font-semibold text-white">
+                      <tr key={customer.customerId} className="border-b border-gray-200 dark:border-gray-700">
+                        <td className="py-3 text-gray-900 dark:text-white">{customer.customerName}</td>
+                        <td className="py-3 text-right font-semibold text-gray-900 dark:text-white">
                           {formatAmount(customer.receivables)}
                         </td>
                         <td className="py-3 text-right text-slate-400">
@@ -416,7 +418,7 @@ export default function DSOReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Répartition des factures
             </h2>
             <div className="grid gap-4 md:grid-cols-3">
@@ -449,27 +451,27 @@ export default function DSOReportPage() {
           transition={{ delay: 0.6 }}
         >
           <GlassPanel className="p-6" gradient="violet">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               💡 Recommandations
             </h2>
             <div className="space-y-3">
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>1. Relances automatiques</strong> - Mettez en place des relances automatiques à J+15, J+30 et J+45.
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>2. Pénalités de retard</strong> - Appliquez systématiquement les pénalités de retard prévues par la loi.
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>3. Conditions de paiement</strong> - Négociez des conditions plus courtes (Net 30 au lieu de Net 45).
                 </p>
               </div>
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-sm text-white">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-3">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <strong>4. Affacturage</strong> - Pour les gros clients, envisagez l&apos;affacturage pour améliorer la trésorerie.
                 </p>
               </div>
@@ -480,5 +482,6 @@ export default function DSOReportPage() {
         )}
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

@@ -133,7 +133,7 @@ export default function NewAccountPage() {
           </div>
           <div className="flex gap-3">
             <Link
-              to="/dashboard/accounts"
+              to="/finance/accounts"
               className="rounded-lg border border-white/20 px-4 py-2 text-sm text-indigo-50 transition hover:border-white/40"
             >
               Retour à la liste
@@ -304,7 +304,7 @@ export default function NewAccountPage() {
             {loading ? "Création..." : "Créer le compte"}
           </button>
           <Link
-            to="/dashboard/accounts"
+            to="/finance/accounts"
             className="rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-indigo-50 transition hover:border-white/40"
           >
             Annuler

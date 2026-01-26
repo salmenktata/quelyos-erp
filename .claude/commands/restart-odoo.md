@@ -12,7 +12,7 @@ Relance le serveur Odoo (backend) sur le port 8069 via Docker Compose.
 ## Workflow de la commande
 
 ### Étape 1 : Arrêter les conteneurs Odoo
-1. Se placer dans le dossier `backend/`
+1. Se placer dans le dossier `odoo-backend/`
 2. Arrêter les conteneurs Docker avec `docker-compose down`
 3. Vérifier que les conteneurs sont bien arrêtés
 

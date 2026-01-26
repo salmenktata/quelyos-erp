@@ -94,7 +94,7 @@ export default function BudgetDetailPage() {
         {/* Header */}
         <div>
           <button
-            onClick={() => navigate("/dashboard/budgets")}
+            onClick={() => navigate("/finance/budgets")}
             className="mb-4 inline-flex items-center gap-2 text-sm text-indigo-300 hover:text-indigo-200 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />

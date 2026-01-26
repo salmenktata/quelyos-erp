@@ -4,6 +4,7 @@ import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
 import { motion } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import {
   BarChart3,
   TrendingUp,
@@ -25,7 +26,7 @@ const reports = [
     title: "Vue d'ensemble",
     description: "KPIs principaux, tendances et synthèse globale",
     icon: BarChart3,
-    href: "/dashboard/reporting/overview",
+    href: "/finance/reporting/overview",
     badge: "Populaire",
     color: "from-indigo-500 to-purple-500",
   },
@@ -34,7 +35,7 @@ const reports = [
     title: "Trésorerie",
     description: "Analyse waterfall, balance et prévisions 90j",
     icon: DollarSign,
-    href: "/dashboard/reporting/cashflow",
+    href: "/finance/reporting/cashflow",
     badge: null,
     color: "from-emerald-500 to-teal-500",
   },
@@ -43,7 +44,7 @@ const reports = [
     title: "Par catégorie",
     description: "Breakdown revenus/dépenses, drill-down transactions",
     icon: PieChart,
-    href: "/dashboard/reporting/by-category",
+    href: "/finance/reporting/by-category",
     badge: "Nouveau",
     color: "from-amber-500 to-orange-500",
   },
@@ -52,7 +53,7 @@ const reports = [
     title: "Par flux",
     description: "Récurrent vs one-shot, fixes vs variables",
     icon: TrendingUp,
-    href: "/dashboard/reporting/by-flow",
+    href: "/finance/reporting/by-flow",
     badge: null,
     color: "from-cyan-500 to-blue-500",
   },
@@ -61,7 +62,7 @@ const reports = [
     title: "Par compte",
     description: "Performance bancaire, soldes, mouvements",
     icon: Wallet,
-    href: "/dashboard/reporting/by-account",
+    href: "/finance/reporting/by-account",
     badge: null,
     color: "from-violet-500 to-purple-500",
   },
@@ -70,7 +71,7 @@ const reports = [
     title: "Par portefeuille",
     description: "Vue consolidée par groupes de comptes",
     icon: Briefcase,
-    href: "/dashboard/reporting/by-portfolio",
+    href: "/finance/reporting/by-portfolio",
     badge: "Nouveau",
     color: "from-fuchsia-500 to-violet-500",
   },
@@ -79,7 +80,7 @@ const reports = [
     title: "Rentabilité",
     description: "Marges, ratios, coûts par catégorie",
     icon: Target,
-    href: "/dashboard/reporting/profitability",
+    href: "/finance/reporting/profitability",
     badge: null,
     color: "from-rose-500 to-pink-500",
   },
@@ -88,7 +89,7 @@ const reports = [
     title: "DSO - Délai d'encaissement",
     description: "Days Sales Outstanding, créances clients",
     icon: Clock,
-    href: "/dashboard/reporting/dso",
+    href: "/finance/reporting/dso",
     badge: "KPI",
     color: "from-cyan-500 to-blue-500",
   },
@@ -97,7 +98,7 @@ const reports = [
     title: "EBITDA",
     description: "Rentabilité avant amortissements",
     icon: TrendingUp,
-    href: "/dashboard/reporting/ebitda",
+    href: "/finance/reporting/ebitda",
     badge: "KPI",
     color: "from-emerald-500 to-teal-500",
   },
@@ -106,7 +107,7 @@ const reports = [
     title: "BFR - Besoin en Fonds de Roulement",
     description: "Working Capital, cycle d'exploitation",
     icon: Wallet,
-    href: "/dashboard/reporting/bfr",
+    href: "/finance/reporting/bfr",
     badge: "KPI",
     color: "from-amber-500 to-orange-500",
   },
@@ -115,7 +116,7 @@ const reports = [
     title: "Point mort (Break-even)",
     description: "Seuil de rentabilité, coûts fixes/variables",
     icon: Target,
-    href: "/dashboard/reporting/breakeven",
+    href: "/finance/reporting/breakeven",
     badge: "KPI",
     color: "from-purple-500 to-indigo-500",
   },
@@ -124,7 +125,7 @@ const reports = [
     title: "Prédictions ML des KPIs",
     description: "Prévisions intelligentes avec Prophet (Machine Learning)",
     icon: TrendingUp,
-    href: "/dashboard/reporting/forecasts",
+    href: "/finance/reporting/forecasts",
     badge: "AI",
     color: "from-violet-500 to-purple-600",
   },
@@ -133,7 +134,7 @@ const reports = [
     title: "Qualité des Données KPIs",
     description: "Fiabilité, prérequis et recommandations d'amélioration",
     icon: ShieldCheck,
-    href: "/dashboard/reporting/data-quality",
+    href: "/finance/reporting/data-quality",
     badge: "Nouveau",
     color: "from-emerald-500 to-teal-500",
   },
@@ -163,7 +164,8 @@ export default function ReportingHubPage() {
   useRequireAuth();
 
   return (
-    <div className="min-h-screen p-6 pt-24">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <motion.div
@@ -173,10 +175,10 @@ export default function ReportingHubPage() {
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-3 shadow-lg shadow-indigo-500/30">
-              <BarChart3 className="h-6 w-6 text-white" />
+              <BarChart3 className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Reporting</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Reporting</h1>
               <p className="text-sm text-slate-400">
                 Analysez vos finances sous tous les angles
               </p>
@@ -215,11 +217,11 @@ export default function ReportingHubPage() {
                     <div
                       className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${report.color} shadow-lg`}
                     >
-                      <Icon className="h-6 w-6 text-white" />
+                      <Icon className="h-6 w-6 text-gray-900 dark:text-white" />
                     </div>
 
                     {/* Content */}
-                    <h3 className="mb-2 text-lg font-semibold text-white group-hover:text-indigo-300 transition-colors">
+                    <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white group-hover:text-indigo-300 transition-colors">
                       {report.title}
                     </h3>
                     <p className="text-sm text-slate-400 mb-4">
@@ -251,7 +253,7 @@ export default function ReportingHubPage() {
           <GlassPanel gradient="purple" className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-white mb-1">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                   Rapport complet
                 </h2>
                 <p className="text-sm text-indigo-200">
@@ -267,5 +269,6 @@ export default function ReportingHubPage() {
         </motion.div>
       </div>
     </div>
+    </ModularLayout>
   );
 }

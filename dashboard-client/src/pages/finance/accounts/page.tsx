@@ -1,14 +1,21 @@
-
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { ModularLayout } from "@/components/ModularLayout";
 import { ROUTES } from "@/lib/finance/compat/routes";
 import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { currencies } from "@/lib/finance/currencies";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
-import { GlassCard, GlassPanel, GlassBadge, GlassListItem } from "@/components/ui/glass";
-import { Plus, Trash2, Pencil, Archive, ArrowUpDown, Check } from "lucide-react";
+import { PageHeader } from "@/components/finance/PageHeader";
+import { Button } from "@/components/ui/button";
+import {
+  PlusIcon,
+  TrashIcon,
+  PencilIcon,
+  ArchiveBoxIcon,
+  ArrowsUpDownIcon,
+  CreditCardIcon,
+} from "@heroicons/react/24/outline";
 import type { CreateAccountRequest, UpdateAccountRequest, ReassignAccountRequest } from "@/types/api";
 import { AccountModal, type AccountFormData } from "@/components/finance/accounts/AccountModal";
 import { DeleteConflictModal } from "@/components/finance/accounts/DeleteConflictModal";
@@ -55,17 +62,6 @@ const accountTypes: { value: AccountType; label: string }[] = [
   { value: "investissement", label: "Investissement" },
   { value: "pret", label: "Prêt / Crédit" },
 ];
-
-const typeBadge: Record<AccountType, string> = {
-  banque: "bg-indigo-500/20 text-indigo-100 border-indigo-400/30",
-  cash: "bg-emerald-500/20 text-emerald-100 border-emerald-400/30",
-  cheques: "bg-cyan-500/20 text-cyan-100 border-cyan-400/30",
-  traites: "bg-amber-500/20 text-amber-100 border-amber-400/30",
-  carte: "bg-violet-500/20 text-violet-100 border-violet-400/30",
-  epargne: "bg-sky-500/20 text-sky-100 border-sky-400/30",
-  investissement: "bg-rose-500/20 text-rose-100 border-rose-400/30",
-  pret: "bg-slate-500/20 text-slate-100 border-slate-400/30",
-};
 
 export default function AccountsPage() {
   const { user } = useRequireAuth();
@@ -329,48 +325,31 @@ export default function AccountsPage() {
   };
 
   return (
-    <div className="relative min-h-screen text-white">
-      {/* Background blur orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/3 h-[350px] w-[350px] rounded-full bg-emerald-500/20 blur-[120px]" />
-      </div>
-
-      <div className="relative space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-1">
-            <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">Comptes</p>
-            <h1 className="bg-gradient-to-r from-white via-indigo-100 to-purple-200 bg-clip-text text-2xl md:text-3xl font-semibold text-transparent">
-              Vue liste
-            </h1>
-            <p className="text-sm text-indigo-100/80 hidden md:block">
-              Consultez vos comptes sous forme de tableau.
-            </p>
-          </div>
-          <div className="flex gap-2 md:gap-3">
-            <Link
-              to={ROUTES.FINANCE.DASHBOARD.ACCOUNTS.NEW}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-2.5 md:px-4 md:py-3 text-sm font-semibold shadow-lg transition hover:from-emerald-400 hover:to-teal-400"
-            >
-              <Plus size={18} />
-              <span className="hidden sm:inline">Nouveau compte</span>
-              <span className="sm:hidden">Ajouter</span>
+    <ModularLayout>
+      <div className="p-8 space-y-6">
+        <PageHeader
+          icon={CreditCardIcon}
+          title="Comptes"
+          description="Gérez vos comptes bancaires, caisses et portefeuilles"
+          breadcrumbs={[
+            { label: "Finance", href: "/finance" },
+            { label: "Comptes" },
+          ]}
+          actions={
+            <Link to={ROUTES.FINANCE.DASHBOARD.ACCOUNTS.NEW}>
+              <Button variant="primary" className="gap-2">
+                <PlusIcon className="h-5 w-5" />
+                Nouveau compte
+              </Button>
             </Link>
-            <Link
-              to="/dashboard"
-              className="hidden md:flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm font-semibold backdrop-blur-sm transition hover:bg-white/10"
-            >
-              Retour dashboard
-            </Link>
-          </div>
-        </div>
+          }
+        />
 
         {/* Filtres */}
-        <GlassPanel gradient="indigo" className="p-4 md:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6">
           <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-4">
             <div className="col-span-2 md:col-span-1 space-y-2">
-              <label className="text-xs uppercase tracking-wider text-indigo-200">
+              <label className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 Rechercher
               </label>
               <input
@@ -378,18 +357,18 @@ export default function AccountsPage() {
                 placeholder="Nom, établissement"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-white/15 bg-white/10 px-3 py-2.5 md:px-4 md:py-3 text-sm text-white placeholder:text-indigo-100/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
 
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-wider text-indigo-200">
+            <label className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
               Type
             </label>
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value as AccountType | "all")}
-              className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
               <option value="all">Tous</option>
               {accountTypes.map((t) => (
@@ -401,11 +380,11 @@ export default function AccountsPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-wider text-indigo-200">
+            <label className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
               Portefeuille
             </label>
             <select
-              className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
               <option value="all">Tous</option>
               {portfolios.map((p) => (
@@ -417,11 +396,11 @@ export default function AccountsPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-wider text-indigo-200">
+            <label className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
               Devise
             </label>
             <select
-              className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
               <option value="all">Toutes</option>
               {currencies.map((c) => (
@@ -432,26 +411,26 @@ export default function AccountsPage() {
             </select>
           </div>
         </div>
-      </GlassPanel>
+      </div>
 
       {/* Tableau des comptes - Desktop */}
-      <GlassPanel gradient="purple" className="hidden md:block overflow-hidden p-0">
-        <div className="flex items-center justify-between border-b border-white/10 p-4 md:p-6">
+      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-4 md:p-6">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold">Tableau des comptes</h2>
-            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Tableau des comptes</h2>
+            <span className="rounded-full bg-gray-100 dark:bg-gray-700 px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-300">
               {sortedAndFiltered.length} lignes
             </span>
           </div>
           <div className="flex gap-2">
             {selectedIds.length > 0 && (
               <>
-                <button className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm transition hover:bg-white/10">
-                  <Archive size={16} />
+                <button className="flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 transition hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <ArchiveBoxIcon className="h-4 w-4" />
                   Archiver
                 </button>
-                <button className="flex items-center gap-2 rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-sm text-rose-100 transition hover:bg-rose-500/20">
-                  <Trash2 size={16} />
+                <button className="flex items-center gap-2 rounded-lg border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/30 px-4 py-2 text-sm text-red-600 dark:text-red-400 transition hover:bg-red-100 dark:hover:bg-red-900/50">
+                  <TrashIcon className="h-4 w-4" />
                   Supprimer
                 </button>
               </>
@@ -462,25 +441,25 @@ export default function AccountsPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wider text-indigo-200">
+              <tr className="border-b border-gray-200 dark:border-gray-700 text-left text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 <th className="p-4">
                   <input
                     type="checkbox"
                     checked={selectedIds.length === sortedAndFiltered.length && sortedAndFiltered.length > 0}
                     onChange={toggleSelectAll}
-                    className="h-4 w-4 rounded border-white/20 bg-white/10 text-indigo-500"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-indigo-600"
                   />
                 </th>
-                <th className="cursor-pointer p-4 hover:text-white" onClick={() => handleSort("name")}>
+                <th className="cursor-pointer p-4 hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort("name")}>
                   <div className="flex items-center gap-2">
                     Compte
-                    <ArrowUpDown size={14} />
+                    <ArrowsUpDownIcon className="h-3.5 w-3.5" />
                   </div>
                 </th>
-                <th className="cursor-pointer p-4 hover:text-white" onClick={() => handleSort("balance")}>
+                <th className="cursor-pointer p-4 hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort("balance")}>
                   <div className="flex items-center gap-2">
                     Montant
-                    <ArrowUpDown size={14} />
+                    <ArrowsUpDownIcon className="h-3.5 w-3.5" />
                   </div>
                 </th>
                 <th className="p-4">Type</th>
@@ -491,46 +470,44 @@ export default function AccountsPage() {
                 <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {sortedAndFiltered.map((acc) => {
-                const badgeClass = typeBadge[(acc.type as AccountType) ?? "banque"];
-                const isShared = (acc.portfolios?.length ?? 0) === 0;
                 return (
                   <tr
                     key={acc.id}
-                    className="group transition hover:bg-white/5"
+                    className="group transition hover:bg-gray-50 dark:hover:bg-gray-700/50"
                   >
                     <td className="p-4">
                       <input
                         type="checkbox"
                         checked={selectedIds.includes(acc.id)}
                         onChange={() => toggleSelect(acc.id)}
-                        className="h-4 w-4 rounded border-white/20 bg-white/10 text-indigo-500"
+                        className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-indigo-600"
                       />
                     </td>
                     <td className="p-4">
                       <div className="space-y-1">
-                        <div className="font-semibold text-white">{acc.name}</div>
-                        <div className="text-xs text-indigo-100/60">ID {acc.id}</div>
+                        <div className="font-medium text-gray-900 dark:text-white">{acc.name}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">ID {acc.id}</div>
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="font-semibold text-emerald-200">
+                      <div className={`font-semibold ${(acc.balance ?? 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                         {(acc.balance ?? 0) >= 0 ? "+" : ""}
                         {(acc.balance ?? 0).toFixed(2)} {globalCurrency}
                       </div>
                     </td>
                     <td className="p-4">
-                      <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${badgeClass}`}>
+                      <span className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 px-3 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-300">
                         {accountTypes.find((t) => t.value === acc.type)?.label ?? "Banque"}
                       </span>
                     </td>
                     <td className="p-4">
                       <span
-                        className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${
                           acc.status === "INACTIVE"
-                            ? "border-orange-300/50 bg-orange-500/15 text-orange-100"
-                            : "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
+                            ? "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
+                            : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300"
                         }`}
                       >
                         {acc.status === "INACTIVE" ? "Inactif" : "Actif"}
@@ -542,23 +519,23 @@ export default function AccountsPage() {
                           {acc.portfolios.map((p) => (
                             <span
                               key={p.portfolio.id}
-                              className="text-xs rounded-full border border-indigo-400/40 bg-indigo-500/10 px-2 py-0.5 text-indigo-200"
+                              className="text-xs rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-gray-600 dark:text-gray-300"
                             >
                               {p.portfolio.name}
                             </span>
                           ))}
                         </div>
                       ) : (
-                        <span className="text-sm text-indigo-100/80">Tous les portefeuilles</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">Tous les portefeuilles</span>
                       )}
                     </td>
                     <td className="p-4">
-                      <span className="text-sm text-indigo-100/70">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
                         {acc.institution || "—"}
                       </span>
                     </td>
                     <td className="p-4 max-w-xs">
-                      <span className="text-sm text-indigo-100/70 truncate block">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 truncate block">
                         {acc.notes || "—"}
                       </span>
                     </td>
@@ -566,19 +543,18 @@ export default function AccountsPage() {
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() => {
-                            // Navigation vers page d'édition ou modal
                             startEdit(acc);
                           }}
-                          className="rounded-lg border border-white/20 p-2 text-indigo-50 transition hover:border-white/40 hover:bg-white/10"
+                          className="rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-gray-600 dark:text-gray-400 transition hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
-                          <Pencil size={16} />
+                          <PencilIcon className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => deleteAccount(acc.id)}
                           disabled={deletingId === acc.id}
-                          className="rounded-lg border border-rose-400/40 p-2 text-rose-100 transition hover:bg-rose-500/10 disabled:opacity-60"
+                          className="rounded-lg border border-red-300 dark:border-red-700 p-2 text-red-600 dark:text-red-400 transition hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-60"
                         >
-                          <Trash2 size={16} />
+                          <TrashIcon className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
@@ -590,34 +566,33 @@ export default function AccountsPage() {
 
           {sortedAndFiltered.length === 0 && (
             <div className="p-12 text-center">
-              <p className="text-indigo-100/60">Aucun compte trouvé.</p>
+              <p className="text-gray-500 dark:text-gray-400">Aucun compte trouvé.</p>
             </div>
           )}
         </div>
-      </GlassPanel>
+      </div>
 
       {/* Liste mobile en cartes */}
       <div className="md:hidden space-y-3">
         <div className="flex items-center justify-between px-1">
-          <span className="text-sm font-medium text-indigo-200">{sortedAndFiltered.length} compte(s)</span>
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{sortedAndFiltered.length} compte(s)</span>
           {selectedIds.length > 0 && (
-            <button className="flex items-center gap-1.5 rounded-lg border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-100">
-              <Trash2 size={14} />
+            <button className="flex items-center gap-1.5 rounded-lg border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/30 px-3 py-1.5 text-xs text-red-600 dark:text-red-400">
+              <TrashIcon className="h-3.5 w-3.5" />
               Suppr. ({selectedIds.length})
             </button>
           )}
         </div>
-        
+
         {sortedAndFiltered.length === 0 && (
-          <GlassCard variant="subtle" className="p-8 text-center">
-            <p className="text-indigo-100/60">Aucun compte trouvé.</p>
-          </GlassCard>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+            <p className="text-gray-500 dark:text-gray-400">Aucun compte trouvé.</p>
+          </div>
         )}
 
         {sortedAndFiltered.map((acc) => {
-          const badgeClass = typeBadge[(acc.type as AccountType) ?? "banque"];
           return (
-            <GlassCard key={acc.id} variant="subtle" className="p-4 space-y-3">
+            <div key={acc.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -625,25 +600,25 @@ export default function AccountsPage() {
                       type="checkbox"
                       checked={selectedIds.includes(acc.id)}
                       onChange={() => toggleSelect(acc.id)}
-                      className="h-4 w-4 rounded border-white/20 bg-white/10 text-indigo-500"
+                      className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-indigo-600"
                     />
-                    <h3 className="font-semibold text-white truncate">{acc.name}</h3>
+                    <h3 className="font-semibold text-gray-900 dark:text-white truncate">{acc.name}</h3>
                   </div>
-                  <p className="text-xs text-indigo-100/60">{acc.institution || "Sans établissement"}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{acc.institution || "Sans établissement"}</p>
                 </div>
-                <span className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${badgeClass}`}>
+                <span className="shrink-0 rounded-full bg-indigo-100 dark:bg-indigo-900/30 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:text-indigo-300">
                   {accountTypes.find((t) => t.value === acc.type)?.label ?? "Banque"}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-emerald-300">
+                <span className={`text-lg font-bold ${(acc.balance ?? 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                   {(acc.balance ?? 0) >= 0 ? "+" : ""}{(acc.balance ?? 0).toFixed(2)} {globalCurrency}
                 </span>
-                <span className={`rounded-full border px-2 py-0.5 text-xs ${
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                   acc.status === "INACTIVE"
-                    ? "border-orange-300/50 bg-orange-500/15 text-orange-100"
-                    : "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
+                    ? "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
+                    : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300"
                 }`}>
                   {acc.status === "INACTIVE" ? "Inactif" : "Actif"}
                 </span>
@@ -654,35 +629,35 @@ export default function AccountsPage() {
                   {acc.portfolios.slice(0, 3).map((p) => (
                     <span
                       key={p.portfolio.id}
-                      className="text-xs rounded-full border border-indigo-400/40 bg-indigo-500/10 px-2 py-0.5 text-indigo-200"
+                      className="text-xs rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-gray-600 dark:text-gray-300"
                     >
                       {p.portfolio.name}
                     </span>
                   ))}
                   {acc.portfolios.length > 3 && (
-                    <span className="text-xs text-indigo-100/60">+{acc.portfolios.length - 3}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">+{acc.portfolios.length - 3}</span>
                   )}
                 </div>
               )}
 
-              <div className="flex gap-2 pt-2 border-t border-white/10">
+              <div className="flex gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => startEdit(acc)}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-white/20 py-2 text-sm text-indigo-50 transition hover:bg-white/10"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 py-2 text-sm text-gray-700 dark:text-gray-300 transition hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  <Pencil size={14} />
+                  <PencilIcon className="h-3.5 w-3.5" />
                   Modifier
                 </button>
                 <button
                   onClick={() => deleteAccount(acc.id)}
                   disabled={deletingId === acc.id}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-rose-400/40 py-2 text-sm text-rose-100 transition hover:bg-rose-500/10 disabled:opacity-60"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-red-300 dark:border-red-700 py-2 text-sm text-red-600 dark:text-red-400 transition hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-60"
                 >
-                  <Trash2 size={14} />
+                  <TrashIcon className="h-3.5 w-3.5" />
                   Supprimer
                 </button>
               </div>
-            </GlassCard>
+            </div>
           );
         })}
       </div>
@@ -722,6 +697,6 @@ export default function AccountsPage() {
         onTargetCompanyIdChange={setTargetCompanyId}
       />
       </div>
-    </div>
+    </ModularLayout>
   );
 }

@@ -2,6 +2,7 @@
 
 import React, { useCallback, useMemo, useState } from "react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
+import { ModularLayout } from "@/components/ModularLayout";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { reportingClient, type ByFlowResponse } from "@/lib/finance/reporting";
 import { useApiData } from "@/hooks/finance/useApiData";
@@ -54,8 +55,8 @@ function CustomTooltip({ active, payload, label, formatter }: CustomTooltipProps
   if (!active || !payload?.length) return null;
   
   return (
-    <div className="rounded-lg border border-white/20 bg-slate-900/95 px-3 py-2 text-sm shadow-xl backdrop-blur-sm">
-      {label && <p className="mb-1 font-medium text-white">{label}</p>}
+    <div className="rounded-lg border border-gray-300 dark:border-gray-600 bg-slate-900/95 px-3 py-2 text-sm shadow-xl backdrop-blur-sm">
+      {label && <p className="mb-1 font-medium text-gray-900 dark:text-white">{label}</p>}
       {payload.map((item, idx) => (
         <p key={idx} className="flex items-center gap-2 text-indigo-100">
           <span
@@ -129,7 +130,8 @@ export default function ReportingByFlowPage() {
   }, [data]);
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
         <ReportingNav />
@@ -145,10 +147,10 @@ export default function ReportingByFlowPage() {
           </Link>
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 p-3 shadow-lg shadow-cyan-500/30">
-              <TrendingUp className="h-6 w-6 text-white" />
+              <TrendingUp className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Analyse par flux de paiement</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analyse par flux de paiement</h1>
               <p className="text-sm text-slate-400">Répartition par type de flux (CB, virement, chèque, etc.)</p>
             </div>
           </div>
@@ -170,7 +172,7 @@ export default function ReportingByFlowPage() {
               <span>{error}</span>
               <button
                 onClick={refetch}
-                className="ml-auto rounded-lg bg-white/10 px-3 py-1 text-xs font-semibold text-white hover:bg-white/20 transition"
+                className="ml-auto rounded-lg bg-gray-100 dark:bg-gray-700 px-3 py-1 text-xs font-semibold text-gray-900 dark:text-white hover:bg-gray-200 dark:bg-gray-700 transition"
               >
                 Réessayer
               </button>
@@ -182,7 +184,7 @@ export default function ReportingByFlowPage() {
         <select
           value={days}
           onChange={(e) => setDays(Number(e.target.value))}
-          className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm text-white backdrop-blur-sm focus:border-indigo-400 focus:outline-none"
+          className="rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white backdrop-blur-sm focus:border-indigo-400 focus:outline-none"
         >
           <option value={7}>7 jours</option>
           <option value={30}>30 jours</option>
@@ -195,7 +197,7 @@ export default function ReportingByFlowPage() {
         <button
           onClick={refetch}
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-white/10 hover:shadow-lg disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm text-gray-900 dark:text-white backdrop-blur-sm transition hover:bg-gray-100 dark:bg-gray-700 hover:shadow-lg disabled:opacity-50"
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : <Filter size={16} />}
           Actualiser
@@ -204,8 +206,8 @@ export default function ReportingByFlowPage() {
 
           {loading && (
             <GlassCard className="grid gap-4 p-4">
-              <div className="h-6 w-40 animate-pulse rounded bg-white/10" />
-              <div className="h-32 w-full animate-pulse rounded bg-white/10" />
+              <div className="h-6 w-40 animate-pulse rounded bg-gray-100 dark:bg-gray-700" />
+              <div className="h-32 w-full animate-pulse rounded bg-gray-100 dark:bg-gray-700" />
             </GlassCard>
           )}
 
@@ -239,7 +241,7 @@ export default function ReportingByFlowPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Bar chart */}
                 <GlassCard className="p-6">
-                  <h2 className="text-lg font-semibold text-white mb-4">Crédits vs Débits par flux</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Crédits vs Débits par flux</h2>
                   {barChartData.length > 0 ? (
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
@@ -254,7 +256,7 @@ export default function ReportingByFlowPage() {
                       </ResponsiveContainer>
                     </div>
                   ) : (
-                    <div className="h-80 flex items-center justify-center text-white/40">
+                    <div className="h-80 flex items-center justify-center text-gray-500 dark:text-gray-500">
                       Aucune donnée disponible
                     </div>
                   )}
@@ -262,7 +264,7 @@ export default function ReportingByFlowPage() {
 
                 {/* Pie chart */}
                 <GlassCard className="p-6">
-                  <h2 className="text-lg font-semibold text-white mb-4">Répartition par volume</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Répartition par volume</h2>
                   {pieChartData.length > 0 ? (
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
@@ -286,7 +288,7 @@ export default function ReportingByFlowPage() {
                       </ResponsiveContainer>
                     </div>
                   ) : (
-                    <div className="h-80 flex items-center justify-center text-white/40">
+                    <div className="h-80 flex items-center justify-center text-gray-500 dark:text-gray-500">
                       Aucune donnée disponible
                     </div>
                   )}
@@ -295,10 +297,10 @@ export default function ReportingByFlowPage() {
 
               {/* Liste détaillée des flux */}
               <GlassCard className="p-6">
-                <h2 className="text-lg font-semibold text-white mb-4">Détail par flux</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Détail par flux</h2>
                 <div className="space-y-3">
                   {data.flows.length === 0 && data.noFlow.count === 0 ? (
-                    <div className="text-center py-8 text-white/40">
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-500">
                       Aucune transaction avec flux assigné
                     </div>
                   ) : (
@@ -316,8 +318,8 @@ export default function ReportingByFlowPage() {
                                 </span>
                               </div>
                               <div>
-                                <p className="font-medium text-white">{flow.flowName}</p>
-                                <p className="text-sm text-white/60">{flow.count} transaction{flow.count > 1 ? 's' : ''}</p>
+                                <p className="font-medium text-gray-900 dark:text-white">{flow.flowName}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">{flow.count} transaction{flow.count > 1 ? 's' : ''}</p>
                               </div>
                             </div>
                             <div className="text-right">
@@ -335,12 +337,12 @@ export default function ReportingByFlowPage() {
                           
                           {/* Mini aperçu des transactions */}
                           {flow.transactions.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-white/10">
+                            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                               <p className="text-xs text-white/50 mb-2">Dernières transactions</p>
                               <div className="space-y-1">
                                 {flow.transactions.slice(0, 3).map((tx) => (
                                   <div key={tx.id} className="flex items-center justify-between text-sm">
-                                    <span className="text-white/70 truncate max-w-[200px]">{tx.description || 'Sans description'}</span>
+                                    <span className="text-gray-600 dark:text-gray-400 truncate max-w-[200px]">{tx.description || 'Sans description'}</span>
                                     <span className={tx.type === 'credit' ? 'text-emerald-400' : 'text-red-400'}>
                                       {tx.type === 'credit' ? '+' : '-'}{money0(tx.amount)}
                                     </span>
@@ -354,15 +356,15 @@ export default function ReportingByFlowPage() {
                       
                       {/* Transactions sans flux */}
                       {data.noFlow.count > 0 && (
-                        <GlassListItem className="p-4 border-white/5">
+                        <GlassListItem className="p-4 border-gray-200 dark:border-gray-700">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                               <div className="p-2 rounded-lg bg-slate-500/20">
                                 <MoreHorizontal className="h-5 w-5 text-slate-400" />
                               </div>
                               <div>
-                                <p className="font-medium text-white/70">Non assigné</p>
-                                <p className="text-sm text-white/40">{data.noFlow.count} transaction{data.noFlow.count > 1 ? 's' : ''}</p>
+                                <p className="font-medium text-gray-600 dark:text-gray-400">Non assigné</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-500">{data.noFlow.count} transaction{data.noFlow.count > 1 ? 's' : ''}</p>
                               </div>
                             </div>
                             <div className="text-right">
@@ -388,7 +390,7 @@ export default function ReportingByFlowPage() {
               <GlassPanel className="p-4 border-indigo-500/30 bg-indigo-500/10">
                 <div className="flex gap-3">
                   <AlertCircle className="h-5 w-5 text-indigo-400 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-white/80">
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
                     <p className="font-medium text-indigo-300 mb-1">Astuce</p>
                     <p>
                       Pour assigner un flux à vos transactions, modifiez vos dépenses ou revenus 
@@ -403,5 +405,6 @@ export default function ReportingByFlowPage() {
         </div>
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

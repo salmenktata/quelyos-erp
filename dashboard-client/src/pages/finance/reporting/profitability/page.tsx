@@ -3,6 +3,7 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import {
   Target,
   ChevronLeft,
@@ -57,7 +58,8 @@ export default function ProfitabilityReportPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
         <ReportingNav />
@@ -77,10 +79,10 @@ export default function ProfitabilityReportPage() {
           </Link>
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-rose-500 to-pink-600 p-3 shadow-lg shadow-rose-500/30">
-              <Target className="h-6 w-6 text-white" />
+              <Target className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Analyse de rentabilité
               </h1>
               <p className="text-sm text-slate-400">
@@ -116,8 +118,8 @@ export default function ProfitabilityReportPage() {
                     disabled={loading}
                     className={`rounded-lg px-3 py-1 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       timeRange === range
-                        ? "bg-rose-500 text-white"
-                        : "text-slate-400 hover:bg-white/5"
+                        ? "bg-rose-500 text-gray-900 dark:text-white"
+                        : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                     }`}
                   >
                     {range}j
@@ -181,7 +183,7 @@ export default function ProfitabilityReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-emerald-200">Marge brute</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {apiData.grossMargin.toFixed(1)}%
                 </p>
                 <p className="text-xs text-emerald-300 mt-1">
@@ -198,7 +200,7 @@ export default function ProfitabilityReportPage() {
                 <p className="mb-1 text-sm text-indigo-200">
                   Marge opérationnelle
                 </p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {apiData.operatingMargin.toFixed(1)}%
                 </p>
                 <p className="text-xs text-indigo-300 mt-1">
@@ -213,7 +215,7 @@ export default function ProfitabilityReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-rose-200">Marge nette</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {apiData.netMargin.toFixed(1)}%
                 </p>
                 <p className="text-xs text-rose-300 mt-1">
@@ -233,7 +235,7 @@ export default function ProfitabilityReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Compte de résultat (waterfall)
             </h2>
             <div className="space-y-4">
@@ -241,7 +243,7 @@ export default function ProfitabilityReportPage() {
               <div className="flex items-center justify-between rounded-lg bg-emerald-500/10 p-4">
                 <div className="flex items-center gap-3">
                   <DollarSign className="h-5 w-5 text-emerald-400" />
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-gray-900 dark:text-white">
                     Chiffre d&apos;affaires
                   </span>
                 </div>
@@ -252,7 +254,7 @@ export default function ProfitabilityReportPage() {
 
               {/* COGS */}
               <div className="ml-4 flex items-center justify-between rounded-lg bg-rose-500/10 p-4">
-                <span className="text-white">Coût des ventes</span>
+                <span className="text-gray-900 dark:text-white">Coût des ventes</span>
                 <span className="font-semibold text-rose-400">
                   -{formatAmount(apiData.cogs)}
                 </span>
@@ -261,7 +263,7 @@ export default function ProfitabilityReportPage() {
               {/* Gross Profit */}
               <div className="flex items-center justify-between rounded-lg bg-cyan-500/10 p-4">
                 <div>
-                  <span className="font-medium text-white">Marge brute</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Marge brute</span>
                   <p className="text-xs text-cyan-400">
                     {apiData.grossMargin.toFixed(1)}% du CA
                   </p>
@@ -273,7 +275,7 @@ export default function ProfitabilityReportPage() {
 
               {/* Operating Expenses */}
               <div className="ml-4 flex items-center justify-between rounded-lg bg-rose-500/10 p-4">
-                <span className="text-white">Charges opérationnelles</span>
+                <span className="text-gray-900 dark:text-white">Charges opérationnelles</span>
                 <span className="font-semibold text-rose-400">
                   -{formatAmount(apiData.operatingExpenses)}
                 </span>
@@ -282,7 +284,7 @@ export default function ProfitabilityReportPage() {
               {/* Operating Profit */}
               <div className="flex items-center justify-between rounded-lg bg-indigo-500/10 p-4">
                 <div>
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-gray-900 dark:text-white">
                     Résultat opérationnel
                   </span>
                   <p className="text-xs text-indigo-400">
@@ -297,7 +299,7 @@ export default function ProfitabilityReportPage() {
               {/* Other Income/Expenses */}
               {(apiData.otherIncome > 0 || apiData.otherExpenses > 0) && (
                 <div className="ml-4 flex items-center justify-between rounded-lg bg-rose-500/10 p-4">
-                  <span className="text-white">Autres revenus & charges</span>
+                  <span className="text-gray-900 dark:text-white">Autres revenus & charges</span>
                   <span className="font-semibold text-rose-400">
                     {apiData.otherIncome > 0 && `+${formatAmount(apiData.otherIncome)} `}
                     {apiData.otherExpenses > 0 && `-${formatAmount(apiData.otherExpenses)}`}
@@ -314,7 +316,7 @@ export default function ProfitabilityReportPage() {
                 }`}
               >
                 <div>
-                  <span className="font-semibold text-white">Résultat net</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">Résultat net</span>
                   <p
                     className={`text-xs ${
                       apiData.netProfit >= 0 ? "text-emerald-400" : "text-rose-400"
@@ -343,7 +345,7 @@ export default function ProfitabilityReportPage() {
             transition={{ delay: 0.4 }}
           >
             <GlassPanel className="p-6">
-              <h2 className="mb-4 text-lg font-semibold text-white">
+              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
                 Comparaison benchmarks sectoriels
               </h2>
               <div className="space-y-4">
@@ -351,12 +353,12 @@ export default function ProfitabilityReportPage() {
                 <div>
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-sm text-slate-400">Marge brute</span>
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
                       {apiData.grossMargin.toFixed(1)}% vs {benchmarks.grossMargin}
                       %
                     </span>
                   </div>
-                  <div className="relative h-3 overflow-hidden rounded-full bg-white/10">
+                  <div className="relative h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
                     <div
                       className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 to-emerald-400"
                       style={{
@@ -367,7 +369,7 @@ export default function ProfitabilityReportPage() {
                       }}
                     />
                     <div
-                      className="absolute inset-y-0 border-l-2 border-white/50"
+                      className="absolute inset-y-0 border-l-2 border-gray-200 dark:border-gray-7000"
                       style={{ left: "100%" }}
                     />
                   </div>
@@ -385,12 +387,12 @@ export default function ProfitabilityReportPage() {
                     <span className="text-sm text-slate-400">
                       Marge opérationnelle
                     </span>
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
                       {apiData.operatingMargin.toFixed(1)}% vs{" "}
                       {benchmarks.operatingMargin}%
                     </span>
                   </div>
-                  <div className="relative h-3 overflow-hidden rounded-full bg-white/10">
+                  <div className="relative h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
                     <div
                       className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 to-indigo-400"
                       style={{
@@ -414,11 +416,11 @@ export default function ProfitabilityReportPage() {
                 <div>
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-sm text-slate-400">Marge nette</span>
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
                       {apiData.netMargin.toFixed(1)}% vs {benchmarks.netMargin}%
                     </span>
                   </div>
-                  <div className="relative h-3 overflow-hidden rounded-full bg-white/10">
+                  <div className="relative h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
                     <div
                       className="absolute inset-y-0 left-0 bg-gradient-to-r from-rose-500 to-rose-400"
                       style={{
@@ -447,24 +449,24 @@ export default function ProfitabilityReportPage() {
             transition={{ delay: 0.5 }}
           >
             <GlassPanel className="p-6">
-              <h2 className="mb-4 text-lg font-semibold text-white">
+              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
                 Récapitulatif
               </h2>
               <div className="space-y-4">
                 <div className="flex items-center justify-between rounded-lg bg-emerald-500/10 p-4">
-                  <span className="text-white">Total revenus</span>
+                  <span className="text-gray-900 dark:text-white">Total revenus</span>
                   <span className="text-lg font-bold text-emerald-400">
                     {formatAmount(apiData.breakdown.totalIncome)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-lg bg-rose-500/10 p-4">
-                  <span className="text-white">Total dépenses</span>
+                  <span className="text-gray-900 dark:text-white">Total dépenses</span>
                   <span className="text-lg font-bold text-rose-400">
                     {formatAmount(apiData.breakdown.totalExpenses)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-lg bg-indigo-500/10 p-4">
-                  <span className="text-white">Transactions analysées</span>
+                  <span className="text-gray-900 dark:text-white">Transactions analysées</span>
                   <span className="text-lg font-bold text-indigo-400">
                     {apiData.breakdown.transactionCount}
                   </span>
@@ -477,5 +479,6 @@ export default function ProfitabilityReportPage() {
         )}
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

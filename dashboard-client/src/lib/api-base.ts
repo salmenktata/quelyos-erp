@@ -8,7 +8,8 @@ export async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem('odoo_session_token')
+  // Utiliser session_id (auth principale) ou odoo_session_token (legacy)
+  const token = localStorage.getItem('session_id') || localStorage.getItem('odoo_session_token')
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',

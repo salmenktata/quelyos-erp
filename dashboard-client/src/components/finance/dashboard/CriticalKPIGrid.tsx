@@ -1,6 +1,5 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
-import { GlassPanel } from "@/components/ui/glass";
 import { DSOCard } from "@/components/kpis/DSOCard";
 import { EBITDACard } from "@/components/kpis/EBITDACard";
 import { BFRCard } from "@/components/kpis/BFRCard";
@@ -18,19 +17,19 @@ export const CriticalKPIGrid = memo(function CriticalKPIGrid({
   days = 30,
 }: CriticalKPIGridProps) {
   return (
-    <GlassPanel gradient="violet" className="p-6">
+    <div className="bg-gradient-to-br from-violet-500 to-violet-600 dark:from-violet-600 dark:to-violet-700 rounded-xl shadow-lg p-6">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-white">
             KPIs Critiques TPE/PME
           </h2>
-          <p className="text-sm text-violet-200">
+          <p className="text-sm text-violet-100">
             Les 4 indicateurs essentiels de pilotage financier
           </p>
         </div>
         <Link
           to="/finance/reporting"
-          className="text-sm font-medium text-violet-400 hover:text-violet-300"
+          className="text-sm font-medium text-white/80 hover:text-white"
         >
           Analyses détaillées →
         </Link>
@@ -57,6 +56,6 @@ export const CriticalKPIGrid = memo(function CriticalKPIGrid({
           <BreakEvenCard days={days} />
         </StaggerItem>
       </StaggerContainer>
-    </GlassPanel>
+    </div>
   );
 });

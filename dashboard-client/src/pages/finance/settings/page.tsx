@@ -17,13 +17,13 @@ const sectionsGroups = [
       {
         title: "Devise & formats",
         desc: "Devise par défaut, thème et langue utilisateur.",
-        href: "/dashboard/settings/devise",
+        href: "/finance/settings/devise",
         icon: "💰",
       },
       {
         title: "TVA & fiscalité",
         desc: "Activer la TVA, mode HT/TTC, taux disponibles.",
-        href: "/dashboard/settings/tva",
+        href: "/finance/settings/tva",
         icon: "📊",
       },
     ],
@@ -36,13 +36,13 @@ const sectionsGroups = [
       {
         title: "Catégories",
         desc: "Gérer les catégories de revenus et dépenses.",
-        href: "/dashboard/settings/categories",
+        href: "/finance/settings/categories",
         icon: "🏷️",
       },
       {
         title: "Flux de paiement",
         desc: "Types de flux par défaut (CB, chèque, virement...).",
-        href: "/dashboard/settings/flux",
+        href: "/finance/settings/flux",
         icon: "💳",
       },
     ],
@@ -55,7 +55,7 @@ const sectionsGroups = [
       {
         title: "Abonnement",
         desc: "Plan actuel, facturation, et gestion de l'abonnement.",
-        href: "/dashboard/settings/billing",
+        href: "/finance/settings/billing",
         icon: "💳",
       },
     ],
@@ -68,19 +68,19 @@ const sectionsGroups = [
       {
         title: "Sécurité",
         desc: "Mot de passe, authentification à deux facteurs (2FA), sessions.",
-        href: "/dashboard/settings/security",
+        href: "/finance/settings/security",
         icon: "🔒",
       },
       {
         title: "Notifications & exports",
         desc: "Fréquence des emails, formats d'export.",
-        href: "/dashboard/settings/notifications",
+        href: "/finance/settings/notifications",
         icon: "🔔",
       },
       {
         title: "Intégrations",
         desc: "Connexions externes, webhooks, API.",
-        href: "/dashboard/settings/integrations",
+        href: "/finance/settings/integrations",
         icon: "🔌",
       },
     ],
@@ -91,37 +91,37 @@ const oldSections = [
   {
     title: "Devise & formats",
     desc: "Devise par défaut, thème et langue utilisateur.",
-    href: "/dashboard/settings/devise",
+    href: "/finance/settings/devise",
   },
   {
     title: "TVA & fiscalité",
     desc: "Activer la TVA, mode HT/TTC, taux disponibles.",
-    href: "/dashboard/settings/tva",
+    href: "/finance/settings/tva",
   },
   {
     title: "Catégories",
     desc: "Gérer les catégories de revenus et dépenses.",
-    href: "/dashboard/settings/categories",
+    href: "/finance/settings/categories",
   },
   {
     title: "Flux de paiement",
     desc: "Types de flux par défaut (CB, chèque, virement...).",
-    href: "/dashboard/settings/flux",
+    href: "/finance/settings/flux",
   },
   {
     title: "Comptes & portefeuilles",
     desc: "Règles de visibilité et statut actif/inactif.",
-    href: "/dashboard/settings/comptes",
+    href: "/finance/settings/comptes",
   },
   {
     title: "Notifications & exports",
     desc: "Fréquence des emails, formats d’export.",
-    href: "/dashboard/settings/notifications",
+    href: "/finance/settings/notifications",
   },
   {
     title: "Intégrations",
     desc: "Connexions externes, webhooks, API.",
-    href: "/dashboard/settings/integrations",
+    href: "/finance/settings/integrations",
   },
 ];
 

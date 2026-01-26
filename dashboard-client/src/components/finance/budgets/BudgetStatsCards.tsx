@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import { GlassStatCard } from "@/components/ui/glass";
-import { Wallet, TrendingDown, CheckCircle, PiggyBank } from "lucide-react";
+import { Wallet, TrendingDown, TrendingUp, CheckCircle, PiggyBank } from "lucide-react";
 
 type BudgetStatus = "ON_TRACK" | "WARNING" | "EXCEEDED";
 
@@ -43,40 +42,111 @@ export function BudgetStatsCards({ budgets, formatCurrency }: BudgetStatsCardsPr
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
       {/* Total Budgété */}
-      <GlassStatCard
-        label="Total budgété"
-        value={formatCurrency(stats.totalBudgeted)}
-        icon={<Wallet className="h-5 w-5 text-indigo-400" />}
-        accentColor="indigo"
-      />
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              Total budgété
+            </p>
+            <p className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mt-1">
+              {formatCurrency(stats.totalBudgeted)}
+            </p>
+          </div>
+          <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
+            <Wallet className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+          </div>
+        </div>
+      </div>
 
       {/* Total Dépensé */}
-      <GlassStatCard
-        label="Total dépensé"
-        value={formatCurrency(stats.totalSpent)}
-        icon={<TrendingDown className="h-5 w-5 text-rose-400" />}
-        trend={stats.percentageUsed > 100 ? "down" : stats.percentageUsed > 80 ? "neutral" : "up"}
-        trendValue={`${stats.percentageUsed.toFixed(1)}% utilisé`}
-        accentColor="rose"
-      />
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              Total dépensé
+            </p>
+            <p className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mt-1">
+              {formatCurrency(stats.totalSpent)}
+            </p>
+            <p className={`text-xs mt-1 flex items-center gap-1 ${
+              stats.percentageUsed > 100
+                ? "text-rose-600 dark:text-rose-400"
+                : stats.percentageUsed > 80
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-emerald-600 dark:text-emerald-400"
+            }`}>
+              {stats.percentageUsed > 80 ? (
+                <TrendingUp className="h-3 w-3" />
+              ) : (
+                <TrendingDown className="h-3 w-3" />
+              )}
+              {stats.percentageUsed.toFixed(1)}% utilisé
+            </p>
+          </div>
+          <div className="p-2 rounded-lg bg-rose-100 dark:bg-rose-900/30">
+            <TrendingDown className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+          </div>
+        </div>
+      </div>
 
       {/* Budgets Sains */}
-      <GlassStatCard
-        label="Budgets sains"
-        value={`${stats.onTrackCount}/${stats.totalCount}`}
-        icon={<CheckCircle className="h-5 w-5 text-emerald-400" />}
-        trendValue={stats.warningCount > 0 ? `${stats.warningCount} en alerte` : stats.exceededCount > 0 ? `${stats.exceededCount} dépassé(s)` : "Tous OK"}
-        accentColor="emerald"
-      />
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              Budgets sains
+            </p>
+            <p className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mt-1">
+              {stats.onTrackCount}/{stats.totalCount}
+            </p>
+            <p className={`text-xs mt-1 ${
+              stats.exceededCount > 0
+                ? "text-rose-600 dark:text-rose-400"
+                : stats.warningCount > 0
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-emerald-600 dark:text-emerald-400"
+            }`}>
+              {stats.warningCount > 0
+                ? `${stats.warningCount} en alerte`
+                : stats.exceededCount > 0
+                  ? `${stats.exceededCount} dépassé(s)`
+                  : "Tous OK"}
+            </p>
+          </div>
+          <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+            <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+        </div>
+      </div>
 
       {/* Économies / Restant */}
-      <GlassStatCard
-        label={stats.remaining >= 0 ? "Économies" : "Dépassement"}
-        value={formatCurrency(Math.abs(stats.remaining))}
-        icon={<PiggyBank className={`h-5 w-5 ${stats.remaining >= 0 ? "text-emerald-400" : "text-rose-400"}`} />}
-        trend={stats.remaining >= 0 ? "up" : "down"}
-        accentColor={stats.remaining >= 0 ? "emerald" : "rose"}
-      />
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              {stats.remaining >= 0 ? "Économies" : "Dépassement"}
+            </p>
+            <p className={`text-xl sm:text-2xl font-semibold mt-1 ${
+              stats.remaining >= 0
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-rose-600 dark:text-rose-400"
+            }`}>
+              {formatCurrency(Math.abs(stats.remaining))}
+            </p>
+          </div>
+          <div className={`p-2 rounded-lg ${
+            stats.remaining >= 0
+              ? "bg-emerald-100 dark:bg-emerald-900/30"
+              : "bg-rose-100 dark:bg-rose-900/30"
+          }`}>
+            <PiggyBank className={`h-5 w-5 ${
+              stats.remaining >= 0
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-rose-600 dark:text-rose-400"
+            }`} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

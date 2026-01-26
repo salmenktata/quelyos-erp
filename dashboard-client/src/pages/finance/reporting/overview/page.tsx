@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
+import { ModularLayout } from "@/components/ModularLayout";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { useApiData } from "@/hooks/finance/useApiData";
@@ -85,8 +86,8 @@ function CustomTooltip({
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="rounded-lg border border-white/20 bg-slate-900/95 px-3 py-2 text-sm shadow-xl backdrop-blur-sm">
-      {label && <p className="mb-1 font-medium text-white">{label}</p>}
+    <div className="rounded-lg border border-gray-300 dark:border-gray-600 bg-slate-900/95 px-3 py-2 text-sm shadow-xl backdrop-blur-sm">
+      {label && <p className="mb-1 font-medium text-gray-900 dark:text-white">{label}</p>}
       {payload.map((item, idx) => (
         <p key={idx} className="flex items-center gap-2 text-indigo-100">
           <span
@@ -356,7 +357,8 @@ export default function ReportingPage() {
   }, [mode, actualsData]);
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
         <ReportingNav />
@@ -365,10 +367,10 @@ export default function ReportingPage() {
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-3">
             <div className="rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-3 shadow-lg shadow-indigo-500/30">
-              <BarChart3 className="h-6 w-6 text-white" />
+              <BarChart3 className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Vue d&apos;ensemble
               </h1>
               <p className="text-sm text-slate-400">
@@ -392,23 +394,23 @@ export default function ReportingPage() {
           <Link to={ROUTES.FINANCE.DASHBOARD.REPORTING}>
             <GlassCard
               variant="subtle"
-              className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/10 transition group"
+              className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100 dark:bg-gray-700 transition group"
             >
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-indigo-500/20">
                   <CreditCard className="h-5 w-5 text-indigo-400" />
                 </div>
                 <div>
-                  <p className="font-medium text-white">
+                  <p className="font-medium text-gray-900 dark:text-white">
                     Rapport par flux de paiement
                   </p>
-                  <p className="text-sm text-white/60">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     Analysez vos transactions par type de flux (CB, chèque,
                     virement...)
                   </p>
                 </div>
               </div>
-              <div className="text-white/40 group-hover:text-white/70 transition">
+              <div className="text-gray-500 dark:text-gray-500 group-hover:text-gray-600 dark:text-gray-400 transition">
                 →
               </div>
             </GlassCard>
@@ -423,7 +425,7 @@ export default function ReportingPage() {
               <span>{error}</span>
               <button
                 onClick={refetch}
-                className="ml-auto rounded-lg bg-white/10 px-3 py-1 text-xs font-semibold text-white hover:bg-white/20 transition"
+                className="ml-auto rounded-lg bg-gray-100 dark:bg-gray-700 px-3 py-1 text-xs font-semibold text-gray-900 dark:text-white hover:bg-gray-200 dark:bg-gray-700 transition"
               >
                 Réessayer
               </button>
@@ -440,7 +442,7 @@ export default function ReportingPage() {
                   className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
                     mode === m
                       ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25"
-                      : "text-indigo-100 hover:bg-white/10"
+                      : "text-indigo-100 hover:bg-gray-100 dark:bg-gray-700"
                   }`}
                 >
                   {m === "reel"
@@ -462,7 +464,7 @@ export default function ReportingPage() {
                       : { ...f, horizonDays: Number(e.target.value) }
                   )
                 }
-                className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm text-white backdrop-blur-sm focus:border-indigo-400 focus:outline-none"
+                className="rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white backdrop-blur-sm focus:border-indigo-400 focus:outline-none"
               >
                 <option value={7}>7 jours</option>
                 <option value={30}>30 jours</option>
@@ -478,7 +480,7 @@ export default function ReportingPage() {
                     groupBy: e.target.value as "day" | "week" | "month",
                   }))
                 }
-                className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm text-white backdrop-blur-sm focus:border-indigo-400 focus:outline-none"
+                className="rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white backdrop-blur-sm focus:border-indigo-400 focus:outline-none"
               >
                 <option value="day">Jour</option>
                 <option value="week">Semaine</option>
@@ -488,7 +490,7 @@ export default function ReportingPage() {
               <button
                 onClick={refetch}
                 disabled={loading}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-white/10 hover:shadow-lg disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm text-gray-900 dark:text-white backdrop-blur-sm transition hover:bg-gray-100 dark:bg-gray-700 hover:shadow-lg disabled:opacity-50"
               >
                 {loading ? (
                   <Loader2 size={16} className="animate-spin" />
@@ -501,7 +503,7 @@ export default function ReportingPage() {
               <button
                 onClick={exportCsv}
                 disabled={loading || isEmpty}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-white/10 hover:shadow-lg disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm text-gray-900 dark:text-white backdrop-blur-sm transition hover:bg-gray-100 dark:bg-gray-700 hover:shadow-lg disabled:opacity-50"
               >
                 CSV
               </button>
@@ -509,7 +511,7 @@ export default function ReportingPage() {
               <button
                 onClick={exportXlsx}
                 disabled={loading || isEmpty}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-white/10 hover:shadow-lg disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm text-gray-900 dark:text-white backdrop-blur-sm transition hover:bg-gray-100 dark:bg-gray-700 hover:shadow-lg disabled:opacity-50"
               >
                 Excel
               </button>
@@ -518,13 +520,13 @@ export default function ReportingPage() {
 
           {loading && (
             <GlassCard className="grid gap-4 p-4">
-              <div className="h-6 w-40 animate-pulse rounded bg-white/10" />
-              <div className="h-32 w-full animate-pulse rounded bg-white/10" />
+              <div className="h-6 w-40 animate-pulse rounded bg-gray-100 dark:bg-gray-700" />
+              <div className="h-32 w-full animate-pulse rounded bg-gray-100 dark:bg-gray-700" />
               <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                 {[...Array(3)].map((_, i) => (
                   <div
                     key={i}
-                    className="h-16 animate-pulse rounded-xl bg-white/10"
+                    className="h-16 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700"
                   />
                 ))}
               </div>
@@ -594,7 +596,7 @@ export default function ReportingPage() {
                     ? "Projection du solde"
                     : "Solde réel + prévisionnel"}
               </h3>
-              <div className="h-80 rounded-xl border border-white/5 bg-black/20 p-3">
+              <div className="h-80 rounded-xl border border-gray-200 dark:border-gray-700 bg-black/20 p-3">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={chartData}
@@ -662,7 +664,7 @@ export default function ReportingPage() {
               <h3 className="mb-4 text-lg font-semibold">
                 Flux crédits & débits
               </h3>
-              <div className="h-64 rounded-xl border border-white/5 bg-black/20 p-3">
+              <div className="h-64 rounded-xl border border-gray-200 dark:border-gray-700 bg-black/20 p-3">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={chartData}
@@ -720,7 +722,7 @@ export default function ReportingPage() {
                     {topCategories.income.map((cat) => (
                       <div
                         key={cat.categoryId || 0}
-                        className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm"
+                        className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm"
                       >
                         <span>{cat.name}</span>
                         <span className="font-semibold text-emerald-300">
@@ -741,7 +743,7 @@ export default function ReportingPage() {
                     {topCategories.expense.map((cat) => (
                       <div
                         key={cat.categoryId || 0}
-                        className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm"
+                        className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm"
                       >
                         <span>{cat.name}</span>
                         <span className="font-semibold text-rose-300">
@@ -764,7 +766,7 @@ export default function ReportingPage() {
                   <button
                     onClick={() => handleDrilldown(drillDate)}
                     disabled={drillLoading}
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-xs text-white backdrop-blur-sm hover:bg-white/10 transition disabled:opacity-50"
+                    className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs text-gray-900 dark:text-white backdrop-blur-sm hover:bg-gray-100 dark:bg-gray-700 transition disabled:opacity-50"
                   >
                     {drillLoading ? (
                       <Loader2 size={14} className="animate-spin" />
@@ -778,7 +780,7 @@ export default function ReportingPage() {
                       setDrillTxs([]);
                       setDrillError(null);
                     }}
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-xs text-white backdrop-blur-sm hover:bg-white/10 transition"
+                    className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs text-gray-900 dark:text-white backdrop-blur-sm hover:bg-gray-100 dark:bg-gray-700 transition"
                   >
                     Fermer
                   </button>
@@ -800,7 +802,7 @@ export default function ReportingPage() {
                   {[...Array(3)].map((_, i) => (
                     <div
                       key={i}
-                      className="h-14 animate-pulse rounded-lg bg-white/10"
+                      className="h-14 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-700"
                     />
                   ))}
                 </div>
@@ -842,5 +844,6 @@ export default function ReportingPage() {
         </div>
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

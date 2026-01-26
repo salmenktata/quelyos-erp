@@ -3,6 +3,7 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import { ShieldCheck, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
@@ -55,7 +56,8 @@ export default function DataQualityPage() {
     : 0;
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         <ReportingNav />
 
@@ -69,10 +71,10 @@ export default function DataQualityPage() {
 
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 p-3 shadow-lg">
-              <ShieldCheck className="h-6 w-6 text-white" />
+              <ShieldCheck className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Qualité des Données KPIs</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Qualité des Données KPIs</h1>
               <p className="text-sm text-slate-400">Fiabilité et prérequis des indicateurs financiers</p>
             </div>
           </div>
@@ -83,7 +85,7 @@ export default function DataQualityPage() {
           <GlassPanel gradient="emerald" className="p-6">
             <div className="text-center">
               <p className="text-sm text-emerald-200 mb-2">Score de Fiabilité Global</p>
-              <div className="text-5xl font-bold text-white mb-2">{globalScore}%</div>
+              <div className="text-5xl font-bold text-gray-900 dark:text-white mb-2">{globalScore}%</div>
               <p className="text-sm text-emerald-100">
                 {globalScore >= 80 && "Données de très bonne qualité"}
                 {globalScore >= 60 && globalScore < 80 && "Données fiables - améliorations possibles"}
@@ -113,7 +115,7 @@ export default function DataQualityPage() {
         {!loading && !error && (
           <div className="grid gap-6 md:grid-cols-2">
             <GlassPanel className="p-5">
-              <h3 className="text-lg font-semibold text-white mb-3">DSO - Délai d&apos;Encaissement</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">DSO - Délai d&apos;Encaissement</h3>
               {dsoQuery.data?.reliability && (
                 <ReliabilityBadge
                   reliability={dsoQuery.data.reliability}
@@ -124,7 +126,7 @@ export default function DataQualityPage() {
             </GlassPanel>
 
             <GlassPanel className="p-5">
-              <h3 className="text-lg font-semibold text-white mb-3">EBITDA - Rentabilité Opérationnelle</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">EBITDA - Rentabilité Opérationnelle</h3>
               {ebitdaQuery.data?.reliability && (
                 <ReliabilityBadge
                   reliability={ebitdaQuery.data.reliability}
@@ -135,7 +137,7 @@ export default function DataQualityPage() {
             </GlassPanel>
 
             <GlassPanel className="p-5">
-              <h3 className="text-lg font-semibold text-white mb-3">BFR - Besoin en Fonds de Roulement</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">BFR - Besoin en Fonds de Roulement</h3>
               {bfrQuery.data?.reliability && (
                 <ReliabilityBadge
                   reliability={bfrQuery.data.reliability}
@@ -146,7 +148,7 @@ export default function DataQualityPage() {
             </GlassPanel>
 
             <GlassPanel className="p-5">
-              <h3 className="text-lg font-semibold text-white mb-3">Point Mort - Seuil de Rentabilité</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Point Mort - Seuil de Rentabilité</h3>
               {breakevenQuery.data?.reliability && (
                 <ReliabilityBadge
                   reliability={breakevenQuery.data.reliability}
@@ -159,5 +161,6 @@ export default function DataQualityPage() {
         )}
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

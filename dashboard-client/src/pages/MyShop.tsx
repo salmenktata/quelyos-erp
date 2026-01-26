@@ -18,7 +18,8 @@ import { FONT_OPTIONS, DEFAULT_COLORS } from '../hooks/useTenants'
 import type { TenantConfig } from '../hooks/useTenants'
 import { useToast } from '../contexts/ToastContext'
 import { THEME_PRESETS } from '../data/themePresets'
-import type { ThemePreset } from '../data/themePresets'
+import type { ThemePreset as ThemePresetLegacy } from '../data/themePresets'
+import { useThemePresets, type ThemePreset } from '../hooks/useThemePresets'
 import {
   SwatchIcon,
   SparklesIcon,
@@ -102,7 +103,7 @@ const buildThemeSnapshotFromTenant = (tenant: TenantConfig): ThemeSnapshot => ({
     border: tenant.theme?.colors?.border || DEFAULT_COLORS.border,
     ring: tenant.theme?.colors?.ring || DEFAULT_COLORS.ring,
   },
-  fontFamily: tenant.theme?.typography?.fontFamily || 'inter',
+  fontFamily: (tenant.theme?.typography?.fontFamily as 'inter' | 'roboto' | 'poppins' | 'montserrat' | 'open-sans' | 'lato') || 'inter',
   darkMode: {
     enabled: tenant.theme?.darkMode?.enabled ?? true,
     defaultDark: tenant.theme?.darkMode?.defaultDark ?? false,
@@ -195,6 +196,10 @@ export default function MyShop() {
   const { data: tenant, isLoading, error, refetch } = useMyTenant()
   const updateMutation = useUpdateMyTenant()
   const toast = useToast()
+
+  // Fetch presets dynamiques (avec fallback sur hardcodés)
+  const { data: dynamicPresets, isLoading: presetsLoading } = useThemePresets(tenant?.id)
+  const themePresets = dynamicPresets && dynamicPresets.length > 0 ? dynamicPresets : THEME_PRESETS
 
   const [activeSection, setActiveSection] = useState('themes')
   const [formData, setFormData] = useState<FormData | null>(null)
@@ -517,7 +522,7 @@ export default function MyShop() {
                 )}
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {THEME_PRESETS.map((preset) => {
+                  {themePresets.map((preset) => {
                     const isActive = isThemeMatch(
                       {
                         colors: preset.colors,

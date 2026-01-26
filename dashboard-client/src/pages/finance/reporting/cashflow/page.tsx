@@ -3,6 +3,7 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import {
   DollarSign,
   ArrowUpCircle,
@@ -90,7 +91,8 @@ export default function CashflowReportPage() {
   const maxValue = Math.max(maxIncome, maxExpense, 1) * 1.1; // Ensure minimum of 1 to avoid division by zero
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
         <ReportingNav />
@@ -110,10 +112,10 @@ export default function CashflowReportPage() {
           </Link>
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 p-3 shadow-lg shadow-emerald-500/30">
-              <DollarSign className="h-6 w-6 text-white" />
+              <DollarSign className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Trésorerie</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Trésorerie</h1>
               <p className="text-sm text-slate-400">
                 Analyse des flux, balance et prévisions sur 90 jours
               </p>
@@ -148,8 +150,8 @@ export default function CashflowReportPage() {
                     disabled={loading}
                     className={`rounded-lg px-3 py-1 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       timeRange === range
-                        ? "bg-emerald-500 text-white"
-                        : "text-slate-400 hover:bg-white/5"
+                        ? "bg-emerald-500 text-gray-900 dark:text-white"
+                        : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                     }`}
                   >
                     {range}j
@@ -213,7 +215,7 @@ export default function CashflowReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-emerald-200">Revenus</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(totalIncome)}
                 </p>
               </div>
@@ -225,7 +227,7 @@ export default function CashflowReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-rose-200">Dépenses</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(totalExpense)}
                 </p>
               </div>
@@ -240,7 +242,7 @@ export default function CashflowReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-cyan-200">Flux net</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(netFlow)}
                 </p>
               </div>
@@ -252,7 +254,7 @@ export default function CashflowReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-indigo-200">Solde actuel</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(currentBalance)}
                 </p>
               </div>
@@ -269,7 +271,7 @@ export default function CashflowReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Évolution de la trésorerie (réel + prévisions 30j)
             </h2>
             <div className="h-96">
@@ -404,7 +406,7 @@ export default function CashflowReportPage() {
               <div className="flex items-center gap-3">
                 <AlertTriangle className="h-5 w-5 text-amber-300" />
                 <div>
-                  <p className="font-semibold text-white">
+                  <p className="font-semibold text-gray-900 dark:text-white">
                     Alerte prévision trésorerie
                   </p>
                   <p className="text-sm text-amber-200">
@@ -425,17 +427,17 @@ export default function CashflowReportPage() {
           transition={{ delay: 0.5 }}
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Détail par jour (derniers 10 jours)
             </h2>
             <div className="space-y-3">
               {realData.slice(-10).reverse().map((d, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between rounded-lg bg-white/5 p-4"
+                  className="flex items-center justify-between rounded-lg bg-gray-100 dark:bg-gray-800 p-4"
                 >
                   <div>
-                    <p className="font-medium text-white">{d.dateLabel}</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{d.dateLabel}</p>
                     <p className="text-xs text-slate-400">
                       Solde: {formatAmount(d.balance)}
                     </p>
@@ -465,5 +467,6 @@ export default function CashflowReportPage() {
         )}
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

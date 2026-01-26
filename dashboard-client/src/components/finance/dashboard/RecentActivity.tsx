@@ -1,7 +1,6 @@
 import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { GlassCard } from "@/components/ui/glass";
 import { StaggerContainer, StaggerItem } from "@/lib/finance/compat/animated";
 import {
   ArrowDownLeft,
@@ -23,22 +22,20 @@ interface RecentActivityProps {
   formatAmount: (amount: number) => string;
 }
 
-// Get icon for transaction based on type and category
 function getTransactionIcon(type: "credit" | "debit", category: string | null) {
   if (type === "credit") {
-    return <ArrowDownLeft className="h-4 w-4 text-emerald-400" />;
+    return <ArrowDownLeft className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />;
   }
-  // For debits, try to match category to icon
   if (category?.toLowerCase().includes("shopping") || category?.toLowerCase().includes("achat")) {
-    return <ShoppingCart className="h-4 w-4 text-rose-400" />;
+    return <ShoppingCart className="h-4 w-4 text-rose-500 dark:text-rose-400" />;
   }
   if (category?.toLowerCase().includes("business") || category?.toLowerCase().includes("professionnel")) {
-    return <Briefcase className="h-4 w-4 text-rose-400" />;
+    return <Briefcase className="h-4 w-4 text-rose-500 dark:text-rose-400" />;
   }
   if (category?.toLowerCase().includes("home") || category?.toLowerCase().includes("maison")) {
-    return <Home className="h-4 w-4 text-rose-400" />;
+    return <Home className="h-4 w-4 text-rose-500 dark:text-rose-400" />;
   }
-  return <ArrowUpRight className="h-4 w-4 text-rose-400" />;
+  return <ArrowUpRight className="h-4 w-4 text-rose-500 dark:text-rose-400" />;
 }
 
 export const RecentActivity = memo(function RecentActivity({
@@ -48,7 +45,6 @@ export const RecentActivity = memo(function RecentActivity({
   const queryClient = useQueryClient();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
-  // Delete transaction mutation
   const deleteMutation = useMutation({
     mutationFn: async (transactionId: number) => {
       return api(`/transactions/${transactionId}`, {
@@ -65,7 +61,6 @@ export const RecentActivity = memo(function RecentActivity({
     },
   });
 
-  // Duplicate transaction mutation
   const duplicateMutation = useMutation({
     mutationFn: async (transaction: DashboardTransaction) => {
       return api("/transactions", {
@@ -101,26 +96,25 @@ export const RecentActivity = memo(function RecentActivity({
   };
 
   const handleEdit = (transactionId: number) => {
-    // Navigate to transaction edit page
     window.location.href = `/finance/transactions?edit=${transactionId}`;
   };
 
   return (
-    <GlassCard className="p-6" data-guide="recent-transactions">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6" data-guide="recent-transactions">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-white">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
           Activité récente
         </h2>
         <Link
           to="/finance/transactions"
-          className="text-sm font-medium text-indigo-400 hover:text-indigo-300"
+          className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300"
         >
           Voir tout →
         </Link>
       </div>
       {transactions.length === 0 ? (
-        <div className="rounded-lg border border-white/10 bg-white/5 p-6 text-center">
-          <p className="text-sm text-slate-400">
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-6 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Aucune transaction récente.
           </p>
         </div>
@@ -128,15 +122,15 @@ export const RecentActivity = memo(function RecentActivity({
         <StaggerContainer speed="fast" className="space-y-2">
           {transactions.map((tx) => (
             <StaggerItem key={tx.id}>
-              <div className="group relative flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-3 transition-colors duration-150 hover:bg-white/[0.08]">
-                <div className="rounded-lg bg-white/10 p-2">
+              <div className="group relative flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-3 transition-colors duration-150 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <div className="rounded-lg bg-white dark:bg-gray-600 p-2 shadow-sm">
                   {getTransactionIcon(tx.type, tx.category?.name || null)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                     {tx.description || tx.category?.name || "Transaction"}
                   </p>
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                     <span>
                       {new Date(tx.date).toLocaleDateString("fr-FR", {
                         day: "numeric",
@@ -154,7 +148,7 @@ export const RecentActivity = memo(function RecentActivity({
                 </div>
                 <p
                   className={`text-sm font-semibold flex-shrink-0 ${
-                    tx.type === "credit" ? "text-emerald-400" : "text-rose-400"
+                    tx.type === "credit" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
                   }`}
                 >
                   {tx.type === "credit" ? "+" : "-"}
@@ -165,18 +159,18 @@ export const RecentActivity = memo(function RecentActivity({
                 <div className="relative flex-shrink-0">
                   <button
                     onClick={() => setOpenMenuId(openMenuId === tx.id ? null : tx.id)}
-                    className="rounded p-1 opacity-0 transition-all hover:bg-white/10 group-hover:opacity-100"
+                    className="rounded p-1 opacity-0 transition-all hover:bg-gray-200 dark:hover:bg-gray-600 group-hover:opacity-100"
                   >
-                    <MoreVertical className="h-4 w-4 text-slate-400" />
+                    <MoreVertical className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                   </button>
 
                   {/* Dropdown menu */}
                   {openMenuId === tx.id && (
-                    <div className="absolute right-0 top-8 z-50 w-40 rounded-lg border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur-xl">
+                    <div className="absolute right-0 top-8 z-50 w-40 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl">
                       <div className="p-1">
                         <button
                           onClick={() => handleEdit(tx.id)}
-                          className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-white transition-colors hover:bg-white/10"
+                          className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-gray-700 dark:text-gray-200 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                           <Edit className="h-4 w-4" />
                           Modifier
@@ -184,7 +178,7 @@ export const RecentActivity = memo(function RecentActivity({
                         <button
                           onClick={() => handleDuplicate(tx)}
                           disabled={duplicateMutation.isPending}
-                          className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-white transition-colors hover:bg-white/10 disabled:opacity-50"
+                          className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-gray-700 dark:text-gray-200 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
                         >
                           <Copy className="h-4 w-4" />
                           Dupliquer
@@ -192,7 +186,7 @@ export const RecentActivity = memo(function RecentActivity({
                         <button
                           onClick={() => handleDelete(tx)}
                           disabled={deleteMutation.isPending}
-                          className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-rose-400 transition-colors hover:bg-rose-500/10 disabled:opacity-50"
+                          className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-rose-600 dark:text-rose-400 transition-colors hover:bg-rose-50 dark:hover:bg-rose-900/20 disabled:opacity-50"
                         >
                           <Trash2 className="h-4 w-4" />
                           Supprimer
@@ -206,6 +200,6 @@ export const RecentActivity = memo(function RecentActivity({
           ))}
         </StaggerContainer>
       )}
-    </GlassCard>
+    </div>
   );
 });

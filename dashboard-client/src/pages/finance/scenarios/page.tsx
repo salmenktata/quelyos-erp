@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { api } from "@/lib/finance/api";
+import { ModularLayout } from "@/components/ModularLayout";
 import { GlassCard, GlassStatCard, GlassPanel, GlassButton, GlassBadge, GlassProgress } from "@/components/ui/glass";
 import {
   AreaChart,
@@ -62,7 +63,7 @@ const ADJUSTMENT_PRESETS = [
   { value: -30, label: "-30%", color: "text-red-400" },
   { value: -20, label: "-20%", color: "text-orange-400" },
   { value: -10, label: "-10%", color: "text-amber-400" },
-  { value: 0, label: "Base", color: "text-white" },
+  { value: 0, label: "Base", color: "text-gray-900 dark:text-white" },
   { value: 10, label: "+10%", color: "text-emerald-400" },
   { value: 20, label: "+20%", color: "text-green-400" },
   { value: 30, label: "+30%", color: "text-teal-400" },
@@ -275,14 +276,8 @@ export default function ScenariosPage() {
   };
 
   return (
-    <div className="relative space-y-8 text-white">
-      {/* Background effects */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-40 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/2 h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-[100px]" />
-      </div>
-
+    <ModularLayout>
+    <div className="p-4 md:p-8 space-y-8">
       {/* Header */}
       <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
@@ -302,7 +297,7 @@ export default function ScenariosPage() {
           <div className="relative">
             <button
               onClick={() => setShowLoadMenu(!showLoadMenu)}
-              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm backdrop-blur-sm hover:bg-white/10 hover:shadow-lg transition"
+              className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm backdrop-blur-sm hover:bg-gray-100 dark:bg-gray-700 hover:shadow-lg transition"
             >
               <ChevronDown className="h-4 w-4" />
               Charger
@@ -312,7 +307,7 @@ export default function ScenariosPage() {
                 {savedScenarios.map((saved) => (
                   <div
                     key={saved.id}
-                    className="flex items-center justify-between rounded-lg p-2 hover:bg-white/5 transition"
+                    className="flex items-center justify-between rounded-lg p-2 hover:bg-gray-100 dark:bg-gray-800 transition"
                   >
                     <button
                       onClick={() => loadSavedScenario(saved)}
@@ -347,7 +342,7 @@ export default function ScenariosPage() {
           {/* Export CSV */}
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm backdrop-blur-sm hover:bg-white/10 hover:shadow-lg transition"
+            className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm backdrop-blur-sm hover:bg-gray-100 dark:bg-gray-700 hover:shadow-lg transition"
           >
             <Download className="h-4 w-4" />
             CSV
@@ -364,7 +359,7 @@ export default function ScenariosPage() {
             className={`rounded-full border px-4 py-2 text-sm transition backdrop-blur-sm ${
               horizon === h
                 ? "border-indigo-400 bg-indigo-500/30 text-white shadow-lg shadow-indigo-500/20"
-                : "border-white/10 bg-white/5 text-indigo-100 hover:border-white/20 hover:bg-white/10"
+                : "border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-indigo-100 hover:border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700"
             }`}
           >
             {h} jours
@@ -378,7 +373,7 @@ export default function ScenariosPage() {
           <h2 className="text-lg font-medium">Configuration des scénarios</h2>
           <button
             onClick={addScenario}
-            className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10 backdrop-blur-sm transition"
+            className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs hover:bg-gray-100 dark:bg-gray-700 backdrop-blur-sm transition"
           >
             <Plus className="h-3 w-3" />
             Ajouter
@@ -399,7 +394,7 @@ export default function ScenariosPage() {
                 onChange={(e) =>
                   updateScenario(scenario.id, { visible: e.target.checked })
                 }
-                className="h-4 w-4 rounded border-white/20 bg-white/10"
+                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700"
               />
 
               {/* Indicateur couleur */}
@@ -415,7 +410,7 @@ export default function ScenariosPage() {
                 onChange={(e) =>
                   updateScenario(scenario.id, { name: e.target.value })
                 }
-                className="w-40 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm"
+                className="w-40 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm"
               />
 
               {/* Ajustement presets */}
@@ -428,8 +423,8 @@ export default function ScenariosPage() {
                     }
                     className={`rounded-lg px-2 py-1 text-xs transition ${
                       scenario.adjustment === preset.value
-                        ? "bg-white/20 font-medium " + preset.color
-                        : "bg-white/5 text-indigo-200 hover:bg-white/10"
+                        ? "bg-gray-200 dark:bg-gray-700 font-medium " + preset.color
+                        : "bg-gray-100 dark:bg-gray-800 text-indigo-200 hover:bg-gray-100 dark:bg-gray-700"
                     }`}
                   >
                     {preset.label}
@@ -450,7 +445,7 @@ export default function ScenariosPage() {
                       adjustment: parseInt(e.target.value),
                     })
                   }
-                  className="h-1 w-24 cursor-pointer appearance-none rounded-full bg-white/20"
+                  className="h-1 w-24 cursor-pointer appearance-none rounded-full bg-gray-200 dark:bg-gray-700"
                 />
                 <span className="w-12 text-right text-sm font-medium">
                   {scenario.adjustment >= 0 ? "+" : ""}
@@ -506,7 +501,7 @@ export default function ScenariosPage() {
                 <p className="text-xs text-indigo-200">Solde min</p>
                 <p
                   className={`text-lg font-semibold ${
-                    kpi.minBalance >= 0 ? "text-white" : "text-red-400"
+                    kpi.minBalance >= 0 ? "text-gray-900 dark:text-white" : "text-red-400"
                   }`}
                 >
                   {money.format(kpi.minBalance)}
@@ -541,7 +536,7 @@ export default function ScenariosPage() {
           <h3 className="mb-4 text-lg font-medium">
             Comparaison des scénarios sur {horizon} jours
           </h3>
-          <div className="h-80 rounded-xl border border-white/5 bg-black/20 p-3">
+          <div className="h-80 rounded-xl border border-gray-200 dark:border-gray-700 bg-black/20 p-3">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
@@ -625,10 +620,10 @@ export default function ScenariosPage() {
       {chartData.length > 0 && (
         <GlassPanel gradient="indigo">
           <h3 className="mb-4 text-lg font-medium">Données détaillées</h3>
-          <div className="max-h-64 overflow-auto rounded-xl border border-white/5 bg-black/20">
+          <div className="max-h-64 overflow-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-black/20">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-slate-900/90 backdrop-blur-sm">
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-gray-200 dark:border-gray-700">
                   <th className="px-3 py-2 text-left text-indigo-200">Date</th>
                   {scenarios
                     .filter((s) => s.visible)
@@ -647,7 +642,7 @@ export default function ScenariosPage() {
                 {chartData.slice(0, 30).map((row, i) => (
                   <tr
                     key={i}
-                    className="border-b border-white/5 hover:bg-white/5 transition"
+                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:bg-gray-800 transition"
                   >
                     <td className="px-3 py-2 text-indigo-100">
                       {row.dateFormatted}
@@ -660,7 +655,7 @@ export default function ScenariosPage() {
                           className={`px-3 py-2 text-right ${
                             (row[s.id] as number) < 0
                               ? "text-red-400"
-                              : "text-white"
+                              : "text-gray-900 dark:text-white"
                           }`}
                         >
                           {money.format(row[s.id] as number)}
@@ -686,13 +681,13 @@ export default function ScenariosPage() {
               value={saveName}
               onChange={(e) => setSaveName(e.target.value)}
               placeholder="Nom de la configuration..."
-              className="mb-4 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-indigo-200/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+              className="mb-4 w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-white placeholder:text-indigo-200/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
               autoFocus
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowSaveModal(false)}
-                className="rounded-xl border border-white/10 px-4 py-2 text-sm hover:bg-white/5 transition"
+                className="rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm hover:bg-gray-100 dark:bg-gray-800 transition"
               >
                 Annuler
               </button>
@@ -708,5 +703,6 @@ export default function ScenariosPage() {
         </div>
       )}
     </div>
+    </ModularLayout>
   );
 }

@@ -1,7 +1,4 @@
-"use client";
-
-import Link from "next/link";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   BarChart3,
@@ -19,49 +16,49 @@ const reports = [
   {
     id: "hub",
     title: "Hub",
-    href: "/dashboard/reporting",
+    href: "/finance/reporting",
     icon: LayoutGrid,
   },
   {
     id: "overview",
     title: "Vue d'ensemble",
-    href: "/dashboard/reporting/overview",
+    href: "/finance/reporting/overview",
     icon: BarChart3,
   },
   {
     id: "cashflow",
     title: "Trésorerie",
-    href: "/dashboard/reporting/cashflow",
+    href: "/finance/reporting/cashflow",
     icon: DollarSign,
   },
   {
     id: "by-category",
     title: "Par catégorie",
-    href: "/dashboard/reporting/by-category",
+    href: "/finance/reporting/by-category",
     icon: PieChart,
   },
   {
     id: "by-flow",
     title: "Par flux",
-    href: "/dashboard/reporting/by-flow",
+    href: "/finance/reporting/by-flow",
     icon: TrendingUp,
   },
   {
     id: "by-account",
     title: "Par compte",
-    href: "/dashboard/reporting/by-account",
+    href: "/finance/reporting/by-account",
     icon: Wallet,
   },
   {
     id: "by-portfolio",
     title: "Par portefeuille",
-    href: "/dashboard/reporting/by-portfolio",
+    href: "/finance/reporting/by-portfolio",
     icon: Briefcase,
   },
   {
     id: "profitability",
     title: "Rentabilité",
-    href: "/dashboard/reporting/profitability",
+    href: "/finance/reporting/profitability",
     icon: Target,
   },
 ];
@@ -80,7 +77,7 @@ export function ReportingNav() {
             return (
               <Link
                 key={report.id}
-                href={report.href}
+                to={report.href}
                 className={cn(
                   "relative flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200",
                   "border border-white/10 backdrop-blur-sm",

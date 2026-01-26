@@ -1,7 +1,9 @@
 # Commande /restart-all - Relancer Tous les Services
 
 ## Description
-Relance l'intégralité des services du projet Quelyos ERP : Backend Odoo (8069), Backoffice (5175) et Frontend (3000).
+Relance l'intégralité des services du projet Quelyos ERP : Backend Odoo (8069), Backoffice (5175), Site Vitrine (3000) et E-commerce (3001).
+
+**Alternative recommandée** : Utiliser `./scripts/dev-start.sh all` pour un contrôle plus granulaire.
 
 ## Usage
 
@@ -12,45 +14,61 @@ Relance l'intégralité des services du projet Quelyos ERP : Backend Odoo (8069)
 ## Workflow de la commande
 
 ### Étape 1 : Arrêter tous les services existants
-1. Arrêter le serveur Frontend (port 3000)
-2. Arrêter le serveur Backoffice (port 5175)
-3. Arrêter les conteneurs Docker Odoo (port 8069)
-4. Vérifier que tous les ports sont libérés
+1. Arrêter le Site Vitrine (port 3000)
+2. Arrêter le E-commerce (port 3001)
+3. Arrêter le Backoffice (port 5175)
+4. Arrêter les conteneurs Docker Odoo (port 8069)
+5. Vérifier que tous les ports sont libérés
 
 ### Étape 2 : Relancer Backend Odoo
-1. Se placer dans `backend/`
+1. Se placer dans `odoo-backend/`
 2. Démarrer les conteneurs Docker avec `docker-compose up -d`
 3. Attendre que Odoo soit prêt (~10-30s)
 4. Confirmer que l'API est accessible sur http://localhost:8069/
 
 ### Étape 3 : Relancer Backoffice
-1. Se placer dans `backoffice/`
+1. Se placer dans `dashboard-client/`
 2. Démarrer le serveur Vite en arrière-plan
 3. Attendre que Vite soit prêt (~2-5s)
 4. Confirmer que le backoffice est accessible sur http://localhost:5175/
 
-### Étape 4 : Relancer Frontend
-1. Se placer dans `frontend/`
+### Étape 4 : Relancer Site Vitrine
+1. Se placer dans `vitrine-quelyos/`
 2. Démarrer le serveur Next.js en arrière-plan
 3. Attendre que Next.js soit prêt (~5-10s)
-4. Confirmer que le frontend est accessible sur http://localhost:3000/
+4. Confirmer que le site vitrine est accessible sur http://localhost:3000/
+
+### Étape 5 : Relancer E-commerce
+1. Se placer dans `vitrine-client/`
+2. Démarrer le serveur Next.js en arrière-plan
+3. Attendre que Next.js soit prêt (~5-10s)
+4. Confirmer que l'e-commerce est accessible sur http://localhost:3001/
 
 ## Commandes utilisées
 
 ```bash
+# Alternative : Utiliser le script automatisé
+./scripts/dev-stop.sh all
+./scripts/dev-start.sh all
+
+# Ou manuellement :
 # 1. Arrêter tous les processus
 lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+lsof -ti:3001 | xargs kill -9 2>/dev/null || true
 lsof -ti:5175 | xargs kill -9 2>/dev/null || true
-cd backend && docker-compose down
+cd odoo-backend && docker-compose down
 
 # 2. Relancer Backend Odoo
-cd backend && docker-compose up -d
+cd odoo-backend && docker-compose up -d
 
-# 3. Relancer Backoffice (en arrière-plan)
-cd backoffice && npm run dev &
+# 3. Relancer Backoffice
+cd dashboard-client && npm run dev &
 
-# 4. Relancer Frontend (en arrière-plan)
-cd frontend && npm run dev &
+# 4. Relancer Site Vitrine
+cd vitrine-quelyos && npm run dev &
+
+# 5. Relancer E-commerce
+cd vitrine-client && npm run dev &
 ```
 
 ## Messages de sortie attendus
@@ -75,10 +93,11 @@ cd frontend && npm run dev &
 ✅ Tous les services sont opérationnels !
 
 📋 Services actifs :
-   • Frontend    : http://localhost:3000
-   • Backoffice  : http://localhost:5175
-   • API Odoo    : http://localhost:8069/api/ecommerce/*
-   • Interface   : http://localhost:8069 (admin/admin)
+   • Site Vitrine : http://localhost:3000 (marketing, finance, superadmin)
+   • E-commerce   : http://localhost:3001 (boutique en ligne)
+   • Backoffice   : http://localhost:5175 (administration)
+   • API Odoo     : http://localhost:8069/api/ecommerce/*
+   • Interface    : http://localhost:8069 (admin/admin)
 ```
 
 ### Erreur

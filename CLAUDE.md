@@ -13,12 +13,16 @@
 Français pour communications. Code en anglais.
 
 ## Architecture
-- `frontend/` : Next.js 16 (e-commerce)
-- `backoffice/` : React + Vite (admin)
-- `backend/addons/quelyos_api/` : Odoo 19 (API)
+- `vitrine-quelyos/` : Next.js 14 (site vitrine : 3000)
+- `vitrine-client/` : Next.js 16 (e-commerce : 3001)
+- `dashboard-client/` : React + Vite (backoffice : 5175)
+- `odoo-backend/addons/quelyos_api/` : Odoo 19 (API : 8069)
+
+Voir [ARCHITECTURE.md](ARCHITECTURE.md) pour détails services et ports.
 
 ## Guides détaillés
 Voir `.claude/reference/` pour conventions TS/Python, anti-patterns, UX/UI, parité Odoo.
+**Conventions API** : `.claude/API_CONVENTIONS.md` (format données, endpoints, authentification)
 
 ## Workflow Odoo CRITIQUE
 **Consultation doc Odoo 19 Community obligatoire**
@@ -39,9 +43,10 @@ Alerter AVANT : schéma DB, modèles Odoo, endpoints API
 **Qualité** : `/polish`, `/parity`, `/coherence`, `/clean`, `/analyze-page`, `/docs`
 
 ## Essentiels
-1. Lire README.md et LOGME.md en début de session
-2. Lire code avant modification
-3. Modifications minimales
-4. Alerter avant modif structurelle Odoo
-5. Logger sécurisé (`@/lib/logger` au lieu de `console.log`)
-6. Tailwind + Zod uniquement
+1. Lire [README.md](README.md), [ARCHITECTURE.md](ARCHITECTURE.md) et [LOGME.md](docs/LOGME.md) en début de session
+2. Utiliser scripts `./scripts/dev-start.sh all` et `./scripts/dev-stop.sh all`
+3. Lire code avant modification
+4. Modifications minimales
+5. Alerter avant modif structurelle Odoo
+6. Logger sécurisé (`@quelyos/logger` au lieu de `console.log`)
+7. Tailwind + Zod uniquement

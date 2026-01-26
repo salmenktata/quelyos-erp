@@ -5,6 +5,7 @@ import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { useApiData } from "@/hooks/finance/useApiData";
+import { ModularLayout } from "@/components/ModularLayout";
 import { GlassCard, GlassPanel, GlassBadge, GlassListItem, GlassStatCard } from "@/components/ui/glass";
 import { Briefcase, Plus, Trash2, Edit } from "lucide-react";
 import type { CreatePortfolioRequest, UpdatePortfolioRequest } from "@/types/api";
@@ -198,14 +199,8 @@ export default function PortfoliosPage() {
   };
 
   return (
-    <div className="relative min-h-screen text-white">
-      {/* Background blur orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/3 h-[350px] w-[350px] rounded-full bg-emerald-500/20 blur-[120px]" />
-      </div>
-
+    <ModularLayout>
+    <div className="p-4 md:p-8 space-y-6">
       <div className="relative space-y-6">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
@@ -249,7 +244,7 @@ export default function PortfoliosPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white" htmlFor="name">
+                <label className="text-sm font-medium text-gray-900 dark:text-white" htmlFor="name">
                   Nom du portefeuille
                 </label>
                 <input
@@ -260,13 +255,13 @@ export default function PortfoliosPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-indigo-100/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                  className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-4 py-3 text-gray-900 dark:text-white placeholder:text-indigo-100/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white" htmlFor="description">
+                <label className="text-sm font-medium text-gray-900 dark:text-white" htmlFor="description">
                   Description (facultatif)
                 </label>
                 <textarea
@@ -277,18 +272,18 @@ export default function PortfoliosPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-indigo-100/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                  className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-4 py-3 text-gray-900 dark:text-white placeholder:text-indigo-100/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
                 />
               </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white" htmlFor="status">
+                  <label className="text-sm font-medium text-gray-900 dark:text-white" htmlFor="status">
                     Statut
                   </label>
                   <select
                     id="status"
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as "ACTIVE" | "INACTIVE" })}
-                    className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                    className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-4 py-3 text-gray-900 dark:text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
                   >
                     <option value="ACTIVE">Actif</option>
                     <option value="INACTIVE">Inactif</option>
@@ -314,7 +309,7 @@ export default function PortfoliosPage() {
                     setEditingId(null);
                     setFormData({ name: "", description: "", status: "ACTIVE" });
                   }}
-                  className="flex-1 rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-indigo-50 transition hover:border-white/40"
+                  className="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 px-4 py-3 text-sm font-semibold text-indigo-50 transition hover:border-gray-400 dark:hover:border-gray-500"
                   disabled={loading}
                 >
                   Annuler
@@ -335,18 +330,18 @@ export default function PortfoliosPage() {
               {getAvailableAccounts().map((account) => (
                 <label
                   key={account.id}
-                  className="flex cursor-pointer items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 transition hover:bg-white/10"
+                  className="flex cursor-pointer items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-3 transition hover:bg-gray-100 dark:bg-gray-700"
                 >
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       checked={selectedAccounts.includes(account.id)}
                       onChange={() => handleToggleAccount(account.id)}
-                      className="h-4 w-4 rounded border-white/20 bg-white/10 text-indigo-500 focus:ring-2 focus:ring-indigo-400"
+                      className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-indigo-500 focus:ring-2 focus:ring-indigo-400"
                     />
                     <div>
-                      <p className="font-medium text-white">{account.name}</p>
-                      <p className="text-xs text-white/60">
+                      <p className="font-medium text-gray-900 dark:text-white">{account.name}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
                         {account.type} · {globalCurrency}
                       </p>
                     </div>
@@ -360,7 +355,7 @@ export default function PortfoliosPage() {
               ))}
 
               {getAvailableAccounts().length === 0 && (
-                <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-8 text-center text-sm text-white/70">
+                <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-8 text-center text-sm text-gray-600 dark:text-gray-400">
                   Aucun compte disponible
                 </div>
               )}
@@ -379,7 +374,7 @@ export default function PortfoliosPage() {
                   setShowAccountModal(false);
                   setSelectedPortfolio(null);
                 }}
-                className="flex-1 rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-indigo-50 transition hover:border-white/40"
+                className="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 px-4 py-3 text-sm font-semibold text-indigo-50 transition hover:border-gray-400 dark:hover:border-gray-500"
                 disabled={loading}
               >
                 Annuler
@@ -406,7 +401,7 @@ export default function PortfoliosPage() {
                     <Briefcase className="h-6 w-6 text-indigo-300" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {portfolio.name}
                     </h3>
                     <div className="mt-1 flex items-center gap-2">
@@ -417,7 +412,7 @@ export default function PortfoliosPage() {
                       </GlassBadge>
                     </div>
                     {portfolio.description && (
-                      <p className="text-xs text-white/60">
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
                         {portfolio.description}
                       </p>
                     )}
@@ -426,14 +421,14 @@ export default function PortfoliosPage() {
               </div>
 
               <GlassListItem className="mb-4 flex items-center justify-between">
-                <span className="text-sm text-white/70">Solde total</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Solde total</span>
                 <span className="text-lg font-semibold text-emerald-200">
                   {totalBalance.toFixed(2)} {globalCurrency}
                 </span>
               </GlassListItem>
 
               <div className="mb-4 space-y-2">
-                <div className="flex items-center justify-between text-xs text-white/70">
+                <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                   <span>Comptes associés</span>
                   <span>{portfolio.accounts.length}</span>
                 </div>
@@ -443,16 +438,16 @@ export default function PortfoliosPage() {
                     {portfolio.accounts.slice(0, 3).map((account) => (
                       <div
                         key={account.id}
-                        className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-xs"
+                        className="flex items-center justify-between rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-2 text-xs"
                       >
-                        <span className="text-white/80">{account.name}</span>
+                        <span className="text-gray-700 dark:text-gray-300">{account.name}</span>
                         <span className="font-medium text-emerald-200">
                           {account.balance.toFixed(2)} {globalCurrency}
                         </span>
                       </div>
                     ))}
                     {portfolio.accounts.length > 3 && (
-                      <p className="text-center text-xs text-white/60">
+                      <p className="text-center text-xs text-gray-600 dark:text-gray-400">
                         +{portfolio.accounts.length - 3} autre(s)
                       </p>
                     )}
@@ -469,7 +464,7 @@ export default function PortfoliosPage() {
                 </button>
                 <button
                   onClick={() => handleEdit(portfolio)}
-                  className="rounded-lg border border-white/20 p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
+                  className="rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-gray-600 dark:text-gray-400 transition hover:bg-gray-100 dark:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                 >
                   <Edit className="h-4 w-4" />
                 </button>
@@ -486,11 +481,11 @@ export default function PortfoliosPage() {
 
         {portfolios.length === 0 && (
           <GlassCard variant="subtle" className="col-span-full p-12 text-center">
-            <Briefcase className="mx-auto mb-4 h-12 w-12 text-white/40" />
-            <h3 className="mb-2 text-lg font-semibold text-white">
+            <Briefcase className="mx-auto mb-4 h-12 w-12 text-gray-500 dark:text-gray-500" />
+            <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
               Aucun portefeuille
             </h3>
-            <p className="mb-4 text-sm text-white/70">
+            <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
               Créez votre premier portefeuille pour organiser vos comptes.
             </p>
             <button
@@ -509,5 +504,6 @@ export default function PortfoliosPage() {
       </div>
       </div>
     </div>
+    </ModularLayout>
   );
 }

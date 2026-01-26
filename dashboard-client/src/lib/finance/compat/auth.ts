@@ -26,6 +26,19 @@ export function useAuth(): AuthContextType {
   // Récupère l'utilisateur depuis le token stocké
   const getUser = useCallback((): User | null => {
     try {
+      // Vérifier d'abord le user stocké par le login principal
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        const user = JSON.parse(storedUser)
+        return {
+          id: user.id || 1,
+          name: user.name || 'Utilisateur',
+          email: user.email || '',
+          role: user.role || 'user'
+        }
+      }
+
+      // Fallback: essayer le JWT token (legacy)
       const token = localStorage.getItem('odoo_session_token')
       if (!token) return null
 
@@ -50,6 +63,8 @@ export function useAuth(): AuthContextType {
 
   const logout = () => {
     localStorage.removeItem('odoo_session_token')
+    localStorage.removeItem('session_id')
+    localStorage.removeItem('user')
     window.location.href = '/login'
   }
 

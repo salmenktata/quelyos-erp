@@ -34,10 +34,23 @@ export default defineConfig({
         },
       },
       '/api/finance': {
-        target: 'http://localhost:3004',
+        target: 'http://localhost:8069',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api\/finance/, ''),
+        // Ne pas transmettre les cookies pour éviter les erreurs Odoo avec sessions invalides
+        cookieDomainRewrite: '',
+        // Réécrire /api/finance vers /api/ecommerce/finance (controller Odoo)
+        rewrite: (path) => path.replace(/^\/api\/finance/, '/api/ecommerce/finance'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            // Supprimer les cookies invalides pour éviter Access Denied Odoo
+            proxyReq.removeHeader('cookie');
+            console.log('[Vite Proxy] Finance API:', req.method, req.url, '→', 'http://localhost:8069/api/ecommerce/finance');
+          });
+          proxy.on('error', (err) => {
+            console.error('[Vite Proxy] Finance API error:', err.message);
+          });
+        },
       },
       '/web': {
         target: 'http://localhost:8069',

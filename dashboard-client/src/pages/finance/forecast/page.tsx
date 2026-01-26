@@ -1,12 +1,11 @@
-
-
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  AlertTriangle, 
-  Shield, 
+import { ModularLayout } from "@/components/ModularLayout";
+import {
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  Shield,
   ChevronDown,
   Calendar,
   Target,
@@ -21,7 +20,7 @@ import {
 import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
-import { GlassCard, GlassPanel, GlassStatCard } from "@/components/ui/glass";
+import { GlassCard, GlassStatCard, GlassPanel } from "@/components/ui/glass";
 import { EventMarkers } from "@/components/finance/forecast/EventMarkers";
 import { ForecastExport } from "@/components/finance/forecast/ForecastExport";
 import { OptimizedForecastChart } from "@/components/finance/forecast/OptimizedForecastChart";
@@ -587,28 +586,21 @@ export default function ForecastPage() {
   const perAccount = forecast?.perAccount ?? [];
 
   return (
-    <div className="relative min-h-screen text-white">
-      {/* Background blur orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-1/3 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/3 h-[350px] w-[350px] rounded-full bg-emerald-500/20 blur-[120px]" />
-      </div>
-
-      <div className="relative space-y-8">
+    <ModularLayout>
+      <div className="p-4 md:p-8 space-y-8">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-300">
+              <span className="flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-100 dark:bg-indigo-500/10 px-3 py-1 text-xs text-indigo-700 dark:text-indigo-300">
                 <Sparkles size={12} />
                 Prévisions IA
               </span>
             </div>
-            <h1 className="bg-gradient-to-r from-white via-indigo-100 to-purple-200 bg-clip-text text-2xl font-semibold text-transparent sm:text-3xl">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
               Trésorerie prévisionnelle
             </h1>
-            <p className="text-sm text-indigo-100/80">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Visualisez l&apos;évolution de votre trésorerie avec zone de confiance et scénarios.
             </p>
           </div>
@@ -885,6 +877,6 @@ export default function ForecastPage() {
           </GlassPanel>
         )}
       </div>
-    </div>
+    </ModularLayout>
   );
 }

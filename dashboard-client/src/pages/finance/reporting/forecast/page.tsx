@@ -3,6 +3,7 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import {
   TrendingUp,
   TrendingDown,
@@ -54,7 +55,8 @@ export default function ForecastReportPage() {
   const error = apiError?.message || null;
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
         <ReportingNav />
@@ -74,10 +76,10 @@ export default function ForecastReportPage() {
           </Link>
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 p-3 shadow-lg shadow-cyan-500/30">
-              <TrendingUp className="h-6 w-6 text-white" />
+              <TrendingUp className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Prévisions de trésorerie
               </h1>
               <p className="text-sm text-slate-400">
@@ -114,8 +116,8 @@ export default function ForecastReportPage() {
                     disabled={loading}
                     className={`rounded-lg px-3 py-1 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       horizon === h
-                        ? "bg-cyan-500 text-white"
-                        : "text-slate-400 hover:bg-white/5"
+                        ? "bg-cyan-500 text-gray-900 dark:text-white"
+                        : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                     }`}
                   >
                     {h} jours
@@ -219,7 +221,7 @@ export default function ForecastReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-purple-200">Solde actuel</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(apiData.currentBalance)}
                 </p>
               </div>
@@ -231,7 +233,7 @@ export default function ForecastReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-indigo-200">Solde projeté</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(apiData.projectedBalance)}
                 </p>
               </div>
@@ -260,7 +262,7 @@ export default function ForecastReportPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="mb-1 text-sm text-amber-200">Runway</p>
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {apiData.runwayDays} jours
                   </p>
                 </div>
@@ -278,7 +280,7 @@ export default function ForecastReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <Calendar className="h-5 w-5" />
               Tendances historiques ({apiData.trends.historicalDays} derniers jours)
             </h2>
@@ -315,7 +317,7 @@ export default function ForecastReportPage() {
           className="mb-6"
         >
           <GlassPanel className="p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Projection de trésorerie
             </h2>
             <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -325,7 +327,7 @@ export default function ForecastReportPage() {
                   className={`flex items-center justify-between rounded-lg p-3 ${
                     day.projectedBalance < 0 ? 'bg-red-500/10' :
                     day.projectedBalance < apiData.currentBalance * 0.3 ? 'bg-amber-500/10' :
-                    'bg-white/5'
+                    'bg-gray-100 dark:bg-gray-800'
                   }`}
                 >
                   <div className="flex-1">
@@ -356,5 +358,6 @@ export default function ForecastReportPage() {
         )}
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

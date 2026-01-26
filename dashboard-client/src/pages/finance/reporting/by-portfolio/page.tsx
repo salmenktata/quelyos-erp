@@ -3,6 +3,7 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import {
   Briefcase,
   ChevronLeft,
@@ -108,7 +109,8 @@ export default function ByPortfolioReportPage() {
     : null;
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
         <ReportingNav />
@@ -128,10 +130,10 @@ export default function ByPortfolioReportPage() {
           </Link>
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 p-3 shadow-lg shadow-violet-500/30">
-              <Briefcase className="h-6 w-6 text-white" />
+              <Briefcase className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Analyse par portefeuille
               </h1>
               <p className="text-sm text-slate-400">
@@ -167,8 +169,8 @@ export default function ByPortfolioReportPage() {
                     disabled={loading}
                     className={`rounded-lg px-3 py-1 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       timeRange === range
-                        ? "bg-violet-500 text-white"
-                        : "text-slate-400 hover:bg-white/5"
+                        ? "bg-violet-500 text-gray-900 dark:text-white"
+                        : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                     }`}
                   >
                     {range}j
@@ -232,7 +234,7 @@ export default function ByPortfolioReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-purple-200">Balance totale</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(totalBalance)}
                 </p>
               </div>
@@ -244,7 +246,7 @@ export default function ByPortfolioReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-indigo-200">Comptes totaux</p>
-                <p className="text-2xl font-bold text-white">{totalAccounts}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalAccounts}</p>
               </div>
               <Briefcase className="h-8 w-8 text-indigo-300" />
             </div>
@@ -254,7 +256,7 @@ export default function ByPortfolioReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-emerald-200">Mouvements</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {totalMovements}
                 </p>
               </div>
@@ -293,10 +295,10 @@ export default function ByPortfolioReportPage() {
                           colorClasses[portfolio.color]
                         }`}
                       >
-                        <Briefcase className="h-6 w-6 text-white" />
+                        <Briefcase className="h-6 w-6 text-gray-900 dark:text-white" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-white">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                           {portfolio.name}
                         </h3>
                         <p className="text-sm text-slate-400">
@@ -308,7 +310,7 @@ export default function ByPortfolioReportPage() {
                     </div>
 
                     <div className="text-right">
-                      <div className="mb-2 text-2xl font-bold text-white">
+                      <div className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
                         {formatAmount(portfolio.balance)}
                       </div>
                       <div
@@ -335,7 +337,7 @@ export default function ByPortfolioReportPage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="mt-6 border-t border-white/10 pt-6"
+                      className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6"
                     >
                       <div className="grid gap-4 md:grid-cols-2">
                         <div>
@@ -360,7 +362,7 @@ export default function ByPortfolioReportPage() {
                           </p>
                           <div className="flex items-center gap-2">
                             <Percent className="h-4 w-4 text-indigo-400" />
-                            <p className="text-lg font-semibold text-white">
+                            <p className="text-lg font-semibold text-gray-900 dark:text-white">
                               {(
                                 ((portfolio.avgIncome - portfolio.avgExpense) /
                                   portfolio.avgIncome) *
@@ -398,5 +400,6 @@ export default function ByPortfolioReportPage() {
         )}
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

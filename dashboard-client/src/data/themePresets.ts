@@ -3,6 +3,7 @@ import type { TenantColors } from '../hooks/useTenants';
 
 export interface ThemePreset {
   id: string;
+  code: string;
   label: string;
   description: string;
   colors: TenantColors;
@@ -16,6 +17,7 @@ export interface ThemePreset {
 export const THEME_PRESETS: ThemePreset[] = [
   {
     id: 'sportif',
+    code: 'sportif',
     label: 'Le Sportif',
     description: 'Theme actuel, vert premium et contraste doux.',
     colors: DEFAULT_COLORS,
@@ -24,6 +26,7 @@ export const THEME_PRESETS: ThemePreset[] = [
   },
   {
     id: 'ocean',
+    code: 'ocean',
     label: 'Ocean',
     description: 'Palette bleue, propre et moderne.',
     colors: {
@@ -46,6 +49,7 @@ export const THEME_PRESETS: ThemePreset[] = [
   },
   {
     id: 'sunset',
+    code: 'sunset',
     label: 'Sunset',
     description: 'Orange chaleureux, ideal pour lifestyle.',
     colors: {
@@ -68,6 +72,7 @@ export const THEME_PRESETS: ThemePreset[] = [
   },
   {
     id: 'forest',
+    code: 'forest',
     label: 'Forest',
     description: 'Vert profond et accents naturels.',
     colors: {

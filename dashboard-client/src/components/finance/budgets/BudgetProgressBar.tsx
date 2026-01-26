@@ -24,7 +24,7 @@ export function BudgetProgressBar({ percentage, status, className = "" }: Budget
 
   return (
     <div
-      className={`w-full h-2 overflow-hidden rounded-full bg-white/10 ${className}`}
+      className={`w-full h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700 ${className}`}
       role="progressbar"
       aria-valuenow={Math.round(clamped)}
       aria-valuemin={0}

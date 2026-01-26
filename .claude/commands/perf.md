@@ -2,16 +2,22 @@
 
 ## Description
 
-Analyse les performances du système tri-couche (Backend Odoo ↔ Backoffice React ↔ Frontend Next.js) avec métriques Web Vitals, profiling API, et recommandations d'optimisation alignées sur les standards UX 2026.
+Analyse les performances du système tri-couche (Backend Odoo ↔ Backoffice React ↔ Frontends Next.js) avec métriques Web Vitals, profiling API, et recommandations d'optimisation alignées sur les standards UX 2026.
+
+**Services analysés** :
+- Site Vitrine (vitrine-quelyos : 3000)
+- E-commerce (vitrine-client : 3001)
+- Backoffice (dashboard-client : 5175)
 
 ## Usage
 
 ```bash
-/perf frontend             # Analyse Lighthouse + bundle frontend Next.js
+/perf vitrine              # Analyse Lighthouse + bundle site vitrine (3000)
+/perf ecommerce            # Analyse Lighthouse + bundle e-commerce (3001)
 /perf backoffice           # Analyse Lighthouse + bundle backoffice React
 /perf api                  # Profiling endpoints API Odoo (> 1s)
 /perf images               # Analyse optimisation images (WebP, lazy loading)
-/perf                      # Analyse complète (frontend + backoffice + API + images)
+/perf                      # Analyse complète (tous services + API + images)
 ```
 
 ## Standards de Performance (UX 2026)
@@ -38,8 +44,9 @@ Analyse les performances du système tri-couche (Backend Odoo ↔ Backoffice Rea
 ### 1. Détection du Scope
 
 Analyser le paramètre fourni pour déterminer quelles analyses effectuer :
-- `frontend` → Lighthouse + bundle Next.js
-- `backoffice` → Lighthouse + bundle React/Vite
+- `vitrine` → Lighthouse + bundle site vitrine (vitrine-quelyos)
+- `ecommerce` → Lighthouse + bundle e-commerce (vitrine-client)
+- `backoffice` → Lighthouse + bundle backoffice (dashboard-client)
 - `api` → Profiling endpoints API lents
 - `images` → Analyse optimisation images
 - Aucun paramètre → Toutes les analyses
@@ -51,23 +58,25 @@ Analyser le paramètre fourni pour déterminer quelles analyses effectuer :
 **Lancer Lighthouse sur pages clés :**
 
 ```bash
-cd frontend
-
-# Homepage
+# Site Vitrine (3000)
+cd vitrine-quelyos
 npx lighthouse http://localhost:3000 \
   --output=json --output-path=./perf-reports/homepage.json \
   --chrome-flags="--headless"
 
+# E-commerce (3001)
+cd vitrine-client
+
 # Page catalogue
-npx lighthouse http://localhost:3000/products \
+npx lighthouse http://localhost:3001/products \
   --output=json --output-path=./perf-reports/catalog.json
 
 # Fiche produit
-npx lighthouse http://localhost:3000/products/test-product \
+npx lighthouse http://localhost:3001/products/test-product \
   --output=json --output-path=./perf-reports/product-page.json
 
 # Panier
-npx lighthouse http://localhost:3000/cart \
+npx lighthouse http://localhost:3001/cart \
   --output=json --output-path=./perf-reports/cart.json
 ```
 
@@ -139,7 +148,7 @@ Via @next/bundle-analyzer :
 **Scanner images dans frontend :**
 
 ```bash
-find frontend/public -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) -exec ls -lh {} \;
+find vitrine-client/public -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) -exec ls -lh {} \;
 ```
 
 **Vérifier :**
@@ -380,12 +389,12 @@ grep -r "\\.search\\(\\[" backend/addons/quelyos_api/ --include="*.py" | \
 **Frontend :**
 ```bash
 # Lister images > 500 KB
-find frontend/public -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) -size +500k -exec ls -lh {} \;
+find vitrine-client/public -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) -size +500k -exec ls -lh {} \;
 
 # Compter images par format
-find frontend/public -type f -name "*.jpg" | wc -l   # JPEG
-find frontend/public -type f -name "*.webp" | wc -l  # WebP
-find frontend/public -type f -name "*.avif" | wc -l  # AVIF
+find vitrine-client/public -type f -name "*.jpg" | wc -l   # JPEG
+find vitrine-client/public -type f -name "*.webp" | wc -l  # WebP
+find vitrine-client/public -type f -name "*.avif" | wc -l  # AVIF
 ```
 
 **Vérifier :**
@@ -398,7 +407,7 @@ find frontend/public -type f -name "*.avif" | wc -l  # AVIF
 **Scanner composants Image :**
 
 ```bash
-grep -r "<Image" frontend/src/ --include="*.tsx" -A 2 | \
+grep -r "<Image" vitrine-client/src/ --include="*.tsx" -A 2 | \
   grep -v "loading=" | \
   head -20  # Afficher premiers 20 sans prop loading
 ```
@@ -421,7 +430,7 @@ grep -r "<Image" frontend/src/ --include="*.tsx" -A 2 | \
 **Vérifier utilisation `sizes` :**
 
 ```bash
-grep -r "<Image" frontend/src/ --include="*.tsx" -A 3 | grep "sizes="
+grep -r "<Image" vitrine-client/src/ --include="*.tsx" -A 3 | grep "sizes="
 ```
 
 **Si aucune image avec `sizes` → P1 (pas de responsive images)**
@@ -593,7 +602,7 @@ import { FaHeart, FaShoppingCart } from 'react-icons/fa';
 ```bash
 # Conversion batch avec sharp
 npm install sharp-cli -g
-sharp -i frontend/public/products/*.jpg -o frontend/public/products/ -f webp -q 85
+sharp -i vitrine-client/public/products/*.jpg -o vitrine-client/public/products/ -f webp -q 85
 ```
 
 #### 6. 12 images > 1 MB non compressées
@@ -831,7 +840,7 @@ products = Product.search([('name', 'ilike', search)], limit=50)
 **Exemple : Bundle trop lourd avec lodash complet**
 
 ```typescript
-// Détecté dans frontend/src/lib/utils.ts
+// Détecté dans vitrine-client/src/lib/utils.ts
 import _ from 'lodash';  // ❌ 500 KB
 
 // Proposition de fix

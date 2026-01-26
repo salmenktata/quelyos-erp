@@ -3,6 +3,7 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
+import { ModularLayout } from "@/components/ModularLayout";
 import {
   Wallet,
   ChevronLeft,
@@ -105,7 +106,8 @@ export default function ByAccountReportPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 pt-16">
+    <ModularLayout>
+    <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
         <ReportingNav />
@@ -125,10 +127,10 @@ export default function ByAccountReportPage() {
           </Link>
           <div className="flex items-center gap-3">
             <div className="rounded-full bg-gradient-to-br from-violet-500 to-purple-600 p-3 shadow-lg shadow-violet-500/30">
-              <Wallet className="h-6 w-6 text-white" />
+              <Wallet className="h-6 w-6 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Analyse par compte bancaire</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analyse par compte bancaire</h1>
               <p className="text-sm text-slate-400">
                 Performance, mouvements et évolution des soldes par compte
               </p>
@@ -162,8 +164,8 @@ export default function ByAccountReportPage() {
                     disabled={loading}
                     className={`rounded-lg px-3 py-1 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       timeRange === range
-                        ? "bg-violet-500 text-white"
-                        : "text-slate-400 hover:bg-white/5"
+                        ? "bg-violet-500 text-gray-900 dark:text-white"
+                        : "text-slate-400 hover:bg-gray-100 dark:bg-gray-800"
                     }`}
                   >
                     {range}j
@@ -227,7 +229,7 @@ export default function ByAccountReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-indigo-200">Solde total</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatAmount(totalBalance)}
                 </p>
               </div>
@@ -239,7 +241,7 @@ export default function ByAccountReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-emerald-200">Comptes actifs</p>
-                <p className="text-2xl font-bold text-white">{accounts.length}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{accounts.length}</p>
               </div>
               <Wallet className="h-8 w-8 text-emerald-300" />
             </div>
@@ -249,7 +251,7 @@ export default function ByAccountReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-cyan-200">Mouvements</p>
-                <p className="text-2xl font-bold text-white">{totalMovements}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalMovements}</p>
               </div>
               <CreditCard className="h-8 w-8 text-cyan-300" />
             </div>
@@ -262,7 +264,7 @@ export default function ByAccountReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="mb-1 text-sm text-emerald-200">Évolution moy.</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {avgEvolution >= 0 ? "+" : ""}
                   {avgEvolution.toFixed(1)}%
                 </p>
@@ -311,7 +313,7 @@ export default function ByAccountReportPage() {
                     <Briefcase className={`h-5 w-5 ${isUnassigned ? 'text-slate-400' : 'text-violet-400'}`} />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-white">{portfolioName}</h2>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{portfolioName}</h2>
                     <p className="text-sm text-slate-400">
                       {groupAccounts.length} compte{groupAccounts.length > 1 ? 's' : ''} • 
                       {' '}{formatAmount(groupAccounts.reduce((sum, acc) => sum + acc.balance, 0))}
@@ -340,13 +342,13 @@ export default function ByAccountReportPage() {
                   className={`p-6 transition-all ${
                     selectedAccount === account.id
                       ? "ring-2 ring-violet-500"
-                      : "hover:bg-white/10"
+                      : "hover:bg-gray-100 dark:bg-gray-700"
                   }`}
                   gradient="none"
                 >
                 <div className="mb-4 flex items-start justify-between">
                   <div>
-                    <h3 className="mb-1 text-lg font-semibold text-white">
+                    <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                       {account.name}
                     </h3>
                     {account.portfolio && (
@@ -375,7 +377,7 @@ export default function ByAccountReportPage() {
                 </div>
 
                 <div className="mb-4">
-                  <p className="mb-1 text-2xl font-bold text-white">
+                  <p className="mb-1 text-2xl font-bold text-gray-900 dark:text-white">
                     {formatAmount(account.balance)}
                   </p>
                   <div className="flex items-center gap-2 text-sm">
@@ -401,7 +403,7 @@ export default function ByAccountReportPage() {
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <p className="text-slate-400">Mouvements</p>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-gray-900 dark:text-white">
                       {account.movements}
                     </p>
                   </div>
@@ -432,5 +434,6 @@ export default function ByAccountReportPage() {
         )}
       </div>
     </div>
-  );
+    </ModularLayout>
+    );
 }

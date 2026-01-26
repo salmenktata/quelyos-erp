@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
-import { api } from "./api";
+import { api, AuthenticationError } from "./api";
 
 const SETTINGS_KEY = "qyl_settings";
 const DEFAULT_CURRENCY = "EUR";
@@ -72,7 +72,10 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         console.error("Erreur lors de la sauvegarde locale", err);
       }
     } catch (err) {
-      console.error("Erreur lors de la récupération de la devise utilisateur", err);
+      // Don't log auth errors (expected when not logged in)
+      if (!(err instanceof AuthenticationError)) {
+        console.error("Erreur lors de la récupération de la devise utilisateur", err);
+      }
       // Fallback to localStorage if API fails
       try {
         const raw = localStorage.getItem(SETTINGS_KEY);
@@ -97,7 +100,10 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
       setAvailableCurrencies(data.currencies);
     } catch (err) {
-      console.error("Erreur lors de la récupération des devises", err);
+      // Don't log auth errors (expected when not logged in)
+      if (!(err instanceof AuthenticationError)) {
+        console.error("Erreur lors de la récupération des devises", err);
+      }
       // Fallback to a basic list
       setAvailableCurrencies([
         { code: "EUR", symbol: "€", name: "Euro" },
@@ -117,7 +123,10 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
       setExchangeRates(data.rates);
     } catch (err) {
-      console.error("Erreur lors de la récupération des taux de change", err);
+      // Don't log auth errors (expected when not logged in)
+      if (!(err instanceof AuthenticationError)) {
+        console.error("Erreur lors de la récupération des taux de change", err);
+      }
       // Set default rate of 1:1 as fallback
       setExchangeRates({});
     }
@@ -126,6 +135,30 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   // Hydrate from backend after mount
   useEffect(() => {
     const init = async () => {
+      // Check if user is authenticated before making API calls
+      const sessionId = localStorage.getItem('session_id');
+      if (!sessionId) {
+        // User not authenticated - use localStorage fallback only
+        try {
+          const raw = localStorage.getItem(SETTINGS_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const savedCurrency = parsed.currency ?? DEFAULT_CURRENCY;
+            setCurrencyState(savedCurrency);
+          }
+        } catch (e) {
+          // Ignore localStorage errors
+        }
+        // Set default currencies for unauthenticated users
+        setAvailableCurrencies([
+          { code: "EUR", symbol: "€", name: "Euro" },
+          { code: "USD", symbol: "$", name: "US Dollar" },
+          { code: "GBP", symbol: "£", name: "British Pound" },
+        ]);
+        setIsHydrated(true);
+        return;
+      }
+
       setIsLoading(true);
       // Use allSettled to prevent crash if API fails
       await Promise.allSettled([

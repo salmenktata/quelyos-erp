@@ -6,18 +6,18 @@ import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/dashboard/settings", label: "Vue d'ensemble" },
-  { href: "/dashboard/settings/devise", label: "Devise & formats" },
-  { href: "/dashboard/settings/tva", label: "TVA & fiscalité" },
-  { href: "/dashboard/settings/categories", label: "Catégories" },
-  { href: "/dashboard/settings/security", label: "Sécurité" },
-  { href: "/dashboard/settings/notifications", label: "Notifications & exports" },
-  { href: "/dashboard/settings/integrations", label: "Intégrations" },
+  { href: "/finance/settings", label: "Vue d'ensemble" },
+  { href: "/finance/settings/devise", label: "Devise & formats" },
+  { href: "/finance/settings/tva", label: "TVA & fiscalité" },
+  { href: "/finance/settings/categories", label: "Catégories" },
+  { href: "/finance/settings/security", label: "Sécurité" },
+  { href: "/finance/settings/notifications", label: "Notifications & exports" },
+  { href: "/finance/settings/integrations", label: "Intégrations" },
 ];
 
 function isActive(href: string, pathname: string) {
-  if (href === "/dashboard/settings" && pathname === "/dashboard/settings") return true;
-  return pathname.startsWith(href) && href !== "/dashboard/settings";
+  if (href === "/finance/settings" && pathname === "/finance/settings") return true;
+  return pathname.startsWith(href) && href !== "/finance/settings";
 }
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
@@ -39,7 +39,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
             {navItems.map((item) => (
               <Link
                 key={item.href}
-                href={item.href}
+                to={item.href}
                 className={cn(
                   "flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition",
                   "border border-transparent hover:border-white/15 hover:bg-white/5",

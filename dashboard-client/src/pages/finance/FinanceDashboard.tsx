@@ -1,6 +1,5 @@
-
-
 import React, { useEffect, useMemo, useState, Suspense } from "react";
+import { ModularLayout } from "@/components/ModularLayout";
 import { useAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { FadeInUp } from "@/lib/finance/compat/animated";
@@ -83,8 +82,8 @@ export default function DashboardPage() {
     return null; // Will redirect
   }
 
-  // Show error state if data fetch failed
-  if (dashboardError) {
+  // Show error state if data fetch failed (ignore auth errors - will redirect to login)
+  if (dashboardError && user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -105,16 +104,17 @@ export default function DashboardPage() {
   const loading = isDashboardLoading || !dashboardData;
 
   return (
-    <div className="min-h-screen space-y-4 sm:space-y-6 lg:space-y-8 p-4 sm:p-6">
-      {/* Dashboard Header with Time Range Selector & Comparison Toggle */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">Tableau de bord</h1>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Vue d'ensemble de votre activité financière
-            {comparisonMode && <span className="ml-2 text-violet-400">• Mode comparaison</span>}
-          </p>
-        </div>
+    <ModularLayout>
+      <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-4 sm:p-6">
+        {/* Dashboard Header with Time Range Selector & Comparison Toggle */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Tableau de bord Finance</h1>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              Vue d'ensemble de votre activité financière
+              {comparisonMode && <span className="ml-2 text-violet-600 dark:text-violet-400">• Mode comparaison</span>}
+            </p>
+          </div>
         <div className="flex items-center gap-2">
           <ComparisonToggle
             enabled={comparisonMode}
@@ -203,11 +203,12 @@ export default function DashboardPage() {
       {/* Quick Add FAB - Fixed position floating action button */}
       <QuickAddFAB onOpenDialog={() => setIsQuickAddOpen(true)} />
 
-      {/* Quick Transaction Dialog */}
-      <QuickTransactionDialog
-        open={isQuickAddOpen}
-        onOpenChange={setIsQuickAddOpen}
-      />
-    </div>
+        {/* Quick Transaction Dialog */}
+        <QuickTransactionDialog
+          open={isQuickAddOpen}
+          onOpenChange={setIsQuickAddOpen}
+        />
+      </div>
+    </ModularLayout>
   );
 }

@@ -148,3 +148,5 @@ backoffice/tsconfig*.tsbuildinfo
 backoffice/vite.config.js
 backoffice/vite.config.d.ts
 backoffice/.env
+/tmp/quelyos-*.log
+/tmp/quelyos-*.pid

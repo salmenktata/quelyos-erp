@@ -8,15 +8,16 @@ Analyse, nettoie et organise les fichiers du projet en identifiant les élément
 ```bash
 /clean              # Analyse complète du projet
 /clean --dry-run    # Analyse sans suppression (rapport seulement)
-/clean frontend     # Nettoyer uniquement le dossier frontend
-/clean backoffice   # Nettoyer uniquement le dossier backoffice
-/clean backend      # Nettoyer uniquement le dossier backend
+/clean vitrine      # Nettoyer site vitrine (vitrine-quelyos)
+/clean ecommerce    # Nettoyer e-commerce (vitrine-client)
+/clean backoffice   # Nettoyer backoffice (dashboard-client)
+/clean backend      # Nettoyer backend (odoo-backend)
 ```
 
 **Exemples** :
 - `/clean` - Nettoyage complet avec confirmation
 - `/clean --dry-run` - Voir ce qui serait nettoyé sans rien supprimer
-- `/clean frontend` - Nettoyer uniquement le frontend Next.js
+- `/clean ecommerce` - Nettoyer uniquement le frontend e-commerce
 
 ---
 
@@ -58,11 +59,12 @@ Analyser le projet et catégoriser les fichiers à nettoyer :
 #### 📦 Fichiers de Build Obsolètes
 ```bash
 # Build artifacts à vérifier
-frontend/.next/          # Sauf si build récent
-frontend/out/            # Export statique
-backoffice/dist/         # Build production
-**/*.map               # Source maps en dev
-**/*.tsbuildinfo       # TypeScript build info
+vitrine-quelyos/.next/   # Sauf si build récent
+vitrine-client/.next/    # Sauf si build récent
+vitrine-*/out/           # Export statique
+dashboard-client/dist/   # Build production
+**/*.map                 # Source maps en dev
+**/*.tsbuildinfo         # TypeScript build info
 ```
 
 #### 📄 Fichiers de Documentation Orphelins
@@ -144,20 +146,20 @@ pip-autoremove           # Backend Python
 Ces fichiers peuvent être supprimés en toute sécurité :
 
 #### Cache & Temporaires (45 fichiers, 128 MB)
-- `frontend/.next/cache/` - 89 MB
-- `frontend/node_modules/.cache/` - 32 MB
-- `backoffice/node_modules/.cache/` - 7 MB
+- `vitrine-client/.next/cache/` - 89 MB
+- `vitrine-client/node_modules/.cache/` - 32 MB
+- `dashboard-client/node_modules/.cache/` - 7 MB
 - `.DS_Store` (12 fichiers)
 - `__pycache__/` (8 dossiers)
 
 #### Build Obsolètes (12 fichiers, 89 MB)
-- `backoffice/dist/` - Non utilisé (build > 7 jours)
+- `dashboard-client/dist/` - Non utilisé (build > 7 jours)
 - `*.tsbuildinfo` (4 fichiers)
 - `*.map` en mode dev (7 fichiers)
 
 #### Dossiers Vides (5 dossiers)
-- `frontend/src/components/unused/`
-- `backoffice/src/utils/deprecated/`
+- `vitrine-client/src/components/unused/`
+- `dashboard-client/src/utils/deprecated/`
 - ...
 
 ### ⚠️ Vérification Manuelle Requise
@@ -272,12 +274,12 @@ AskUserQuestion({
 2. **Nettoyage cache/temp** (100% safe)
    ```bash
    # Frontend
-   rm -rf frontend/.next/cache/
-   rm -rf frontend/node_modules/.cache/
+   rm -rf vitrine-client/.next/cache/
+   rm -rf vitrine-client/node_modules/.cache/
 
    # Backoffice
-   rm -rf backoffice/node_modules/.cache/
-   rm -rf backoffice/dist/
+   rm -rf dashboard-client/node_modules/.cache/
+   rm -rf dashboard-client/dist/
 
    # Python
    find backend -type d -name "__pycache__" -exec rm -rf {} +
@@ -295,8 +297,8 @@ AskUserQuestion({
 
 4. **Suppression builds obsolètes**
    ```bash
-   rm -rf frontend/.next/
-   rm -rf backoffice/dist/
+   rm -rf vitrine-client/.next/
+   rm -rf dashboard-client/dist/
    find . -name "*.tsbuildinfo" -delete
    ```
 
@@ -446,12 +448,12 @@ Propose de déplacer les fichiers mal organisés vers leur emplacement correct s
 
 ### Commande rapide cache frontend
 ```bash
-rm -rf frontend/.next/cache frontend/node_modules/.cache
+rm -rf vitrine-client/.next/cache vitrine-client/node_modules/.cache
 ```
 
 ### Commande rapide cache backoffice
 ```bash
-rm -rf backoffice/node_modules/.cache backoffice/dist
+rm -rf dashboard-client/node_modules/.cache dashboard-client/dist
 ```
 
 ### Commande rapide Python
@@ -463,8 +465,8 @@ find backend -name "*.pyc" -delete 2>/dev/null
 ### Nettoyage complet (dangereux)
 ```bash
 # ⚠️ Nécessite npm install après
-rm -rf frontend/node_modules frontend/.next
-rm -rf backoffice/node_modules backoffice/dist
+rm -rf vitrine-client/node_modules vitrine-client/.next
+rm -rf dashboard-client/node_modules dashboard-client/dist
 ```
 
 ---
