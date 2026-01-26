@@ -49,6 +49,7 @@ import {
   // New
   Megaphone,
   UsersRound,
+  ExternalLink,
 } from 'lucide-react'
 
 // ============================================================================
@@ -474,9 +475,22 @@ function TopNavbar({
 
       {/* Right side */}
       <div className="flex items-center gap-2 ml-auto">
+        {/* View site button */}
+        <a
+          href={import.meta.env.VITE_SHOP_URL || 'http://localhost:3001'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition-all"
+          title="Voir mon site e-commerce"
+        >
+          <ExternalLink className="h-4 w-4" />
+          <span className="hidden md:inline">Voir mon site</span>
+        </a>
+
         <button
           onClick={toggleTheme}
           className="p-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all"
+          title={theme === 'light' ? 'Mode sombre' : 'Mode clair'}
         >
           {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
         </button>
