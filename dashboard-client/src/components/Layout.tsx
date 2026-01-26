@@ -185,11 +185,21 @@ function NavItemComponent({
   )
 }
 
+const STORAGE_KEY = 'quelyos_menu_open_groups'
+
 export function Layout({ children }: LayoutProps) {
   const location = useLocation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isCompact, setIsCompact] = useState(false)
-  const [openGroupName, setOpenGroupName] = useState<string | null>(null)
+  // Permettre plusieurs groupes ouverts simultanément
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      return saved ? new Set(JSON.parse(saved)) : new Set()
+    } catch {
+      return new Set()
+    }
+  })
   const { data: analyticsData } = useAnalyticsStats()
 
   const isActive = (path: string) => {
@@ -490,15 +500,39 @@ export function Layout({ children }: LayoutProps) {
     const activeGroup = navGroups.find((group) =>
       group.items.some((item) => isActive(item.path))
     )
-    if (activeGroup) {
-      setOpenGroupName(activeGroup.name)
+    if (activeGroup && !openGroups.has(activeGroup.name)) {
+      setOpenGroups((prev) => {
+        const next = new Set(prev)
+        next.add(activeGroup.name)
+        return next
+      })
     }
   }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Persister l'état des groupes ouverts
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...openGroups]))
+    } catch {
+      // Ignorer les erreurs localStorage
+    }
+  }, [openGroups])
+
   const handleGroupToggle = (groupName: string) => {
-    // Si on clique sur le groupe déjà ouvert, on le ferme
-    // Sinon on ouvre le nouveau groupe (et ferme l'ancien)
-    setOpenGroupName((prev) => (prev === groupName ? null : groupName))
+    setOpenGroups((prev) => {
+      const next = new Set(prev)
+      if (next.has(groupName)) {
+        // Ne pas fermer le groupe s'il contient la page active
+        const group = navGroups.find((g) => g.name === groupName)
+        const hasActivePage = group?.items.some((item) => isActive(item.path))
+        if (!hasActivePage) {
+          next.delete(groupName)
+        }
+      } else {
+        next.add(groupName)
+      }
+      return next
+    })
   }
 
   const sidebarWidth = isCompact ? 'w-16' : 'w-56'
@@ -559,7 +593,7 @@ export function Layout({ children }: LayoutProps) {
               isActive={isActive}
               compact={isCompact}
               onItemClick={() => setIsMobileMenuOpen(false)}
-              isOpen={openGroupName === group.name}
+              isOpen={openGroups.has(group.name)}
               onToggle={() => handleGroupToggle(group.name)}
             />
           ))}
