@@ -710,8 +710,17 @@ class QuelyCMS(BaseController):
             if error:
                 return error
 
-
             params = self._get_params()
+
+            # Validations
+            if not params.get('name'):
+                return {'success': False, 'error': 'Le nom est requis'}
+            if not params.get('title'):
+                return {'success': False, 'error': 'Le titre est requis'}
+            if not params.get('cta_text'):
+                return {'success': False, 'error': 'Le texte du bouton principal est requis'}
+            if not params.get('cta_link'):
+                return {'success': False, 'error': 'Le lien du bouton principal est requis'}
 
             slide = request.env['quelyos.hero.slide'].sudo().create({
                 'name': params.get('name'),
@@ -743,12 +752,21 @@ class QuelyCMS(BaseController):
             if error:
                 return error
 
-
             params = self._get_params()
 
             slide = request.env['quelyos.hero.slide'].sudo().browse(slide_id)
             if not slide.exists():
                 return {'success': False, 'error': 'Slide non trouvé'}
+
+            # Validations (si champs fournis)
+            if 'name' in params and not params.get('name'):
+                return {'success': False, 'error': 'Le nom ne peut pas être vide'}
+            if 'title' in params and not params.get('title'):
+                return {'success': False, 'error': 'Le titre ne peut pas être vide'}
+            if 'cta_text' in params and not params.get('cta_text'):
+                return {'success': False, 'error': 'Le texte du bouton principal ne peut pas être vide'}
+            if 'cta_link' in params and not params.get('cta_link'):
+                return {'success': False, 'error': 'Le lien du bouton principal ne peut pas être vide'}
 
             # Mapper image_url frontend → image_external_url backend
             update_data = {k: v for k, v in params.items() if k in [

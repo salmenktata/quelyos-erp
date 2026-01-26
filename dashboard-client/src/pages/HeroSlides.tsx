@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { useHeroSlides, useCreateHeroSlide, useUpdateHeroSlide, useDeleteHeroSlide, HeroSlide } from '../hooks/useHeroSlides'
-import { Button } from '../components/common'
+import { Button, ToastContainer } from '../components/common'
 import { useToast } from '../hooks/useToast'
 import { HeroSlideTable } from '../components/HeroSlideTable'
 import { HeroSlideForm, HeroSlideFormData } from '../components/HeroSlideForm'
@@ -68,8 +68,9 @@ export default function HeroSlides() {
         toast.success('Slide mis à jour')
       }
       handleCancel()
-    } catch {
-      toast.error('Erreur lors de la sauvegarde')
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la sauvegarde'
+      toast.error(errorMessage)
     }
   }
 

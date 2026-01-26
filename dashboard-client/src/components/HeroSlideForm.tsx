@@ -50,13 +50,14 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Titre</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Titre *</label>
           <input
             type="text"
             value={formData.title}
             onChange={e => updateField('title', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             placeholder="Titre principal affiché"
+            required
           />
         </div>
 
@@ -90,23 +91,25 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bouton principal</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bouton principal *</label>
             <input
               type="text"
               value={formData.cta_text}
               onChange={e => updateField('cta_text', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="Texte du bouton"
+              required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lien principal</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lien principal *</label>
             <input
               type="text"
               value={formData.cta_link}
               onChange={e => updateField('cta_link', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="/categories/promo"
+              required
             />
           </div>
         </div>
@@ -148,8 +151,23 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
 
       <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <Button onClick={onCancel} variant="secondary">Annuler</Button>
-        <Button onClick={onSave} disabled={!formData.name}>Sauvegarder</Button>
+        <Button
+          onClick={onSave}
+          disabled={
+            !formData.name.trim() ||
+            !formData.title.trim() ||
+            !formData.cta_text.trim() ||
+            !formData.cta_link.trim()
+          }
+        >
+          Sauvegarder
+        </Button>
       </div>
+      {(!formData.name.trim() || !formData.title.trim() || !formData.cta_text.trim() || !formData.cta_link.trim()) && (
+        <p className="text-xs text-red-600 dark:text-red-400 text-right mt-2">
+          * Champs obligatoires : Nom, Titre, Bouton principal (texte + lien)
+        </p>
+      )}
     </div>
   )
 }
