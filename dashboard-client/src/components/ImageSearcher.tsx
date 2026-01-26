@@ -16,6 +16,29 @@ interface UnsplashImage {
   }
 }
 
+interface PexelsImage {
+  id: number
+  src: {
+    large2x: string
+    medium: string
+  }
+  alt: string
+  photographer: string
+  photographer_url: string
+}
+
+interface UnifiedImage {
+  id: string
+  url: string
+  thumbnail: string
+  alt: string
+  source: 'unsplash' | 'pexels'
+  photographer: string
+  photographer_url: string
+}
+
+type ImageSource = 'unsplash' | 'pexels' | 'both'
+
 interface ImageSearcherProps {
   onSelectImage: (imageUrl: string) => void
   currentImageUrl?: string
@@ -23,19 +46,17 @@ interface ImageSearcherProps {
 
 export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherProps) {
   const [query, setQuery] = useState('')
-  const [images, setImages] = useState<UnsplashImage[]>([])
+  const [images, setImages] = useState<UnifiedImage[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedUrl, setSelectedUrl] = useState<string>(currentImageUrl || '')
+  const [source, setSource] = useState<ImageSource>('both')
 
-  // Unsplash API (gratuit, 50 requêtes/heure)
-  const UNSPLASH_ACCESS_KEY = 'YOUR_UNSPLASH_ACCESS_KEY' // À remplacer
+  // API Keys depuis .env (optionnel)
+  const UNSPLASH_ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY || '' // 50 req/h
+  const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_API_KEY || '' // 200 req/h
 
-  const searchImages = async () => {
-    if (!query.trim()) return
-
-    setLoading(true)
+  const searchUnsplash = async (): Promise<UnifiedImage[]> => {
     try {
-      // API Unsplash
       const response = await fetch(
         `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=12&orientation=landscape`,
         {
@@ -45,11 +66,82 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
         }
       )
 
+      if (!response.ok) throw new Error('Unsplash API error')
+
       const data = await response.json()
-      setImages(data.results || [])
+      return (data.results || []).map((img: UnsplashImage) => ({
+        id: `unsplash-${img.id}`,
+        url: img.urls.regular,
+        thumbnail: img.urls.small,
+        alt: img.alt_description || 'Unsplash image',
+        source: 'unsplash' as const,
+        photographer: img.user.name,
+        photographer_url: img.user.links.html,
+      }))
     } catch (error) {
-      console.error('Erreur recherche Unsplash:', error)
-      // Fallback : images par défaut
+      console.error('Erreur Unsplash:', error)
+      return []
+    }
+  }
+
+  const searchPexels = async (): Promise<UnifiedImage[]> => {
+    try {
+      const response = await fetch(
+        `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=12&orientation=landscape`,
+        {
+          headers: {
+            Authorization: PEXELS_API_KEY,
+          },
+        }
+      )
+
+      if (!response.ok) throw new Error('Pexels API error')
+
+      const data = await response.json()
+      return (data.photos || []).map((img: PexelsImage) => ({
+        id: `pexels-${img.id}`,
+        url: img.src.large2x,
+        thumbnail: img.src.medium,
+        alt: img.alt || 'Pexels image',
+        source: 'pexels' as const,
+        photographer: img.photographer,
+        photographer_url: img.photographer_url,
+      }))
+    } catch (error) {
+      console.error('Erreur Pexels:', error)
+      return []
+    }
+  }
+
+  const searchImages = async () => {
+    if (!query.trim()) return
+
+    setLoading(true)
+    try {
+      let results: UnifiedImage[] = []
+
+      if (source === 'unsplash') {
+        results = await searchUnsplash()
+      } else if (source === 'pexels') {
+        results = await searchPexels()
+      } else {
+        // Les deux sources
+        const [unsplashResults, pexelsResults] = await Promise.all([
+          searchUnsplash(),
+          searchPexels(),
+        ])
+        // Mélanger les résultats (alterner)
+        results = []
+        const maxLen = Math.max(unsplashResults.length, pexelsResults.length)
+        for (let i = 0; i < maxLen; i++) {
+          if (unsplashResults[i]) results.push(unsplashResults[i])
+          if (pexelsResults[i]) results.push(pexelsResults[i])
+        }
+      }
+
+      setImages(results)
+    } catch (error) {
+      console.error('Erreur recherche images:', error)
       setImages([])
     } finally {
       setLoading(false)
@@ -75,6 +167,44 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Rechercher une image
         </label>
+
+        {/* Sélecteur de source */}
+        <div className="flex gap-2 mb-2">
+          <button
+            type="button"
+            onClick={() => setSource('both')}
+            className={`px-3 py-1 text-sm rounded-md transition ${
+              source === 'both'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            Les deux
+          </button>
+          <button
+            type="button"
+            onClick={() => setSource('unsplash')}
+            className={`px-3 py-1 text-sm rounded-md transition ${
+              source === 'unsplash'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            Unsplash
+          </button>
+          <button
+            type="button"
+            onClick={() => setSource('pexels')}
+            className={`px-3 py-1 text-sm rounded-md transition ${
+              source === 'pexels'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            Pexels
+          </button>
+        </div>
+
         <div className="flex gap-2">
           <input
             type="text"
@@ -89,7 +219,9 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
           </Button>
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          Powered by Unsplash - Images libres de droits
+          {source === 'both' && 'Powered by Unsplash & Pexels - Images libres de droits'}
+          {source === 'unsplash' && 'Powered by Unsplash - Images libres de droits'}
+          {source === 'pexels' && 'Powered by Pexels - Images libres de droits'}
         </p>
       </div>
 
@@ -113,24 +245,32 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
       {images.length > 0 ? (
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Sélectionnez une image
+            Sélectionnez une image ({images.length} résultats)
           </label>
           <div className="grid grid-cols-3 gap-3 max-h-96 overflow-y-auto">
             {images.map(img => (
               <button
                 key={img.id}
                 type="button"
-                onClick={() => handleSelectImage(img.urls.regular)}
+                onClick={() => handleSelectImage(img.url)}
                 className={`relative h-24 rounded-lg overflow-hidden hover:ring-2 hover:ring-indigo-500 transition ${
-                  selectedUrl === img.urls.regular ? 'ring-2 ring-indigo-600' : ''
+                  selectedUrl === img.url ? 'ring-2 ring-indigo-600' : ''
                 }`}
               >
                 <img
-                  src={img.urls.small}
-                  alt={img.alt_description || 'Unsplash image'}
+                  src={img.thumbnail}
+                  alt={img.alt}
                   className="w-full h-full object-cover"
                 />
-                {selectedUrl === img.urls.regular && (
+                {/* Badge source */}
+                <div className={`absolute top-1 left-1 px-2 py-0.5 text-[10px] font-semibold rounded ${
+                  img.source === 'unsplash'
+                    ? 'bg-black/70 text-white'
+                    : 'bg-green-500/90 text-white'
+                }`}>
+                  {img.source === 'unsplash' ? 'U' : 'P'}
+                </div>
+                {selectedUrl === img.url && (
                   <div className="absolute inset-0 bg-indigo-600/30 flex items-center justify-center">
                     <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -140,6 +280,9 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
               </button>
             ))}
           </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            💡 U = Unsplash, P = Pexels
+          </p>
         </div>
       ) : !loading && query && (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
