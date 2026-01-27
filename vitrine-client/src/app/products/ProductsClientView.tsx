@@ -143,7 +143,7 @@ export default function ProductsClientView({
         <div className="flex gap-6">
           {/* SIDEBAR FILTRES */}
           <aside className="hidden lg:block w-64 shrink-0">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 sticky top-24">
               <div className="p-4 border-b border-gray-100">
                 <div className="flex justify-between items-center">
                   <h2 className="font-bold text-lg text-gray-900">Filtrer</h2>
@@ -333,7 +333,7 @@ export default function ProductsClientView({
 
             {/* GRILLE PRODUITS */}
             {isLoading ? (
-              <ProductGridSkeleton count={12} viewMode={viewMode} />
+              <ProductGridSkeleton count={itemsPerPage} viewMode={viewMode} />
             ) : products.length > 0 ? (
               <>
                 <ProductGrid viewMode={viewMode}>

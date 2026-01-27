@@ -58,11 +58,38 @@ const VALUE_MAPPINGS: Record<string, Record<string, string>> = {
 const DUAL_NAMING_MODE = false;
 
 /**
+ * Encode une URL en base64 (server-side)
+ */
+function encodeImageUrl(url: string): string {
+  return Buffer.from(url).toString('base64');
+}
+
+/**
+ * Transforme les URLs /web/image en URLs proxy anonymisées
+ */
+function anonymizeImageUrl(value: unknown): unknown {
+  if (typeof value !== 'string') return value;
+
+  // Détecter les URLs Odoo
+  if (value.includes('/web/image')) {
+    const encoded = encodeImageUrl(value);
+    return `/api/image?id=${encodeURIComponent(encoded)}`;
+  }
+
+  return value;
+}
+
+/**
  * Transforme récursivement un objet en renommant les champs
  */
 export function anonymizeResponse<T>(data: T): T {
   if (data === null || data === undefined) {
     return data;
+  }
+
+  // Anonymiser les strings contenant des URLs images
+  if (typeof data === 'string') {
+    return anonymizeImageUrl(data) as T;
   }
 
   if (Array.isArray(data)) {
