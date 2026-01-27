@@ -80,11 +80,7 @@
 
                         <page string="Droits d'accès" name="access_rights">
                             <group>
-                                <field name="group_ids" widget="many2many_tags" options="{'color_field': 'color'}">
-                                    <tree>
-                                        <field name="name"/>
-                                    </tree>
-                                </field>
+                                <field name="group_ids" widget="many2many_tags"/>
                             </group>
                             <group>
                                 <div class="alert alert-info" role="alert">
