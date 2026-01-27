@@ -216,7 +216,7 @@ export default function ForecastReportPage() {
               <div>
                 <p className="mb-1 text-sm text-purple-200">Solde actuel</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {formatAmount(apiData.currentBalance ?? apiData.baseBalance ?? 0)}
+                  {formatAmount(apiData.currentBalance ?? 0)}
                 </p>
               </div>
               <DollarSign className="h-8 w-8 text-purple-300" />
@@ -317,12 +317,12 @@ export default function ForecastReportPage() {
               Projection de trésorerie
             </h2>
             <div className="space-y-2 max-h-96 overflow-y-auto">
-              {(apiData.forecast ?? apiData.daily ?? []).slice(0, 30).map((day, idx) => (
+              {(apiData.forecast ?? []).slice(0, 30).map((day, idx) => (
                 <div
                   key={day.date}
                   className={`flex items-center justify-between rounded-lg p-3 ${
                     day.projectedBalance < 0 ? 'bg-red-500/10' :
-                    day.projectedBalance < (apiData.currentBalance ?? apiData.baseBalance ?? 0) * 0.3 ? 'bg-amber-500/10' :
+                    day.projectedBalance < (apiData.currentBalance ?? 0) * 0.3 ? 'bg-amber-500/10' :
                     'bg-gray-100 dark:bg-gray-800'
                   }`}
                 >

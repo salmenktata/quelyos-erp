@@ -22,7 +22,7 @@ const SETTINGS_KEY = "qyl_settings";
 
 export default function DeviseFormatsPage() {
   const { currency, setCurrency, availableCurrencies, isLoading: currenciesLoading, baseCurrency } = useCurrency();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [lang, setLang] = useState("fr");
   const [saved, setSaved] = useState(false);
 
@@ -111,21 +111,11 @@ export default function DeviseFormatsPage() {
               >
                 Sombre
               </Button>
-              <Button
-                variant={theme === "system" ? "primary" : "secondary"}
-                size="sm"
-                onClick={() => setTheme("system")}
-                icon={<Monitor className="h-4 w-4" />}
-              >
-                Système
-              </Button>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {theme === "system"
-                ? `Mode automatique activé (actuellement : ${resolvedTheme === "dark" ? "sombre" : "clair"})`
-                : theme === "dark"
-                  ? "Mode sombre activé"
-                  : "Mode clair activé"
+              {theme === "dark"
+                ? "Mode sombre activé"
+                : "Mode clair activé"
               }
             </p>
           </div>

@@ -5,7 +5,7 @@ import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { api } from "@/lib/finance/api";
 import { ModularLayout } from "@/components/ModularLayout";
-import { GlassCard, GlassStatCard, GlassPanel, GlassButton, GlassBadge, GlassProgress } from "@/components/ui/glass";
+import { GlassCard, GlassStatCard, GlassPanel, GlassButton, GlassBadge } from "@/components/ui/glass";
 import {
   AreaChart,
   Area,
@@ -588,7 +588,7 @@ export default function ScenariosPage() {
                   formatter={(value: number, name: string) => [
                     money.format(value),
                     scenarios.find((s) => s.id === name)?.name || name,
-                  ]}
+                  ] as any}
                 />
                 <Legend
                   wrapperStyle={{ paddingTop: "20px" }}

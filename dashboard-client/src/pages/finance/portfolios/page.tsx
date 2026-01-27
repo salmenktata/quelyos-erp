@@ -391,8 +391,6 @@ export default function PortfoliosPage() {
           return (
             <GlassCard
               key={portfolio.id}
-              hover
-              gradient="indigo"
               className="p-6"
             >
               <div className="mb-4 flex items-start justify-between">

@@ -573,7 +573,7 @@ export default function ReportingPage() {
                       : String(kpi.value)
                   }
                   accentColor={
-                    idx === 0 ? "emerald" : idx === 1 ? "rose" : "cyan"
+                    idx === 0 ? "emerald" : idx === 1 ? "rose" : "blue"
                   }
                 />
               ))}
@@ -594,7 +594,7 @@ export default function ReportingPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={chartData}
-                    onClick={(e) =>
+                    onClick={(e: any) =>
                       handleDrilldown(e?.activePayload?.[0]?.payload?.rawDate)
                     }
                   >
@@ -662,7 +662,7 @@ export default function ReportingPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={chartData}
-                    onClick={(e) =>
+                    onClick={(e: any) =>
                       handleDrilldown(e?.activePayload?.[0]?.payload?.rawDate)
                     }
                   >
