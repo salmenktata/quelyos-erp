@@ -12,7 +12,6 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Layout } from "@/components/Layout";
 import { Breadcrumbs, PageNotice, SkeletonTable } from "@/components/common";
 import { Button } from "@/components/common/Button";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
@@ -147,9 +146,8 @@ export default function SettingsOverviewPage() {
   }
 
   return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
-        <Breadcrumbs
+    <div className="space-y-6">
+      <Breadcrumbs
           items={[
             { label: "Finance", href: "/finance" },
             { label: "Paramètres", href: "/finance/settings" },
@@ -267,10 +265,10 @@ export default function SettingsOverviewPage() {
                 </div>
 
                 <Button
-                  variant={isDemoActive ? "destructive" : "default"}
+                  variant={isDemoActive ? "danger" : "default"}
                   onClick={handleDemoToggle}
                   disabled={loading}
-                  icon={isDemoActive ? StopCircle : PlayCircle}
+                  icon={isDemoActive ? <StopCircle className="h-5 w-5" /> : <PlayCircle className="h-5 w-5" />}
                   className="whitespace-nowrap"
                 >
                   {loading ? "Traitement..." : (isDemoActive ? "Désactiver le mode démo" : "Activer le mode démo")}
@@ -309,7 +307,6 @@ export default function SettingsOverviewPage() {
             </div>
           </div>
         )}
-      </div>
 
       <ConfirmDialog
         isOpen={showConfirm}
@@ -325,6 +322,6 @@ export default function SettingsOverviewPage() {
         confirmText={confirmAction === "deactivate" ? "Supprimer" : "Activer"}
         cancelText="Annuler"
       />
-    </Layout>
+    </div>
   );
 }

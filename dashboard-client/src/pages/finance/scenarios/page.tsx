@@ -13,8 +13,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Layout } from "@/components/Layout"
-import { Breadcrumbs, Button, SkeletonTable } from "@/components/common"
+import { Breadcrumbs, Button, PageNotice, SkeletonTable } from "@/components/common"
 import { useRequireAuth } from "@/lib/finance/compat/auth"
+import { financeNotices } from "@/lib/notices/finance-notices"
 import { useCurrency } from "@/lib/finance/CurrencyContext"
 import { api } from "@/lib/finance/api"
 import {
@@ -316,21 +317,25 @@ export default function ScenariosPage() {
                       key={saved.id}
                       className="flex items-center justify-between rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
-                      <button
+                      <Button
                         onClick={() => loadSavedScenario(saved)}
-                        className="flex-1 text-left text-sm text-gray-900 dark:text-white"
+                        variant="ghost"
+                        size="sm"
+                        className="flex-1 justify-start text-left text-sm text-gray-900 dark:text-white"
                       >
                         {saved.name}
                         <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
                           {saved.horizon}j
                         </span>
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => deleteSavedScenario(saved.id)}
-                        className="p-1 text-red-500 hover:text-red-600"
+                        variant="ghost"
+                        size="sm"
+                        className="p-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
                         <Trash2 className="h-3 w-3" />
-                      </button>
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -355,20 +360,20 @@ export default function ScenariosPage() {
           </div>
         </div>
 
+        <PageNotice config={financeNotices['scenarios']} className="mb-2" />
+
         {/* Horizon selector */}
         <div className="flex gap-2 flex-wrap">
           {HORIZONS.map((h) => (
-            <button
+            <Button
               key={h}
               onClick={() => setHorizon(h)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                horizon === h
-                  ? "bg-emerald-600 text-white"
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-              }`}
+              variant={horizon === h ? "primary" : "secondary"}
+              size="sm"
+              className="rounded-full"
             >
               {h} jours
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -410,17 +415,15 @@ export default function ScenariosPage() {
 
                 <div className="flex gap-1 flex-wrap">
                   {ADJUSTMENT_PRESETS.map((preset) => (
-                    <button
+                    <Button
                       key={preset.value}
                       onClick={() => updateScenario(scenario.id, { adjustment: preset.value })}
-                      className={`rounded-lg px-2 py-1 text-xs transition ${
-                        scenario.adjustment === preset.value
-                          ? "bg-emerald-600 text-white font-medium"
-                          : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-                      }`}
+                      variant={scenario.adjustment === preset.value ? "primary" : "secondary"}
+                      size="sm"
+                      className="px-2 py-1 text-xs"
                     >
                       {preset.label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
 
@@ -440,12 +443,14 @@ export default function ScenariosPage() {
                 </div>
 
                 {scenario.id !== "baseline" && (
-                  <button
+                  <Button
                     onClick={() => removeScenario(scenario.id)}
-                    className="ml-auto p-1 text-red-500 hover:text-red-600"
+                    variant="ghost"
+                    size="sm"
+                    className="ml-auto text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
                     <Trash2 className="h-4 w-4" />
-                  </button>
+                  </Button>
                 )}
               </div>
             ))}

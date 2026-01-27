@@ -14,7 +14,6 @@ import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Check, Loader2, Moon, Sun, Monitor, Globe, Building2 } from "lucide-react";
 import { logger } from '@quelyos/logger';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button } from '@/components/common';
 import { financeNotices } from '@/lib/notices/finance-notices';
 
@@ -66,9 +65,8 @@ export default function DeviseFormatsPage() {
   }
 
   return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
-        <Breadcrumbs
+    <div className="space-y-6">
+      <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
             { label: 'Finance', href: '/finance' },
@@ -195,7 +193,6 @@ export default function DeviseFormatsPage() {
             </div>
           )}
         </div>
-      </div>
-    </Layout>
+    </div>
   );
 }

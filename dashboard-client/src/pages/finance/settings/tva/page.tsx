@@ -13,7 +13,6 @@ import { useEffect, useMemo, useState } from "react";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Check, Loader2, Shield, WalletCards } from "lucide-react";
 import { logger } from '@quelyos/logger';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button } from '@/components/common';
 import { financeNotices } from '@/lib/notices/finance-notices';
 
@@ -91,9 +90,8 @@ export default function TvaPage() {
   };
 
   return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
-        <Breadcrumbs
+    <div className="space-y-6">
+      <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
             { label: 'Finance', href: '/finance' },
@@ -258,7 +256,6 @@ export default function TvaPage() {
             </div>
           </section>
         </div>
-      </div>
-    </Layout>
+    </div>
   );
 }

@@ -12,7 +12,6 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/finance/api";
 import { Loader2, Plus, Trash2, Edit2, Tag, TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button } from '@/components/common';
 import { financeNotices } from '@/lib/notices/finance-notices';
 
@@ -155,9 +154,8 @@ export default function CategoriesPage() {
   const incomeCategories = categories.filter((c) => c.kind === "INCOME");
 
   return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
-        <Breadcrumbs
+    <div className="space-y-6">
+      <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
             { label: 'Finance', href: '/finance' },
@@ -398,7 +396,6 @@ export default function CategoriesPage() {
             </div>
           </div>
         </div>
-      </div>
-    </Layout>
+    </div>
   );
 }

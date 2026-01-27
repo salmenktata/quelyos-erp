@@ -136,7 +136,7 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
 
           {/* Sidebar */}
           <aside
-            className={`w-60 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed lg:sticky top-14 h-[calc(100vh-3.5rem)] z-50 transition-transform duration-300 flex flex-col ${
+            className={`w-60 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed lg:sticky top-14 h-[calc(100vh-3.5rem)] z-50 transition-transform duration-300 flex flex-col ${
               isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
             }`}
           >
