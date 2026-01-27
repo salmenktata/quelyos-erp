@@ -17,7 +17,7 @@ NC='\033[0m'
 
 # Configuration
 OCA_REPO="https://github.com/OCA/stock-logistics-warehouse.git"
-OCA_BRANCH="17.0"
+OCA_BRANCH="18.0"
 TMP_DIR="/tmp/oca-stock-$(date +%s)"
 
 MODULES=(

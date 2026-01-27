@@ -58,9 +58,9 @@ for module in "${MODULES[@]}"; do
   echo -e "${YELLOW}Installation de $module...${NC}"
 
   # Installer le module via Odoo CLI
-  docker-compose -f odoo-backend/docker-compose.yml exec -T odoo \
-    odoo-bin -c /etc/odoo/odoo.conf \
-    -d odoo_db \
+  docker-compose -f odoo-backend/docker-compose.yml run --rm odoo \
+    odoo -d quelyos \
+    --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons \
     -i "$module" \
     --stop-after-init \
     --log-level=warn
