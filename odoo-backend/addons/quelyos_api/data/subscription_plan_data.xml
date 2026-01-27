@@ -28,6 +28,11 @@
                 "Gestion stock de base",
                 "Dashboard analytics de base"
             ]</field>
+            <!-- Droits d'accès Starter : Home et Store uniquement (User) -->
+            <field name="group_ids" eval="[(6, 0, [
+                ref('group_quelyos_home_user'),
+                ref('group_quelyos_store_user')
+            ])]"/>
         </record>
 
         <!-- Plan Pro -->
@@ -59,6 +64,15 @@
                 "Gestion livraison multi-méthodes",
                 "Rapports personnalisés"
             ]</field>
+            <!-- Droits d'accès Pro : Tous les modules (User) -->
+            <field name="group_ids" eval="[(6, 0, [
+                ref('group_quelyos_home_user'),
+                ref('group_quelyos_store_user'),
+                ref('group_quelyos_stock_user'),
+                ref('group_quelyos_crm_user'),
+                ref('group_quelyos_marketing_user'),
+                ref('group_quelyos_finance_user')
+            ])]"/>
         </record>
 
         <!-- Plan Enterprise -->
@@ -91,6 +105,16 @@
                 "Audit sécurité",
                 "Backup quotidien dédié"
             ]</field>
+            <!-- Droits d'accès Enterprise : Tous les modules (Manager) + HR -->
+            <field name="group_ids" eval="[(6, 0, [
+                ref('group_quelyos_home_manager'),
+                ref('group_quelyos_store_manager'),
+                ref('group_quelyos_stock_manager'),
+                ref('group_quelyos_crm_manager'),
+                ref('group_quelyos_marketing_manager'),
+                ref('group_quelyos_finance_manager'),
+                ref('group_quelyos_hr_manager')
+            ])]"/>
         </record>
 
         <!-- Séquence pour les références d'abonnement -->

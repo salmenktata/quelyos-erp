@@ -677,6 +677,13 @@ class QuelyosTenant(models.Model):
             'company_id': self.company_id.id,
         })
 
+        # Préparer les groupes de base
+        base_groups = [self.env.ref('base.group_user').id]  # Internal User
+
+        # Ajouter les groupes du plan d'abonnement si disponible
+        if self.subscription_id and self.subscription_id.plan_id:
+            base_groups.extend([group.id for group in self.subscription_id.plan_id.group_ids])
+
         # Créer l'utilisateur
         user = self.env['res.users'].sudo().create({
             'name': partner.name,
@@ -685,9 +692,7 @@ class QuelyosTenant(models.Model):
             'partner_id': partner.id,
             'company_id': self.company_id.id,
             'company_ids': [(4, self.company_id.id)],
-            'groups_id': [(6, 0, [
-                self.env.ref('base.group_user').id,  # Internal User
-            ])],
+            'groups_id': [(6, 0, base_groups)],
         })
 
         # Log le mot de passe temporaire (à remplacer par envoi email)

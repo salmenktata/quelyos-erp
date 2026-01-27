@@ -81,6 +81,16 @@ class SubscriptionPlan(models.Model):
         ('dedicated_2h', 'Support dédié (2h)')
     ], string='Niveau de support', default='email_48h', required=True)
 
+    # Droits d'accès par module
+    group_ids = fields.Many2many(
+        'res.groups',
+        'subscription_plan_group_rel',
+        'plan_id',
+        'group_id',
+        string='Groupes d\'accès',
+        help='Groupes de sécurité assignés automatiquement aux utilisateurs lors de la souscription'
+    )
+
     # Marketing
     description = fields.Text(
         string='Description',

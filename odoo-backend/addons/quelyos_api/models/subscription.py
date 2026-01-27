@@ -229,7 +229,51 @@ class Subscription(models.Model):
                     start = fields.Date.from_string(start)
                 vals['trial_end_date'] = start + timedelta(days=14)
 
-        return super().create(vals_list)
+        subscriptions = super().create(vals_list)
+
+        # Assigner automatiquement les groupes du plan aux utilisateurs
+        for subscription in subscriptions:
+            subscription._assign_plan_groups_to_users()
+
+        return subscriptions
+
+    def write(self, vals):
+        """Gère le changement de plan et réassigne les groupes."""
+        # Détecter si le plan change
+        plan_changed = 'plan_id' in vals
+
+        # Sauvegarder l'ancien plan si changement
+        old_plans = {}
+        if plan_changed:
+            for subscription in self:
+                old_plans[subscription.id] = subscription.plan_id
+
+        # Effectuer la modification
+        result = super().write(vals)
+
+        # Si le plan a changé, réassigner les groupes
+        if plan_changed:
+            for subscription in self:
+                # Retirer les groupes de l'ancien plan
+                old_plan = old_plans.get(subscription.id)
+                if old_plan and old_plan.group_ids:
+                    users = self.env['res.users'].sudo().search([
+                        ('company_ids', 'in', subscription.company_id.id),
+                        ('active', '=', True),
+                        ('share', '=', False),
+                    ])
+                    for user in users:
+                        user.write({
+                            'groups_id': [(3, group.id) for group in old_plan.group_ids]
+                        })
+
+                # Assigner les groupes du nouveau plan
+                subscription._assign_plan_groups_to_users()
+                subscription.message_post(
+                    body=_("Plan d'abonnement modifié. Groupes d'accès mis à jour.")
+                )
+
+        return result
 
     def check_quota_limit(self, resource_type):
         """
@@ -268,11 +312,13 @@ class Subscription(models.Model):
         """Active l'abonnement (sortie de trial ou past_due)."""
         for record in self:
             record.write({'state': 'active'})
+            record._assign_plan_groups_to_users()
             record.message_post(body=_("Abonnement activé"))
 
     def action_cancel(self):
         """Annule l'abonnement."""
         for record in self:
+            record._remove_plan_groups_from_users()
             record.write({
                 'state': 'cancelled',
                 'end_date': fields.Date.today()
@@ -288,6 +334,7 @@ class Subscription(models.Model):
     def action_expire(self):
         """Expire l'abonnement."""
         for record in self:
+            record._remove_plan_groups_from_users()
             record.write({
                 'state': 'expired',
                 'end_date': fields.Date.today()
@@ -317,6 +364,65 @@ class Subscription(models.Model):
             name = f"{record.name} - {record.partner_id.name} ({record.plan_id.name})"
             result.append((record.id, name))
         return result
+
+    def _assign_plan_groups_to_users(self):
+        """
+        Assigne les groupes du plan d'abonnement à tous les utilisateurs du tenant.
+        Cette méthode est appelée automatiquement lors de :
+        - Création d'un nouvel abonnement
+        - Changement de plan d'abonnement
+        - Activation d'un abonnement
+        """
+        for subscription in self:
+            if not subscription.plan_id or not subscription.plan_id.group_ids:
+                continue
+
+            # Récupérer tous les utilisateurs actifs de la company
+            users = self.env['res.users'].sudo().search([
+                ('company_ids', 'in', subscription.company_id.id),
+                ('active', '=', True),
+                ('share', '=', False),  # Exclure les utilisateurs portail
+            ])
+
+            # Assigner les groupes du plan à chaque utilisateur
+            for user in users:
+                user.write({
+                    'groups_id': [(4, group.id) for group in subscription.plan_id.group_ids]
+                })
+
+            _logger.info(
+                f"Assigned {len(subscription.plan_id.group_ids)} groups from plan {subscription.plan_id.name} "
+                f"to {len(users)} users of company {subscription.company_id.name}"
+            )
+
+    def _remove_plan_groups_from_users(self):
+        """
+        Retire les groupes du plan d'abonnement de tous les utilisateurs du tenant.
+        Cette méthode est appelée lors de :
+        - Expiration d'un abonnement
+        - Annulation d'un abonnement
+        """
+        for subscription in self:
+            if not subscription.plan_id or not subscription.plan_id.group_ids:
+                continue
+
+            # Récupérer tous les utilisateurs de la company
+            users = self.env['res.users'].sudo().search([
+                ('company_ids', 'in', subscription.company_id.id),
+                ('active', '=', True),
+                ('share', '=', False),
+            ])
+
+            # Retirer les groupes du plan de chaque utilisateur
+            for user in users:
+                user.write({
+                    'groups_id': [(3, group.id) for group in subscription.plan_id.group_ids]
+                })
+
+            _logger.info(
+                f"Removed {len(subscription.plan_id.group_ids)} groups from {len(users)} users "
+                f"of company {subscription.company_id.name}"
+            )
 
     @api.model
     def _cron_check_trial_expiry(self):

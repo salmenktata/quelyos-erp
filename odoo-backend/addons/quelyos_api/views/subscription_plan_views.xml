@@ -71,9 +71,39 @@
                         <field name="description" placeholder="Description affichée sur la page pricing"/>
                     </group>
 
-                    <group string="Fonctionnalités">
-                        <field name="features" widget="text" placeholder='["Feature 1", "Feature 2"]'/>
-                    </group>
+                    <notebook>
+                        <page string="Fonctionnalités" name="features">
+                            <group>
+                                <field name="features" widget="text" placeholder='["Feature 1", "Feature 2"]'/>
+                            </group>
+                        </page>
+
+                        <page string="Droits d'accès" name="access_rights">
+                            <group>
+                                <field name="group_ids" widget="many2many_tags" options="{'color_field': 'color'}">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="category_id"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group>
+                                <div class="alert alert-info" role="alert">
+                                    <strong>Information :</strong> Les groupes sélectionnés ici seront automatiquement assignés
+                                    à tous les utilisateurs lors de la souscription à ce plan.
+                                    <ul>
+                                        <li>Stock : Gestion des stocks et inventaires</li>
+                                        <li>CRM : Gestion de la relation client</li>
+                                        <li>Store : Boutique e-commerce</li>
+                                        <li>Finance : Gestion financière et abonnements</li>
+                                        <li>Marketing : Campagnes marketing et promotions</li>
+                                        <li>HR : Ressources humaines</li>
+                                        <li>Home : CMS et gestion du site web</li>
+                                    </ul>
+                                </div>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>

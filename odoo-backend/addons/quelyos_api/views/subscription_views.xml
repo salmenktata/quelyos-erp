@@ -99,6 +99,20 @@
                                 <field name="orders_usage_percentage" widget="progressbar"/>
                             </group>
                         </page>
+
+                        <page string="Droits d'accès" name="access_rights">
+                            <group>
+                                <field name="plan_id" invisible="1"/>
+                                <field name="plan_id" string="Groupes assignés" widget="many2many_tags" readonly="1"
+                                       related="plan_id.group_ids" options="{'color_field': 'color'}"/>
+                            </group>
+                            <group>
+                                <div class="alert alert-info" role="alert">
+                                    <strong>Information :</strong> Les groupes d'accès proviennent du plan d'abonnement.
+                                    Pour les modifier, changez le plan ou éditez les groupes du plan directement.
+                                </div>
+                            </group>
+                        </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
