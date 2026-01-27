@@ -98,8 +98,8 @@ import FinanceSettingsBilling from './pages/finance/settings/billing/page'
 import FinanceSettingsNotifications from './pages/finance/settings/notifications/page'
 import FinanceSettingsIntegrations from './pages/finance/settings/integrations/page'
 import FinanceSettingsSecurity from './pages/finance/settings/security/page'
-import FinanceStockValuation from './pages/finance/stock/valuation/page'
-import FinanceStockTurnover from './pages/finance/stock/turnover/page'
+import StockValuation from './pages/stock/valuation/page'
+import StockTurnover from './pages/stock/turnover/page'
 import NoticeAnalytics from './pages/NoticeAnalytics'
 import GlobalSettings from './pages/settings/page'
 import { CurrencyProvider } from './lib/finance/CurrencyContext'
@@ -284,6 +284,26 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <ReorderingRules />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/stock/valuation"
+                element={
+                  <ProtectedRoute>
+                    <CurrencyProvider>
+                      <StockValuation />
+                    </CurrencyProvider>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/stock/turnover"
+                element={
+                  <ProtectedRoute>
+                    <CurrencyProvider>
+                      <StockTurnover />
+                    </CurrencyProvider>
                   </ProtectedRoute>
                 }
               />
@@ -953,30 +973,6 @@ export default function App() {
                 <Route path="notifications" element={<FinanceSettingsNotifications />} />
                 <Route path="integrations" element={<FinanceSettingsIntegrations />} />
               </Route>
-              <Route
-                path="/finance/stock/valuation"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceStockValuation />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/stock/turnover"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceStockTurnover />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
               {/* Route Paramètres Globaux (temporaire - redirige vers Finance) */}
               <Route
                 path="/dashboard/settings"
