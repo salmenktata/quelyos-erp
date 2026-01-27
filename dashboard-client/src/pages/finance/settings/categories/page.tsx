@@ -242,6 +242,7 @@ export default function CategoriesPage() {
                               icon={<Edit2 className="h-3.5 w-3.5" />}
                               aria-label="Modifier"
                             >
+                              {''}
                             </Button>
                             <Button
                               variant="ghost"
@@ -252,6 +253,7 @@ export default function CategoriesPage() {
                               icon={deleting !== category.id && <Trash2 className="h-3.5 w-3.5 text-red-500" />}
                               aria-label="Supprimer"
                             >
+                              {''}
                             </Button>
                           </div>
                         </div>
@@ -291,6 +293,7 @@ export default function CategoriesPage() {
                               icon={<Edit2 className="h-3.5 w-3.5" />}
                               aria-label="Modifier"
                             >
+                              {''}
                             </Button>
                             <Button
                               variant="ghost"
@@ -301,6 +304,7 @@ export default function CategoriesPage() {
                               icon={deleting !== category.id && <Trash2 className="h-3.5 w-3.5 text-red-500" />}
                               aria-label="Supprimer"
                             >
+                              {''}
                             </Button>
                           </div>
                         </div>
