@@ -176,17 +176,17 @@ export default function WhatIfSimulator({
     <GlassCard className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex-1">
-          <h3 className="font-semibold text-white flex items-center gap-2 mb-1">
-            <Calculator className="w-5 h-5 text-indigo-400" />
+          <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-1">
+            <Calculator className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Simulateur What-If
           </h3>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Testez l'impact de décisions stratégiques sur votre trésorerie
           </p>
         </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+          className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors flex items-center gap-1"
         >
           {isExpanded ? (
             <>
@@ -211,8 +211,8 @@ export default function WhatIfSimulator({
                 key={scenario.id}
                 className={`p-4 rounded-xl border transition-all ${
                   scenario.enabled
-                    ? "bg-indigo-500/10 border-indigo-500/30"
-                    : "bg-slate-800/30 border-slate-700/50"
+                    ? "bg-indigo-100 dark:bg-indigo-500/10 border-indigo-300 dark:border-indigo-500/30"
+                    : "bg-gray-100 dark:bg-slate-800/30 border-gray-200 dark:border-slate-700/50"
                 }`}
               >
                 <div className="flex items-start gap-3 mb-3">
@@ -231,15 +231,15 @@ export default function WhatIfSimulator({
                       <div
                         className={`p-1.5 rounded-lg ${
                           scenario.type === "revenue"
-                            ? "bg-emerald-500/20 text-emerald-400"
+                            ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                             : scenario.type === "expense"
-                            ? "bg-rose-500/20 text-rose-400"
-                            : "bg-amber-500/20 text-amber-400"
+                            ? "bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400"
+                            : "bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400"
                         }`}
                       >
                         {scenario.icon}
                       </div>
-                      <label className="block text-white font-medium">
+                      <label className="block text-gray-900 dark:text-white font-medium">
                         {scenario.label}
                       </label>
                       <GlassBadge
@@ -257,7 +257,7 @@ export default function WhatIfSimulator({
                         {scenario.type === "delay" && "Délai"}
                       </GlassBadge>
                     </div>
-                    <p className="text-sm text-slate-400 mb-3">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                       {scenario.description}
                     </p>
 
@@ -277,16 +277,16 @@ export default function WhatIfSimulator({
                           className="w-full accent-indigo-500"
                         />
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-400">
+                          <span className="text-gray-600 dark:text-gray-400">
                             {scenario.unit === "€" ? "Montant" : "Durée"}:
                           </span>
                           <span
                             className={`font-medium ${
                               scenario.type === "revenue"
-                                ? "text-emerald-400"
+                                ? "text-emerald-600 dark:text-emerald-400"
                                 : scenario.type === "expense"
-                                ? "text-rose-400"
-                                : "text-amber-400"
+                                ? "text-rose-600 dark:text-rose-400"
+                                : "text-amber-600 dark:text-amber-400"
                             }`}
                           >
                             {scenario.unit === "€"
@@ -308,31 +308,31 @@ export default function WhatIfSimulator({
             <div
               className={`p-4 rounded-xl border ${
                 totalImpact >= 0
-                  ? "bg-emerald-500/10 border-emerald-500/30"
-                  : "bg-rose-500/10 border-rose-500/30"
+                  ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30"
+                  : "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30"
               }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {totalImpact >= 0 ? (
-                    <TrendingUp className="w-5 h-5 text-emerald-400" />
+                    <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    <TrendingDown className="w-5 h-5 text-rose-400" />
+                    <TrendingDown className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                   )}
-                  <span className="text-white font-medium">
+                  <span className="text-gray-900 dark:text-white font-medium">
                     Impact mensuel total
                   </span>
                 </div>
                 <span
                   className={`text-xl font-bold ${
-                    totalImpact >= 0 ? "text-emerald-400" : "text-rose-400"
+                    totalImpact >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
                   }`}
                 >
                   {totalImpact >= 0 ? "+" : ""}
                   {formatMoney(totalImpact)}
                 </span>
               </div>
-              <p className="text-sm text-slate-400 mt-2 flex items-start gap-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 flex items-start gap-1">
                 <Info className="w-3 h-3 mt-0.5 shrink-0" />
                 Impact estimé sur votre solde de trésorerie après 30 jours
               </p>
@@ -361,8 +361,8 @@ export default function WhatIfSimulator({
           </div>
 
           {/* Info */}
-          <div className="p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
-            <p className="text-xs text-indigo-300 flex items-start gap-2">
+          <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 rounded-lg">
+            <p className="text-xs text-indigo-700 dark:text-indigo-300 flex items-start gap-2">
               <Info className="w-3 h-3 mt-0.5 shrink-0" />
               <span>
                 Les simulations sont appliquées à vos prévisions existantes.
@@ -375,14 +375,14 @@ export default function WhatIfSimulator({
 
       {/* État replié */}
       {!isExpanded && hasActiveScenarios && (
-        <div className="mt-3 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+        <div className="mt-3 p-3 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 rounded-lg">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-white">
+            <span className="text-gray-900 dark:text-white">
               {scenarios.filter((s) => s.enabled).length} scénario(s) actif(s)
             </span>
             <span
               className={`font-medium ${
-                totalImpact >= 0 ? "text-emerald-400" : "text-rose-400"
+                totalImpact >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
               }`}
             >
               {totalImpact >= 0 ? "+" : ""}

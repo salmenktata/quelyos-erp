@@ -1,6 +1,21 @@
+/**
+ * Page Prévisions de Trésorerie
+ *
+ * Fonctionnalités :
+ * - Projection trésorerie sur 7/15/30/60/90 jours avec modèle Prophet IA
+ * - Zone de confiance ML avec intervalles de probabilité
+ * - Simulateur What-If pour tester des scénarios stratégiques
+ * - Indicateur de risque automatique (faible/modéré/élevé/critique)
+ * - Détail par compte bancaire avec évolution individuelle
+ * - Export des prévisions (PDF, Excel)
+ * - Événements planifiés avec impact sur projection
+ */
+
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ModularLayout } from "@/components/ModularLayout";
+import { Layout } from "@/components/Layout";
+import { Breadcrumbs, PageNotice, SkeletonTable, Button } from "@/components/common";
+import { financeNotices } from "@/lib/notices";
 import { TrendingUp, TrendingDown, Target, Sparkles, BarChart3 } from "lucide-react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
@@ -60,8 +75,16 @@ export default function ForecastPage() {
     : [];
 
   return (
-    <ModularLayout>
-      <div className="p-4 md:p-8 space-y-8">
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Finance', href: '/finance' },
+            { label: 'Prévisions' },
+          ]}
+        />
+
         <ForecastHeader
           showConfidence={showConfidence}
           showScenarios={showScenarios}
@@ -69,6 +92,8 @@ export default function ForecastPage() {
           onToggleScenarios={() => setShowScenarios(!showScenarios)}
           forecast={forecast}
         />
+
+        <PageNotice config={financeNotices.forecast} className="mb-6" />
 
         <HorizonSelector selectedDays={selectedDays} onSelect={setSelectedDays} />
 
@@ -99,19 +124,15 @@ export default function ForecastPage() {
           </motion.div>
         )}
 
-        {loading && (
-          <GlassCard variant="subtle" className="flex items-center justify-center gap-3 p-8">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-400 border-t-transparent" />
-            <span className="text-sm text-gray-600 dark:text-indigo-100/80">
-              Calcul des prévisions en cours...
-            </span>
-          </GlassCard>
-        )}
+        {loading && <SkeletonTable rows={5} columns={4} />}
 
         {error && (
-          <GlassCard className="border-red-300/40 bg-red-50 dark:bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-100">
-            {error}
-          </GlassCard>
+          <div role="alert" className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+            <p className="text-red-800 dark:text-red-200 mb-4">{error}</p>
+            <Button variant="secondary" onClick={() => window.location.reload()}>
+              Réessayer
+            </Button>
+          </div>
         )}
 
         {forecast && (
@@ -184,6 +205,6 @@ export default function ForecastPage() {
 
         <AccountBreakdown accounts={forecast?.perAccount ?? []} currency={currency} />
       </div>
-    </ModularLayout>
+    </Layout>
   );
 }

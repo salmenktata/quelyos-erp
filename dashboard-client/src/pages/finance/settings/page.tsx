@@ -279,7 +279,7 @@ export default function SettingsOverviewPage() {
                 <div role="alert" className="mt-4 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-3">
                   <div className="flex items-center justify-between gap-4">
                     <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
-                    <Button variant="outline" size="sm" onClick={() => setError(null)}>
+                    <Button variant="secondary" size="sm" onClick={() => setError(null)}>
                       Fermer
                     </Button>
                   </div>
