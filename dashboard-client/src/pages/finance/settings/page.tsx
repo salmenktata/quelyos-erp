@@ -1,137 +1,125 @@
-
+/**
+ * Page : Paramètres Finance - Vue d'ensemble
+ *
+ * Fonctionnalités :
+ * - Vue d'ensemble organisée par groupes de paramètres (Configuration, Données, Abonnement, Préférences)
+ * - Navigation vers sous-pages de configuration (Devise, TVA, Catégories, Flux, Sécurité, etc.)
+ * - Mode Démo : activation/désactivation avec 110 transactions, 5 comptes, 3 portefeuilles fictifs
+ * - Protection contre activation démo si données réelles existent
+ * - Confirmation avant activation/désactivation du mode démo
+ * - Toast de feedback avec détail des changements effectués
+ */
 
 import React from "react";
 import { Link } from "react-router-dom";
+import { Layout } from "@/components/Layout";
+import { Breadcrumbs, PageNotice, SkeletonTable } from "@/components/common";
+import { Button } from "@/components/common/Button";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { api } from "@/lib/finance/api";
-import { GlassCard, GlassPanel, GlassListItem } from "@/components/ui/glass";
-import { ArrowRight, PlayCircle, StopCircle, AlertTriangle } from "lucide-react";
+import {
+  Settings,
+  ArrowRight,
+  PlayCircle,
+  StopCircle,
+  AlertTriangle,
+  DollarSign,
+  Receipt,
+  Tag,
+  CreditCard,
+  Shield,
+  Bell,
+  Plug
+} from "lucide-react";
 import { ConfirmDialog } from "@/components/finance/ConfirmDialog";
+import { financeNotices } from "@/lib/notices/finance-notices";
 import { logger } from '@quelyos/logger';
 
-const sectionsGroups = [
+const settingsGroups = [
   {
     group: "Configuration de base",
     description: "Paramètres essentiels pour démarrer",
-    icon: "⚙️",
+    icon: Settings,
     sections: [
       {
         title: "Devise & formats",
         desc: "Devise par défaut, thème et langue utilisateur.",
         href: "/finance/settings/devise",
-        icon: "💰",
+        icon: DollarSign,
       },
       {
         title: "TVA & fiscalité",
         desc: "Activer la TVA, mode HT/TTC, taux disponibles.",
         href: "/finance/settings/tva",
-        icon: "📊",
+        icon: Receipt,
       },
     ],
   },
   {
     group: "Données métier",
     description: "Référentiels et classifications",
-    icon: "🏷️",
+    icon: Tag,
     sections: [
       {
         title: "Catégories",
         desc: "Gérer les catégories de revenus et dépenses.",
         href: "/finance/settings/categories",
-        icon: "🏷️",
+        icon: Tag,
       },
       {
         title: "Flux de paiement",
         desc: "Types de flux par défaut (CB, chèque, virement...).",
         href: "/finance/settings/flux",
-        icon: "💳",
+        icon: CreditCard,
       },
     ],
   },
   {
     group: "Abonnement & Facturation",
     description: "Gérez votre plan et vos paiements",
-    icon: "💳",
+    icon: CreditCard,
     sections: [
       {
         title: "Abonnement",
         desc: "Plan actuel, facturation, et gestion de l'abonnement.",
         href: "/finance/settings/billing",
-        icon: "💳",
+        icon: CreditCard,
       },
     ],
   },
   {
     group: "Préférences & connexions",
     description: "Options avancées",
-    icon: "🔧",
+    icon: Settings,
     sections: [
       {
         title: "Sécurité",
         desc: "Mot de passe, authentification à deux facteurs (2FA), sessions.",
         href: "/finance/settings/security",
-        icon: "🔒",
+        icon: Shield,
       },
       {
         title: "Notifications & exports",
         desc: "Fréquence des emails, formats d'export.",
         href: "/finance/settings/notifications",
-        icon: "🔔",
+        icon: Bell,
       },
       {
         title: "Intégrations",
         desc: "Connexions externes, webhooks, API.",
         href: "/finance/settings/integrations",
-        icon: "🔌",
+        icon: Plug,
       },
     ],
-  },
-];
-
-const oldSections = [
-  {
-    title: "Devise & formats",
-    desc: "Devise par défaut, thème et langue utilisateur.",
-    href: "/finance/settings/devise",
-  },
-  {
-    title: "TVA & fiscalité",
-    desc: "Activer la TVA, mode HT/TTC, taux disponibles.",
-    href: "/finance/settings/tva",
-  },
-  {
-    title: "Catégories",
-    desc: "Gérer les catégories de revenus et dépenses.",
-    href: "/finance/settings/categories",
-  },
-  {
-    title: "Flux de paiement",
-    desc: "Types de flux par défaut (CB, chèque, virement...).",
-    href: "/finance/settings/flux",
-  },
-  {
-    title: "Comptes & portefeuilles",
-    desc: "Règles de visibilité et statut actif/inactif.",
-    href: "/finance/settings/comptes",
-  },
-  {
-    title: "Notifications & exports",
-    desc: "Fréquence des emails, formats d’export.",
-    href: "/finance/settings/notifications",
-  },
-  {
-    title: "Intégrations",
-    desc: "Connexions externes, webhooks, API.",
-    href: "/finance/settings/integrations",
   },
 ];
 
 export default function SettingsOverviewPage() {
   useRequireAuth();
   const [loading, setLoading] = React.useState(false);
+  const [initialLoading, setInitialLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [isDemoActive, setIsDemoActive] = React.useState(false);
-  const [checkingStatus, setCheckingStatus] = React.useState(true);
   const [showToast, setShowToast] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState("");
   const [showConfirm, setShowConfirm] = React.useState(false);
@@ -146,7 +134,7 @@ export default function SettingsOverviewPage() {
       } catch (e) {
         logger.error("Erreur lors de la vérification du statut démo:", e);
       } finally {
-        setCheckingStatus(false);
+        setInitialLoading(false);
       }
     }
     checkDemoStatus();
@@ -167,10 +155,10 @@ export default function SettingsOverviewPage() {
       const data = await api("/admin/demo-mode", {
         method: "POST",
         body: { action: confirmAction } as any,
-      }) as { 
-        success?: boolean; 
-        message?: string; 
-        error?: string; 
+      }) as {
+        success?: boolean;
+        message?: string;
+        error?: string;
         warning?: string;
         changes?: {
           currency?: string;
@@ -185,13 +173,13 @@ export default function SettingsOverviewPage() {
       }
 
       setIsDemoActive(!isDemoActive);
-      
+
       // Message enrichi avec les modifications effectuées
       let message = data.message || (isDemoActive ? "Mode démo désactivé" : "Mode démo activé");
       if (data.changes && !isDemoActive) {
         message += "\n\n✓ " + Object.values(data.changes).join("\n✓ ");
       }
-      
+
       setToastMessage(message);
       setShowToast(true);
 
@@ -205,240 +193,158 @@ export default function SettingsOverviewPage() {
     } finally {
       setLoading(false);
       setConfirmAction(null);
+      setShowConfirm(false);
     }
   }
 
   return (
-    <div className="relative space-y-6 text-white">
-      {/* Background effects */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-indigo-500/20 blur-[120px]" />
-        <div className="absolute -right-40 top-40 h-[400px] w-[400px] rounded-full bg-purple-500/20 blur-[120px]" />
-      </div>
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: "Finance", href: "/finance" },
+            { label: "Paramètres", href: "/finance/settings" },
+          ]}
+        />
 
-      <div className="relative space-y-2">
-        <p className="text-xs uppercase tracking-[0.25em] text-indigo-200">Paramètres</p>
-        <h1 className="bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-3xl font-semibold text-transparent">
-          Vue d&apos;ensemble
-        </h1>
-        <p className="text-sm text-indigo-100/80">
-          Choisissez une rubrique pour configurer votre espace.
-        </p>
-      </div>
-
-      <div className="relative space-y-8">
-        {/* Configuration de base */}
-        <div data-guide="settings-profile">
-          <div className="mb-4 flex items-center gap-3">
-            <span className="text-2xl">⚙️</span>
+        {/* Header */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-start gap-4">
+            <div className="rounded-lg bg-emerald-100 dark:bg-emerald-900/30 p-3">
+              <Settings className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+            </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Configuration de base</h2>
-              <p className="text-sm text-slate-400">Paramètres essentiels pour démarrer</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Paramètres Finance
+              </h1>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Choisissez une rubrique pour configurer votre espace
+              </p>
             </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {sectionsGroups[0].sections.map((s) => (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="group flex h-full flex-col justify-between rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10 hover:shadow-xl hover:shadow-indigo-500/5"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{s.icon}</span>
-                    <p className="text-sm font-semibold text-white">{s.title}</p>
-                  </div>
-                  <p className="text-sm text-indigo-100/80">{s.desc}</p>
-                </div>
-                <div className="mt-4 flex items-center gap-2 text-indigo-200 group-hover:text-white transition">
-                  <span className="text-xs font-medium">Configurer</span>
-                  <ArrowRight className="h-4 w-4" />
-                </div>
-              </Link>
-            ))}
           </div>
         </div>
 
-        {/* Données métier */}
-        <div data-guide="settings-preferences">
-          <div className="mb-4 flex items-center gap-3">
-            <span className="text-2xl">🏷️</span>
-            <div>
-              <h2 className="text-lg font-semibold text-white">Données métier</h2>
-              <p className="text-sm text-slate-400">Référentiels et classifications</p>
-            </div>
+        <PageNotice
+          config={financeNotices['settings']}
+          className="mb-6"
+        />
+
+        {initialLoading ? (
+          <div className="space-y-8">
+            <SkeletonTable rows={4} columns={2} />
+            <SkeletonTable rows={4} columns={2} />
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {sectionsGroups[1].sections.map((s) => (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="group flex h-full flex-col justify-between rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10 hover:shadow-xl hover:shadow-indigo-500/5"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{s.icon}</span>
-                    <p className="text-sm font-semibold text-white">{s.title}</p>
+        ) : (
+          <div className="space-y-8">
+            {settingsGroups.map((group, groupIndex) => (
+              <div key={groupIndex}>
+                <div className="mb-4 flex items-center gap-3">
+                  <group.icon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{group.group}</h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{group.description}</p>
                   </div>
-                  <p className="text-sm text-indigo-100/80">{s.desc}</p>
                 </div>
-                <div className="mt-4 flex items-center gap-2 text-indigo-200 group-hover:text-white transition">
-                  <span className="text-xs font-medium">Configurer</span>
-                  <ArrowRight className="h-4 w-4" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
 
-        {/* Abonnement & Facturation */}
-        <div data-guide="settings-billing">
-          <div className="mb-4 flex items-center gap-3">
-            <span className="text-2xl">💳</span>
-            <div>
-              <h2 className="text-lg font-semibold text-white">Abonnement & Facturation</h2>
-              <p className="text-sm text-slate-400">Gérez votre plan et vos paiements</p>
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {sectionsGroups[2].sections.map((s) => (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="group flex h-full flex-col justify-between rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10 hover:shadow-xl hover:shadow-indigo-500/5"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{s.icon}</span>
-                    <p className="text-sm font-semibold text-white">{s.title}</p>
-                  </div>
-                  <p className="text-sm text-indigo-100/80">{s.desc}</p>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {group.sections.map((section) => (
+                    <Link
+                      key={section.href}
+                      to={section.href}
+                      className="group flex h-full flex-col justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm transition hover:shadow-md hover:border-emerald-500 dark:hover:border-emerald-600"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <section.icon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">{section.title}</p>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{section.desc}</p>
+                      </div>
+                      <div className="mt-4 flex items-center gap-2 text-emerald-600 dark:text-emerald-400 group-hover:gap-3 transition-all">
+                        <span className="text-xs font-medium">Configurer</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-                <div className="mt-4 flex items-center gap-2 text-indigo-200 group-hover:text-white transition">
-                  <span className="text-xs font-medium">Configurer</span>
-                  <ArrowRight className="h-4 w-4" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Préférences & connexions */}
-        <div data-guide="settings-notifications">
-          <div className="mb-4 flex items-center gap-3">
-            <span className="text-2xl">🔧</span>
-            <div>
-              <h2 className="text-lg font-semibold text-white">Préférences & connexions</h2>
-              <p className="text-sm text-slate-400">Options avancées</p>
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {sectionsGroups[3].sections.map((s) => (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="group flex h-full flex-col justify-between rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10 hover:shadow-xl hover:shadow-indigo-500/5"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{s.icon}</span>
-                    <p className="text-sm font-semibold text-white">{s.title}</p>
-                  </div>
-                  <p className="text-sm text-indigo-100/80">{s.desc}</p>
-                </div>
-                <div className="mt-4 flex items-center gap-2 text-indigo-200 group-hover:text-white transition">
-                  <span className="text-xs font-medium">Configurer</span>
-                  <ArrowRight className="h-4 w-4" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Section Mode Démo */}
-      <GlassPanel gradient="purple" className="mt-8">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-2">
-              {isDemoActive ? (
-                <StopCircle className="h-5 w-5 text-orange-400" />
-              ) : (
-                <PlayCircle className="h-5 w-5 text-green-400" />
-              )}
-              <h3 className="text-lg font-semibold text-white">
-                Mode Démo {isDemoActive ? "Actif" : "Inactif"}
-              </h3>
-            </div>
-            <p className="text-sm text-indigo-100/80">
-              {isDemoActive 
-                ? "Les données fictives sont actuellement chargées. Vous pouvez les supprimer pour revenir à vos données réelles."
-                : "Activez le mode démo pour tester l'application avec 110 transactions, 5 comptes, 3 portefeuilles et 15 catégories fictives."
-              }
-            </p>
-            {!isDemoActive && (
-              <GlassCard variant="subtle" className="mt-3 flex items-start gap-2 border-amber-500/20 bg-amber-500/10 p-3">
-                <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0" />
-                <p className="text-xs text-amber-200">
-                  <strong>Protection active :</strong> L&apos;activation échouera si des données réelles existent déjà dans votre espace. 
-                  Cela évite toute suppression accidentelle.
-                </p>
-              </GlassCard>
-            )}
-          </div>
-          <button
-            className={`flex items-center gap-2 rounded-xl px-6 py-3 font-bold shadow-lg transition disabled:opacity-50 ${
-              isDemoActive 
-                ? "bg-red-600 text-white shadow-red-500/25 hover:bg-red-700" 
-                : "bg-green-600 text-white shadow-green-500/25 hover:bg-green-700"
-            }`}
-            onClick={handleDemoToggle}
-            disabled={loading || checkingStatus}
-          >
-            {loading ? (
-              <>
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                <span>Traitement...</span>
-              </>
-            ) : isDemoActive ? (
-              <>
-                <StopCircle className="h-4 w-4" />
-                <span>Désactiver le mode démo</span>
-              </>
-            ) : (
-              <>
-                <PlayCircle className="h-4 w-4" />
-                <span>Activer le mode démo</span>
-              </>
-            )}
-          </button>
-        </div>
-
-        {error && (
-          <GlassCard variant="subtle" className="mt-4 border-rose-500/30 bg-rose-500/10 p-3">
-            <p className="text-sm text-rose-200">{error}</p>
-          </GlassCard>
-        )}
-
-        {showToast && (
-          <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 max-w-md rounded-xl border border-white/20 bg-indigo-700/90 backdrop-blur-xl px-6 py-4 text-white shadow-2xl shadow-indigo-500/25 animate-fade-in">
-            <div className="flex items-start gap-3">
-              <div className="h-2 w-2 mt-1.5 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
-              <div className="flex-1">
-                <p className="font-bold whitespace-pre-line">{toastMessage.split('\n\n')[0]}</p>
-                {toastMessage.includes('\n\n') && (
-                  <div className="mt-2 space-y-1">
-                    {toastMessage.split('\n\n')[1]?.split('\n').map((line, i) => (
-                      <p key={i} className="text-xs text-indigo-100">{line}</p>
-                    ))}
-                  </div>
-                )}
-                <p className="text-xs text-indigo-200 mt-2">Actualisation en cours...</p>
               </div>
+            ))}
+
+            {/* Section Mode Démo */}
+            <div className="rounded-lg border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20 p-6">
+              <div className="flex flex-col md:flex-row items-start justify-between gap-4">
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    {isDemoActive ? (
+                      <StopCircle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                    ) : (
+                      <PlayCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    )}
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Mode Démo {isDemoActive ? "Actif" : "Inactif"}
+                    </h3>
+                  </div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {isDemoActive
+                      ? "Les données fictives sont actuellement chargées. Vous pouvez les supprimer pour revenir à vos données réelles."
+                      : "Activez le mode démo pour tester l'application avec 110 transactions, 5 comptes, 3 portefeuilles et 15 catégories fictives."
+                    }
+                  </p>
+                  {!isDemoActive && (
+                    <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-3">
+                      <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-amber-800 dark:text-amber-200">
+                        <strong>Protection active :</strong> L'activation échouera si des données réelles existent déjà dans votre espace.
+                        Cela évite toute suppression accidentelle.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <Button
+                  variant={isDemoActive ? "destructive" : "default"}
+                  onClick={handleDemoToggle}
+                  disabled={loading}
+                  icon={isDemoActive ? StopCircle : PlayCircle}
+                  className="whitespace-nowrap"
+                >
+                  {loading ? "Traitement..." : (isDemoActive ? "Désactiver le mode démo" : "Activer le mode démo")}
+                </Button>
+              </div>
+
+              {error && (
+                <div role="alert" className="mt-4 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-3">
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+                    <Button variant="outline" size="sm" onClick={() => setError(null)}>
+                      Fermer
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {showToast && (
+                <div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 max-w-md rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/90 backdrop-blur-xl px-6 py-4 shadow-2xl animate-slide-in-right">
+                  <div className="flex items-start gap-3">
+                    <div className="h-2 w-2 mt-1.5 rounded-full bg-green-600 dark:bg-green-400 animate-pulse flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="font-bold text-gray-900 dark:text-white whitespace-pre-line">{toastMessage.split('\n\n')[0]}</p>
+                      {toastMessage.includes('\n\n') && (
+                        <div className="mt-2 space-y-1">
+                          {toastMessage.split('\n\n')[1]?.split('\n').map((line, i) => (
+                            <p key={i} className="text-xs text-gray-700 dark:text-gray-300">{line}</p>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">Actualisation en cours...</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
-      </GlassPanel>
+      </div>
 
       <ConfirmDialog
         isOpen={showConfirm}
@@ -454,6 +360,6 @@ export default function SettingsOverviewPage() {
         confirmText={confirmAction === "deactivate" ? "Supprimer" : "Activer"}
         cancelText="Annuler"
       />
-    </div>
+    </Layout>
   );
 }

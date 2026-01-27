@@ -14,6 +14,11 @@ import {
   ArrowUpCircle,
   Users,
   Lightbulb,
+  Bell,
+  Tag,
+  Archive,
+  FolderOpen,
+  Settings,
   type LucideIcon,
 } from 'lucide-react';
 import type { PageNoticeConfig } from './types';
@@ -23,6 +28,49 @@ import type { PageNoticeConfig } from './types';
  * Couleur: emerald (vert)
  */
 export const financeNotices: Record<string, PageNoticeConfig> = {
+  // Paramètres
+  settings: {
+    pageId: 'finance-settings',
+    title: 'Paramètres Finance',
+    purpose: "Centralisez tous vos réglages pour personnaliser votre expérience Finance selon vos besoins métier et vos préférences.",
+    icon: Settings as LucideIcon,
+    moduleColor: 'emerald',
+    sections: [
+      {
+        title: 'Organisation par groupes',
+        icon: Lightbulb,
+        items: [
+          'Configuration de base : devise, formats, TVA et fiscalité pour démarrer rapidement',
+          'Données métier : catégories de transactions et types de flux de paiement personnalisables',
+          'Abonnement & Facturation : gestion de votre plan et paiements récurrents',
+          'Préférences & connexions : sécurité, notifications, exports et intégrations externes',
+          'Mode Démo : testez avec 110 transactions, 5 comptes et 15 catégories fictives sans risque',
+        ],
+      },
+    ],
+  },
+
+  categories: {
+    pageId: 'finance-categories',
+    title: 'Catégories de transactions',
+    purpose: "Organisez vos flux financiers avec des catégories personnalisées pour un suivi clair des revenus et dépenses.",
+    icon: Tag as LucideIcon,
+    moduleColor: 'emerald',
+    sections: [
+      {
+        title: 'Fonctionnalités principales',
+        icon: Lightbulb,
+        items: [
+          'Séparation revenus et dépenses : visualisez distinctement vos catégories de flux entrants et sortants',
+          'Création rapide : ajoutez une nouvelle catégorie en un clic avec formulaire inline',
+          'Compteurs en temps réel : suivez le nombre de catégories par type',
+          'États empty clairs : messages informatifs quand aucune catégorie existe',
+          'Full dark mode : interface adaptative pour confort visuel',
+        ],
+      },
+    ],
+  },
+
   // Reporting
   dso: {
     pageId: 'finance-dso',
@@ -491,6 +539,61 @@ export const financeNotices: Record<string, PageNoticeConfig> = {
           'Comparaison de scénarios : analysez côte-à-côte les métriques (économies, taux paiement à temps, pénalités)',
           'Export Excel : téléchargez vos plans de paiement optimisés pour communication interne',
           'Exécution directe : validez et envoyez les paiements depuis l\'interface une fois le plan approuvé',
+        ],
+      },
+    ],
+  },
+
+  alerts: {
+    pageId: 'finance-alerts',
+    title: 'Alertes Financières',
+    purpose:
+      "Configurez et gérez vos alertes financières pour être notifié en temps réel des événements critiques : seuils de trésorerie, dépassements budgétaires, paiements en retard, et variations anormales. Les alertes vous permettent de réagir rapidement et d'éviter les problèmes de trésorerie.",
+    icon: Bell as LucideIcon,
+    moduleColor: 'emerald',
+    sections: [
+      {
+        title: 'Types d\'alertes disponibles',
+        icon: Bell,
+        items: [
+          'Seuil de trésorerie : notification quand un compte bancaire passe sous un montant critique',
+          'Dépassement budgétaire : alerte quand une catégorie dépasse son budget mensuel',
+          'Paiements en retard : notification pour les factures clients impayées après X jours',
+          'Variation anormale : détection des écarts importants vs tendance (CA, dépenses)',
+          'Échéances à venir : rappel des paiements fournisseurs et prélèvements importants',
+        ],
+      },
+      {
+        title: 'Configuration recommandée',
+        icon: Target,
+        items: [
+          'Définissez des seuils conservateurs : trésorerie minimum = 2 mois de charges fixes',
+          'Activez les notifications multi-canal (email, SMS, notifications in-app)',
+          'Configurez des destinataires par type d\'alerte (DAF, CEO, comptable)',
+          'Testez vos alertes pour vérifier la bonne réception des notifications',
+          'Consultez l\'historique pour analyser les récurrences et ajuster les seuils',
+        ],
+      },
+    ],
+  },
+
+  archives: {
+    pageId: 'finance-archives',
+    title: 'Archives Transactions',
+    purpose:
+      "Les transactions archivées sont exclues de tous les calculs (trésorerie, budgets, rapports). Utilisez les archives pour masquer temporairement des opérations sans les supprimer définitivement. Vous pouvez restaurer une transaction archivée à tout moment.",
+    icon: Archive as LucideIcon,
+    moduleColor: 'emerald',
+    sections: [
+      {
+        title: 'Gestion des archives',
+        icon: FolderOpen,
+        items: [
+          'Filtrez par type (dépense/revenu) et statut pour trouver rapidement une transaction',
+          'Utilisez la recherche par description, tag ou nom de compte',
+          'Sélectionnez plusieurs lignes pour restauration ou suppression groupée',
+          'Restaurer : réintègre la transaction dans les calculs actifs',
+          'Supprimer : suppression définitive (irréversible, attention)',
         ],
       },
     ],
