@@ -31,7 +31,7 @@ export default function WarehouseRoutes() {
   }
 
   return (
-    <Layout title="Routes d'Entrepôt">
+    <Layout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">

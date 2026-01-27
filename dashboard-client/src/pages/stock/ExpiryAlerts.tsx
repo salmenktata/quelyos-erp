@@ -44,7 +44,7 @@ export default function ExpiryAlerts() {
   }
 
   return (
-    <Layout title="Alertes d'Expiration">
+    <Layout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">

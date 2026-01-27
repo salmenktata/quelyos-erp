@@ -47,7 +47,7 @@ export default function ABCAnalysis() {
   }
 
   return (
-    <Layout title="Analyse ABC">
+    <Layout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
