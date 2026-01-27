@@ -11,7 +11,7 @@
 
 import { useState } from 'react'
 import { Layout } from '../../components/Layout'
-import { Breadcrumbs, Badge, PageNotice } from '../../components/common'
+import { Breadcrumbs, Badge, PageNotice, SkeletonTable, Button } from '../../components/common'
 import { stockNotices } from '@/lib/notices'
 import { useReorderingRules, useDeleteReorderingRule, useToggleReorderingRule } from '../../hooks/finance/useReorderingRules'
 import { useWarehouses } from '../../hooks/useWarehouses'
@@ -103,13 +103,9 @@ export default function ReorderingRules() {
               Gestion automatique des commandes fournisseurs
             </p>
           </div>
-          <button
-            onClick={handleCreate}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-          >
-            <Plus className="h-5 w-5 mr-2" />
+          <Button variant="primary" icon={<Plus className="h-5 w-5" />} onClick={handleCreate}>
             Créer Règle
-          </button>
+          </Button>
         </div>
 
         <PageNotice config={stockNotices.reorderingRules} className="mb-6" />
@@ -186,33 +182,22 @@ export default function ReorderingRules() {
 
         {/* Loading state */}
         {isLoading ? (
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-8">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-            </div>
-          </div>
+          <SkeletonTable rows={5} columns={7} />
         ) : error ? (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-            <p className="text-red-800 dark:text-red-200">Erreur : {error.message}</p>
-            <button
-              onClick={() => refetch()}
-              className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-            >
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6" role="alert">
+            <p className="text-red-800 dark:text-red-200 mb-4">Erreur : {error.message}</p>
+            <Button variant="secondary" onClick={() => refetch()}>
               Réessayer
-            </button>
+            </Button>
           </div>
         ) : rules.length === 0 ? (
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-12 text-center">
             <p className="text-gray-500 dark:text-gray-400 mb-4">
               Aucune règle de réapprovisionnement configurée
             </p>
-            <button
-              onClick={handleCreate}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              <Plus className="h-5 w-5 mr-2" />
+            <Button variant="primary" icon={<Plus className="h-5 w-5" />} onClick={handleCreate}>
               Créer votre première règle
-            </button>
+            </Button>
           </div>
         ) : (
           /* Tableau */

@@ -184,4 +184,61 @@ export const stockNotices: Record<string, PageNoticeConfig> = {
       }
     ]
   },
+
+  locationLocks: {
+    pageId: 'stock-location-locks',
+    title: 'Verrouillage Emplacements',
+    purpose: "Bloquez temporairement des emplacements de stock pour maintenance, réorganisation ou inventaire physique. Empêche tout mouvement de stock sur les zones verrouillées pour garantir l'intégrité des opérations.",
+    icon: MapPin,
+    moduleColor: 'orange',
+    sections: [{
+      title: 'Bonnes pratiques',
+      icon: Lightbulb,
+      items: [
+        `Verrouillez avant inventaire : empêche les mouvements pendant le comptage pour garantir cohérence`,
+        `Documentez la raison : indiquez motif (maintenance, réorganisation, inventaire) pour traçabilité`,
+        `Planifiez les verrouillages : prévenez l'équipe logistique pour éviter blocages opérationnels`,
+        `Limitez la durée : déverrouillez dès que possible pour ne pas ralentir l'activité`,
+        `Suivez les alertes : notifications automatiques si tentative d'accès à emplacement verrouillé`,
+      ]
+    }]
+  },
+
+  changeReasons: {
+    pageId: 'stock-change-reasons',
+    title: 'Raisons de Changement',
+    purpose: "Tracez les motifs d'ajustements de stock (casse, vol, inventaire, péremption) pour analyser les pertes et identifier les sources de démarque inconnue. Essentiel pour l'audit et le contrôle qualité.",
+    icon: ClipboardList,
+    moduleColor: 'orange',
+    sections: [{
+      title: 'Bonnes pratiques',
+      icon: Lightbulb,
+      items: [
+        `Créez des raisons standardisées : Casse, Vol, Péremption, Inventaire, Erreur saisie, Retour client`,
+        `Associez une raison à chaque ajustement : garantit la traçabilité et facilite l'analyse des pertes`,
+        `Analysez mensuellement les motifs : identifiez les tendances (casse récurrente sur produit fragile)`,
+        `Sensibilisez les équipes : encouragez la déclaration systématique pour réduire la démarque inconnue`,
+        `Exportez pour comptabilité : les ajustements avec raison simplifient les écritures de perte/démarque`,
+      ]
+    }]
+  },
+
+  inventoriesOCA: {
+    pageId: 'stock-inventories-oca',
+    title: 'Inventaires OCA',
+    purpose: "Version avancée de l'inventaire physique avec fonctionnalités OCA : inventaires par lots, validation multi-niveaux, historique détaillé. Pour organisations nécessitant un contrôle strict du stock.",
+    icon: ClipboardList,
+    moduleColor: 'orange',
+    sections: [{
+      title: 'Bonnes pratiques',
+      icon: Lightbulb,
+      items: [
+        `Utilisez les inventaires tournants : comptez 20% du stock chaque semaine plutôt qu'un inventaire complet annuel`,
+        `Segmentez par emplacement : créez plusieurs inventaires parallèles pour ne pas bloquer tout l'entrepôt`,
+        `Validez en 2 temps : recomptez les écarts >10% avant validation finale pour éviter erreurs`,
+        `Analysez les tendances d'écarts : identifiez les zones/produits à problèmes récurrents`,
+        `Documentez les ajustements : joignez photos ou justificatifs pour écarts importants (audit)`,
+      ]
+    }]
+  },
 };

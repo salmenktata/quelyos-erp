@@ -1,12 +1,19 @@
 /**
  * Page de gestion du verrouillage d'emplacements (OCA)
  * Module OCA: stock_location_lockdown
+ *
+ * Fonctionnalités :
+ * - Liste des emplacements verrouillés avec état actuel
+ * - Verrouillage/déverrouillage d'emplacements pour inventaire ou maintenance
+ * - Bloque tous les mouvements de stock sur zones verrouillées
+ * - Traçabilité complète des verrouillages
  */
 
 import { useState } from 'react'
 import { Layout } from '../../components/Layout'
-import { Breadcrumbs, Badge } from '../../components/common'
+import { Breadcrumbs, Badge, SkeletonTable, PageNotice, Button } from '../../components/common'
 import { useLocationLocks, useLockLocation } from '../../hooks/useStock'
+import { stockNotices } from '@/lib/notices'
 import { AlertCircle, Lock, Unlock } from 'lucide-react'
 import type { LocationLock } from '@/types/stock'
 import { logger } from '@quelyos/logger'
@@ -44,95 +51,95 @@ export default function LocationLocks() {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
             { label: 'Stock', href: '/stock' },
-            { label: 'Verrouillage Emplacements', href: '/stock/location-locks' },
+            { label: 'Verrouillage Emplacements' },
           ]}
         />
 
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Verrouillage Emplacements</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Module OCA stock_location_lockdown - Bloquer les mouvements pendant inventaire
-            </p>
-          </div>
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+            Verrouillage Emplacements
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Module OCA stock_location_lockdown - Bloquer les mouvements pendant inventaire
+          </p>
         </div>
 
+        <PageNotice config={stockNotices.locationLocks} className="mb-6" />
+
         {!isModuleInstalled && (
-          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+          <div className="rounded-lg border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6">
             <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-yellow-800">Module OCA non installé</h3>
-                <p className="mt-1 text-sm text-yellow-700">
+                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">Module OCA non installé</h3>
+                <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
                   Le module OCA "stock_location_lockdown" n'est pas installé. Installez-le pour utiliser cette fonctionnalité.
                 </p>
-                <p className="mt-2 text-sm text-yellow-700">
-                  <code className="bg-yellow-100 px-2 py-1 rounded">./scripts/install-oca-stock.sh</code>
+                <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                  <code className="bg-yellow-100 dark:bg-yellow-800 px-2 py-1 rounded">./scripts/install-oca-stock.sh</code>
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        {isLoading ? (
+          <SkeletonTable rows={5} columns={4} />
+        ) : error ? (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6" role="alert">
+            <p className="text-red-800 dark:text-red-200 mb-4">
+              Erreur lors du chargement des verrouillages
+            </p>
+            <Button variant="secondary" onClick={() => refetch()}>
+              Réessayer
+            </Button>
           </div>
-        )}
-
-        {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-            <p className="text-sm text-red-800">Erreur: {error.message}</p>
-          </div>
-        )}
-
-        {!isLoading && !error && isModuleInstalled && (
+        ) : !isModuleInstalled ? null : (
           <>
-            <div className="bg-white shadow rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-500">
-                  Total: <span className="font-medium text-gray-900">{locks.length}</span> emplacements verrouillés
-                </div>
+            <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 mb-6 border border-gray-200 dark:border-gray-700">
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Total: <span className="font-medium text-gray-900 dark:text-white">{locks.length}</span> emplacements verrouillés
               </div>
             </div>
 
-            <div className="bg-white shadow rounded-lg overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Emplacement
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Chemin complet
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       État
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {locks.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-sm text-gray-500">
+                      <td colSpan={4} className="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
                         Aucun emplacement verrouillé. Verrouillez des emplacements pour bloquer les mouvements pendant un inventaire.
                       </td>
                     </tr>
                   )}
                   {locks.map((lock: LocationLock) => (
-                    <tr key={lock.location_id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={lock.location_id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                         {lock.location_name}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {lock.complete_name}
+                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        {lock.location_name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge variant="warning">
@@ -141,18 +148,15 @@ export default function LocationLocks() {
                         </Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                        <button
-                          onClick={() => handleToggleLock(lock.location_id, lock.blocked, lock.location_name)}
-                          disabled={isLocking && processingId === lock.location_id}
-                          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleToggleLock(lock.location_id, true, lock.location_name)}
+                          loading={isLocking && processingId === lock.location_id}
+                          icon={<Unlock className="h-4 w-4" />}
                         >
-                          {isLocking && processingId === lock.location_id ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700"></div>
-                          ) : (
-                            <Unlock className="h-4 w-4" />
-                          )}
                           Déverrouiller
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -160,15 +164,6 @@ export default function LocationLocks() {
               </table>
             </div>
           </>
-        )}
-
-        {!isLoading && !error && isModuleInstalled && (
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-            <p className="text-sm text-blue-800">
-              💡 <strong>Astuce :</strong> Verrouillez les emplacements pendant l'inventaire pour empêcher tout mouvement de stock.
-              Cela garantit la cohérence des comptages. Pensez à déverrouiller après l'inventaire.
-            </p>
-          </div>
         )}
       </div>
     </Layout>
