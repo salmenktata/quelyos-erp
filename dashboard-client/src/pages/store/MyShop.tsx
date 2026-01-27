@@ -713,27 +713,27 @@ export default function MyShop() {
                       Texte secondaire avec couleur muted
                     </p>
                     <div className="flex gap-2">
-                      <button
-                        className="px-4 py-2 rounded-lg text-white text-sm font-medium"
-                        style={{ backgroundColor: formData.primary_color }}
+                      <Button
+                        size="sm"
+                        style={{ backgroundColor: formData.primary_color, color: '#ffffff' }}
                       >
                         Bouton primaire
-                      </button>
-                      <button
-                        className="px-4 py-2 rounded-lg text-sm font-medium"
+                      </Button>
+                      <Button
+                        size="sm"
                         style={{
                           backgroundColor: formData.secondary_color,
                           color: formData.foreground_color,
                         }}
                       >
                         Bouton secondaire
-                      </button>
-                      <button
-                        className="px-4 py-2 rounded-lg text-white text-sm font-medium"
-                        style={{ backgroundColor: formData.accent_color }}
+                      </Button>
+                      <Button
+                        size="sm"
+                        style={{ backgroundColor: formData.accent_color, color: '#ffffff' }}
                       >
                         Accent
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
