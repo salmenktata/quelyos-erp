@@ -98,4 +98,36 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
     ],
     color: 'indigo',
   },
+  productForm: {
+    pageId: 'store-product-form',
+    title: 'Formulaire Produit',
+    purpose: 'Créez ou modifiez un produit : informations, prix, images, variantes et stock.',
+    features: [
+      { icon: Package, text: 'Informations produit complètes' },
+      { icon: Image, text: 'Galerie d\'images multi-upload' },
+      { icon: Settings, text: 'Variantes et gestion du stock' },
+    ],
+    actions: [
+      { label: 'Remplir les informations', description: 'Nom, prix, description, catégorie' },
+      { label: 'Ajouter des images', description: 'Upload et réorganisation des photos' },
+      { label: 'Gérer les variantes', description: 'Tailles, couleurs, options' },
+    ],
+    color: 'indigo',
+  },
+  siteConfig: {
+    pageId: 'store-site-config',
+    title: 'Configuration Site',
+    purpose: 'Configurez votre boutique en ligne : fonctionnalités, contact, livraison, paiement.',
+    features: [
+      { icon: Settings, text: 'Fonctionnalités activables/désactivables' },
+      { icon: Store, text: 'Informations de contact et livraison' },
+      { icon: Package, text: 'Modes de paiement et garantie' },
+    ],
+    actions: [
+      { label: 'Activer des fonctionnalités', description: 'Comparateur, wishlist, avis, newsletter' },
+      { label: 'Configurer la livraison', description: 'Délais et seuil livraison gratuite' },
+      { label: 'Modes de paiement', description: 'Carte, espèces, virement, mobile money' },
+    ],
+    color: 'indigo',
+  },
 };

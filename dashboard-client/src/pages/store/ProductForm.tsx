@@ -8,10 +8,11 @@ import {
   Button,
   Input,
   Breadcrumbs,
-  Skeleton,
+  SkeletonTable,
   ImageGallery,
   VariantManager,
   Badge,
+  PageNotice,
 } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
 import { ToastContainer } from '../../components/common/Toast'
@@ -23,6 +24,7 @@ import {
 } from '../../hooks/useProductImages'
 import { api } from '../../lib/api'
 import { logger } from '@quelyos/logger'
+import { storeNotices } from '../../lib/notices/store-notices'
 
 export default function ProductForm() {
   const navigate = useNavigate()
@@ -291,12 +293,8 @@ export default function ProductForm() {
               { label: 'Chargement...' },
             ]}
           />
-          <div className="space-y-4 mt-8">
-            <Skeleton variant="text" width="40%" height={36} />
-            <Skeleton variant="text" width="60%" height={20} />
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-6 mt-8">
-              <Skeleton count={4} height={80} />
-            </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mt-8">
+            <SkeletonTable rows={8} columns={2} />
           </div>
         </div>
       </Layout>
@@ -314,6 +312,9 @@ export default function ProductForm() {
             { label: isEditing ? 'Modifier' : 'Nouveau produit' },
           ]}
         />
+
+        {/* PageNotice */}
+        <PageNotice config={storeNotices.productForm} className="mb-8" />
 
         {/* En-tête */}
         <div className="mb-8">
@@ -337,25 +338,21 @@ export default function ProductForm() {
                   width: activeTab === 'general' ? '160px' : activeTab === 'variants' ? '90px' : '50px',
                 }}
               />
-              <button
+              <Button
                 type="button"
+                variant={activeTab === 'general' ? 'primary' : 'ghost'}
+                size="sm"
                 onClick={() => setActiveTab('general')}
-                className={`py-2 px-1 font-medium text-sm transition-all duration-200 ${
-                  activeTab === 'general'
-                    ? 'text-indigo-600 dark:text-indigo-400 scale-105'
-                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                }`}
+                className="transition-all duration-200"
               >
                 Informations générales
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant={activeTab === 'variants' ? 'primary' : 'ghost'}
+                size="sm"
                 onClick={() => setActiveTab('variants')}
-                className={`py-2 px-1 font-medium text-sm transition-all duration-200 ${
-                  activeTab === 'variants'
-                    ? 'text-indigo-600 dark:text-indigo-400 scale-105'
-                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                }`}
+                className="transition-all duration-200"
               >
                 Variantes
                 {productData?.data?.product?.variant_count && productData.data.product.variant_count > 1 && (
@@ -363,18 +360,16 @@ export default function ProductForm() {
                     {productData.data.product.variant_count}
                   </Badge>
                 )}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant={activeTab === 'stock' ? 'primary' : 'ghost'}
+                size="sm"
                 onClick={() => setActiveTab('stock')}
-                className={`py-2 px-1 font-medium text-sm transition-all duration-200 ${
-                  activeTab === 'stock'
-                    ? 'text-indigo-600 dark:text-indigo-400 scale-105'
-                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                }`}
+                className="transition-all duration-200"
               >
                 Stock
-              </button>
+              </Button>
             </nav>
           </div>
         )}
@@ -829,15 +824,17 @@ export default function ProductForm() {
                             className="flex items-center gap-1"
                           >
                             {tag.name}
-                            <button
+                            <Button
                               type="button"
+                              variant="ghost"
+                              size="sm"
                               onClick={() =>
                                 setSelectedTagIds((prev) => prev.filter((id) => id !== tagId))
                               }
-                              className="ml-1 hover:text-red-500"
+                              className="ml-1 hover:text-red-500 p-0 h-auto"
                             >
                               ×
-                            </button>
+                            </Button>
                           </Badge>
                         ) : null
                       })}
@@ -853,14 +850,16 @@ export default function ProductForm() {
                       productTags
                         .filter((tag: { id: number }) => !selectedTagIds.includes(tag.id))
                         .map((tag: { id: number; name: string; color: number }) => (
-                          <button
+                          <Button
                             key={tag.id}
                             type="button"
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setSelectedTagIds((prev) => [...prev, tag.id])}
-                            className="block w-full text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded"
+                            className="w-full justify-start text-left"
                           >
                             + {tag.name}
-                          </button>
+                          </Button>
                         ))
                     )}
                   </div>

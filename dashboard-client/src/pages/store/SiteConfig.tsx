@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Layout } from '../../components/Layout'
 import { useSiteConfig, useUpdateSiteConfig } from '../../hooks/useSiteConfig'
-import { Button, Breadcrumbs, Skeleton } from '../../components/common'
+import { Button, Breadcrumbs, SkeletonTable, PageNotice } from '../../components/common'
 import { useToast } from '../../contexts/ToastContext'
 import { z } from 'zod'
 import { logger } from '@quelyos/logger'
+import { storeNotices } from '../../lib/notices/store-notices'
 import {
   contactSchema,
   shippingSchema,
@@ -268,9 +269,8 @@ export default function SiteConfig() {
     return (
       <Layout>
         <div className="p-8">
-          <Skeleton className="h-10 w-64 mb-8" />
-          <div className="grid gap-6">
-            <Skeleton className="h-64 w-full" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <SkeletonTable rows={10} columns={2} />
           </div>
         </div>
       </Layout>
@@ -300,6 +300,9 @@ export default function SiteConfig() {
             { label: 'Configuration du site' },
           ]}
         />
+
+        {/* PageNotice */}
+        <PageNotice config={storeNotices.siteConfig} className="mb-8" />
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -468,20 +471,15 @@ export default function SiteConfig() {
                 { key: 'price_desc', label: 'Prix décroissant' },
                 { key: 'popular', label: 'Popularité' },
               ].map((option) => (
-                <button
+                <Button
                   key={option.key}
                   type="button"
+                  variant={catalogConfig.sort_options.includes(option.key) ? 'primary' : 'subtle'}
+                  size="sm"
                   onClick={() => toggleSortOption(option.key)}
-                  className={`
-                    px-3 py-2 rounded-lg text-sm font-medium transition-all
-                    ${catalogConfig.sort_options.includes(option.key)
-                      ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-500'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }
-                  `}
                 >
                   {option.label}
-                </button>
+                </Button>
               ))}
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
@@ -496,20 +494,15 @@ export default function SiteConfig() {
             </h3>
             <div className="flex flex-wrap gap-2">
               {[12, 24, 36, 48, 60].map((option) => (
-                <button
+                <Button
                   key={option}
                   type="button"
+                  variant={catalogConfig.pagination_options.includes(option) ? 'primary' : 'subtle'}
+                  size="sm"
                   onClick={() => togglePaginationOption(option)}
-                  className={`
-                    px-4 py-2 rounded-lg text-sm font-medium transition-all
-                    ${catalogConfig.pagination_options.includes(option)
-                      ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-500'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }
-                  `}
                 >
                   {option}
-                </button>
+                </Button>
               ))}
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
@@ -724,23 +717,16 @@ export default function SiteConfig() {
               { key: 'transfer', label: 'Virement' },
               { key: 'mobile', label: 'Mobile money' },
             ].map((method) => (
-              <button
+              <Button
                 key={method.key}
                 type="button"
+                variant={paymentMethods.includes(method.key) ? 'primary' : 'subtle'}
+                size="sm"
                 onClick={() => togglePaymentMethod(method.key)}
-                className={`
-                  px-4 py-2 rounded-lg text-sm font-medium transition-all
-                  ${paymentMethods.includes(method.key)
-                    ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-500'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }
-                `}
-                role="checkbox"
-                aria-checked={paymentMethods.includes(method.key)}
                 aria-label={`${paymentMethods.includes(method.key) ? 'Désactiver' : 'Activer'} le paiement par ${method.label}`}
               >
                 {method.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
