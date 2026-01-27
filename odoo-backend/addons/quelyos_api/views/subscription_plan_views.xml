@@ -83,7 +83,6 @@
                                 <field name="group_ids" widget="many2many_tags" options="{'color_field': 'color'}">
                                     <tree>
                                         <field name="name"/>
-                                        <field name="category_id"/>
                                     </tree>
                                 </field>
                             </group>

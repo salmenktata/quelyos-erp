@@ -1,7 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-# ========================================
-# FINANCE (Abonnements SaaS)
-# ========================================
 access_quelyos_subscription_plan_public,quelyos.subscription.plan public,model_quelyos_subscription_plan,,1,0,0,0
 access_quelyos_subscription_plan_user,quelyos.subscription.plan user,model_quelyos_subscription_plan,group_quelyos_finance_user,1,1,0,0
 access_quelyos_subscription_plan_manager,quelyos.subscription.plan manager,model_quelyos_subscription_plan,group_quelyos_finance_manager,1,1,1,1
@@ -11,9 +8,6 @@ access_quelyos_subscription_manager,quelyos.subscription manager,model_quelyos_s
 access_quelyos_tenant_public,quelyos.tenant public,model_quelyos_tenant,,1,0,0,0
 access_quelyos_tenant_user,quelyos.tenant user,model_quelyos_tenant,group_quelyos_finance_user,1,1,0,0
 access_quelyos_tenant_manager,quelyos.tenant manager,model_quelyos_tenant,group_quelyos_finance_manager,1,1,1,1
-# ========================================
-# HOME (CMS / Site Web)
-# ========================================
 access_hero_slide_public,quelyos.hero.slide public,model_quelyos_hero_slide,base.group_public,1,0,0,0
 access_hero_slide_user,quelyos.hero.slide user,model_quelyos_hero_slide,group_quelyos_home_user,1,1,1,0
 access_hero_slide_manager,quelyos.hero.slide manager,model_quelyos_hero_slide,group_quelyos_home_manager,1,1,1,1
@@ -29,9 +23,6 @@ access_static_page_manager,quelyos.static.page manager,model_quelyos_static_page
 access_trust_badge_public,quelyos.trust.badge public,model_quelyos_trust_badge,base.group_public,1,0,0,0
 access_trust_badge_user,quelyos.trust.badge user,model_quelyos_trust_badge,group_quelyos_home_user,1,1,1,0
 access_trust_badge_manager,quelyos.trust.badge manager,model_quelyos_trust_badge,group_quelyos_home_manager,1,1,1,1
-# ========================================
-# MARKETING
-# ========================================
 access_promo_banner_public,quelyos.promo.banner public,model_quelyos_promo_banner,base.group_public,1,0,0,0
 access_promo_banner_user,quelyos.promo.banner user,model_quelyos_promo_banner,group_quelyos_marketing_user,1,1,1,0
 access_promo_banner_manager,quelyos.promo.banner manager,model_quelyos_promo_banner,group_quelyos_marketing_manager,1,1,1,1
@@ -41,15 +32,9 @@ access_promo_message_manager,quelyos.promo.message manager,model_quelyos_promo_m
 access_marketing_popup_public,quelyos.marketing.popup public,model_quelyos_marketing_popup,base.group_public,1,0,0,0
 access_marketing_popup_user,quelyos.marketing.popup user,model_quelyos_marketing_popup,group_quelyos_marketing_user,1,1,1,0
 access_marketing_popup_manager,quelyos.marketing.popup manager,model_quelyos_marketing_popup,group_quelyos_marketing_manager,1,1,1,1
-# ========================================
-# STORE (E-commerce)
-# ========================================
 access_api_settings_public,quelyos.api.settings public,model_quelyos_api_settings,base.group_public,1,0,0,0
 access_api_settings_user,quelyos.api.settings user,model_quelyos_api_settings,group_quelyos_store_user,1,1,0,0
 access_api_settings_manager,quelyos.api.settings manager,model_quelyos_api_settings,group_quelyos_store_manager,1,1,1,1
-# ========================================
-# STOCK
-# ========================================
 access_cycle_count_user,quelyos.cycle.count user,model_quelyos_cycle_count,group_quelyos_stock_user,1,1,1,0
 access_cycle_count_manager,quelyos.cycle.count manager,model_quelyos_cycle_count,group_quelyos_stock_manager,1,1,1,1
 access_cycle_count_line_user,quelyos.cycle.count.line user,model_quelyos_cycle_count_line,group_quelyos_stock_user,1,1,1,0

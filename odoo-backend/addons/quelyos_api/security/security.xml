@@ -2,65 +2,19 @@
 <odoo>
     <data noupdate="0">
         <!-- ========================================== -->
-        <!-- Catégories de Modules -->
-        <!-- ========================================== -->
-
-        <record id="module_category_quelyos_stock" model="ir.module.category">
-            <field name="name">Quelyos Stock</field>
-            <field name="description">Gestion des stocks et inventaires</field>
-            <field name="sequence">10</field>
-        </record>
-
-        <record id="module_category_quelyos_crm" model="ir.module.category">
-            <field name="name">Quelyos CRM</field>
-            <field name="description">Gestion de la relation client</field>
-            <field name="sequence">20</field>
-        </record>
-
-        <record id="module_category_quelyos_store" model="ir.module.category">
-            <field name="name">Quelyos Store</field>
-            <field name="description">Boutique e-commerce</field>
-            <field name="sequence">30</field>
-        </record>
-
-        <record id="module_category_quelyos_finance" model="ir.module.category">
-            <field name="name">Quelyos Finance</field>
-            <field name="description">Gestion financière et abonnements SaaS</field>
-            <field name="sequence">40</field>
-        </record>
-
-        <record id="module_category_quelyos_marketing" model="ir.module.category">
-            <field name="name">Quelyos Marketing</field>
-            <field name="description">Campagnes marketing et promotions</field>
-            <field name="sequence">50</field>
-        </record>
-
-        <record id="module_category_quelyos_hr" model="ir.module.category">
-            <field name="name">Quelyos HR</field>
-            <field name="description">Gestion des ressources humaines</field>
-            <field name="sequence">60</field>
-        </record>
-
-        <record id="module_category_quelyos_home" model="ir.module.category">
-            <field name="name">Quelyos Home</field>
-            <field name="description">CMS et gestion du site web</field>
-            <field name="sequence">70</field>
-        </record>
-
-        <!-- ========================================== -->
         <!-- Groupes Stock -->
         <!-- ========================================== -->
 
         <record id="group_quelyos_stock_user" model="res.groups">
-            <field name="name">Stock User</field>
-            <field name="category_id" ref="module_category_quelyos_stock"/>
+            <field name="name">Quelyos Stock User</field>
+            <field name="sequence">10</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Accès lecture/écriture limité aux stocks et inventaires</field>
+            <field name="comment">Accès lecture/écriture aux stocks et inventaires</field>
         </record>
 
         <record id="group_quelyos_stock_manager" model="res.groups">
-            <field name="name">Stock Manager</field>
-            <field name="category_id" ref="module_category_quelyos_stock"/>
+            <field name="name">Quelyos Stock Manager</field>
+            <field name="sequence">11</field>
             <field name="implied_ids" eval="[(4, ref('group_quelyos_stock_user'))]"/>
             <field name="comment">Tous droits sur la gestion des stocks et inventaires</field>
         </record>
@@ -70,15 +24,15 @@
         <!-- ========================================== -->
 
         <record id="group_quelyos_crm_user" model="res.groups">
-            <field name="name">CRM User</field>
-            <field name="category_id" ref="module_category_quelyos_crm"/>
+            <field name="name">Quelyos CRM User</field>
+            <field name="sequence">20</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Accès lecture/écriture limité au CRM</field>
+            <field name="comment">Accès lecture/écriture au CRM</field>
         </record>
 
         <record id="group_quelyos_crm_manager" model="res.groups">
-            <field name="name">CRM Manager</field>
-            <field name="category_id" ref="module_category_quelyos_crm"/>
+            <field name="name">Quelyos CRM Manager</field>
+            <field name="sequence">21</field>
             <field name="implied_ids" eval="[(4, ref('group_quelyos_crm_user'))]"/>
             <field name="comment">Tous droits sur le CRM</field>
         </record>
@@ -88,15 +42,15 @@
         <!-- ========================================== -->
 
         <record id="group_quelyos_store_user" model="res.groups">
-            <field name="name">Store User</field>
-            <field name="category_id" ref="module_category_quelyos_store"/>
+            <field name="name">Quelyos Store User</field>
+            <field name="sequence">30</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Accès lecture/écriture limité à la boutique e-commerce</field>
+            <field name="comment">Accès lecture/écriture à la boutique e-commerce</field>
         </record>
 
         <record id="group_quelyos_store_manager" model="res.groups">
-            <field name="name">Store Manager</field>
-            <field name="category_id" ref="module_category_quelyos_store"/>
+            <field name="name">Quelyos Store Manager</field>
+            <field name="sequence">31</field>
             <field name="implied_ids" eval="[(4, ref('group_quelyos_store_user'))]"/>
             <field name="comment">Tous droits sur la boutique e-commerce</field>
         </record>
@@ -106,15 +60,15 @@
         <!-- ========================================== -->
 
         <record id="group_quelyos_finance_user" model="res.groups">
-            <field name="name">Finance User</field>
-            <field name="category_id" ref="module_category_quelyos_finance"/>
+            <field name="name">Quelyos Finance User</field>
+            <field name="sequence">40</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Accès lecture/écriture limité aux finances et abonnements</field>
+            <field name="comment">Accès lecture/écriture aux finances et abonnements</field>
         </record>
 
         <record id="group_quelyos_finance_manager" model="res.groups">
-            <field name="name">Finance Manager</field>
-            <field name="category_id" ref="module_category_quelyos_finance"/>
+            <field name="name">Quelyos Finance Manager</field>
+            <field name="sequence">41</field>
             <field name="implied_ids" eval="[(4, ref('group_quelyos_finance_user'))]"/>
             <field name="comment">Tous droits sur les finances et abonnements</field>
         </record>
@@ -124,15 +78,15 @@
         <!-- ========================================== -->
 
         <record id="group_quelyos_marketing_user" model="res.groups">
-            <field name="name">Marketing User</field>
-            <field name="category_id" ref="module_category_quelyos_marketing"/>
+            <field name="name">Quelyos Marketing User</field>
+            <field name="sequence">50</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Accès lecture/écriture limité au marketing</field>
+            <field name="comment">Accès lecture/écriture au marketing</field>
         </record>
 
         <record id="group_quelyos_marketing_manager" model="res.groups">
-            <field name="name">Marketing Manager</field>
-            <field name="category_id" ref="module_category_quelyos_marketing"/>
+            <field name="name">Quelyos Marketing Manager</field>
+            <field name="sequence">51</field>
             <field name="implied_ids" eval="[(4, ref('group_quelyos_marketing_user'))]"/>
             <field name="comment">Tous droits sur le marketing</field>
         </record>
@@ -142,15 +96,15 @@
         <!-- ========================================== -->
 
         <record id="group_quelyos_hr_user" model="res.groups">
-            <field name="name">HR User</field>
-            <field name="category_id" ref="module_category_quelyos_hr"/>
+            <field name="name">Quelyos HR User</field>
+            <field name="sequence">60</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Accès lecture/écriture limité aux ressources humaines</field>
+            <field name="comment">Accès lecture/écriture aux ressources humaines</field>
         </record>
 
         <record id="group_quelyos_hr_manager" model="res.groups">
-            <field name="name">HR Manager</field>
-            <field name="category_id" ref="module_category_quelyos_hr"/>
+            <field name="name">Quelyos HR Manager</field>
+            <field name="sequence">61</field>
             <field name="implied_ids" eval="[(4, ref('group_quelyos_hr_user'))]"/>
             <field name="comment">Tous droits sur les ressources humaines</field>
         </record>
@@ -160,15 +114,15 @@
         <!-- ========================================== -->
 
         <record id="group_quelyos_home_user" model="res.groups">
-            <field name="name">Home User</field>
-            <field name="category_id" ref="module_category_quelyos_home"/>
+            <field name="name">Quelyos Home User</field>
+            <field name="sequence">70</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Accès lecture/écriture limité au CMS et site web</field>
+            <field name="comment">Accès lecture/écriture au CMS et site web</field>
         </record>
 
         <record id="group_quelyos_home_manager" model="res.groups">
-            <field name="name">Home Manager</field>
-            <field name="category_id" ref="module_category_quelyos_home"/>
+            <field name="name">Quelyos Home Manager</field>
+            <field name="sequence">71</field>
             <field name="implied_ids" eval="[(4, ref('group_quelyos_home_user'))]"/>
             <field name="comment">Tous droits sur le CMS et site web</field>
         </record>
