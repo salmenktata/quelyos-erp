@@ -254,7 +254,7 @@ export function useUploadTenantLogo() {
       const formData = new FormData()
       formData.append('image', file)
 
-      const response = await fetch(`${import.meta.env.VITE_ODOO_URL}/api/ecommerce/tenants/${id}/upload-logo`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/ecommerce/tenants/${id}/upload-logo`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -283,7 +283,7 @@ export function useUploadTenantFavicon() {
       const formData = new FormData()
       formData.append('image', file)
 
-      const response = await fetch(`${import.meta.env.VITE_ODOO_URL}/api/ecommerce/tenants/${id}/upload-favicon`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/ecommerce/tenants/${id}/upload-favicon`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,

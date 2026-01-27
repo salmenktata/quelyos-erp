@@ -17,7 +17,7 @@ import {
   Modal,
   Breadcrumbs,
   SkeletonTable,
-  OdooImage,
+  BackendImage,
   Input,
   ImportProductsModal,
   SearchAutocomplete,
@@ -500,7 +500,7 @@ export default function Products() {
                   >
                     <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
                       {item.data.image ? (
-                        <OdooImage
+                        <BackendImage
                           src={item.data.image}
                           alt={item.data.name}
                           className="w-full h-full object-cover"
@@ -871,7 +871,7 @@ export default function Products() {
                       />
                       {/* Image */}
                       <div className="h-16 w-16 shrink-0">
-                        <OdooImage
+                        <BackendImage
                           src={product.image || ''}
                           alt={product.name}
                           className="h-16 w-16 rounded-lg object-cover"
@@ -1065,7 +1065,7 @@ export default function Products() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="h-10 w-10 shrink-0">
-                              <OdooImage
+                              <BackendImage
                                 src={product.image ?? null}
                                 alt={product.name}
                                 className="h-10 w-10 rounded object-cover"

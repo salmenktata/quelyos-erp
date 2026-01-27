@@ -1,4 +1,4 @@
-interface OdooImageProps {
+interface BackendImageProps {
   src: string | null
   alt: string
   className?: string
@@ -6,13 +6,13 @@ interface OdooImageProps {
 }
 
 /**
- * Composant pour afficher les images provenant d'Odoo
+ * Composant pour afficher les images provenant du backend
  * Gère automatiquement le préfixe de l'URL et le fallback
  */
-export function OdooImage({ src, alt, className, fallback }: OdooImageProps) {
-  // En développement, utiliser l'URL complète d'Odoo
+export function BackendImage({ src, alt, className, fallback }: BackendImageProps) {
+  // En développement, utiliser l'URL complète du backend
   // En production, les images passeront par le même domaine
-  const ODOO_URL = import.meta.env.VITE_ODOO_URL || 'http://localhost:8069'
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8069'
 
   if (!src) {
     if (fallback) {
@@ -38,8 +38,8 @@ export function OdooImage({ src, alt, className, fallback }: OdooImageProps) {
   }
 
   // Si l'URL commence déjà par http, l'utiliser telle quelle
-  // Sinon, préfixer avec l'URL Odoo
-  const imageUrl = src.startsWith('http') ? src : `${ODOO_URL}${src}`
+  // Sinon, préfixer avec l'URL backend
+  const imageUrl = src.startsWith('http') ? src : `${BACKEND_URL}${src}`
 
   return <img src={imageUrl} alt={alt} className={className} />
 }

@@ -29,7 +29,7 @@ export type { TableProps, Column, SortDirection } from './Table'
 export { Breadcrumbs } from './Breadcrumbs'
 export type { BreadcrumbsProps, BreadcrumbItem } from './Breadcrumbs'
 
-export { OdooImage } from './OdooImage'
+export { BackendImage } from './BackendImage'
 
 export { ImageGallery } from './ImageGallery'
 export type { ProductImage, ImageGalleryProps } from './ImageGallery'

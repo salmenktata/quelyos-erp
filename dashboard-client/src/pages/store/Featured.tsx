@@ -7,7 +7,7 @@ import {
   useRemoveFeaturedProduct,
   useReorderFeaturedProducts,
 } from '../../hooks/useFeatured'
-import { Badge, Button, Breadcrumbs, SkeletonTable, Modal, OdooImage, PageNotice } from '../../components/common'
+import { Badge, Button, Breadcrumbs, SkeletonTable, Modal, BackendImage, PageNotice } from '../../components/common'
 import { ecommerceNotices } from '@/lib/notices'
 import { useToast } from '../../hooks/useToast'
 import { ToastContainer } from '../../components/common/Toast'
@@ -236,7 +236,7 @@ export default function Featured() {
                   </div>
 
                   {/* Image */}
-                  <OdooImage
+                  <BackendImage
                     src={product.image}
                     alt={product.name}
                     className="w-16 h-16 rounded-lg object-cover"
@@ -364,7 +364,7 @@ export default function Featured() {
                       key={product.id}
                       className="p-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
-                      <OdooImage
+                      <BackendImage
                         src={product.image}
                         alt={product.name}
                         className="w-12 h-12 rounded object-cover"

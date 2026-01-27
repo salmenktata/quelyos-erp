@@ -135,9 +135,6 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-          <p className="text-sm text-indigo-100/80">Gérez vos alertes, digests et exports de données.</p>
-        </div>
-
       <div className="grid gap-6 lg:grid-cols-3 mt-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Email notifications */}
@@ -292,7 +289,6 @@ export default function NotificationsPage() {
             Les exports sont générés instantanément et sécurisés.
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

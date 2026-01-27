@@ -1,5 +1,5 @@
 import { useState, useRef, DragEvent } from 'react'
-import { OdooImage } from './OdooImage'
+import { BackendImage } from './BackendImage'
 import { Button } from './Button'
 import { logger } from '@quelyos/logger'
 
@@ -254,7 +254,7 @@ export function ImageGallery({
               >
                 {/* Image */}
                 <div className="aspect-square">
-                  <OdooImage
+                  <BackendImage
                     src={image.url}
                     alt={image.name}
                     className="w-full h-full object-cover"

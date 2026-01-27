@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Badge } from './Badge'
 import { Skeleton } from './Skeleton'
-import { OdooImage } from './OdooImage'
+import { BackendImage } from './BackendImage'
 import { AttributeValueImageGallery } from './AttributeValueImageGallery'
 import {
   useProductAttributeImages,
@@ -222,7 +222,7 @@ function AttributeValueCard({ value, displayType, disabled, onClick }: Attribute
       {/* Miniature ou placeholder */}
       <div className="aspect-square mb-2 rounded-md overflow-hidden bg-gray-100 dark:bg-gray-700">
         {value.first_image_url ? (
-          <OdooImage
+          <BackendImage
             src={value.first_image_url}
             alt={value.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform"

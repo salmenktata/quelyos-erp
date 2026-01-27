@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-const ODOO_URL = import.meta.env.VITE_ODOO_URL || 'http://localhost:8069'
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8069'
 
 export function useHeroSlideImageUpload(slideId: number) {
   const queryClient = useQueryClient()
@@ -13,7 +13,7 @@ export function useHeroSlideImageUpload(slideId: number) {
       // Récupérer le token d'authentification
       const token = localStorage.getItem('authToken')
 
-      const response = await fetch(`${ODOO_URL}/api/ecommerce/hero-slides/${slideId}/upload-image`, {
+      const response = await fetch(`${BACKEND_URL}/api/ecommerce/hero-slides/${slideId}/upload-image`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -377,7 +377,7 @@ export default function SecurityPage() {
                     </p>
                   </div>
                 </div>
-              </section>
+              </GlassCard>
 
               <button
                 onClick={handleSetup2FA}
@@ -400,7 +400,7 @@ export default function SecurityPage() {
                     <AlertTriangle size={16} />
                     <span className="text-sm">{twoFAError}</span>
                   </div>
-                </section>
+                </GlassCard>
               )}
             </div>
           )}
@@ -487,7 +487,7 @@ export default function SecurityPage() {
                     </p>
                   </div>
                 </div>
-              </section>
+              </GlassCard>
 
               <button
                 onClick={handleDisable2FA}
@@ -521,7 +521,7 @@ export default function SecurityPage() {
         ) : sessions.length === 0 ? (
           <GlassCard variant="subtle" className="p-6 text-center">
             <p className="text-slate-400">Aucune session active trouvée</p>
-          </section>
+          </GlassCard>
         ) : (
           <div className="space-y-3">
             {sessions.map((session) => (
@@ -561,7 +561,7 @@ export default function SecurityPage() {
                     </button>
                   )}
                 </div>
-              </section>
+              </GlassCard>
             ))}
           </div>
         )}

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
-import { Badge, OdooImage, Skeleton } from '../components/common'
+import { Badge, BackendImage, Skeleton } from '../components/common'
 import { useAnalyticsStats } from '../hooks/useAnalytics'
 import { useDashboardStats, useDashboardRecentOrders } from '../hooks/useDashboard'
 import { DashboardKPIs } from '../components/dashboard/DashboardKPIs'
@@ -98,7 +98,7 @@ export default function Dashboard() {
                   }`}
                 >
                   <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                    <OdooImage
+                    <BackendImage
                       src={alert.image}
                       alt={alert.name}
                       className="w-full h-full object-cover"
