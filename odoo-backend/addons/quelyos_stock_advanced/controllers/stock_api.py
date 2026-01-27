@@ -21,7 +21,7 @@ class StockAPIController(http.Controller):
 
     # ==================== STOCK CHANGE REASONS ====================
 
-    @http.route('/api/stock/change-reasons', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/change-reasons', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def get_change_reasons(self, **kwargs):
         """
         Liste des raisons de changement de stock (modèle Quelyos natif)
@@ -69,7 +69,7 @@ class StockAPIController(http.Controller):
                 'error_code': 'FETCH_ERROR'
             }
 
-    @http.route('/api/stock/change-reasons/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/change-reasons/create', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def create_change_reason(self, **kwargs):
         """
         Créer une nouvelle raison de changement de stock
@@ -123,7 +123,7 @@ class StockAPIController(http.Controller):
 
     # ==================== STOCK INVENTORIES ====================
 
-    @http.route('/api/stock/inventories', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/inventories', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def get_inventories(self, **kwargs):
         """
         Liste des inventaires de stock (modèle Quelyos natif)
@@ -186,7 +186,7 @@ class StockAPIController(http.Controller):
                 'error_code': 'FETCH_ERROR'
             }
 
-    @http.route('/api/stock/inventories/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/inventories/create', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def create_inventory(self, **kwargs):
         """
         Créer un nouvel inventaire
@@ -244,7 +244,7 @@ class StockAPIController(http.Controller):
                 'error_code': 'CREATE_ERROR'
             }
 
-    @http.route('/api/stock/inventories/<int:inventory_id>/start', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/inventories/<int:inventory_id>/start', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def start_inventory(self, inventory_id, **kwargs):
         """
         Démarrer un inventaire (passe en état 'in_progress' et crée les lignes)
@@ -284,7 +284,7 @@ class StockAPIController(http.Controller):
                 'error_code': 'START_ERROR'
             }
 
-    @http.route('/api/stock/inventories/<int:inventory_id>/validate', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/inventories/<int:inventory_id>/validate', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def validate_inventory(self, inventory_id, **kwargs):
         """
         Valider un inventaire (crée les ajustements de stock)
@@ -325,7 +325,7 @@ class StockAPIController(http.Controller):
 
     # ==================== LOCATION LOCKS ====================
 
-    @http.route('/api/stock/location-locks', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/location-locks', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def get_location_locks(self, **kwargs):
         """
         Liste des verrouillages d'emplacements (modèle Quelyos natif)
@@ -389,7 +389,7 @@ class StockAPIController(http.Controller):
                 'error_code': 'FETCH_ERROR'
             }
 
-    @http.route('/api/stock/location-locks/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/location-locks/create', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def create_location_lock(self, **kwargs):
         """
         Créer un nouveau verrouillage d'emplacement
@@ -453,7 +453,7 @@ class StockAPIController(http.Controller):
                 'error_code': 'CREATE_ERROR'
             }
 
-    @http.route('/api/stock/location-locks/<int:lock_id>/unlock', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/location-locks/<int:lock_id>/unlock', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def unlock_location(self, lock_id, **kwargs):
         """
         Déverrouiller manuellement un emplacement
@@ -493,7 +493,7 @@ class StockAPIController(http.Controller):
                 'error_code': 'UNLOCK_ERROR'
             }
 
-    @http.route('/api/stock/location-locks/<int:lock_id>/lock', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/location-locks/<int:lock_id>/lock', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def lock_location(self, lock_id, **kwargs):
         """
         Reverrouiller un emplacement

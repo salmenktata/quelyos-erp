@@ -43,7 +43,7 @@ class FinanceController(http.Controller):
             _logger.error(f"Error getting categories: {e}")
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/categories', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/ecommerce/finance/categories', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def create_category(self, **kwargs):
         """Crée une nouvelle catégorie"""
         try:
@@ -73,7 +73,7 @@ class FinanceController(http.Controller):
         except Exception as e:
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/categories/<int:category_id>', type='json', auth='public', methods=['PUT', 'PATCH'], csrf=False)
+    @http.route('/api/ecommerce/finance/categories/<int:category_id>', type='jsonrpc', auth='public', methods=['PUT', 'PATCH'], csrf=False)
     def update_category(self, category_id, **kwargs):
         """Met à jour une catégorie"""
         try:
@@ -129,7 +129,7 @@ class FinanceController(http.Controller):
             _logger.error(f"Error getting accounts: {e}")
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/accounts', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/ecommerce/finance/accounts', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def create_account(self, **kwargs):
         """Crée un nouveau compte"""
         try:
@@ -171,7 +171,7 @@ class FinanceController(http.Controller):
         except Exception as e:
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/accounts/<int:account_id>', type='json', auth='public', methods=['PUT', 'PATCH'], csrf=False)
+    @http.route('/api/ecommerce/finance/accounts/<int:account_id>', type='jsonrpc', auth='public', methods=['PUT', 'PATCH'], csrf=False)
     def update_account(self, account_id, **kwargs):
         """Met à jour un compte"""
         try:
@@ -213,7 +213,7 @@ class FinanceController(http.Controller):
         except Exception as e:
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/portfolios', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/ecommerce/finance/portfolios', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def create_portfolio(self, **kwargs):
         """Crée un nouveau portefeuille"""
         try:
@@ -244,7 +244,7 @@ class FinanceController(http.Controller):
         except Exception as e:
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/payment-flows', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/ecommerce/finance/payment-flows', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def create_payment_flow(self, **kwargs):
         """Crée un nouveau flux de paiement"""
         try:
@@ -276,7 +276,7 @@ class FinanceController(http.Controller):
         except Exception as e:
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/budgets', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/ecommerce/finance/budgets', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def create_budget(self, **kwargs):
         """Crée un nouveau budget"""
         try:
@@ -365,7 +365,7 @@ class FinanceController(http.Controller):
             _logger.error(f"Error getting transactions: {e}")
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/transactions', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/ecommerce/finance/transactions', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def create_transaction(self, **kwargs):
         """Crée une nouvelle transaction (account.move)"""
         try:
@@ -442,7 +442,7 @@ class FinanceController(http.Controller):
         except Exception as e:
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/alerts', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/ecommerce/finance/alerts', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def create_alert(self, **kwargs):
         """Crée une nouvelle alerte"""
         try:
@@ -721,7 +721,7 @@ class FinanceController(http.Controller):
         except Exception as e:
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/currencies/user/currency-preference', type='json', auth='public', methods=['PUT'], csrf=False)
+    @http.route('/api/ecommerce/finance/currencies/user/currency-preference', type='jsonrpc', auth='public', methods=['PUT'], csrf=False)
     def set_user_currency_preference(self, **kwargs):
         """Sauvegarde la préférence de devise de l'utilisateur"""
         try:
@@ -893,7 +893,7 @@ class FinanceController(http.Controller):
             _logger.error(f"Error in enhanced forecast: {e}")
             return self._error_response(str(e), 500)
 
-    @http.route('/api/ecommerce/finance/forecast-events', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/ecommerce/finance/forecast-events', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def create_forecast_event(self, **kwargs):
         """Créer un événement de prévision (annotation)"""
         try:
@@ -909,7 +909,7 @@ class FinanceController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/ecommerce/finance/forecast-events/<int:event_id>', type='json', auth='public', methods=['DELETE'], csrf=False, cors='*')
+    @http.route('/api/ecommerce/finance/forecast-events/<int:event_id>', type='jsonrpc', auth='public', methods=['DELETE'], csrf=False, cors='*')
     def delete_forecast_event(self, event_id, **kwargs):
         """Supprimer un événement de prévision"""
         try:
@@ -922,7 +922,7 @@ class FinanceController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/ecommerce/finance/forecast-events/import', type='json', auth='public', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/ecommerce/finance/forecast-events/import', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def import_forecast_events(self, **kwargs):
         """Importer des événements de prévision en masse"""
         try:

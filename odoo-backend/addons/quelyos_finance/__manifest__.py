@@ -1,6 +1,6 @@
 {
     'name': 'Quelyos Finance',
-    'version': '19.0.1.2.2',
+    'version': '19.0.1.2.3',
     'category': 'Accounting/Finance',
     'summary': 'Module Finance pour Quelyos ERP - Gestion trésorerie, budgets, portefeuilles',
     'description': """

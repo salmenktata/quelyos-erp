@@ -26,7 +26,7 @@ class QuelyApiSettings(BaseController):
                 'error': str(e)
             })
 
-    @http.route('/api/settings/images', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/settings/images', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_image_api_settings(self):
         """Update image API settings (authentification requise)"""
         try:

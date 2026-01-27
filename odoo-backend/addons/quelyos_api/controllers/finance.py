@@ -48,7 +48,7 @@ class QuelyFinanceApi(BaseController):
                 'error': str(e)
             }, status=500)
 
-    @http.route('/api/finance/categories', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/finance/categories', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def create_finance_category(self):
         """Create a new financial account category"""
         try:

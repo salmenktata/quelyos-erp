@@ -19,7 +19,7 @@ class StockOCAController(http.Controller):
 
     # ==================== STOCK QUANTITY CHANGE REASONS (OCA) ====================
 
-    @http.route('/api/stock/change-reasons', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/change-reasons', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def get_stock_change_reasons(self, **kwargs):
         """
         Liste des raisons de changement de quantité (module OCA stock_change_qty_reason)
@@ -69,7 +69,7 @@ class StockOCAController(http.Controller):
                 'error_code': 'FETCH_ERROR'
             }
 
-    @http.route('/api/stock/adjust-with-reason', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/adjust-with-reason', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def adjust_stock_with_reason(self, **kwargs):
         """
         Ajuster le stock avec une raison (module OCA stock_change_qty_reason)
@@ -167,7 +167,7 @@ class StockOCAController(http.Controller):
 
     # ==================== STOCK INVENTORY (OCA) ====================
 
-    @http.route('/api/stock/inventories-oca', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/inventories-oca', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def get_stock_inventories_oca(self, **kwargs):
         """
         Liste des inventaires (module OCA stock_inventory)
@@ -228,7 +228,7 @@ class StockOCAController(http.Controller):
 
     # ==================== LOCATION LOCKDOWN (OCA) ====================
 
-    @http.route('/api/stock/location-locks', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/location-locks', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def get_location_locks(self, **kwargs):
         """
         Liste des emplacements verrouillés (module OCA stock_location_lockdown)
@@ -280,7 +280,7 @@ class StockOCAController(http.Controller):
                 'error_code': 'FETCH_ERROR'
             }
 
-    @http.route('/api/stock/location/<int:location_id>/lock', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/stock/location/<int:location_id>/lock', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def lock_location(self, location_id, **kwargs):
         """
         Verrouiller un emplacement pendant inventaire
