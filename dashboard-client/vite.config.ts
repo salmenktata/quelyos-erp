@@ -73,6 +73,13 @@ export default defineConfig({
         secure: false,
         ws: false,
       },
+      // Catch-all pour toutes les autres routes /api/* (doit être en dernier)
+      '/api/': {
+        target: 'http://127.0.0.1:8069',
+        changeOrigin: true,
+        secure: false,
+        ws: false,
+      },
       '/web': {
         target: 'http://127.0.0.1:8069',
         changeOrigin: true,
