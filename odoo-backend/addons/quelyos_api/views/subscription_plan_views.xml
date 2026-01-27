@@ -80,7 +80,7 @@
 
                         <page string="Droits d'accès" name="access_rights">
                             <group>
-                                <field name="group_ids" widget="many2many_tags"/>
+                                <field name="group_ids" widget="many2many_tags" domain="[('name', 'ilike', 'Quelyos')]"/>
                             </group>
                             <group>
                                 <div class="alert alert-info" role="alert">

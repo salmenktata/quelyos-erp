@@ -104,7 +104,7 @@
                             <group>
                                 <field name="plan_id" invisible="1"/>
                                 <field name="plan_id" string="Groupes assignés" widget="many2many_tags" readonly="1"
-                                       related="plan_id.group_ids" options="{'color_field': 'color'}"/>
+                                       related="plan_id.group_ids" domain="[('name', 'ilike', 'Quelyos')]"/>
                             </group>
                             <group>
                                 <div class="alert alert-info" role="alert">
