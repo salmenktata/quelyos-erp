@@ -6,7 +6,7 @@ from .base import BaseController
 class QuelyApiSettings(BaseController):
     """API Settings Management Controller"""
 
-    @http.route('/api/settings/images', type='json', auth='public', methods=['GET'], csrf=False, cors='*')
+    @http.route('/api/settings/images', type='jsonrpc', auth='public', methods=['GET'], csrf=False, cors='*')
     def get_image_api_settings(self):
         """Get all image API settings (public pour usage frontend)"""
         try:
@@ -26,7 +26,7 @@ class QuelyApiSettings(BaseController):
                 'error': str(e)
             }
 
-    @http.route('/api/settings/images', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/settings/images', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def update_image_api_settings(self):
         """Update image API settings (authentification requise)"""
         try:
@@ -65,7 +65,7 @@ class QuelyApiSettings(BaseController):
                 'error': str(e)
             }
 
-    @http.route('/api/settings/all', type='json', auth='user', methods=['GET'], csrf=False, cors='*')
+    @http.route('/api/settings/all', type='jsonrpc', auth='user', methods=['GET'], csrf=False, cors='*')
     def get_all_settings(self):
         """Get all settings grouped by category (admin only)"""
         try:

@@ -65,7 +65,7 @@
 | Consulter stock virtuel (`virtual_available`) | ✅ | ❌ | ✅ Stock.tsx:251 | ✅ | - | Inclut qty_entrant/sortant |
 | Ajuster stock manuellement | ✅ `/variants/.../stock/update` | ❌ | ✅ StockAdjustmentModal | ✅ | - | Via modal |
 | Historique mouvements stock | ❌ | ❌ | 🟡 StockMoves.tsx | 🔴 | P1 | Page existante mais API manquante |
-| Inventaire physique (comptage) | 🟡 `/stock/inventory/prepare` | ❌ | 🟡 Inventory.tsx | 🟡 | P0 | Flux 4 étapes mais validation manquante |
+| Inventaire physique (comptage) | ✅ `/stock/inventory/validate` | ❌ | ✅ Inventory.tsx | ✅ | - | Flux complet avec validation API |
 | Multi-locations par entrepôt | ❌ | ❌ | 🟡 StockLocations.tsx | 🔴 | P1 | Page UI seule, pas d'API CRUD |
 | **Règles réapprovisionnement** |
 | Règles min/max automatiques | 🟡 API partielle | ❌ | ✅ ReorderingRules.tsx | 🟡 | - | CRUD complet UI, API limitée |
@@ -79,8 +79,8 @@
 | Configuration routes automatiques (Odoo 19) | ❌ | ❌ | ❌ | 🔴 | P2 | Auto-configuration Buy/Manufacture |
 | Emplacements hiérarchiques | ❌ | ❌ | 🟡 StockLocations.tsx | 🔴 | P1 | UI seule, pas d'API |
 | **Transferts et picking** |
-| Bons de transfert (`stock.picking`) | ❌ | ❌ | 🟡 StockTransfers.tsx | 🔴 | P0 | Page UI mais API absente |
-| Validation picking | ❌ | ❌ | ❌ | 🔴 | P0 | Confirmer/Valider transferts |
+| Bons de transfert (`stock.picking`) | ✅ `/stock/pickings` | ❌ | ✅ StockTransfers.tsx | ✅ | - | 4 endpoints (list/detail/validate/cancel) |
+| Validation picking | ✅ `/pickings/{id}/validate` | ❌ | ✅ | ✅ | - | Action_done implémentée |
 | Retards de disponibilité (Odoo 19) | ❌ | ❌ | ❌ | 🔴 | P1 | Filtre Late Availability |
 | Stratégies de prélèvement (FIFO/FEFO) | ❌ | ❌ | ❌ | 🔴 | P2 | Removal strategies |
 | Batch picking | ❌ | ❌ | ❌ | 🔴 | P2 | Multi-commandes simultanées |

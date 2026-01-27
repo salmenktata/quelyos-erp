@@ -144,23 +144,11 @@ class ApiClient {
       this.sessionId = result.session_id
       localStorage.setItem('session_id', result.session_id)
       if (result.user) {
+        // Les groupes sont déjà inclus dans result.user depuis le backend
         localStorage.setItem('user', JSON.stringify(result.user))
+        logger.debug('[API] User stored with groups:', result.user.groups?.length || 0, 'groups')
       }
       logger.debug('[API] Session stored:', this.sessionId?.substring(0, 20) + '...')
-
-      // Récupérer les groupes de sécurité de l'utilisateur
-      try {
-        const userInfo = await this.getUserInfo()
-        if (userInfo.success && userInfo.user) {
-          // Enrichir les données utilisateur avec les groupes
-          const enrichedUser = { ...result.user, groups: userInfo.user.groups }
-          localStorage.setItem('user', JSON.stringify(enrichedUser))
-          logger.debug('[API] User groups loaded:', userInfo.user.groups)
-        }
-      } catch (error) {
-        logger.warn('[API] Failed to load user groups:', error)
-        // Continuer même si la récupération des groupes échoue
-      }
     } else {
       logger.warn('[API] Login failed or no session_id:', result)
     }
@@ -169,7 +157,26 @@ class ApiClient {
   }
 
   async getUserInfo(): Promise<APIResponse<{ user: { id: number; name: string; email: string; login: string; groups: string[] } }>> {
-    return this.request<APIResponse<{ user: { id: number; name: string; email: string; login: string; groups: string[] } }>>('/api/auth/user-info')
+    // Utiliser credentials: 'include' pour envoyer les cookies de session Odoo
+    const url = `${this.baseUrl}/api/auth/user-info`
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // Envoyer cookies pour auth Odoo
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'call',
+        params: {},
+        id: Math.random(),
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.result || data
   }
 
   async logout(): Promise<APIResponse> {

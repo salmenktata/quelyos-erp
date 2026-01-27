@@ -52,7 +52,7 @@ class AuthController(http.Controller):
             response.status_code = 400
             return response
 
-    @http.route('/api/auth/sso-login', type='json', auth='none', methods=['POST', 'OPTIONS'], csrf=False)
+    @http.route('/api/auth/sso-login', type='jsonrpc', auth='none', methods=['POST', 'OPTIONS'], csrf=False)
     def sso_login(self, **kwargs):
         """
         Authentification SSO - valide les credentials et crée une session Odoo.
@@ -68,7 +68,7 @@ class AuthController(http.Controller):
             return request.make_response('', headers=cors_headers)
 
         try:
-            params = request.jsonrequest
+            params = request.params if hasattr(request, 'params') and request.params else {}
             login = params.get('login', '').strip()
             password = params.get('password', '')
             db = params.get('db') or request.db
@@ -76,8 +76,8 @@ class AuthController(http.Controller):
             if not login or not password:
                 return {'success': False, 'error': 'Login et mot de passe requis'}
 
-            # Authenticate user
-            uid = request.session.authenticate(db, login, password)
+            # Authenticate user (Odoo 19: authenticate prend env et credentials dict)
+            uid = request.session.authenticate(request.env, {'db': db, 'login': login, 'password': password})
 
             if not uid:
                 return {'success': False, 'error': 'Identifiants invalides'}
@@ -98,7 +98,7 @@ class AuthController(http.Controller):
             _logger.error(f"SSO login error: {e}")
             return {'success': False, 'error': 'Erreur de connexion'}
 
-    @http.route('/api/auth/user-info', type='json', auth='user', methods=['POST'], csrf=False)
+    @http.route('/api/auth/user-info', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_user_info(self, **kwargs):
         """
         Récupère les informations de l'utilisateur connecté incluant ses groupes de sécurité.
@@ -116,10 +116,24 @@ class AuthController(http.Controller):
             }
         """
         try:
+            # Vérifier si l'utilisateur est connecté
+            if not request.session.uid:
+                return {'success': False, 'error': 'Non authentifié'}
+
             user = request.env.user
 
             # Récupérer uniquement les groupes Quelyos
-            quelyos_groups = user.groups_id.filtered(lambda g: 'Quelyos' in g.name)
+            quelyos_groups = user.groups_id.filtered(lambda g: 'Quelyos' in str(g.name))
+
+            # Extraire les noms de groupes (gérer format JSONB {"en_US": "nom"})
+            group_names = []
+            for group in quelyos_groups:
+                name = group.name
+                # Si name est un dict (JSONB traduit), extraire la valeur
+                if isinstance(name, dict):
+                    # Essayer en_US, puis fr_FR, puis la première valeur disponible
+                    name = name.get('en_US') or name.get('fr_FR') or next(iter(name.values()), '')
+                group_names.append(name)
 
             return {
                 'success': True,
@@ -128,7 +142,7 @@ class AuthController(http.Controller):
                     'name': user.name,
                     'email': user.email or '',
                     'login': user.login,
-                    'groups': quelyos_groups.mapped('name'),
+                    'groups': group_names,
                 }
             }
         except Exception as e:
