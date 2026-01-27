@@ -1,7 +1,7 @@
 /**
  * Next.js API Route Proxy to Backend
  *
- * This proxies all requests to /api/odoo/* to the backend system
+ * This proxies all requests to /api/backend/* to the backend system
  * Avoids CORS issues and keeps API configuration server-side
  */
 
@@ -18,12 +18,12 @@ export async function POST(
     // Await params in Next.js 15+
     const params = await context.params;
 
-    // Reconstruct the Odoo endpoint path
-    const odooPath = `/api/ecommerce/${params.path.join('/')}`;
+    // Reconstruct the backend endpoint path
+    const backendPath = `/api/ecommerce/${params.path.join('/')}`;
     const body = await request.json();
 
-    // Forward the request to Odoo with JSON-RPC format
-    const response = await fetch(`${BACKEND_URL}${odooPath}`, {
+    // Forward the request to backend with JSON-RPC format
+    const response = await fetch(`${BACKEND_URL}${backendPath}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ export async function POST(
     }
 
     // Return the result
-    // Some Odoo endpoints are type='http' and return data directly (not wrapped in JSON-RPC)
+    // Some endpoints are type='http' and return data directly (not wrapped in JSON-RPC)
     // Others are type='json' and return {jsonrpc, id, result}
     if (data.result !== undefined) {
       return NextResponse.json(data.result);
@@ -87,10 +87,10 @@ export async function GET(
       queryParams[key] = value;
     });
 
-    // Use POST internally (Odoo expects JSON-RPC POST)
-    const odooPath = `/api/ecommerce/${params.path.join('/')}`;
+    // Use POST internally (backend expects JSON-RPC POST)
+    const backendPath = `/api/ecommerce/${params.path.join('/')}`;
 
-    const response = await fetch(`${BACKEND_URL}${odooPath}`, {
+    const response = await fetch(`${BACKEND_URL}${backendPath}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ export async function GET(
     }
 
     // Return the result
-    // Some Odoo endpoints are type='http' and return data directly (not wrapped in JSON-RPC)
+    // Some endpoints are type='http' and return data directly (not wrapped in JSON-RPC)
     // Others are type='json' and return {jsonrpc, id, result}
     if (data.result !== undefined) {
       return NextResponse.json(data.result);

@@ -5,17 +5,16 @@ import Image from 'next/image';
 import type { Product } from '@quelyos/types';
 import { useToast } from '@/store/toastStore';
 
-// Helper function to proxy Odoo images through Next.js API
+// Helper function to proxy backend images through Next.js API
 function getProxiedImageUrl(url: string | undefined): string {
   if (!url) return '';
   if (url.startsWith('/api/image')) return url;
   if (url.startsWith('/') && !url.includes('/web/image')) return url;
 
-  const isOdooImage = url.includes('/web/image') ||
-                      url.includes('localhost:8069') ||
-                      url.includes('odoo:8069');
+  const isBackendImage = url.includes('/web/image') ||
+                         url.includes('localhost:8069');
 
-  if (isOdooImage) {
+  if (isBackendImage) {
     return `/api/image?url=${encodeURIComponent(url)}`;
   }
 

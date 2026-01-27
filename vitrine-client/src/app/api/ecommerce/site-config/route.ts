@@ -1,6 +1,6 @@
 /**
  * API Route: Site Configuration
- * Proxy vers l'endpoint Odoo GET /api/ecommerce/site-config
+ * Proxy vers l'endpoint backend GET /api/ecommerce/site-config
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,7 +10,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:806
 
 export async function GET(request: NextRequest) {
   try {
-    // Appeler directement l'endpoint Odoo (type='http', méthode GET)
+    // Appeler directement l'endpoint backend (type='http', méthode GET)
     const response = await fetch(`${BACKEND_URL}/api/ecommerce/site-config`, {
       method: 'GET',
       headers: {

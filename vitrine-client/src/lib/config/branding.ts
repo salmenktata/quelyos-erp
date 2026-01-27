@@ -1,6 +1,6 @@
 /**
  * Branding Configuration
- * Uses centralized site configuration from Odoo API.
+ * Uses centralized site configuration from backend API.
  * This file provides computed values and backward compatibility.
  */
 

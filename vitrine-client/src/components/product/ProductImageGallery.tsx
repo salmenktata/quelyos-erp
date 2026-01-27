@@ -18,7 +18,7 @@ interface Image {
 }
 
 /**
- * Helper function to proxy Odoo images through Next.js API to avoid CORS issues
+ * Helper function to proxy backend images through Next.js API to avoid CORS issues
  */
 function getProxiedImageUrl(url: string | undefined): string {
   if (!url) return '/placeholder-product.svg';
@@ -29,12 +29,11 @@ function getProxiedImageUrl(url: string | undefined): string {
   // Local public asset (placeholder, etc.), return as-is
   if (url.startsWith('/') && !url.includes('/web/image')) return url;
 
-  // Proxy Odoo images through our API to avoid CORS issues
-  const isOdooImage = url.includes('/web/image') ||
-                      url.includes('localhost:8069') ||
-                      url.includes('odoo:8069');
+  // Proxy backend images through our API to avoid CORS issues
+  const isBackendImage = url.includes('/web/image') ||
+                         url.includes('localhost:8069');
 
-  if (isOdooImage) {
+  if (isBackendImage) {
     return `/api/image?url=${encodeURIComponent(url)}`;
   }
 

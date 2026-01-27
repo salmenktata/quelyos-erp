@@ -68,7 +68,7 @@ export class BackendClient {
   }
 
   /**
-   * Appel JSON-RPC générique vers Odoo via le proxy Next.js
+   * Appel JSON-RPC générique vers backend via le proxy Next.js
    * Le proxy ajoute automatiquement le wrapper JSON-RPC
    */
   private async jsonrpc<T = any>(
@@ -111,7 +111,7 @@ export class BackendClient {
   setSession(sessionId: string) {
     this.sessionId = sessionId;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('odoo_session_id', sessionId);
+      localStorage.setItem('backend_session_id', sessionId);
     }
   }
 
@@ -120,7 +120,7 @@ export class BackendClient {
    */
   loadSession() {
     if (typeof window !== 'undefined') {
-      const sessionId = localStorage.getItem('odoo_session_id');
+      const sessionId = localStorage.getItem('backend_session_id');
       if (sessionId) {
         this.sessionId = sessionId;
       }
@@ -133,7 +133,7 @@ export class BackendClient {
   clearSession() {
     this.sessionId = null;
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('odoo_session_id');
+      localStorage.removeItem('backend_session_id');
     }
   }
 

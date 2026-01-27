@@ -1,7 +1,7 @@
 /**
  * Site Configuration
  * Centralized configuration for all site-wide settings
- * Fetches from Odoo backend with fallback to defaults
+ * Fetches from backend with fallback to defaults
  */
 
 import { odooClient } from '@/lib/odoo/client';
@@ -139,7 +139,7 @@ let cacheTimestamp: number = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 /**
- * Fetch site configuration from Odoo API
+ * Fetch site configuration from backend API
  * Uses caching to avoid excessive API calls
  */
 export async function fetchSiteConfig(): Promise<SiteConfig> {

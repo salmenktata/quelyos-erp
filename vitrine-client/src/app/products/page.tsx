@@ -31,22 +31,21 @@ const RecentlyViewedCarousel = dynamic(
   { ssr: false }
 );
 
-// Helper function to proxy Odoo images through Next.js API
+// Helper function to proxy backend images through Next.js API
 function getProxiedImageUrl(url: string | undefined): string {
   if (!url) return '';
 
   // If already proxied, return as-is
   if (url.startsWith('/api/image')) return url;
 
-  // If it's a local public asset (not Odoo), return as-is
+  // If it's a local public asset, return as-is
   if (url.startsWith('/') && !url.includes('/web/image')) return url;
 
-  // Proxy Odoo images through our API to avoid CORS issues
-  const isOdooImage = url.includes('/web/image') ||
-                      url.includes('localhost:8069') ||
-                      url.includes('');
+  // Proxy backend images through our API to avoid CORS issues
+  const isBackendImage = url.includes('/web/image') ||
+                         url.includes('localhost:8069');
 
-  if (isOdooImage) {
+  if (isBackendImage) {
     return `/api/image?url=${encodeURIComponent(url)}`;
   }
 

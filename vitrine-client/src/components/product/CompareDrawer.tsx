@@ -29,17 +29,16 @@ export function CompareDrawer({ isOpen, onClose }: CompareDrawerProps) {
 
   const hasProducts = products.length > 0;
 
-  // Helper function pour proxy des images Odoo
+  // Helper function pour proxy des images backend
   const getProxiedImageUrl = (url: string | undefined): string => {
     if (!url) return '';
     if (url.startsWith('/api/image')) return url;
     if (url.startsWith('/') && !url.includes('/web/image')) return url;
 
-    const isOdooImage = url.includes('/web/image') ||
-      url.includes('localhost:8069') ||
-      url.includes('odoo:8069');
+    const isBackendImage = url.includes('/web/image') ||
+      url.includes('localhost:8069');
 
-    if (isOdooImage) {
+    if (isBackendImage) {
       return `/api/image?url=${encodeURIComponent(url)}`;
     }
 

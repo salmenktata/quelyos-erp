@@ -31,9 +31,9 @@ async function lookupTenant(
   }
 
   try {
-    const odooUrl = process.env.BACKEND_URL || 'http://localhost:8069';
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8069';
     const response = await fetch(
-      `${odooUrl}/api/ecommerce/tenant/by-domain?domain=${encodeURIComponent(domain)}`,
+      `${backendUrl}/api/ecommerce/tenant/by-domain?domain=${encodeURIComponent(domain)}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },

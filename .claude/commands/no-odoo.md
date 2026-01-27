@@ -187,3 +187,69 @@ curl http://localhost:3001/api/backend/ecommerce/site-config
 10. Cookie `session_id` → `_auth_token` ✅
 11. `next.config.ts` : Commentaire + hostname `*.odoo.com` supprimés ✅
 12. `nginx.conf` : Headers `Server` masqués dans `/api/` et `/web/` ✅
+
+### Phase 1 - Infrastructure Hardening ✅ (2026-01-26)
+
+**45 fichiers modifiés** - Infrastructure 100% anonymisée
+
+#### **1. Page test-api supprimée**
+```bash
+rm -rf vitrine-client/src/app/test-api
+```
+✅ Aucune URL backend hardcodée exposée publiquement
+
+#### **2. Builds nettoyés**
+```bash
+rm -rf vitrine-client/.next vitrine-client/out
+npm run build  # Rebuild propre
+```
+✅ Ancien dossier `/api/odoo/` supprimé des artifacts
+
+#### **3. Classe BackendClient**
+```ts
+// AVANT: export class OdooClient
+// APRÈS: export class BackendClient
+```
+✅ Nom classe anonymisé dans bundles
+
+#### **4. Fonction getBackendImageUrl**
+```ts
+// AVANT: export function getOdooImageUrl(path)
+// APRÈS: export function getBackendImageUrl(path)
+```
+✅ Nom fonction masqué dans autocomplete DevTools
+
+#### **5. Variables env renommées**
+```bash
+# 22 fichiers corrigés
+ODOO_URL → BACKEND_URL
+NEXT_PUBLIC_ODOO_URL → NEXT_PUBLIC_BACKEND_URL
+ODOO_DATABASE → BACKEND_DATABASE
+```
+✅ Aucune variable "ODOO" dans code source
+
+#### **6. Commentaires nettoyés**
+- `// Proxies images from Odoo` → `// Proxies images from backend`
+- `// Odoo expects JSON-RPC POST` → `// backend expects JSON-RPC POST`
+- `// Some Odoo endpoints` → `// Some endpoints`
+✅ 15+ commentaires anonymisés
+
+#### **7. Pattern odoo:8069 supprimé**
+```ts
+// AVANT: url.includes('odoo:8069')
+// APRÈS: (supprimé)
+```
+✅ Pattern Docker hostname éliminé
+
+#### **8. Validation build production**
+```bash
+Build Output:
+  ├ ƒ /api/backend/[...path]  ✅
+  ├ ✗ /api/odoo/              (absent) ✅
+  ├ ✗ /test-api               (absent) ✅
+
+Bundles statiques:
+  - "odoo" occurrences: 15 (legal/node_modules uniquement)
+  - "OdooClient": 0 ✅
+  - "getOdooImageUrl": 0 ✅
+```

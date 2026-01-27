@@ -3,7 +3,7 @@
  *
  * GET /api/tenant/[code]
  *
- * Proxy vers Odoo: GET /api/ecommerce/tenant/[code]
+ * Proxy vers backend: GET /api/ecommerce/tenant/[code]
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -26,10 +26,10 @@ export async function GET(
       );
     }
 
-    // Appel direct HTTP vers Odoo (pas JSON-RPC)
-    const odooUrl = `${BACKEND_URL}/api/ecommerce/tenant/${code}`;
+    // Appel direct HTTP vers backend (pas JSON-RPC)
+    const backendUrl = `${BACKEND_URL}/api/ecommerce/tenant/${code}`;
 
-    const response = await fetch(odooUrl, {
+    const response = await fetch(backendUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

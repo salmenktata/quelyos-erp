@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json()
 
-    // Si erreur Odoo ou format JSON-RPC
+    // Si erreur backend ou format JSON-RPC
     if (data.error || !data.result) {
       return NextResponse.json(
         { success: true, slides: [] }, // Fallback gracieux

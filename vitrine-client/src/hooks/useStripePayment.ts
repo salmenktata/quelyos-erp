@@ -28,7 +28,7 @@ interface UseStripePaymentReturn {
  * Flow:
  * 1. createPaymentIntent() - Créer un PaymentIntent côté serveur
  * 2. L'utilisateur remplit le formulaire Stripe Elements
- * 3. confirmPayment() - Confirmer le paiement avec Stripe et finaliser la commande Odoo
+ * 3. confirmPayment() - Confirmer le paiement avec Stripe et finaliser la commande
  */
 export function useStripePayment({
   orderId,
@@ -128,14 +128,14 @@ export function useStripePayment({
 
         logger.info('Paiement Stripe confirmé:', paymentIntent.id);
 
-        // Confirmer la commande côté serveur Odoo
+        // Confirmer la commande côté serveur
         const confirmResponse = await odooClient.confirmStripePayment(
           paymentIntent.id,
           orderId
         );
 
         if (confirmResponse.success && confirmResponse.order) {
-          logger.info('Commande Odoo confirmée:', confirmResponse.order.name);
+          logger.info('Commande confirmée:', confirmResponse.order.name);
           onSuccess?.(orderId);
         } else {
           throw new Error(confirmResponse.error || 'Erreur confirmation commande');

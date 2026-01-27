@@ -41,14 +41,14 @@ interface SearchAutocompleteProps {
   onSearch?: (query: string) => void;
 }
 
-// Helper to get full image URL with Odoo server prefix
+// Helper to get full image URL with backend server prefix
 const getImageUrl = (imagePath: string | null | undefined): string => {
   if (!imagePath) return '/placeholder-product.svg';
   // If already a full URL, return as is
   if (imagePath.startsWith('http')) return imagePath;
-  // Prefix with Odoo URL
-  const odooUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8069';
-  return `${odooUrl}${imagePath}`;
+  // Prefix with backend URL
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8069';
+  return `${backendUrl}${imagePath}`;
 };
 
 /**

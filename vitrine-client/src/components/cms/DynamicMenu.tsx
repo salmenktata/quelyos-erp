@@ -18,7 +18,7 @@ interface DynamicMenuProps {
 }
 
 /**
- * Composant de menu dynamique chargé depuis le CMS Odoo
+ * Composant de menu dynamique chargé depuis le CMS
  */
 export const DynamicMenu: React.FC<DynamicMenuProps> = ({
   code,

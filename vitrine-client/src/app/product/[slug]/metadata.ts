@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       productId = response.product.id;
     }
 
-    // Fetch SEO metadata from Odoo
+    // Fetch SEO metadata from backend
     return await getProductSeoMetadata(productId);
   } catch (error) {
     logger.error('Error generating product metadata:', error);

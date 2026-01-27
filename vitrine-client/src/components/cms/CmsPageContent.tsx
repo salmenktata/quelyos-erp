@@ -424,7 +424,7 @@ const ContactTemplate: React.FC<{ page: CmsPage }> = ({ page }) => {
               </div>
             </div>
 
-            {/* Contenu additionnel depuis Odoo */}
+            {/* Contenu additionnel depuis le CMS */}
             {page.content && (
               <div
                 className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 bg-white rounded-2xl shadow-sm border border-gray-100 p-6"
@@ -790,7 +790,7 @@ const AboutTemplate: React.FC<{ page: CmsPage }> = ({ page }) => {
 
       {/* Contenu principal */}
       <div className="container mx-auto px-4 py-12">
-        {/* Contenu depuis Odoo */}
+        {/* Contenu depuis le CMS */}
         {page.content && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12 mb-12">
             <div

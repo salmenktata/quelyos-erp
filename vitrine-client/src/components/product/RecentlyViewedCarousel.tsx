@@ -13,17 +13,16 @@ import { useRecentlyViewedStore } from '@/store/recentlyViewedStore';
 import { formatPrice } from '@/lib/utils/formatting';
 import { staggerContainer, staggerItem } from '@/lib/animations/variants';
 
-// Helper function to proxy Odoo images through Next.js API
+// Helper function to proxy backend images through Next.js API
 function getProxiedImageUrl(url: string | undefined): string {
   if (!url) return '';
   if (url.startsWith('/api/image')) return url;
   if (url.startsWith('/') && !url.includes('/web/image')) return url;
 
-  const isOdooImage = url.includes('/web/image') ||
-    url.includes('localhost:8069') ||
-    url.includes('odoo:8069');
+  const isBackendImage = url.includes('/web/image') ||
+    url.includes('localhost:8069');
 
-  if (isOdooImage) {
+  if (isBackendImage) {
     return `/api/image?url=${encodeURIComponent(url)}`;
   }
 

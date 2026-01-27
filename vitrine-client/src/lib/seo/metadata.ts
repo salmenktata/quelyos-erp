@@ -1,6 +1,6 @@
 /**
  * SEO Metadata Utilities for Next.js 14
- * Integrates with Odoo backend SEO metadata
+ * Integrates with backend SEO metadata
  */
 
 import { Metadata } from 'next';
