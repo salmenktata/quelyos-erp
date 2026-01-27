@@ -337,8 +337,8 @@ export default function ProductsClientView({
             ) : products.length > 0 ? (
               <>
                 <ProductGrid viewMode={viewMode}>
-                  {products.map((product) => (
-                    <ProductCardLeSportif key={product.id} product={product} viewMode={viewMode} />
+                  {products.map((product, index) => (
+                    <ProductCardLeSportif key={product.id} product={product} viewMode={viewMode} priority={index < 6} />
                   ))}
                 </ProductGrid>
 
@@ -454,7 +454,7 @@ function CompareProductButton({ product }: { product: Product }) {
 }
 
 // Carte produit (version simplifiée pour économiser tokens)
-function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMode: 'grid' | 'list' }) {
+function ProductCardLeSportif({ product, viewMode, priority = false }: { product: Product; viewMode: 'grid' | 'list'; priority?: boolean }) {
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string>('');
 
@@ -479,7 +479,7 @@ function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMod
       <div data-testid="product-card" className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex gap-4 hover:shadow-xl hover:border-primary/20 transition-all duration-300">
         <div className="w-32 h-32 shrink-0 bg-gray-50 rounded-lg overflow-hidden relative">
           {imageUrl ? (
-            <Image src={imageUrl} alt={product.name} fill className="object-cover" sizes="128px" />
+            <Image src={imageUrl} alt={product.name} fill quality={75} priority={priority} loading={priority ? undefined : 'lazy'} className="object-cover" sizes="128px" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400">
               <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
@@ -539,6 +539,9 @@ function ProductCardLeSportif({ product, viewMode }: { product: Product; viewMod
                 src={imageUrl}
                 alt={product.name}
                 fill
+                quality={75}
+                priority={priority}
+                loading={priority ? undefined : 'lazy'}
                 className="object-cover group-hover:scale-110 transition-transform duration-500"
                 sizes="(max-width: 768px) 50vw, 25vw"
               />

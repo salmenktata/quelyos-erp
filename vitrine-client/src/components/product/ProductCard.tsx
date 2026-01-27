@@ -11,9 +11,10 @@ import { logger } from '@/lib/logger';
 interface ProductCardProps {
   product: Product;
   onQuickView?: (productId: number) => void;
+  priority?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, priority = false }) => {
   const addToCart = useCartStore((state) => state.addToCart);
   const [isAdding, setIsAdding] = React.useState(false);
 
@@ -104,6 +105,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
             src={imageUrl}
             alt={product.name}
             fill
+            quality={75}
+            priority={priority}
+            loading={priority ? undefined : 'lazy'}
             className="object-cover transition-transform duration-500 group-hover:scale-110"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
