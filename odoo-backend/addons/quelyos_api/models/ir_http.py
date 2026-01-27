@@ -9,6 +9,7 @@ from odoo import models
 from odoo.http import request
 from werkzeug.utils import redirect as werkzeug_redirect
 from werkzeug.exceptions import Forbidden
+from ..config import get_cors_headers, is_origin_allowed
 
 _logger = logging.getLogger(__name__)
 
@@ -59,6 +60,13 @@ class IrHttpSecure(models.AbstractModel):
         """
         path = request.httprequest.path
 
+        # Gérer les requêtes OPTIONS (CORS preflight)
+        if request.httprequest.method == 'OPTIONS':
+            origin = request.httprequest.headers.get('Origin', '')
+            if is_origin_allowed(origin):
+                cors_headers = get_cors_headers(origin)
+                return request.make_response('', headers=list(cors_headers.items()))
+
         # Bloquer les routes de gestion de base de données
         for blocked in BLOCKED_ROUTES:
             if path.startswith(blocked):
@@ -86,3 +94,34 @@ class IrHttpSecure(models.AbstractModel):
                 return werkzeug_redirect(FRONTEND_LOGIN_URL, code=302)
 
         return super()._dispatch(endpoint)
+
+    @classmethod
+    def _post_dispatch(cls, response):
+        """
+        Override de _post_dispatch pour ajouter les headers CORS à toutes les réponses.
+        Cette méthode est appelée après la conversion du résultat en Response HTTP.
+        """
+        # Appeler d'abord la méthode parent
+        response = super()._post_dispatch(response)
+
+        # Vérifier que la réponse existe et a des headers
+        if not response or not hasattr(response, 'headers'):
+            return response
+
+        # Remplacer les headers CORS si l'origine est autorisée
+        origin = request.httprequest.headers.get('Origin', '')
+        if origin and is_origin_allowed(origin):
+            # Supprimer les headers CORS par défaut d'Odoo (wildcard *)
+            response.headers.pop('Access-Control-Allow-Origin', None)
+            response.headers.pop('Access-Control-Allow-Methods', None)
+            response.headers.pop('Access-Control-Allow-Headers', None)
+            response.headers.pop('Access-Control-Max-Age', None)
+
+            # Ajouter nos headers CORS spécifiques
+            cors_headers = get_cors_headers(origin)
+            for key, value in cors_headers.items():
+                response.headers[key] = value
+
+            _logger.debug(f"CORS headers applied for origin: {origin}")
+
+        return response

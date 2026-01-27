@@ -23,3 +23,7 @@ access_static_page_public,quelyos.static.page public,model_quelyos_static_page,b
 access_static_page_user,quelyos.static.page user,model_quelyos_static_page,base.group_user,1,1,1,1
 access_api_settings_public,quelyos.api.settings public,model_quelyos_api_settings,base.group_public,1,0,0,0
 access_api_settings_user,quelyos.api.settings user,model_quelyos_api_settings,base.group_user,1,1,1,1
+access_cycle_count_user,quelyos.cycle.count user,model_quelyos_cycle_count,base.group_user,1,1,1,1
+access_cycle_count_manager,quelyos.cycle.count manager,model_quelyos_cycle_count,base.group_system,1,1,1,1
+access_cycle_count_line_user,quelyos.cycle.count.line user,model_quelyos_cycle_count_line,base.group_user,1,1,1,1
+access_cycle_count_line_manager,quelyos.cycle.count.line manager,model_quelyos_cycle_count_line,base.group_system,1,1,1,1

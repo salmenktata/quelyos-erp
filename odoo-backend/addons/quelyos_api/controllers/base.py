@@ -51,11 +51,11 @@ class BaseController(http.Controller):
 
     def _authenticate_from_header(self):
         """
-        Authentifie l'utilisateur via le header X-Session-Id.
+        Authentifie l'utilisateur via le header Authorization (Bearer token).
         Utilisé pour les endpoints auth='public' qui nécessitent une authentification.
 
         Cette méthode restaure la session Odoo à partir du session_id envoyé
-        dans le header, permettant aux requêtes sans cookies de fonctionner.
+        dans le header Authorization, permettant aux requêtes sans cookies de fonctionner.
 
         Returns:
             dict d'erreur si authentification échouée, None si succès
@@ -66,11 +66,19 @@ class BaseController(http.Controller):
                 return error
             # L'utilisateur est maintenant authentifié dans request.env
         """
-        # Récupérer le session_id du header
-        session_id = request.httprequest.headers.get('X-Session-Id')
+        # Récupérer le session_id du header Authorization (format: Bearer <session_id>)
+        auth_header = request.httprequest.headers.get('Authorization', '')
+        session_id = None
+
+        if auth_header.startswith('Bearer '):
+            session_id = auth_header[7:]  # Enlever "Bearer "
+
+        # Fallback sur X-Session-Id pour compatibilité
+        if not session_id:
+            session_id = request.httprequest.headers.get('X-Session-Id')
 
         if not session_id or session_id in ('null', 'undefined', ''):
-            _logger.warning("No valid X-Session-Id header provided")
+            _logger.warning("No valid Authorization header provided")
             return {
                 'success': False,
                 'error': 'Authentification requise',

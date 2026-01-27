@@ -64,9 +64,9 @@ class ApiClient {
       'Content-Type': 'application/json',
     }
 
-    // Ajouter le session_id si disponible et valide (ne pas envoyer "null" ou chaîne vide)
+    // Utiliser Authorization au lieu de X-Session-Id (déjà autorisé par CORS)
     if (this.sessionId && this.sessionId !== 'null' && this.sessionId !== 'undefined') {
-      headers['X-Session-Id'] = this.sessionId
+      headers['Authorization'] = `Bearer ${this.sessionId}`
     }
 
     logger.debug('[API] Sending fetch to:', url)

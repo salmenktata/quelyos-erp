@@ -2,7 +2,9 @@
 from . import ir_http
 from . import product_image
 from . import product_template
+from . import product_product
 from . import stock_quant
+from . import stock_location
 from . import sale_order
 from . import subscription_quota_mixin
 from . import subscription_plan
@@ -18,3 +20,4 @@ from . import seo_metadata
 from . import marketing_popup
 from . import static_page
 from . import api_settings
+from . import cycle_count

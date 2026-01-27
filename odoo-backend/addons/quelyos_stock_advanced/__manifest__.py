@@ -1,46 +1,39 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos Stock Advanced',
-    'version': '19.0.1.0.0',
+    'version': '19.0.2.0.0',
     'category': 'Inventory/Inventory',
-    'summary': 'Fonctionnalités Stock Avancées Quelyos (wrapper OCA)',
+    'summary': 'Fonctionnalités Stock Avancées Quelyos (natif)',
     'description': """
 Quelyos Stock Advanced
 ======================
 
-Module wrapper qui intègre les fonctionnalités OCA Stock dans l'écosystème Quelyos.
+Module Stock natif Quelyos avec fonctionnalités avancées de gestion d'inventaire.
 
-Fonctionnalités Incluses:
---------------------------
-- Raisons de changement de quantité (stock_change_qty_reason)
-- Inventaires améliorés (stock_inventory)
-- Verrouillage d'emplacements (stock_location_lockdown)
-- Estimation de la demande (stock_demand_estimate)
+Fonctionnalités:
+----------------
+- **Raisons de changement** : Tracer les motifs d'ajustements de stock (casse, vol, inventaire, etc.)
+- **Inventaires** : Workflow complet de comptage physique avec validation
+- **Verrouillage d'emplacements** : Bloquer temporairement des emplacements (maintenance, réorganisation)
+- **API REST** : Endpoints pour le backoffice Quelyos
 
 API REST:
 ---------
-- /api/stock/change-reasons - Liste des raisons de changement
-- /api/stock/adjust-with-reason - Ajustement avec raison
-- /api/stock/inventories-oca - Liste des inventaires OCA
-- /api/stock/location-locks - Liste des emplacements verrouillés
-- /api/stock/location/<id>/lock - Verrouiller/déverrouiller emplacement
+- GET/POST /api/stock/change-reasons - Gestion des raisons de changement
+- GET/POST /api/stock/inventories - Gestion des inventaires
+- GET/POST /api/stock/location-locks - Gestion des verrouillages d'emplacements
+
+Modèles:
+--------
+- quelyos.stock.change.reason - Raisons de changement de stock
+- quelyos.stock.inventory - Entêtes d'inventaire
+- quelyos.stock.inventory.line - Lignes d'inventaire
+- quelyos.stock.location.lock - Verrouillage temporaire d'emplacements
 
 Architecture:
 -------------
-Ce module wrapper permet de :
-1. Garder les modules OCA séparés et maintenables
-2. Ajouter des personnalisations Quelyos par-dessus
-3. Exposer une API REST unifiée pour le frontend
-
-Modules OCA Requis:
--------------------
-- stock_change_qty_reason (19.0)
-- stock_inventory (19.0)
-- stock_location_lockdown (19.0)
-- stock_demand_estimate (19.0)
-
-Note: Les modules OCA 18.0 ont été adaptés pour Odoo 19.0.
-Voir docs/OCA_PATCHES_19.md pour détails.
+Module 100% natif Quelyos, sans dépendances externes.
+Conçu pour s'intégrer parfaitement avec le backoffice React/Vite.
     """,
     'author': 'Quelyos Development Team',
     'website': 'https://github.com/salmenktata/quelyosSuite',
@@ -48,10 +41,6 @@ Voir docs/OCA_PATCHES_19.md pour détails.
     'depends': [
         'stock',
         'quelyos_api',
-        'stock_change_qty_reason',
-        'stock_inventory',
-        'stock_location_lockdown',
-        'stock_demand_estimate',
     ],
     'data': [
         'security/ir.model.access.csv',

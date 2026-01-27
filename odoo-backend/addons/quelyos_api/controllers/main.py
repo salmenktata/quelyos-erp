@@ -1491,6 +1491,7 @@ class QuelyosAPI(http.Controller):
                     'price': p.list_price,
                     'standard_price': p.standard_price,
                     'qty_available': qty,
+                    'qty_available_unreserved': p.qty_available_unreserved,
                     'stock_status': stock_status,
                     'weight': p.weight or 0,
                     'category': p.categ_id.name if p.categ_id else '',
@@ -8023,14 +8024,21 @@ class QuelyosAPI(http.Controller):
             # Préparer les données pour l'inventaire
             inventory_lines = []
             for product in products:
+                # Ajouter informations de valorisation
+                theoretical_qty = product.qty_available
+                standard_price = product.standard_price
+                theoretical_value = theoretical_qty * standard_price
+
                 inventory_lines.append({
                     'product_id': product.id,
                     'product_name': product.name,
                     'sku': product.default_code or '',
                     'image_url': f'/web/image/product.product/{product.id}/image_128',
                     'category': product.categ_id.name if product.categ_id else '',
-                    'theoretical_qty': product.qty_available,  # Stock théorique (actuel)
+                    'theoretical_qty': theoretical_qty,
                     'counted_qty': None,  # À saisir par l'utilisateur
+                    'standard_price': standard_price,
+                    'theoretical_value': theoretical_value,
                 })
 
             return {
@@ -8121,12 +8129,23 @@ class QuelyosAPI(http.Controller):
                         })
                         quant.action_apply_inventory()
 
+                    # Calculer valorisation (coût × quantité)
+                    standard_price = product.standard_price
+                    old_value = old_qty * standard_price
+                    new_value = new_qty * standard_price
+                    value_difference = new_value - old_value
+
                     adjusted_products.append({
                         'product_id': product.id,
                         'product_name': product.name,
+                        'sku': product.default_code or '',
                         'old_qty': old_qty,
                         'new_qty': new_qty,
                         'difference': new_qty - old_qty,
+                        'standard_price': standard_price,
+                        'old_value': old_value,
+                        'new_value': new_value,
+                        'value_difference': value_difference,
                     })
 
                 except Exception as product_error:
@@ -8135,11 +8154,19 @@ class QuelyosAPI(http.Controller):
                         'product_id': adjustment.get('product_id')
                     })
 
+            # Calculer valorisation totale de l'inventaire
+            total_value_difference = sum(p['value_difference'] for p in adjusted_products)
+            total_old_value = sum(p['old_value'] for p in adjusted_products)
+            total_new_value = sum(p['new_value'] for p in adjusted_products)
+
             return {
                 'success': True,
                 'data': {
                     'adjusted_products': adjusted_products,
                     'total_adjusted': len(adjusted_products),
+                    'total_old_value': total_old_value,
+                    'total_new_value': total_new_value,
+                    'total_value_difference': total_value_difference,
                     'errors': errors,
                     'error_count': len(errors),
                 }
@@ -8436,6 +8463,419 @@ class QuelyosAPI(http.Controller):
             return {
                 'success': False,
                 'error': 'Erreur lors de l\'annulation du transfert'
+            }
+
+    # ==================== CYCLE COUNTS ====================
+
+    @http.route('/api/ecommerce/stock/cycle-counts', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_cycle_counts(self, **kwargs):
+        """
+        Lister les comptages cycliques
+        ADMIN UNIQUEMENT
+        """
+        try:
+            # Vérifier droits admin
+            error = self._require_admin()
+            if error:
+                return error
+
+            params = self._get_params()
+            limit = params.get('limit', 20)
+            offset = params.get('offset', 0)
+            state = params.get('state')  # draft, scheduled, in_progress, done, cancel
+
+            CycleCount = request.env['quelyos.cycle.count'].sudo()
+
+            domain = []
+            if state:
+                domain.append(('state', '=', state))
+
+            counts = CycleCount.search(domain, limit=limit, offset=offset, order='scheduled_date desc, id desc')
+            total_count = CycleCount.search_count(domain)
+
+            state_labels = {
+                'draft': 'Brouillon',
+                'scheduled': 'Planifié',
+                'in_progress': 'En cours',
+                'done': 'Terminé',
+                'cancel': 'Annulé',
+            }
+
+            cycle_counts = []
+            for count in counts:
+                cycle_counts.append({
+                    'id': count.id,
+                    'name': count.name,
+                    'scheduled_date': count.scheduled_date.isoformat() if count.scheduled_date else None,
+                    'state': count.state,
+                    'state_label': state_labels.get(count.state, count.state),
+                    'location_names': ', '.join(count.location_ids.mapped('complete_name')),
+                    'category_names': ', '.join(count.category_ids.mapped('name')) if count.category_ids else 'Toutes',
+                    'user_name': count.user_id.name if count.user_id else None,
+                    'product_count': count.product_count,
+                    'counted_products': count.counted_products,
+                    'completion_date': count.completion_date.isoformat() if count.completion_date else None,
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'cycle_counts': cycle_counts,
+                    'total': total_count,
+                    'limit': limit,
+                    'offset': offset,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get cycle counts error: {e}")
+            return {
+                'success': False,
+                'error': 'Erreur lors de la récupération des comptages'
+            }
+
+    @http.route('/api/ecommerce/stock/cycle-counts/<int:count_id>', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_cycle_count_detail(self, count_id, **kwargs):
+        """
+        Détails d'un comptage cyclique avec lignes
+        ADMIN UNIQUEMENT
+        """
+        try:
+            # Vérifier droits admin
+            error = self._require_admin()
+            if error:
+                return error
+
+            CycleCount = request.env['quelyos.cycle.count'].sudo()
+            count = CycleCount.browse(count_id)
+
+            if not count.exists():
+                return {
+                    'success': False,
+                    'error': 'Comptage non trouvé'
+                }
+
+            lines = []
+            for line in count.line_ids:
+                lines.append({
+                    'id': line.id,
+                    'product_id': line.product_id.id,
+                    'product_name': line.product_id.name,
+                    'product_sku': line.product_id.default_code or '',
+                    'location_id': line.location_id.id,
+                    'location_name': line.location_id.complete_name,
+                    'theoretical_qty': line.theoretical_qty,
+                    'counted_qty': line.counted_qty,
+                    'difference': line.difference,
+                    'standard_price': line.standard_price,
+                    'value_difference': line.value_difference,
+                    'notes': line.notes or '',
+                })
+
+            return {
+                'success': True,
+                'data': {
+                    'id': count.id,
+                    'name': count.name,
+                    'scheduled_date': count.scheduled_date.isoformat() if count.scheduled_date else None,
+                    'state': count.state,
+                    'location_ids': count.location_ids.ids,
+                    'location_names': ', '.join(count.location_ids.mapped('complete_name')),
+                    'category_ids': count.category_ids.ids if count.category_ids else [],
+                    'category_names': ', '.join(count.category_ids.mapped('name')) if count.category_ids else 'Toutes',
+                    'user_name': count.user_id.name if count.user_id else None,
+                    'product_count': count.product_count,
+                    'counted_products': count.counted_products,
+                    'completion_date': count.completion_date.isoformat() if count.completion_date else None,
+                    'notes': count.notes or '',
+                    'lines': lines,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get cycle count detail error: {e}")
+            return {
+                'success': False,
+                'error': 'Erreur lors de la récupération des détails'
+            }
+
+    @http.route('/api/ecommerce/stock/cycle-counts/create', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def create_cycle_count(self, **kwargs):
+        """
+        Créer un comptage cyclique
+        ADMIN UNIQUEMENT
+        """
+        try:
+            # Vérifier droits admin
+            error = self._require_admin()
+            if error:
+                return error
+
+            params = self._get_params()
+            scheduled_date = params.get('scheduled_date')
+            location_ids = params.get('location_ids', [])
+            category_ids = params.get('category_ids', [])
+            notes = params.get('notes', '')
+
+            if not location_ids:
+                return {
+                    'success': False,
+                    'error': 'Au moins un emplacement est requis'
+                }
+
+            CycleCount = request.env['quelyos.cycle.count'].sudo()
+
+            cycle_count = CycleCount.create({
+                'scheduled_date': scheduled_date,
+                'location_ids': [(6, 0, location_ids)],
+                'category_ids': [(6, 0, category_ids)] if category_ids else False,
+                'notes': notes,
+            })
+
+            # Générer automatiquement les lignes
+            cycle_count.action_generate_lines()
+
+            _logger.info(f"[CYCLE COUNT] Created {cycle_count.name} by admin")
+
+            return {
+                'success': True,
+                'data': {
+                    'id': cycle_count.id,
+                    'name': cycle_count.name,
+                    'product_count': cycle_count.product_count,
+                },
+                'message': f'Comptage {cycle_count.name} créé avec {cycle_count.product_count} produit(s)'
+            }
+
+        except Exception as e:
+            _logger.error(f"Create cycle count error: {e}")
+            return {
+                'success': False,
+                'error': 'Erreur lors de la création du comptage'
+            }
+
+    @http.route('/api/ecommerce/stock/cycle-counts/<int:count_id>/start', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def start_cycle_count(self, count_id, **kwargs):
+        """
+        Démarrer un comptage cyclique
+        ADMIN UNIQUEMENT
+        """
+        try:
+            # Vérifier droits admin
+            error = self._require_admin()
+            if error:
+                return error
+
+            CycleCount = request.env['quelyos.cycle.count'].sudo()
+            count = CycleCount.browse(count_id)
+
+            if not count.exists():
+                return {
+                    'success': False,
+                    'error': 'Comptage non trouvé'
+                }
+
+            count.action_start()
+
+            return {
+                'success': True,
+                'message': f'Comptage {count.name} démarré'
+            }
+
+        except Exception as e:
+            _logger.error(f"Start cycle count error: {e}")
+            return {
+                'success': False,
+                'error': 'Erreur lors du démarrage'
+            }
+
+    @http.route('/api/ecommerce/stock/cycle-counts/<int:count_id>/validate', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def validate_cycle_count(self, count_id, **kwargs):
+        """
+        Valider un comptage cyclique et appliquer ajustements
+        ADMIN UNIQUEMENT
+        """
+        try:
+            # Vérifier droits admin
+            error = self._require_admin()
+            if error:
+                return error
+
+            CycleCount = request.env['quelyos.cycle.count'].sudo()
+            count = CycleCount.browse(count_id)
+
+            if not count.exists():
+                return {
+                    'success': False,
+                    'error': 'Comptage non trouvé'
+                }
+
+            count.action_validate()
+
+            _logger.info(f"[CYCLE COUNT] Validated {count.name} by admin")
+
+            return {
+                'success': True,
+                'message': f'Comptage {count.name} validé et ajustements appliqués'
+            }
+
+        except Exception as e:
+            _logger.error(f"Validate cycle count error: {e}")
+            return {
+                'success': False,
+                'error': 'Erreur lors de la validation'
+            }
+
+    @http.route('/api/ecommerce/stock/cycle-counts/<int:count_id>/update-line', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def update_cycle_count_line(self, count_id, **kwargs):
+        """
+        Mettre à jour quantité comptée d'une ligne
+        ADMIN UNIQUEMENT
+        """
+        try:
+            # Vérifier droits admin
+            error = self._require_admin()
+            if error:
+                return error
+
+            params = self._get_params()
+            line_id = params.get('line_id')
+            counted_qty = params.get('counted_qty')
+
+            if line_id is None or counted_qty is None:
+                return {
+                    'success': False,
+                    'error': 'line_id et counted_qty requis'
+                }
+
+            Line = request.env['quelyos.cycle.count.line'].sudo()
+            line = Line.browse(line_id)
+
+            if not line.exists() or line.cycle_count_id.id != count_id:
+                return {
+                    'success': False,
+                    'error': 'Ligne non trouvée'
+                }
+
+            line.write({'counted_qty': float(counted_qty)})
+
+            return {
+                'success': True,
+                'data': {
+                    'line_id': line.id,
+                    'counted_qty': line.counted_qty,
+                    'difference': line.difference,
+                    'value_difference': line.value_difference,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Update cycle count line error: {e}")
+            return {
+                'success': False,
+                'error': 'Erreur lors de la mise à jour'
+            }
+
+    # ==================== STOCK LOCATIONS LOCK/UNLOCK ====================
+
+    @http.route('/api/ecommerce/stock/locations/<int:location_id>/lock', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def lock_stock_location(self, location_id, **kwargs):
+        """
+        Verrouiller une location (bloquer mouvements)
+        ADMIN UNIQUEMENT
+        """
+        try:
+            # Vérifier droits admin
+            error = self._require_admin()
+            if error:
+                return error
+
+            params = self._get_params()
+            reason = params.get('reason', 'Inventaire en cours')
+
+            Location = request.env['stock.location'].sudo()
+            location = Location.browse(location_id)
+
+            if not location.exists():
+                return {
+                    'success': False,
+                    'error': 'Emplacement non trouvé'
+                }
+
+            if location.is_locked:
+                return {
+                    'success': False,
+                    'error': f'Emplacement déjà verrouillé par {location.locked_by_id.name}'
+                }
+
+            location.action_lock(reason=reason)
+
+            _logger.info(f"[STOCK] Location {location.complete_name} locked by {request.env.user.name}")
+
+            return {
+                'success': True,
+                'message': f'Emplacement {location.complete_name} verrouillé',
+                'data': {
+                    'location_id': location.id,
+                    'is_locked': location.is_locked,
+                    'lock_reason': location.lock_reason,
+                    'locked_by': location.locked_by_id.name,
+                    'locked_date': location.locked_date.isoformat() if location.locked_date else None,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Lock location error: {e}")
+            return {
+                'success': False,
+                'error': 'Erreur lors du verrouillage'
+            }
+
+    @http.route('/api/ecommerce/stock/locations/<int:location_id>/unlock', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
+    def unlock_stock_location(self, location_id, **kwargs):
+        """
+        Déverrouiller une location
+        ADMIN UNIQUEMENT
+        """
+        try:
+            # Vérifier droits admin
+            error = self._require_admin()
+            if error:
+                return error
+
+            Location = request.env['stock.location'].sudo()
+            location = Location.browse(location_id)
+
+            if not location.exists():
+                return {
+                    'success': False,
+                    'error': 'Emplacement non trouvé'
+                }
+
+            if not location.is_locked:
+                return {
+                    'success': False,
+                    'error': 'Emplacement déjà déverrouillé'
+                }
+
+            location.action_unlock()
+
+            _logger.info(f"[STOCK] Location {location.complete_name} unlocked by {request.env.user.name}")
+
+            return {
+                'success': True,
+                'message': f'Emplacement {location.complete_name} déverrouillé',
+                'data': {
+                    'location_id': location.id,
+                    'is_locked': location.is_locked,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Unlock location error: {e}")
+            return {
+                'success': False,
+                'error': 'Erreur lors du déverrouillage'
             }
 
     # ==================== STOCK ALERTS ====================

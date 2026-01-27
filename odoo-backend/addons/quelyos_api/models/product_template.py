@@ -1,10 +1,24 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class ProductTemplate(models.Model):
     """Extension du modèle product.template pour les fonctionnalités e-commerce."""
     _inherit = 'product.template'
+
+    qty_available_unreserved = fields.Float(
+        string='Stock Disponible Non Réservé',
+        compute='_compute_qty_available_unreserved',
+        help='Quantité totale disponible hors réservations (toutes variantes)'
+    )
+
+    @api.depends('product_variant_ids.qty_available_unreserved')
+    def _compute_qty_available_unreserved(self):
+        """Pour les templates, sommer le stock non réservé de toutes les variantes"""
+        for template in self:
+            template.qty_available_unreserved = sum(
+                template.product_variant_ids.mapped('qty_available_unreserved')
+            )
 
     # Champs marketing e-commerce
     x_is_featured = fields.Boolean(

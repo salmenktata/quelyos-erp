@@ -150,7 +150,7 @@ Parité     Packaging  Légal          Commercial  Lancement
 | **Panier** | **90%** ✅ | 🟡 1 P1 (panier abandonné) | |
 | **Factures** | **85%** ✅ | ✅ COMPLÉTÉ | 0 P0, 0 P1 (UI backoffice) |
 | **Clients** | **85%** | 🟡 1 P1 (export CSV) | |
-| **Stock** | **31%** | 🔴 2 P0 (UI ajustement + inventaire) + 8 P1 | Audit `/parity stock` + 8 addons OCA identifiés (#52) |
+| **Stock** | **31%** | 🔴 2 P0 (validation inventaire + transferts) + 8 P1 | Audit détaillé 2026-01-27 : 8 addons OCA 🎁 + 3 fonctionnalités Enterprise ⭐ identifiées |
 | **Commandes** | **75%** | 🟡 3 P1 (bon livraison, tracking, historique) | |
 | **Paiement** | **65%** | 🟡 2 P1 (Stripe Elements, remboursements UI) | |
 | **Pricelists** | **21%** | 🔴 3 P0 (CRUD complet) + 10 P1 | Audit 2026-01-25 : Lecture seule uniquement |
@@ -173,17 +173,21 @@ Quelyos Suite = Odoo Community
 Valeur ajoutée : Fonctionnalités premium Enterprise incluses dans l'offre
 ```
 
-#### ⭐ Top 5 Fonctionnalités Premium à Implémenter
+#### ⭐ Top 8 Fonctionnalités Premium à Implémenter
 
-| Module | Type Odoo | Impact | Effort | Priorité Cible |
-|--------|-----------|--------|--------|----------------|
-| **Subscription Management** | Enterprise ⭐ | ★★★★★ | 2-3 sem | E-commerce |
-| **Marketing Automation** | Enterprise ⭐ | ★★★★★ | 2-3 sem | Backoffice |
-| **Bank Sync + OCR** | Enterprise ⭐ | ★★★★★ | 3-4 sem | Backoffice |
-| **Odoo Studio (No-Code)** | Enterprise ⭐ | ★★★★☆ | 3-4 sem | Backoffice |
-| **Field Service** | Enterprise ⭐ | ★★★☆☆ | 2-3 sem | Backoffice |
+| Module | Type Odoo | Impact | Effort | Priorité Cible | Économie |
+|--------|-----------|--------|--------|----------------|----------|
+| **Barcode Mobile App (Stock)** | Enterprise ⭐ | ★★★★★ | 2-3 sem | Backoffice | $360/user/an |
+| **Subscription Management** | Enterprise ⭐ | ★★★★★ | 2-3 sem | E-commerce | $400/user/an |
+| **Marketing Automation** | Enterprise ⭐ | ★★★★★ | 2-3 sem | Backoffice | $300/user/an |
+| **Batch & Wave Picking (Stock)** | Enterprise ⭐ | ★★★★☆ | 1-2 sem | Backoffice | $240/user/an |
+| **Bank Sync + OCR** | Enterprise ⭐ | ★★★★★ | 3-4 sem | Backoffice | $400/user/an |
+| **Odoo Studio (No-Code)** | Enterprise ⭐ | ★★★★☆ | 3-4 sem | Backoffice | $300/user/an |
+| **Advanced Putaway Rules (Stock)** | Enterprise ⭐ | ★★★☆☆ | 1 sem | Backoffice | Inclus |
+| **Field Service** | Enterprise ⭐ | ★★★☆☆ | 2-3 sem | Backoffice | $300/user/an |
 
 **Différenciation** : Inclure des fonctionnalités Enterprise (~$30-50/user/mois dans Odoo) dans l'offre Quelyos Suite
+**Économie totale estimée** : ~$2300/user/an (vs Odoo Enterprise All-In-One)
 
 #### 🚀 Modules Community à Ajouter
 
@@ -195,10 +199,14 @@ Valeur ajoutée : Fonctionnalités premium Enterprise incluses dans l'offre
 
 #### 📊 Opportunités Identifiées (Audit complet)
 
-- **12 modules/fonctionnalités** Odoo 19 identifiés
-- **8 fonctionnalités Enterprise ⭐** : Marketing Automation, Subscriptions, Bank Sync, SMS Marketing, Social Media, Field Service, Studio, Website Builder avancé
-- **4 fonctionnalités Community** : Project, ESG, Blog, modules industrie
-- **8 addons OCA gratuits 🎁** : Stock cycle count, Barcode scanning, Stock requests, Demand estimate (voir #52)
+- **20 modules/fonctionnalités** Odoo 19 identifiés
+- **11 fonctionnalités Enterprise ⭐** :
+  - **Stock** : Barcode Mobile, Batch/Wave Picking, Advanced Putaway (3 modules)
+  - **Autres** : Marketing Automation, Subscriptions, Bank Sync, SMS Marketing, Social Media, Field Service, Studio, Website Builder (8 modules)
+- **12 fonctionnalités Community** :
+  - **Stock** : Stock Demand Forecasting, Traceability Dashboard, Stock Alerts Frontend, Click & Collect (4 modules)
+  - **Autres** : Project, ESG, Blog, modules industrie (8 modules)
+- **8 addons OCA gratuits 🎁** : Stock cycle count, Barcode scanning, Stock requests, Demand estimate, Inventory lockdown, Unreserved stock, Inventory cost, Warehouse calendar
 - **Priorisation** : Backoffice (P1) > E-commerce (P2) > Vitrine (P3)
 
 **Voir détails complets** : Issue #43 - Roadmap Fonctionnalités Premium
@@ -207,13 +215,32 @@ Valeur ajoutée : Fonctionnalités premium Enterprise incluses dans l'offre
 
 > **Stratégie** : Intégrer des addons OCA gratuits (licence AGPL-3.0) pour accélérer le développement avec du code mature et testé par la communauté.
 
-**Audit Stock** : 8 addons OCA identifiés (Issue #52)
-- **4 modules installation directe** : stock_cycle_count, stock_inventory_lockdown, stock_inventory_cost_info, stock_available_unreserved
-- **4 modules réimplémentation** : stock_barcodes (PWA mobile), stock_request, stock_demand_estimate (ML), stock_warehouse_calendar
+**Audit Stock** : 8 addons OCA identifiés + 3 fonctionnalités Enterprise ⭐ (Audit complet 2026-01-27)
 
-**Gain** : ~2-3 mois de développement économisés + Passage de 31% à 65%+ parité Stock
+**Addons OCA 🎁 (installation directe < 1j chacun)** :
+- `stock_cycle_count` - Comptage cyclique par zones (vs inventaire annuel complet)
+- `stock_inventory_lockdown` - Verrouillage emplacements durant inventaire
+- `stock_inventory_cost_info` - Valorisation temps réel inventaires
+- `stock_available_unreserved` - Stock disponible hors réservations
 
-**Documentation** : Voir `docs/OCA_INTEGRATION.md`
+**Addons OCA 🎁 (réimplémentation UX moderne)** :
+- `stock_barcodes` → PWA mobile scan codes-barres (10-14j)
+- `stock_request` → Workflow demandes approvisionnement (5-7j)
+- `stock_demand_estimate` → Prévision demande ML (7-10j)
+- `stock_warehouse_calendar` → Calendrier horaires entrepôts (3-5j)
+
+**Fonctionnalités Enterprise ⭐ à implémenter gratuitement** :
+- **Barcode Mobile App** (PWA moderne) - Économie $360/user/an
+- **Batch & Wave Picking** - Productivité +40%
+- **Advanced Putaway Rules** - Optimisation espace +25%
+
+**Gain** : ~2-3 mois développement économisés + Passage 31% → 65%+ parité Stock + $5000/an économisés (10 users)
+
+**Gaps critiques (P0)** :
+1. Validation inventaire physique (API manquante) - 2j
+2. Gestion bons transfert (`stock.picking`) - 4j
+
+**Documentation** : Voir rapport complet audit `/parity stock` (2026-01-27)
 
 ### Phase 2 : Packaging Produit (3-4 semaines)
 
