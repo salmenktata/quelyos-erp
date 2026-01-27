@@ -64,7 +64,7 @@ import FinanceDashboard from './pages/finance/FinanceDashboard'
 import FinanceAccounts from './pages/finance/accounts/page'
 import FinanceAccountNew from './pages/finance/accounts/new/page'
 import FinanceAccountDetail from './pages/finance/accounts/[id]/page'
-import FinanceTransactions from './pages/finance/transactions/page'
+// import FinanceTransactions from './pages/finance/transactions/page' // SUPPRIMÉ - redondant avec expenses/incomes
 import FinanceBudgets from './pages/finance/budgets/page'
 import FinanceBudgetNew from './pages/finance/budgets/new/page'
 import FinanceBudgetDetail from './pages/finance/budgets/[id]/page'
@@ -84,7 +84,7 @@ import FinanceAlerts from './pages/finance/alerts/page'
 import FinanceCharts from './pages/finance/charts/page'
 import FinanceImport from './pages/finance/import/page'
 import FinanceReporting from './pages/finance/reporting/page'
-import FinanceReportingOverview from './pages/finance/reporting/overview/page'
+// import FinanceReportingOverview from './pages/finance/reporting/overview/page' // SUPPRIMÉ - fusionné avec Hub
 import FinanceReportingCashflow from './pages/finance/reporting/cashflow/page'
 import FinanceReportingByCategory from './pages/finance/reporting/by-category/page'
 import FinanceReportingByAccount from './pages/finance/reporting/by-account/page'
@@ -111,6 +111,7 @@ import FinanceSettingsSecurity from './pages/finance/settings/security/page'
 import FinanceStockValuation from './pages/finance/stock/valuation/page'
 import FinanceStockTurnover from './pages/finance/stock/turnover/page'
 import NoticeAnalytics from './pages/NoticeAnalytics'
+import GlobalSettings from './pages/settings/page'
 import { CurrencyProvider } from './lib/finance/CurrencyContext'
 import { FinanceErrorBoundary } from './components/finance/FinanceErrorBoundary'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
@@ -610,18 +611,8 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/finance/transactions"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceTransactions />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
+              {/* Redirection /finance/transactions vers /finance/expenses */}
+              <Route path="/finance/transactions" element={<Navigate to="/finance/expenses" replace />} />
               <Route
                 path="/finance/budgets"
                 element={
@@ -874,18 +865,8 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/finance/reporting/overview"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingOverview />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
+              {/* Redirection /finance/reporting/overview vers /finance/reporting */}
+              <Route path="/finance/reporting/overview" element={<Navigate to="/finance/reporting" replace />} />
               <Route
                 path="/finance/reporting/cashflow"
                 element={
@@ -1083,6 +1064,15 @@ export default function App() {
                         <FinanceStockTurnover />
                       </CurrencyProvider>
                     </FinanceErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              {/* Route Paramètres Globaux (temporaire - redirige vers Finance) */}
+              <Route
+                path="/dashboard/settings"
+                element={
+                  <ProtectedRoute>
+                    <GlobalSettings />
                   </ProtectedRoute>
                 }
               />

@@ -22,30 +22,12 @@ import { GlassPanel } from "@/components/ui/glass";
 
 const reports = [
   {
-    id: "overview",
-    title: "Vue d'ensemble",
-    description: "KPIs principaux, tendances et synthèse globale",
-    icon: BarChart3,
-    href: "/finance/reporting/overview",
-    badge: "Populaire",
-    color: "from-indigo-500 to-purple-500",
-  },
-  {
-    id: "cashflow",
-    title: "Trésorerie",
-    description: "Analyse waterfall, balance et prévisions 90j",
-    icon: DollarSign,
-    href: "/finance/reporting/cashflow",
-    badge: null,
-    color: "from-emerald-500 to-teal-500",
-  },
-  {
     id: "by-category",
     title: "Par catégorie",
     description: "Breakdown revenus/dépenses, drill-down transactions",
     icon: PieChart,
     href: "/finance/reporting/by-category",
-    badge: "Nouveau",
+    badge: null,
     color: "from-amber-500 to-orange-500",
   },
   {
@@ -72,7 +54,7 @@ const reports = [
     description: "Vue consolidée par groupes de comptes",
     icon: Briefcase,
     href: "/finance/reporting/by-portfolio",
-    badge: "Nouveau",
+    badge: null,
     color: "from-fuchsia-500 to-violet-500",
   },
   {
@@ -119,15 +101,6 @@ const reports = [
     href: "/finance/reporting/breakeven",
     badge: "KPI",
     color: "from-purple-500 to-indigo-500",
-  },
-  {
-    id: "forecasts",
-    title: "Prédictions ML des KPIs",
-    description: "Prévisions intelligentes avec Prophet (Machine Learning)",
-    icon: TrendingUp,
-    href: "/finance/reporting/forecasts",
-    badge: "AI",
-    color: "from-violet-500 to-purple-600",
   },
   {
     id: "data-quality",

@@ -37,29 +37,16 @@ import { logger } from '@quelyos/logger';
 
 const settingsGroups = [
   {
-    group: "Configuration de base",
-    description: "Paramètres essentiels pour démarrer",
+    group: "Configuration Finance",
+    description: "Paramètres spécifiques au module Finance",
     icon: Settings,
     sections: [
-      {
-        title: "Devise & formats",
-        desc: "Devise par défaut, thème et langue utilisateur.",
-        href: "/finance/settings/devise",
-        icon: DollarSign,
-      },
       {
         title: "TVA & fiscalité",
         desc: "Activer la TVA, mode HT/TTC, taux disponibles.",
         href: "/finance/settings/tva",
         icon: Receipt,
       },
-    ],
-  },
-  {
-    group: "Données métier",
-    description: "Référentiels et classifications",
-    icon: Tag,
-    sections: [
       {
         title: "Catégories",
         desc: "Gérer les catégories de revenus et dépenses.",
@@ -71,44 +58,6 @@ const settingsGroups = [
         desc: "Types de flux par défaut (CB, chèque, virement...).",
         href: "/finance/settings/flux",
         icon: CreditCard,
-      },
-    ],
-  },
-  {
-    group: "Abonnement & Facturation",
-    description: "Gérez votre plan et vos paiements",
-    icon: CreditCard,
-    sections: [
-      {
-        title: "Abonnement",
-        desc: "Plan actuel, facturation, et gestion de l'abonnement.",
-        href: "/finance/settings/billing",
-        icon: CreditCard,
-      },
-    ],
-  },
-  {
-    group: "Préférences & connexions",
-    description: "Options avancées",
-    icon: Settings,
-    sections: [
-      {
-        title: "Sécurité",
-        desc: "Mot de passe, authentification à deux facteurs (2FA), sessions.",
-        href: "/finance/settings/security",
-        icon: Shield,
-      },
-      {
-        title: "Notifications & exports",
-        desc: "Fréquence des emails, formats d'export.",
-        href: "/finance/settings/notifications",
-        icon: Bell,
-      },
-      {
-        title: "Intégrations",
-        desc: "Connexions externes, webhooks, API.",
-        href: "/finance/settings/integrations",
-        icon: Plug,
       },
     ],
   },
@@ -228,6 +177,22 @@ export default function SettingsOverviewPage() {
           config={financeNotices['settings']}
           className="mb-6"
         />
+
+        {/* Notice redirection paramètres globaux */}
+        <div className="mb-6 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4">
+          <div className="flex items-start gap-3">
+            <Settings className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                Paramètres Globaux
+              </h3>
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                Les paramètres généraux de la plateforme (Devise, Abonnement, Sécurité, Notifications, Intégrations)
+                ont été déplacés vers les <Link to="/dashboard/settings" className="underline font-medium hover:text-blue-600 dark:hover:text-blue-300">Paramètres Globaux</Link>.
+              </p>
+            </div>
+          </div>
+        </div>
 
         {initialLoading ? (
           <div className="space-y-8">

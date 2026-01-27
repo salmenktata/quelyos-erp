@@ -4,9 +4,9 @@ import { useTheme } from '../contexts/ThemeContext'
 import {
   LayoutDashboard,
   Wallet,
-  ArrowLeftRight,
-  PieChart,
+  TrendingDown,
   TrendingUp,
+  PieChart,
   BarChart3,
   ChevronDown,
   ChevronRight,
@@ -16,8 +16,6 @@ import {
   FolderOpen,
   Upload,
   Archive,
-  FileText,
-  CreditCard,
   Calendar,
   Layers,
   Sun,
@@ -25,7 +23,8 @@ import {
   LogOut,
   Menu,
   X,
-  PlayCircle,
+  Briefcase,
+  Coins,
 } from 'lucide-react'
 
 interface FinanceLayoutProps {
@@ -203,25 +202,33 @@ export function FinanceLayout({ children }: FinanceLayoutProps) {
     },
     {
       name: 'Comptes',
+      path: '/finance/accounts',
       icon: Wallet,
-      subItems: [
-        { name: 'Tous les comptes', path: '/finance/accounts' },
-        { name: 'Portefeuilles', path: '/finance/portfolios' },
-      ],
     },
     {
-      name: 'Transactions',
-      icon: ArrowLeftRight,
-      subItems: [
-        { name: 'Toutes', path: '/finance/transactions' },
-        { name: 'Dépenses', path: '/finance/expenses' },
-        { name: 'Revenus', path: '/finance/incomes' },
-      ],
+      name: 'Portefeuilles',
+      path: '/finance/portfolios',
+      icon: Briefcase,
+    },
+    {
+      name: 'Dépenses',
+      path: '/finance/expenses',
+      icon: TrendingDown,
+    },
+    {
+      name: 'Revenus',
+      path: '/finance/incomes',
+      icon: TrendingUp,
     },
     {
       name: 'Budgets',
       path: '/finance/budgets',
       icon: PieChart,
+    },
+    {
+      name: 'Plan Comptable',
+      path: '/finance/charts',
+      icon: Coins,
     },
     {
       name: 'Prévisions',
@@ -235,13 +242,6 @@ export function FinanceLayout({ children }: FinanceLayoutProps) {
       name: 'Rapports',
       icon: BarChart3,
       subItems: [
-        { name: 'Tableau de bord', separator: true },
-        { name: 'Hub', path: '/finance/reporting' },
-        { name: 'Vue d\'ensemble', path: '/finance/reporting/overview' },
-        { name: 'Trésorerie', separator: true },
-        { name: 'Trésorerie', path: '/finance/reporting/cashflow' },
-        { name: 'Prévisions', path: '/finance/reporting/forecast' },
-        { name: 'Analyses prév.', path: '/finance/reporting/forecasts' },
         { name: 'Analyses', separator: true },
         { name: 'Par catégorie', path: '/finance/reporting/by-category' },
         { name: 'Par flux', path: '/finance/reporting/by-flow' },
@@ -289,6 +289,16 @@ export function FinanceLayout({ children }: FinanceLayoutProps) {
       name: 'Archives',
       path: '/finance/archives',
       icon: Archive,
+    },
+    {
+      name: 'Paramètres',
+      icon: Settings,
+      subItems: [
+        { name: 'Général', path: '/finance/settings' },
+        { name: 'Catégories', path: '/finance/settings/categories' },
+        { name: 'Flux de paiement', path: '/finance/settings/flux' },
+        { name: 'TVA & fiscalité', path: '/finance/settings/tva' },
+      ],
     },
   ]
 
