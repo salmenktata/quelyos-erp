@@ -251,7 +251,6 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
       });
       setEditingId(null);
       fetchTransactions();
-      router.refresh();
     } catch (err) {
       setError(
         err instanceof Error
@@ -375,7 +374,6 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
       });
 
       fetchTransactions();
-      router.refresh();
     } catch (err) {
       setError(
         err instanceof Error
@@ -398,7 +396,6 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
       await api(`/transactions/${id}`, { method: "DELETE" });
       if (editingId === id) cancelEdit();
       fetchTransactions();
-      router.refresh();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Impossible de supprimer la transaction."

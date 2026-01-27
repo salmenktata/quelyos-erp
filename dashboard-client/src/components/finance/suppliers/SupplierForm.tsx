@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,7 +37,7 @@ interface SupplierFormProps {
 }
 
 export default function SupplierForm({ initialData, supplierId, mode }: SupplierFormProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,7 +99,7 @@ export default function SupplierForm({ initialData, supplierId, mode }: Supplier
         throw new Error(data.error || "Erreur lors de l'enregistrement");
       }
 
-      router.push("/finance/suppliers");
+      navigate("/finance/suppliers");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue");

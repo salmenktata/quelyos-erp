@@ -130,7 +130,11 @@ class ApiClient {
   }
 
   // Méthode publique pour permettre aux hooks d'appeler l'API
-  public async post<T>(endpoint: string, data?: unknown): Promise<{ data: T }> {
+  // Retourne { data: <réponse endpoint> } où <réponse endpoint> = { success, error?, data? }
+  public async post<T = { success: boolean; error?: string; data?: any }>(
+    endpoint: string,
+    data?: unknown
+  ): Promise<{ data: T }> {
     const result = await this.request<T>(endpoint, data)
     return { data: result }
   }
