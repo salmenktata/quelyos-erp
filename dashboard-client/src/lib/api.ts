@@ -994,6 +994,97 @@ class ApiClient {
     return this.request(`/api/ecommerce/stock/transfers/${pickingId}/cancel`, {})
   }
 
+  // ==================== STOCK OCA ====================
+
+  async getStockChangeReasons() {
+    return this.request<{
+      success: boolean
+      data: {
+        reasons: Array<{
+          id: number
+          name: string
+          code: string | null
+          active: boolean
+        }>
+        total: number
+      }
+      error?: string
+      error_code?: string
+    }>('/api/stock/change-reasons', {})
+  }
+
+  async adjustStockWithReason(params: {
+    product_id: number
+    location_id: number
+    new_quantity: number
+    reason_id?: number
+    notes?: string
+  }) {
+    return this.request<{
+      success: boolean
+      data: {
+        quant_id: number
+        old_quantity: number
+        new_quantity: number
+        reason: string
+        notes: string
+      }
+      error?: string
+      error_code?: string
+    }>('/api/stock/adjust-with-reason', params)
+  }
+
+  async getStockInventoriesOCA(params?: { limit?: number; offset?: number }) {
+    return this.request<{
+      success: boolean
+      data: {
+        inventories: Array<{
+          id: number
+          name: string
+          date: string | null
+          state: string
+          location_id: number | null
+          location_name: string | null
+        }>
+        total: number
+        limit: number
+        offset: number
+      }
+      error?: string
+      error_code?: string
+    }>('/api/stock/inventories-oca', params)
+  }
+
+  async getLocationLocks() {
+    return this.request<{
+      success: boolean
+      data: {
+        locks: Array<{
+          location_id: number
+          location_name: string
+          complete_name: string
+          blocked: boolean
+        }>
+        total: number
+      }
+      error?: string
+      error_code?: string
+    }>('/api/stock/location-locks', {})
+  }
+
+  async lockLocation(locationId: number, lock: boolean = true) {
+    return this.request<{
+      success: boolean
+      data: {
+        location_id: number
+        location_name: string
+        locked: boolean
+      }
+      error?: string
+      error_code?: string
+    }>(`/api/stock/location/${locationId}/lock`, { lock })
+  }
+
   // ==================== DELIVERY ====================
 
   async getDeliveryMethods() {

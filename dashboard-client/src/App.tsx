@@ -23,6 +23,9 @@ import StockMoves from './pages/StockMoves'
 import StockTransfers from './pages/StockTransfers'
 import StockLocations from './pages/StockLocations'
 import ReorderingRules from './pages/stock/ReorderingRules'
+import StockChangeReasons from './pages/stock/StockChangeReasons'
+import InventoriesOCA from './pages/stock/InventoriesOCA'
+import LocationLocks from './pages/stock/LocationLocks'
 import DeliveryMethods from './pages/store/DeliveryMethods'
 import SiteConfig from './pages/store/SiteConfig'
 import Payments from './pages/Payments'
@@ -280,6 +283,30 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <ReorderingRules />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/stock/change-reasons"
+                element={
+                  <ProtectedRoute>
+                    <StockChangeReasons />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/stock/inventories-oca"
+                element={
+                  <ProtectedRoute>
+                    <InventoriesOCA />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/stock/location-locks"
+                element={
+                  <ProtectedRoute>
+                    <LocationLocks />
                   </ProtectedRoute>
                 }
               />

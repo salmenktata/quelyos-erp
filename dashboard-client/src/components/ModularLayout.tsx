@@ -42,6 +42,7 @@ import {
   ArrowRightLeft,
   Warehouse,
   ClipboardList,
+  ClipboardCheck,
   MapPin,
   RefreshCw,
   // CRM
@@ -289,6 +290,14 @@ const MODULES: Module[] = [
           { name: 'Entrepôts', path: '/warehouses', icon: Warehouse },
           { name: 'Emplacements', path: '/stock/locations', icon: MapPin },
           { name: 'Règles Réapprovisionnement', path: '/stock/reordering-rules', icon: RefreshCw },
+        ],
+      },
+      {
+        title: 'Fonctionnalités OCA',
+        items: [
+          { name: 'Raisons Changement Stock', path: '/stock/change-reasons', icon: FileText },
+          { name: 'Inventaires OCA', path: '/stock/inventories-oca', icon: ClipboardCheck },
+          { name: 'Verrouillage Emplacements', path: '/stock/location-locks', icon: Lock },
         ],
       },
       {

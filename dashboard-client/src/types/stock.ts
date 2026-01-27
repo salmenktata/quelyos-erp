@@ -188,3 +188,28 @@ export interface UpdateReorderingRuleParams {
   qty_multiple?: number
   active?: boolean
 }
+
+// ==================== OCA STOCK ====================
+
+export interface StockChangeReason {
+  id: number
+  name: string
+  code: string | null
+  active: boolean
+}
+
+export interface StockInventoryOCA {
+  id: number
+  name: string
+  date: string | null
+  state: string
+  location_id: number | null
+  location_name: string | null
+}
+
+export interface LocationLock {
+  location_id: number
+  location_name: string
+  complete_name: string
+  blocked: boolean
+}
