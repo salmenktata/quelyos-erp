@@ -26,6 +26,8 @@
 - Oublier `security/ir.model.access.csv`
 - Boucles N+1 queries
 - `search()` sans limite
+- **Odoo 19** : Vues `<tree>` imbriquées dans widgets `many2many_tags` (erreur "Cannot find key 'tree' in views registry")
+- **Odoo 19** : Utiliser `category_id` au lieu de privilèges pour groupes de sécurité
 
 ## API
 - Oublier pagination
