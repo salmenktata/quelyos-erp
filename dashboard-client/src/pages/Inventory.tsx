@@ -1,3 +1,14 @@
+/**
+ * Page Inventaire Physique - Comptage et ajustement du stock
+ *
+ * Fonctionnalités :
+ * - Workflow en 4 étapes (sélection, comptage, écarts, validation)
+ * - Sélection par catégorie ou recherche
+ * - Saisie des quantités comptées
+ * - Revue des écarts avant validation
+ * - Ajustements automatiques du stock
+ */
+
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { usePrepareInventory, useValidateInventory } from '../hooks/useStock'
@@ -5,11 +16,11 @@ import { Badge, Button, Breadcrumbs, Input, PageNotice } from '../components/com
 import { stockNotices } from '@/lib/notices'
 import { useToast } from '../contexts/ToastContext'
 import {
-  ClipboardDocumentListIcon,
-  CheckCircleIcon,
-  ArrowLeftIcon,
-  ArrowRightIcon,
-} from '@heroicons/react/24/outline'
+  ClipboardList,
+  CheckCircle2,
+  ArrowLeft,
+  ArrowRight,
+} from 'lucide-react'
 
 type Step = 1 | 2 | 3 | 4
 
@@ -139,7 +150,7 @@ export default function Inventory() {
                 `}
               >
                 {step > s.number ? (
-                  <CheckCircleIcon className="h-6 w-6" />
+                  <CheckCircle2 className="h-6 w-6" />
                 ) : (
                   s.number
                 )}
@@ -169,7 +180,7 @@ export default function Inventory() {
 
   return (
     <Layout>
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
@@ -195,7 +206,7 @@ export default function Inventory() {
         {step === 1 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center gap-3 mb-6">
-              <ClipboardDocumentListIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+              <ClipboardList className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Sélection du périmètre
@@ -240,7 +251,7 @@ export default function Inventory() {
                   disabled={prepareInventoryMutation.isPending}
                   loading={prepareInventoryMutation.isPending}
                 >
-                  <ArrowRightIcon className="h-5 w-5 mr-2" />
+                  <ArrowRight className="h-5 w-5 mr-2" />
                   Préparer l'inventaire
                 </Button>
               </div>
@@ -253,7 +264,7 @@ export default function Inventory() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3">
-                <ClipboardDocumentListIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+                <ClipboardList className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     Comptage des quantités
@@ -326,12 +337,12 @@ export default function Inventory() {
 
             <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between">
               <Button variant="secondary" onClick={() => setStep(1)}>
-                <ArrowLeftIcon className="h-5 w-5 mr-2" />
+                <ArrowLeft className="h-5 w-5 mr-2" />
                 Retour
               </Button>
               <Button onClick={handleNextToReview}>
                 Revue des écarts
-                <ArrowRightIcon className="h-5 w-5 ml-2" />
+                <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             </div>
           </div>
@@ -342,7 +353,7 @@ export default function Inventory() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3">
-                <ClipboardDocumentListIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+                <ClipboardList className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     Revue des écarts
@@ -408,7 +419,7 @@ export default function Inventory() {
 
             <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between">
               <Button variant="secondary" onClick={() => setStep(2)}>
-                <ArrowLeftIcon className="h-5 w-5 mr-2" />
+                <ArrowLeft className="h-5 w-5 mr-2" />
                 Retour
               </Button>
               <Button
@@ -416,7 +427,7 @@ export default function Inventory() {
                 disabled={validateInventoryMutation.isPending}
                 loading={validateInventoryMutation.isPending}
               >
-                <CheckCircleIcon className="h-5 w-5 mr-2" />
+                <CheckCircle2 className="h-5 w-5 mr-2" />
                 Valider l'inventaire
               </Button>
             </div>
@@ -427,7 +438,7 @@ export default function Inventory() {
         {step === 4 && validationResult && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <div className="flex items-center gap-3 mb-6">
-              <CheckCircleIcon className="h-12 w-12 text-green-600" />
+              <CheckCircle2 className="h-12 w-12 text-green-600" />
               <div>
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
                   Inventaire validé !
@@ -477,7 +488,7 @@ export default function Inventory() {
                 Retour au stock
               </Button>
               <Button onClick={handleRestart}>
-                <ClipboardDocumentListIcon className="h-5 w-5 mr-2" />
+                <ClipboardList className="h-5 w-5 mr-2" />
                 Nouvel inventaire
               </Button>
             </div>

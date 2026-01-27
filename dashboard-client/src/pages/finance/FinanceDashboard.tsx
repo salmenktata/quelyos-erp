@@ -105,7 +105,7 @@ export default function DashboardPage() {
 
   return (
     <ModularLayout>
-      <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-4 sm:p-6">
+      <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-4 md:p-8">
         {/* Dashboard Header with Time Range Selector & Comparison Toggle */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

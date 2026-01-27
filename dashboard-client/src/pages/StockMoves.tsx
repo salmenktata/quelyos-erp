@@ -1,3 +1,14 @@
+/**
+ * Page Mouvements Stock - Historique des mouvements
+ *
+ * Fonctionnalités :
+ * - Liste complète des mouvements de stock
+ * - Filtres avancés (produit, type, dates, état)
+ * - Export CSV des données
+ * - Pagination des résultats
+ * - Liens vers les produits
+ */
+
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
@@ -8,11 +19,11 @@ import { useToast } from '../contexts/ToastContext'
 import { api } from '../lib/api'
 import { logger } from '@quelyos/logger'
 import {
-  ArrowsRightLeftIcon,
-  ArrowDownTrayIcon,
-  FunnelIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
+  ArrowLeftRight,
+  Download,
+  Filter,
+  X,
+} from 'lucide-react'
 import type { StockMove } from '@/types'
 
 export default function StockMoves() {
@@ -195,7 +206,7 @@ export default function StockMoves() {
 
   return (
     <Layout>
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
@@ -208,7 +219,7 @@ export default function StockMoves() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                <ArrowsRightLeftIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+                <ArrowLeftRight className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
                 Mouvements de Stock
               </h1>
               <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -221,7 +232,7 @@ export default function StockMoves() {
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center gap-2"
               >
-                <FunnelIcon className="h-5 w-5" />
+                <Filter className="h-5 w-5" />
                 Filtres
                 {hasActiveFilters && (
                   <Badge variant="info" className="ml-1">
@@ -234,7 +245,7 @@ export default function StockMoves() {
                 onClick={handleExportCSV}
                 className="flex items-center gap-2"
               >
-                <ArrowDownTrayIcon className="h-5 w-5" />
+                <Download className="h-5 w-5" />
                 Exporter CSV
               </Button>
             </div>
@@ -254,7 +265,7 @@ export default function StockMoves() {
                     onClick={clearFilters}
                     className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
                   >
-                    <XMarkIcon className="h-4 w-4" />
+                    <X className="h-4 w-4" />
                     Réinitialiser
                   </button>
                 )}

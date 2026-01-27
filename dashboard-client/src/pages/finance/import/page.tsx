@@ -23,7 +23,6 @@ import { UploadStep } from "@/components/finance/import/UploadStep";
 import { MappingStep } from "@/components/finance/import/MappingStep";
 import { ValidationStep } from "@/components/finance/import/ValidationStep";
 import { useImportWizard } from "@/hooks/useImportWizard";
-import { API_BASE_URL } from "@/lib/api-base";
 import { logger } from "@quelyos/logger";
 import type { StepInfo, FieldType } from "@/types/import";
 
@@ -44,7 +43,7 @@ export default function ImportPage() {
   useEffect(() => {
     async function fetchAccounts() {
       try {
-        const response = await fetch(`${API_BASE_URL}/accounts`, {
+        const response = await fetch('/api/ecommerce/accounts', {
           credentials: "include",
         });
         if (response.ok) {

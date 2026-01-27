@@ -43,6 +43,12 @@ import {
   BadgePercent,
   Megaphone,
   UsersRound,
+  Briefcase,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  GitBranch,
+  Waves,
+  CreditCard,
 } from 'lucide-react'
 
 // ============================================================================
@@ -117,88 +123,54 @@ export const MODULES: Module[] = [
     basePath: '/finance',
     sections: [
       {
-        title: 'Principal',
+        title: 'Tableau de bord',
         items: [
-          { name: 'Tableau de bord', path: '/finance', icon: LayoutDashboard },
-          {
-            name: 'Comptes',
-            icon: Wallet,
-            subItems: [
-              { name: 'Tous les comptes', path: '/finance/accounts' },
-              { name: 'Portefeuilles', path: '/finance/portfolios' },
-            ],
-          },
-          {
-            name: 'Transactions',
-            icon: ArrowLeftRight,
-            subItems: [
-              { name: 'Toutes', path: '/finance/transactions' },
-              { name: 'Dépenses', path: '/finance/expenses' },
-              { name: 'Revenus', path: '/finance/incomes' },
-            ],
-          },
+          { name: 'Vue d\'ensemble', path: '/finance', icon: LayoutDashboard },
+        ],
+      },
+      {
+        title: 'Comptes',
+        items: [
+          { name: 'Tous les comptes', path: '/finance/accounts', icon: Wallet },
+          { name: 'Portefeuilles', path: '/finance/portfolios', icon: Briefcase },
+        ],
+      },
+      {
+        title: 'Transactions',
+        items: [
+          { name: 'Dépenses', path: '/finance/expenses', icon: ArrowDownCircle },
+          { name: 'Revenus', path: '/finance/incomes', icon: ArrowUpCircle },
+        ],
+      },
+      {
+        title: 'Planification',
+        items: [
           { name: 'Budgets', path: '/finance/budgets', icon: PieChart },
-          {
-            name: 'Prévisions',
-            icon: TrendingUp,
-            subItems: [
-              { name: 'Trésorerie', path: '/finance/forecast' },
-              { name: 'Scénarios', path: '/finance/scenarios', badge: 'Nouveau' },
-            ],
-          },
-          {
-            name: 'Rapports',
-            icon: BarChart3,
-            subItems: [
-              { name: 'Tableau de bord', separator: true },
-              { name: 'Hub', path: '/finance/reporting' },
-              { name: 'Vue d\'ensemble', path: '/finance/reporting/overview' },
-              { name: 'Trésorerie', separator: true },
-              { name: 'Trésorerie', path: '/finance/reporting/cashflow' },
-              { name: 'Prévisions', path: '/finance/reporting/forecast' },
-              { name: 'Analyses prév.', path: '/finance/reporting/forecasts' },
-              { name: 'Analyses', separator: true },
-              { name: 'Par catégorie', path: '/finance/reporting/by-category' },
-              { name: 'Par flux', path: '/finance/reporting/by-flow' },
-              { name: 'Par compte', path: '/finance/reporting/by-account' },
-              { name: 'Par portefeuille', path: '/finance/reporting/by-portfolio' },
-              { name: 'Indicateurs', separator: true },
-              { name: 'Rentabilité', path: '/finance/reporting/profitability' },
-              { name: 'EBITDA', path: '/finance/reporting/ebitda' },
-              { name: 'DSO', path: '/finance/reporting/dso' },
-              { name: 'BFR', path: '/finance/reporting/bfr' },
-              { name: 'Point mort', path: '/finance/reporting/breakeven' },
-              { name: 'Qualité', separator: true },
-              { name: 'Qualité données', path: '/finance/reporting/data-quality' },
-            ],
-          },
-          { name: 'Plan Comptable', path: '/finance/charts', icon: Coins },
+          { name: 'Trésorerie', path: '/finance/forecast', icon: TrendingUp },
+          { name: 'Scénarios', path: '/finance/scenarios', icon: GitBranch },
+          { name: 'Échéancier', path: '/finance/payment-planning', icon: Calendar },
+        ],
+      },
+      {
+        title: 'Rapports',
+        items: [
+          { name: 'Hub Rapports', path: '/finance/reporting', icon: BarChart3 },
+          { name: 'Trésorerie', path: '/finance/reporting/cashflow', icon: Waves },
+          { name: 'Par catégorie', path: '/finance/reporting/by-category', icon: FolderOpen },
+          { name: 'Par compte', path: '/finance/reporting/by-account', icon: CreditCard },
+          { name: 'Rentabilité', path: '/finance/reporting/profitability', icon: TrendingUp },
         ],
       },
       {
         title: 'Configuration',
         items: [
-          { name: 'Catégories', path: '/finance/categories', icon: FolderOpen },
+          { name: 'Catégories', path: '/finance/categories', icon: Tag },
           { name: 'Fournisseurs', path: '/finance/suppliers', icon: Users },
+          { name: 'Plan Comptable', path: '/finance/charts', icon: Coins },
           { name: 'Alertes', path: '/finance/alerts', icon: Bell },
-          { name: 'Planification', path: '/finance/payment-planning', icon: Calendar },
           { name: 'Import', path: '/finance/import', icon: Upload },
           { name: 'Archives', path: '/finance/archives', icon: Archive },
-          {
-            name: 'Paramètres',
-            icon: Settings,
-            subItems: [
-              { name: 'Général', path: '/finance/settings' },
-              { name: 'Catégories', path: '/finance/settings/categories' },
-              { name: 'Devise', path: '/finance/settings/devise' },
-              { name: 'Flux', path: '/finance/settings/flux' },
-              { name: 'TVA', path: '/finance/settings/tva' },
-              { name: 'Facturation', path: '/finance/settings/billing' },
-              { name: 'Notifications', path: '/finance/settings/notifications' },
-              { name: 'Intégrations', path: '/finance/settings/integrations' },
-              { name: 'Sécurité', path: '/finance/settings/security' },
-            ],
-          },
+          { name: 'Paramètres', path: '/finance/settings', icon: Settings },
         ],
       },
     ],

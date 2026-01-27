@@ -294,7 +294,7 @@ export default function ReorderingRules() {
                           </button>
 
                           {/* Dropdown menu */}
-                          <div className="hidden absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
+                          <div className="hidden absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation()

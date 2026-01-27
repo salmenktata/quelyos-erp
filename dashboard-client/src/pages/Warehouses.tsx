@@ -20,7 +20,8 @@ import { useNavigate } from 'react-router-dom';
 import { useWarehouses } from '../hooks/useWarehouses';
 import { Layout } from '../components/Layout';
 import { SkeletonGrid } from '../components/common/Skeleton';
-import { BuildingStorefrontIcon, CheckCircleIcon, MagnifyingGlassIcon, XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Building2, CheckCircle2, Search, X, Plus } from 'lucide-react';
+import { Breadcrumbs } from '../components/common';
 import { WarehouseFormModal } from '../components/stock/WarehouseFormModal';
 import { PageNotice } from '../components/common';
 import { stockNotices } from '@/lib/notices';
@@ -201,6 +202,14 @@ export default function Warehouses() {
           Aller à la liste des entrepôts
         </a>
 
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Stock', href: '/stock' },
+            { label: 'Entrepôts' },
+          ]}
+        />
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -213,7 +222,7 @@ export default function Warehouses() {
             onClick={() => setIsCreateModalOpen(true)}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
           >
-            <PlusIcon className="h-5 w-5 mr-2" />
+            <Plus className="h-5 w-5 mr-2" />
             Créer Entrepôt
           </button>
         </div>
@@ -237,7 +246,7 @@ export default function Warehouses() {
           {/* Search */}
           <div className="flex-1 relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+              <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
             </div>
             <input
               id="warehouse-search"
@@ -257,7 +266,7 @@ export default function Warehouses() {
                 className="absolute inset-y-0 right-0 pr-3 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-r-lg transition-colors duration-200"
                 aria-label="Effacer la recherche"
               >
-                <XMarkIcon className="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
+                <X className="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
               </button>
             )}
           </div>
@@ -307,7 +316,7 @@ export default function Warehouses() {
                 </p>
               </div>
               <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
-                <BuildingStorefrontIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                <Building2 className="w-6 h-6 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
               </div>
             </div>
           </div>
@@ -322,7 +331,7 @@ export default function Warehouses() {
                 </p>
               </div>
               <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
-                <CheckCircleIcon className="w-6 h-6 text-green-600 dark:text-green-400" aria-hidden="true" />
+                <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" aria-hidden="true" />
               </div>
             </div>
           </div>
@@ -419,7 +428,7 @@ export default function Warehouses() {
             <div className="col-span-full bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-gray-900/20 p-12 border border-gray-200 dark:border-gray-700">
               <div className="flex flex-col items-center text-center">
                 <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
-                  <BuildingStorefrontIcon className="w-12 h-12 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                  <Building2 className="w-12 h-12 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Aucun entrepôt trouvé</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">

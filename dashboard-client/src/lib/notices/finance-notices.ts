@@ -598,4 +598,26 @@ export const financeNotices: Record<string, PageNoticeConfig> = {
       },
     ],
   },
+
+  scenarios: {
+    pageId: 'finance-scenarios',
+    title: 'Scénarios Financiers',
+    purpose:
+      "Simulez différentes hypothèses financières (croissance, baisse d'activité, investissements) pour anticiper l'impact sur votre trésorerie et votre rentabilité. Comparez vos scénarios pour prendre des décisions éclairées.",
+    icon: TrendingUp as LucideIcon,
+    moduleColor: 'emerald',
+    sections: [
+      {
+        title: 'Fonctionnalités principales',
+        icon: Lightbulb,
+        items: [
+          'Création de scénarios : définissez des hypothèses de croissance, réduction de coûts, ou investissements',
+          'Simulation multi-horizon : visualisez l\'impact à 3, 6 et 12 mois',
+          'Comparaison visuelle : graphiques côte-à-côte pour analyser les différentes trajectoires',
+          'Sauvegarde des scénarios : conservez vos hypothèses pour les réutiliser ou les partager',
+          'Export et partage : générez des rapports PDF pour vos présentations ou votre board',
+        ],
+      },
+    ],
+  },
 };

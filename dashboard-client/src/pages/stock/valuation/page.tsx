@@ -1,3 +1,15 @@
+/**
+ * Page Valorisation Stock - Vue d'ensemble de la valeur du stock
+ *
+ * Fonctionnalités :
+ * - Valorisation totale du stock
+ * - Breakdown par entrepôt
+ * - Breakdown par catégorie
+ * - Filtres par date
+ * - Export CSV des données
+ * - KPIs (valeur totale, quantité, valeur moyenne)
+ */
+
 import { useState } from "react"
 import { Layout } from "@/components/Layout"
 import { Breadcrumbs, PageNotice } from "@/components/common"

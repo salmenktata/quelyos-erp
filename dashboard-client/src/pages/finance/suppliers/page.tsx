@@ -68,13 +68,14 @@ export default function SuppliersPage() {
       }
 
       const data = await response.json()
-      setSuppliers(data.suppliers)
+      const suppliersList = data.suppliers ?? data.data ?? []
+      setSuppliers(suppliersList)
 
-      const strategic = data.suppliers.filter((s: Supplier) => s.category === 'STRATEGIC').length
-      const regular = data.suppliers.filter((s: Supplier) => s.category === 'REGULAR').length
-      const occasional = data.suppliers.filter((s: Supplier) => s.category === 'OCCASIONAL').length
-      const totalInvoices = data.suppliers.reduce(
-        (sum: number, s: Supplier) => sum + s._count.invoices,
+      const strategic = suppliersList.filter((s: Supplier) => s.category === 'STRATEGIC').length
+      const regular = suppliersList.filter((s: Supplier) => s.category === 'REGULAR').length
+      const occasional = suppliersList.filter((s: Supplier) => s.category === 'OCCASIONAL').length
+      const totalInvoices = suppliersList.reduce(
+        (sum: number, s: Supplier) => sum + (s._count?.invoices ?? 0),
         0
       )
 

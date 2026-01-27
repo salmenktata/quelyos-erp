@@ -108,17 +108,17 @@ cd ../vitrine-client && npm run dev &
 
 | Métrique | Valeur | Évolution |
 |----------|--------|-----------|
-| Parité fonctionnelle Odoo | **~78%** | ⬇️ -4% (audit Pricelists 2026-01-25) |
+| Parité fonctionnelle Odoo | **~72%** | ⬇️ -6% (audit Marketing 2026-01-28) |
 | Score Sécurité API | **A (90/100)** | ⬆️ D→A (25 endpoints sécurisés) |
 | Endpoints API Backend | **130+** | ⬆️ +28 (multi-devises, pricelists, warehouses) |
 | Pages Backoffice | **22** | ⬆️ +5 (Pricelists, Warehouses, SiteConfig) |
 | Pages Frontend | **22+** | Stable (boutique + espace client complets) |
-| Gaps P0 (Bloquants) | **5** | 🔴 +3 (Pricelists : CRUD complet manquant) |
-| Gaps P1 (Importants) | **26** | 🔴 +10 (Pricelists : 10 P1 identifiés) |
+| Gaps P0 (Bloquants) | **8** | 🔴 +3 (Marketing : Email, Listes, Automation) |
+| Gaps P1 (Importants) | **38** | 🔴 +12 (Marketing : 12 P1 identifiés) |
 | Composants UI modernes | **17** | Mode sombre, WCAG 2.1 AA |
 | Hooks React Query | **16** | State management optimisé |
 
-**🏆 Statut** : **Fonctionnel** mais 5 gaps P0 bloquent gestion quotidienne (Stock + Pricelists)
+**🏆 Statut** : **Fonctionnel** mais 8 gaps P0 bloquent gestion quotidienne (Stock + Pricelists + Marketing)
 
 ### Planning Global
 
@@ -154,9 +154,10 @@ Parité     Packaging  Légal          Commercial  Lancement
 | **Commandes** | **75%** | 🟡 3 P1 (bon livraison, tracking, historique) | |
 | **Paiement** | **65%** | 🟡 2 P1 (Stripe Elements, remboursements UI) | |
 | **Pricelists** | **21%** | 🔴 3 P0 (CRUD complet) + 10 P1 | Audit 2026-01-25 : Lecture seule uniquement |
+| **Marketing** | **18%** | 🔴 3 P0 (Email, Listes, Automation) + 12 P1 | Audit 2026-01-28 : UI existe mais pages vides |
 
-**Score global** : **~78%** (audit `/parity` révèle gaps Pricelists + Stock)
-**Production-ready** : 🔴 5 gaps P0 bloquent segmentation clients (Pricelists) + gestion stock quotidienne
+**Score global** : **~72%** (audit `/parity` révèle gaps Marketing + Pricelists + Stock)
+**Production-ready** : 🔴 8 gaps P0 bloquent marketing automation + segmentation clients + gestion stock quotidienne
 
 ### Phase 1.5 : Opportunités Premium (Audit `/parity` 2026-01-27)
 
@@ -173,21 +174,23 @@ Quelyos Suite = Odoo Community
 Valeur ajoutée : Fonctionnalités premium Enterprise incluses dans l'offre
 ```
 
-#### ⭐ Top 8 Fonctionnalités Premium à Implémenter
+#### ⭐ Top 10 Fonctionnalités Premium à Implémenter
 
 | Module | Type Odoo | Impact | Effort | Priorité Cible | Économie |
 |--------|-----------|--------|--------|----------------|----------|
 | **Barcode Mobile App (Stock)** | Enterprise ⭐ | ★★★★★ | 2-3 sem | Backoffice | $360/user/an |
 | **Subscription Management** | Enterprise ⭐ | ★★★★★ | 2-3 sem | E-commerce | $400/user/an |
-| **Marketing Automation** | Enterprise ⭐ | ★★★★★ | 2-3 sem | Backoffice | $300/user/an |
+| **Marketing Automation Workflows** | Enterprise ⭐ | ★★★★★ | 2-3 sem | Backoffice | $300/user/an |
+| **Email Builder Drag-and-Drop** | Enterprise ⭐ | ★★★★★ | 2 sem | Backoffice | $200/user/an |
+| **SMS Marketing Intégré** | Enterprise ⭐ | ★★★★☆ | 1 sem | Backoffice | $200/user/an |
 | **Batch & Wave Picking (Stock)** | Enterprise ⭐ | ★★★★☆ | 1-2 sem | Backoffice | $240/user/an |
 | **Bank Sync + OCR** | Enterprise ⭐ | ★★★★★ | 3-4 sem | Backoffice | $400/user/an |
+| **Social Media Scheduling** | Enterprise ⭐ | ★★★★☆ | 2-3 sem | Backoffice | $300/user/an |
 | **Odoo Studio (No-Code)** | Enterprise ⭐ | ★★★★☆ | 3-4 sem | Backoffice | $300/user/an |
 | **Advanced Putaway Rules (Stock)** | Enterprise ⭐ | ★★★☆☆ | 1 sem | Backoffice | Inclus |
-| **Field Service** | Enterprise ⭐ | ★★★☆☆ | 2-3 sem | Backoffice | $300/user/an |
 
 **Différenciation** : Inclure des fonctionnalités Enterprise (~$30-50/user/mois dans Odoo) dans l'offre Quelyos Suite
-**Économie totale estimée** : ~$2300/user/an (vs Odoo Enterprise All-In-One)
+**Économie totale estimée** : ~$3300/user/an (vs Odoo Enterprise All-In-One) - inclut Stock + Marketing
 
 #### 🚀 Modules Community à Ajouter
 
@@ -197,16 +200,19 @@ Valeur ajoutée : Fonctionnalités premium Enterprise incluses dans l'offre
 | **ESG Module** (nouveau 19) | Community | 1-2 sem | Backoffice |
 | **Blog & Content Marketing** | Community | 1-2 sem | Vitrine |
 
-#### 📊 Opportunités Identifiées (Audit complet)
+#### 📊 Opportunités Identifiées (Audits complets)
 
-- **20 modules/fonctionnalités** Odoo 19 identifiés
-- **11 fonctionnalités Enterprise ⭐** :
+- **28 modules/fonctionnalités** Odoo 19 identifiés (Stock + Marketing)
+- **16 fonctionnalités Enterprise ⭐** :
   - **Stock** : Barcode Mobile, Batch/Wave Picking, Advanced Putaway (3 modules)
-  - **Autres** : Marketing Automation, Subscriptions, Bank Sync, SMS Marketing, Social Media, Field Service, Studio, Website Builder (8 modules)
+  - **Marketing** : Marketing Automation, Email Builder, SMS Marketing, Social Media, Link Tracker (5 modules)
+  - **Autres** : Subscriptions, Bank Sync, Field Service, Studio, Website Builder (5 modules)
 - **12 fonctionnalités Community** :
   - **Stock** : Stock Demand Forecasting, Traceability Dashboard, Stock Alerts Frontend, Click & Collect (4 modules)
   - **Autres** : Project, ESG, Blog, modules industrie (8 modules)
-- **8 addons OCA gratuits 🎁** : Stock cycle count, Barcode scanning, Stock requests, Demand estimate, Inventory lockdown, Unreserved stock, Inventory cost, Warehouse calendar
+- **14 addons OCA gratuits 🎁** :
+  - **Stock** (8) : cycle count, Barcode scanning, Stock requests, Demand estimate, Inventory lockdown, Unreserved stock, Inventory cost, Warehouse calendar
+  - **Marketing** (6) : mass_mailing_partner, mass_mailing_resend, mass_mailing_subscription_email, mass_mailing_list_dynamic, sale_coupon_mass_mailing, mass_mailing_contact_partner
 - **Priorisation** : Backoffice (P1) > E-commerce (P2) > Vitrine (P3)
 
 **Voir détails complets** : Issue #43 - Roadmap Fonctionnalités Premium
@@ -236,11 +242,47 @@ Valeur ajoutée : Fonctionnalités premium Enterprise incluses dans l'offre
 
 **Gain** : ~2-3 mois développement économisés + Passage 31% → 65%+ parité Stock + $5000/an économisés (10 users)
 
-**Gaps critiques (P0)** :
+**Gaps critiques Stock (P0)** :
 1. Validation inventaire physique (API manquante) - 2j
 2. Gestion bons transfert (`stock.picking`) - 4j
 
 **Documentation** : Voir rapport complet audit `/parity stock` (2026-01-27)
+
+---
+
+**Audit Marketing** : 6 addons OCA identifiés + 5 fonctionnalités Enterprise ⭐ (Audit complet 2026-01-28)
+
+**État actuel** : Menu UI existe (`/marketing/*`) mais **aucune page fonctionnelle**
+- ✅ Popups Marketing (CRUD complet via `/store/marketing-popups`)
+- ✅ Newsletter (inscription simple, stockage `ir.config_parameter`)
+- ✅ Programme Fidélité (API points/paliers, pas d'UI backoffice)
+- 🔴 Email Marketing : **inexistant**
+- 🔴 SMS Marketing : **inexistant**
+- 🔴 Workflows Automation : **inexistant**
+
+**Addons OCA 🎁 (installation directe < 1j chacun)** :
+- `mass_mailing_partner` - Sync contacts mailing ↔ res.partner
+- `mass_mailing_resend` - Relance campagnes email
+- `mass_mailing_subscription_email` - Notifications inscription/désinscription
+
+**Addons OCA 🎁 (réimplémentation UX moderne)** :
+- `mass_mailing_list_dynamic` → Listes dynamiques par filtres (3-5j)
+- `sale_coupon_mass_mailing` → Lien promotions ↔ campagnes (2-3j)
+
+**Fonctionnalités Enterprise ⭐ à implémenter gratuitement** :
+- **Marketing Automation Workflows** (builder visuel) - Économie $300/user/an
+- **Email Builder Drag-and-Drop** (react-email + MJML) - Économie $200/user/an
+- **SMS Marketing Intégré** (Twilio/OVH) - Économie $200/user/an
+- **Social Media Scheduling** - Économie $300/user/an
+
+**Économie totale Marketing** : ~$1000/user/an (vs Odoo Enterprise)
+
+**Gaps critiques Marketing (P0)** :
+1. Système Email Marketing complet (`mailing.mailing`) - 2 sem
+2. Gestion Listes de Diffusion (`mailing.list`) - 1 sem
+3. Workflows Marketing Automation - 2-3 sem
+
+**Documentation** : Voir rapport complet audit `/parity Marketing` (2026-01-28)
 
 ### Phase 2 : Packaging Produit (3-4 semaines)
 

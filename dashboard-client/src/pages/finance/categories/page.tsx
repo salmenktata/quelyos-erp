@@ -40,7 +40,7 @@ export default function CategoriesPage() {
     try {
       setError(null);
       setLoading(true);
-      const data = await api<Category[]>("/categories");
+      const data = await api<Category[]>("/finance/categories");
       setCategories(data);
     } catch (err) {
       setError(

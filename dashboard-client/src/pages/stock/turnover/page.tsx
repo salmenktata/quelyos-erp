@@ -1,3 +1,15 @@
+/**
+ * Page Rotation Stock - Analyse de la rotation des produits
+ *
+ * Fonctionnalités :
+ * - Calcul du ratio de rotation par produit
+ * - Classification automatique (excellent, bon, lent, dormant)
+ * - Filtres par période et statut
+ * - KPIs agrégés (rotation moyenne, stock dormant)
+ * - Export CSV des données
+ * - Pagination des résultats
+ */
+
 import { useState } from "react"
 import { Layout } from "@/components/Layout"
 import { Breadcrumbs, Badge, PageNotice } from "@/components/common"

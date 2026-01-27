@@ -1,3 +1,14 @@
+/**
+ * Page Transferts Stock - Gestion des mouvements inter-entrepôts
+ *
+ * Fonctionnalités :
+ * - Liste des transferts avec filtres par état
+ * - Création de nouveaux transferts
+ * - Validation et annulation des transferts
+ * - Recherche par référence
+ * - Pagination des résultats
+ */
+
 import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import {
@@ -11,13 +22,13 @@ import { useToast } from '../contexts/ToastContext'
 import { TransferModal } from '../components/stock/TransferModal'
 import type { StockTransfer, TransferState } from '@/types'
 import {
-  ArrowsRightLeftIcon,
-  PlusIcon,
-  CheckIcon,
-  XMarkIcon,
-  MagnifyingGlassIcon,
-  FunnelIcon,
-} from '@heroicons/react/24/outline'
+  ArrowLeftRight,
+  Plus,
+  Check,
+  X,
+  Search,
+  Filter,
+} from 'lucide-react'
 
 const STATE_FILTERS: { value: TransferState | ''; label: string }[] = [
   { value: '', label: 'Tous' },
@@ -128,7 +139,7 @@ export default function StockTransfers() {
 
   return (
     <Layout>
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
@@ -141,7 +152,7 @@ export default function StockTransfers() {
         <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <ArrowsRightLeftIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+              <ArrowLeftRight className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               Transferts Inter-entrepôts
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -153,7 +164,7 @@ export default function StockTransfers() {
             onClick={() => setShowCreateModal(true)}
             className="flex items-center gap-2"
           >
-            <PlusIcon className="h-5 w-5" />
+            <Plus className="h-5 w-5" />
             Nouveau transfert
           </Button>
         </div>
@@ -164,7 +175,7 @@ export default function StockTransfers() {
         <div className="mb-6 space-y-4">
           {/* Pills états */}
           <div className="flex flex-wrap items-center gap-2">
-            <FunnelIcon className="h-5 w-5 text-gray-400" />
+            <Filter className="h-5 w-5 text-gray-400" />
             {STATE_FILTERS.map((filter) => (
               <button
                 key={filter.value}
@@ -186,7 +197,7 @@ export default function StockTransfers() {
           {/* Recherche */}
           <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
             <div className="relative flex-1">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
                 value={searchInput}
@@ -210,7 +221,7 @@ export default function StockTransfers() {
           </div>
         ) : transfers.length === 0 ? (
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-            <ArrowsRightLeftIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <ArrowLeftRight className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
               Aucun transfert
             </h3>
@@ -225,7 +236,7 @@ export default function StockTransfers() {
                 className="mt-4"
                 onClick={() => setShowCreateModal(true)}
               >
-                <PlusIcon className="h-5 w-5 mr-2" />
+                <Plus className="h-5 w-5 mr-2" />
                 Nouveau transfert
               </Button>
             )}
@@ -317,7 +328,7 @@ export default function StockTransfers() {
                               }
                               title="Valider le transfert"
                             >
-                              <CheckIcon className="h-4 w-4 text-green-600" />
+                              <Check className="h-4 w-4 text-green-600" />
                             </Button>
                           )}
                           {canCancel(transfer.state) && (
@@ -329,7 +340,7 @@ export default function StockTransfers() {
                               }
                               title="Annuler le transfert"
                             >
-                              <XMarkIcon className="h-4 w-4 text-red-600" />
+                              <X className="h-4 w-4 text-red-600" />
                             </Button>
                           )}
                         </div>

@@ -1,3 +1,15 @@
+/**
+ * Page Stock - Gestion centralisée du stock produits
+ *
+ * Fonctionnalités :
+ * - Liste des produits avec niveaux de stock
+ * - Alertes stock bas et stock élevé
+ * - Gestion des variantes produits
+ * - Valorisation du stock par catégorie
+ * - Export CSV des données
+ * - Ajustements de stock manuels
+ */
+
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
@@ -16,15 +28,15 @@ import { ExportStockModal } from '../components/stock/ExportStockModal'
 import { StockAdjustmentModal } from '../components/stock/StockAdjustmentModal'
 import { VariantStockTable } from '../components/stock/VariantStockTable'
 import {
-  ExclamationTriangleIcon,
-  ShoppingBagIcon,
-  CubeIcon,
-  CheckIcon,
-  ArrowDownTrayIcon,
-  Squares2X2Icon,
-  ArrowLeftIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
+  AlertTriangle,
+  ShoppingBag,
+  Package,
+  Check,
+  Download,
+  LayoutGrid,
+  ArrowLeft,
+  X,
+} from 'lucide-react'
 import type { StockProduct } from '@/types'
 import { stockNotices } from '@/lib/notices'
 
@@ -295,7 +307,7 @@ export default function Stock() {
 
   return (
     <Layout>
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
@@ -311,13 +323,14 @@ export default function Stock() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button
+            <Button
+              variant="primary"
               onClick={() => setShowExportModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+              icon={<Download className="h-5 w-5" />}
+              className="bg-green-600 hover:bg-green-700"
             >
-              <ArrowDownTrayIcon className="h-5 w-5" />
               Exporter CSV
-            </button>
+            </Button>
             <Link to="/stock/moves">
               <Button variant="secondary" className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -346,7 +359,7 @@ export default function Stock() {
                   }
                 `}
               >
-                <CubeIcon className="h-5 w-5" />
+                <Package className="h-5 w-5" />
                 Tous les Produits
                 {productsTotal > 0 && (
                   <Badge variant="info" className="ml-2">
@@ -366,7 +379,7 @@ export default function Stock() {
                   }
                 `}
               >
-                <ExclamationTriangleIcon className="h-5 w-5" />
+                <AlertTriangle className="h-5 w-5" />
                 Alertes Stock Bas
                 {alertsTotal > 0 && (
                   <Badge variant="error" className="ml-2">
@@ -386,7 +399,7 @@ export default function Stock() {
                   }
                 `}
               >
-                <Squares2X2Icon className="h-5 w-5" />
+                <LayoutGrid className="h-5 w-5" />
                 Variantes
                 {selectedProductForVariants && (
                   <Badge variant="info" className="ml-2">
@@ -464,7 +477,7 @@ export default function Stock() {
                 className="flex items-center gap-2"
                 size="sm"
               >
-                <ArrowDownTrayIcon className="h-4 w-4" />
+                <Download className="h-4 w-4" />
                 Exporter CSV
               </Button>
             </div>
@@ -575,7 +588,7 @@ export default function Stock() {
                 onClick={handleExportCSV}
                 className="flex items-center gap-2"
               >
-                <ArrowDownTrayIcon className="h-5 w-5" />
+                <Download className="h-5 w-5" />
                 Exporter CSV
               </Button>
             </div>
@@ -591,7 +604,7 @@ export default function Stock() {
                       onClick={() => setCategoryFilter('')}
                       className="ml-1 hover:text-red-600"
                     >
-                      <XMarkIcon className="h-3 w-3" />
+                      <X className="h-3 w-3" />
                     </button>
                   </Badge>
                 )}
@@ -602,7 +615,7 @@ export default function Stock() {
                       onClick={() => setStatusFilter('all')}
                       className="ml-1 hover:text-red-600"
                     >
-                      <XMarkIcon className="h-3 w-3" />
+                      <X className="h-3 w-3" />
                     </button>
                   </Badge>
                 )}
@@ -616,7 +629,7 @@ export default function Stock() {
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-6 mb-6">
             <div className="flex items-start gap-4">
               <div className="shrink-0">
-                <ExclamationTriangleIcon className="h-12 w-12 text-amber-600 dark:text-amber-400" />
+                <AlertTriangle className="h-12 w-12 text-amber-600 dark:text-amber-400" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
@@ -684,7 +697,7 @@ export default function Stock() {
                               />
                             ) : (
                               <div className="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <ShoppingBagIcon className="h-6 w-6 text-gray-400" />
+                                <ShoppingBag className="h-6 w-6 text-gray-400" />
                               </div>
                             )}
                             <div>
@@ -745,7 +758,7 @@ export default function Stock() {
                               className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
                               title="Voir les variantes"
                             >
-                              <Squares2X2Icon className="h-5 w-5" />
+                              <LayoutGrid className="h-5 w-5" />
                             </button>
                           </div>
                         </td>
@@ -826,7 +839,7 @@ export default function Stock() {
                               />
                             ) : (
                               <div className="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <ShoppingBagIcon className="h-6 w-6 text-gray-400" />
+                                <ShoppingBag className="h-6 w-6 text-gray-400" />
                               </div>
                             )}
                             <div>
@@ -944,7 +957,7 @@ export default function Stock() {
                                   />
                                 ) : (
                                   <div className="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                    <ShoppingBagIcon className="h-6 w-6 text-gray-400" />
+                                    <ShoppingBag className="h-6 w-6 text-gray-400" />
                                   </div>
                                 )}
                                 <div>
@@ -1037,7 +1050,7 @@ export default function Stock() {
                                 />
                               ) : (
                                 <div className="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                  <ShoppingBagIcon className="h-6 w-6 text-gray-400" />
+                                  <ShoppingBag className="h-6 w-6 text-gray-400" />
                                 </div>
                               )}
                               <div>
@@ -1096,7 +1109,7 @@ export default function Stock() {
                         }}
                         className="inline-flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                       >
-                        <ArrowLeftIcon className="h-5 w-5" />
+                        <ArrowLeft className="h-5 w-5" />
                         Retour aux produits
                       </button>
                       <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -1116,7 +1129,7 @@ export default function Stock() {
                     />
                   ) : (
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-                      <Squares2X2Icon className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                      <LayoutGrid className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                         Aucune variante
                       </h3>
@@ -1128,7 +1141,7 @@ export default function Stock() {
                 </>
               ) : (
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-                  <Squares2X2Icon className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                  <LayoutGrid className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                     Sélectionnez un produit
                   </h3>
@@ -1139,7 +1152,7 @@ export default function Stock() {
                     onClick={() => setActiveTab('products')}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
                   >
-                    <CubeIcon className="h-5 w-5" />
+                    <Package className="h-5 w-5" />
                     Aller aux produits
                   </button>
                 </div>
@@ -1149,7 +1162,7 @@ export default function Stock() {
             <div className="p-12 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                  <CheckIcon className="w-8 h-8 text-green-600 dark:text-green-400" />
+                  <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
                 </div>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">

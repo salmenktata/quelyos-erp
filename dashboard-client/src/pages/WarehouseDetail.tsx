@@ -1,19 +1,30 @@
+/**
+ * Page Détail Entrepôt - Vue détaillée d'un entrepôt
+ *
+ * Fonctionnalités :
+ * - Informations générales de l'entrepôt
+ * - Liste du stock disponible avec filtres
+ * - Liste des emplacements (locations)
+ * - Actions: modification, archivage
+ * - Pagination et recherche
+ */
+
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { useWarehouseDetail, useWarehouseStock, useArchiveWarehouse } from '../hooks/useWarehouses'
 import { Badge, Button, Breadcrumbs, SkeletonTable } from '../components/common'
 import {
-  ArrowLeftIcon,
-  BuildingStorefrontIcon,
-  MapPinIcon,
-  CubeIcon,
-  MagnifyingGlassIcon,
-  ExclamationTriangleIcon,
-  PencilIcon,
-  ArchiveBoxIcon,
-  ArchiveBoxArrowDownIcon,
-} from '@heroicons/react/24/outline'
+  ArrowLeft,
+  Building2,
+  MapPin,
+  Package,
+  Search,
+  AlertTriangle,
+  Pencil,
+  Archive,
+  ArchiveRestore,
+} from 'lucide-react'
 
 type TabType = 'locations' | 'stock'
 
@@ -57,7 +68,7 @@ export default function WarehouseDetail() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
           </div>
@@ -69,7 +80,7 @@ export default function WarehouseDetail() {
   if (error || !warehouse) {
     return (
       <Layout>
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
             <p className="text-red-800 dark:text-red-200">Entrepôt introuvable</p>
             <Button
@@ -77,7 +88,7 @@ export default function WarehouseDetail() {
               onClick={() => navigate('/warehouses')}
               className="mt-4"
             >
-              <ArrowLeftIcon className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4 mr-2" />
               Retour aux entrepôts
             </Button>
           </div>
@@ -91,7 +102,7 @@ export default function WarehouseDetail() {
 
   return (
     <Layout>
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
@@ -105,7 +116,7 @@ export default function WarehouseDetail() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-4">
-              <BuildingStorefrontIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+              <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                   {warehouse.name}
@@ -128,7 +139,7 @@ export default function WarehouseDetail() {
                 }}
                 className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
               >
-                <PencilIcon className="h-4 w-4 mr-2" />
+                <Pencil className="h-4 w-4 mr-2" />
                 Modifier
               </button>
               <button
@@ -158,12 +169,12 @@ export default function WarehouseDetail() {
               >
                 {warehouse.active ? (
                   <>
-                    <ArchiveBoxIcon className="h-4 w-4 mr-2" />
+                    <Archive className="h-4 w-4 mr-2" />
                     {isArchiving ? 'Archivage...' : 'Archiver'}
                   </>
                 ) : (
                   <>
-                    <ArchiveBoxArrowDownIcon className="h-4 w-4 mr-2" />
+                    <ArchiveRestore className="h-4 w-4 mr-2" />
                     Réactiver
                   </>
                 )}
@@ -174,21 +185,21 @@ export default function WarehouseDetail() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <p className="text-sm text-gray-500 dark:text-gray-400">Locations</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{warehouse.location_count}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <p className="text-sm text-gray-500 dark:text-gray-400">Produits en stock</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{stockTotal}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <p className="text-sm text-gray-500 dark:text-gray-400">Société</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">
               {warehouse.company_name || 'N/A'}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
             <Link
               to="/stock/transfers"
               className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
@@ -209,7 +220,7 @@ export default function WarehouseDetail() {
                   : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
               }`}
             >
-              <CubeIcon className="h-5 w-5 inline mr-2" />
+              <Package className="h-5 w-5 inline mr-2" />
               Stock ({stockTotal})
             </button>
             <button
@@ -220,7 +231,7 @@ export default function WarehouseDetail() {
                   : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
               }`}
             >
-              <MapPinIcon className="h-5 w-5 inline mr-2" />
+              <MapPin className="h-5 w-5 inline mr-2" />
               Locations ({warehouse.location_count})
             </button>
           </nav>
@@ -233,7 +244,7 @@ export default function WarehouseDetail() {
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-wrap gap-4 items-center">
               <form onSubmit={handleStockSearch} className="flex gap-2 flex-1 min-w-[200px] max-w-md">
                 <div className="relative flex-1">
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="text"
                     value={stockSearchInput}
@@ -268,7 +279,7 @@ export default function WarehouseDetail() {
               </div>
             ) : stockProducts.length === 0 ? (
               <div className="p-12 text-center">
-                <CubeIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <Package className="mx-auto h-12 w-12 text-gray-400" />
                 <p className="mt-4 text-gray-500 dark:text-gray-400">
                   {stockSearch || lowStockOnly
                     ? 'Aucun produit ne correspond à vos critères'
@@ -316,7 +327,7 @@ export default function WarehouseDetail() {
                                   />
                                 ) : (
                                   <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                                    <CubeIcon className="h-5 w-5 text-gray-400" />
+                                    <Package className="h-5 w-5 text-gray-400" />
                                   </div>
                                 )}
                                 <div>
@@ -340,7 +351,7 @@ export default function WarehouseDetail() {
                                 {product.free_qty}
                               </span>
                               {product.free_qty < 10 && (
-                                <ExclamationTriangleIcon className="inline ml-1 h-4 w-4 text-amber-500" />
+                                <AlertTriangle className="inline ml-1 h-4 w-4 text-amber-500" />
                               )}
                             </td>
                             <td className="px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">
@@ -398,7 +409,7 @@ export default function WarehouseDetail() {
                     className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50"
                   >
                     <div className="flex items-center gap-3">
-                      <MapPinIcon className="h-5 w-5 text-gray-400" />
+                      <MapPin className="h-5 w-5 text-gray-400" />
                       <div>
                         <p className="font-medium text-gray-900 dark:text-white">
                           {location.complete_name}
@@ -416,7 +427,7 @@ export default function WarehouseDetail() {
               </div>
             ) : (
               <div className="p-12 text-center">
-                <MapPinIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <MapPin className="mx-auto h-12 w-12 text-gray-400" />
                 <p className="mt-4 text-gray-500 dark:text-gray-400">
                   Aucune location dans cet entrepôt
                 </p>
