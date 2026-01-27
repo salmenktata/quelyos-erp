@@ -5,6 +5,7 @@ interface SelectContextType {
   onValueChange: (value: string) => void
   open: boolean
   setOpen: (open: boolean) => void
+  disabled: boolean
 }
 
 const SelectContext = createContext<SelectContextType | null>(null)
@@ -14,9 +15,10 @@ interface SelectProps {
   value?: string
   defaultValue?: string
   onValueChange?: (value: string) => void
+  disabled?: boolean
 }
 
-export function Select({ children, value: controlledValue, defaultValue = '', onValueChange }: SelectProps) {
+export function Select({ children, value: controlledValue, defaultValue = '', onValueChange, disabled = false }: SelectProps) {
   const [internalValue, setInternalValue] = useState(defaultValue)
   const [open, setOpen] = useState(false)
 
@@ -31,7 +33,7 @@ export function Select({ children, value: controlledValue, defaultValue = '', on
   }
 
   return (
-    <SelectContext.Provider value={{ value, onValueChange: handleValueChange, open, setOpen }}>
+    <SelectContext.Provider value={{ value, onValueChange: handleValueChange, open, setOpen, disabled }}>
       <div className="relative inline-block w-full">
         {children}
       </div>
@@ -42,17 +44,20 @@ export function Select({ children, value: controlledValue, defaultValue = '', on
 interface SelectTriggerProps {
   children: React.ReactNode
   className?: string
+  id?: string
 }
 
-export function SelectTrigger({ children, className = '' }: SelectTriggerProps) {
+export function SelectTrigger({ children, className = '', id }: SelectTriggerProps) {
   const context = useContext(SelectContext)
   if (!context) throw new Error('SelectTrigger must be used within Select')
 
   return (
     <button
       type="button"
-      onClick={() => context.setOpen(!context.open)}
-      className={`flex items-center justify-between w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
+      id={id}
+      disabled={context.disabled}
+      onClick={() => !context.disabled && context.setOpen(!context.open)}
+      className={`flex items-center justify-between w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${context.disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
     >
       {children}
       <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

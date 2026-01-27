@@ -799,6 +799,7 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
           onMenuClick={() => setIsMobileMenuOpen(true)}
           onAppLauncherClick={() => setIsAppLauncherOpen(!isAppLauncherOpen)}
           isAppLauncherOpen={isAppLauncherOpen}
+          isModuleChanging={isModuleChanging}
           modules={accessibleModules}
         />
 
@@ -835,9 +836,15 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
                 <h2 className={`font-semibold ${currentModule.color}`}>{currentModule.name}</h2>
                 <p className="text-xs text-gray-500 dark:text-gray-400">{currentModule.description}</p>
               </div>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden ml-auto text-gray-400">
-                <X className="w-5 h-5" />
-              </button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="lg:hidden ml-auto text-gray-400"
+                icon={<X className="w-5 h-5" />}
+              >
+                <span className="sr-only">Fermer le menu</span>
+              </Button>
             </div>
 
             {/* Navigation */}
@@ -865,13 +872,15 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
 
             {/* Footer */}
             <div className="px-3 py-3 border-t border-gray-200 dark:border-gray-700">
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleLogout}
-                className="flex items-center gap-3 w-full rounded-lg px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="w-full justify-start text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                icon={<LogOut className="h-5 w-5" />}
               >
-                <LogOut className="h-5 w-5" />
-                <span>Déconnexion</span>
-              </button>
+                Déconnexion
+              </Button>
             </div>
           </aside>
 
