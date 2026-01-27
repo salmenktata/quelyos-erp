@@ -1,9 +1,24 @@
+/**
+ * Page Bannières Promotionnelles - Gestion des bannières publicitaires
+ *
+ * Fonctionnalités :
+ * - Liste des bannières avec statut actif/inactif
+ * - Création/édition/suppression de bannières
+ * - Configuration complète (titre, description, tag, gradient, bouton)
+ * - Formulaire inline d'édition avec prévisualisation en temps réel
+ * - Activation/désactivation rapide des bannières
+ */
+
 import { useState } from 'react'
+import { Plus, Trash2, X, Save } from 'lucide-react'
 import { Layout } from '../../components/Layout'
 import { usePromoBanners, useCreatePromoBanner, useUpdatePromoBanner, useDeletePromoBanner, PromoBanner } from '../../hooks/usePromoBanners'
 import { Button, SkeletonTable, PageNotice, Breadcrumbs } from '../../components/common'
 import { storeNotices } from '@/lib/notices'
 import { useToast } from '../../hooks/useToast'
+import { BannerFormInputs } from '../../components/store/promo-banners/BannerFormInputs'
+import { BannerTableRow } from '../../components/store/promo-banners/BannerTableRow'
+import { BannerPreview } from '../../components/store/promo-banners/BannerPreview'
 
 export default function PromoBanners() {
   const [editingBanner, setEditingBanner] = useState<PromoBanner | null>(null)
@@ -84,55 +99,61 @@ export default function PromoBanners() {
 
   return (
     <Layout>
-      <Breadcrumbs
-        items={[
-          { label: 'Tableau de bord', href: '/dashboard' },
-          { label: 'Bannières Promo' },
-        ]}
-      />
-      <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Bannières Promo</h1>
-          {!showForm && <Button onClick={handleNew}>Nouveau</Button>}
+      <div className="p-4 md:p-8 space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Store', href: '/store' },
+            { label: 'Bannières Promo' },
+          ]}
+        />
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Bannières Promo</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Gérez vos bannières promotionnelles affichées sur le site
+            </p>
+          </div>
+          {!showForm && (
+            <Button onClick={handleNew} icon={<Plus className="h-4 w-4" />}>
+              Nouveau
+            </Button>
+          )}
         </div>
 
         <PageNotice config={storeNotices.promoBanners} className="mb-6" />
 
         <div className={`grid gap-6 ${showForm ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
           {/* Liste */}
-          <div className="overflow-hidden">
-            {isLoading ? <SkeletonTable rows={5} columns={4} /> : (
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl overflow-hidden">
+            {isLoading ? (
+              <div className="p-6">
+                <SkeletonTable rows={5} columns={4} />
+              </div>
+            ) : (
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nom</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Titre</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actif</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nom</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Titre</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actif</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {banners?.map(b => (
-                    <tr
+                    <BannerTableRow
                       key={b.id}
-                      className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${editingBanner?.id === b.id ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}`}
-                      onClick={() => handleEdit(b)}
-                    >
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{b.name}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{b.title}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex px-2 py-1 text-xs rounded-full ${b.active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
-                          {b.active ? 'Oui' : 'Non'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <Button onClick={(e) => { e.stopPropagation(); handleDelete(b.id) }} size="sm" variant="secondary">Supprimer</Button>
-                      </td>
-                    </tr>
+                      banner={b}
+                      isEditing={editingBanner?.id === b.id}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                    />
                   ))}
                   {(!banners || banners.length === 0) && (
                     <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                      <td colSpan={4} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                         Aucune bannière. Cliquez sur "Nouveau" pour en créer une.
                       </td>
                     </tr>
@@ -142,129 +163,31 @@ export default function PromoBanners() {
             )}
           </div>
 
-          {/* Formulaire inline */}
+          {/* Formulaire et prévisualisation */}
           {showForm && (
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                {isCreating ? 'Nouvelle Bannière' : 'Modifier la Bannière'}
-              </h2>
+            <div className="space-y-6">
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-xl">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  {isCreating ? 'Nouvelle Bannière' : 'Modifier la Bannière'}
+                </h2>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Nom interne"
-                  />
-                </div>
+                <BannerFormInputs
+                  formData={formData}
+                  onChange={setFormData}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Titre</label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={e => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Titre affiché"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                  <textarea
-                    value={formData.description}
-                    onChange={e => setFormData({ ...formData, description: e.target.value })}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Description de la bannière"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tag</label>
-                    <input
-                      type="text"
-                      value={formData.tag}
-                      onChange={e => setFormData({ ...formData, tag: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
-                      placeholder="PROMO"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Couleur tag</label>
-                    <input
-                      type="color"
-                      value={formData.tag_color}
-                      onChange={e => setFormData({ ...formData, tag_color: e.target.value })}
-                      className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gradient CSS</label>
-                  <input
-                    type="text"
-                    value={formData.gradient}
-                    onChange={e => setFormData({ ...formData, gradient: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
-                    placeholder="from-blue-500 to-purple-500"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Texte bouton</label>
-                    <input
-                      type="text"
-                      value={formData.button_text}
-                      onChange={e => setFormData({ ...formData, button_text: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
-                      placeholder="Découvrir"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Couleur bouton</label>
-                    <input
-                      type="color"
-                      value={formData.button_bg}
-                      onChange={e => setFormData({ ...formData, button_bg: e.target.value })}
-                      className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lien bouton</label>
-                  <input
-                    type="text"
-                    value={formData.button_link}
-                    onChange={e => setFormData({ ...formData, button_link: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
-                    placeholder="/categories/promo"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="active"
-                    checked={formData.active}
-                    onChange={e => setFormData({ ...formData, active: e.target.checked })}
-                    className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                  />
-                  <label htmlFor="active" className="text-sm text-gray-700 dark:text-gray-300">Actif</label>
+                <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <Button onClick={handleCancel} variant="secondary" icon={<X className="h-4 w-4" />}>
+                    Annuler
+                  </Button>
+                  <Button onClick={handleSave} disabled={!formData.name} icon={<Save className="h-4 w-4" />}>
+                    Sauvegarder
+                  </Button>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Button onClick={handleCancel} variant="secondary">Annuler</Button>
-                <Button onClick={handleSave} disabled={!formData.name}>Sauvegarder</Button>
-              </div>
+              {/* Prévisualisation */}
+              <BannerPreview formData={formData} />
             </div>
           )}
         </div>
