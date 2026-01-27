@@ -51,7 +51,7 @@ export function VariantSwatches({
       const response = await fetchVariantsLazy(productId);
 
       if (response && response.success) {
-        setAttributeLines(response.attributes);
+        setAttributeLines(response.attributes || []);
         setVariants(response.variants);
       }
     } catch (error) {
