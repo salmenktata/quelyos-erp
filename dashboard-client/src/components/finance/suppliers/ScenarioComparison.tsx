@@ -151,10 +151,10 @@ export default function ScenarioComparison() {
     const bestId = getBestScenario(metricKey);
 
     return (
-      <div className="grid grid-cols-4 gap-4 py-3 border-b items-center">
-        <div className="font-medium text-sm">{label}</div>
+      <div className="grid grid-cols-4 gap-4 py-3 border-b border-gray-200 dark:border-gray-700 items-center">
+        <div className="font-medium text-sm text-gray-900 dark:!text-white">{label}</div>
         {comparisonData.map((scenario) => {
-          if (!scenario.metrics) return <div key={scenario.id}>-</div>;
+          if (!scenario.metrics) return <div key={scenario.id} className="text-gray-900 dark:!text-white">-</div>;
 
           const value = scenario.metrics[metricKey];
           const isBest = scenario.id === bestId;
@@ -165,7 +165,7 @@ export default function ScenarioComparison() {
             <div
               key={scenario.id}
               className={`text-center font-semibold ${
-                isBest ? "text-green-600" : ""
+                isBest ? "text-green-600 dark:text-green-400" : "text-gray-900 dark:!text-white"
               }`}
             >
               {displayValue}
@@ -190,7 +190,7 @@ export default function ScenarioComparison() {
         <div className="flex items-center gap-3 mb-4">
           <GitCompare className="h-6 w-6 text-primary" />
           <div>
-            <h3 className="text-xl font-semibold">Comparaison de scénarios</h3>
+            <h3 className="text-xl font-semibold text-gray-900 dark:!text-white">Comparaison de scénarios</h3>
             <p className="text-sm text-muted-foreground">
               Comparez jusqu'à 3 stratégies d'optimisation différentes
             </p>
@@ -241,15 +241,15 @@ export default function ScenarioComparison() {
       {/* Tableau de comparaison */}
       {comparisonData.length > 0 && (
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Comparaison des métriques</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:!text-white mb-4">Comparaison des métriques</h3>
 
           <div className="space-y-1">
             {/* En-têtes */}
-            <div className="grid grid-cols-4 gap-4 pb-3 border-b-2 font-semibold">
-              <div>Métrique</div>
+            <div className="grid grid-cols-4 gap-4 pb-3 border-b-2 border-gray-300 dark:border-gray-600 font-semibold">
+              <div className="text-gray-900 dark:!text-white">Métrique</div>
               {comparisonData.map((scenario) => (
                 <div key={scenario.id} className="text-center">
-                  <div className="font-bold">{scenario.name}</div>
+                  <div className="font-bold text-gray-900 dark:!text-white">{scenario.name}</div>
                   <div className="text-xs text-muted-foreground">
                     {STRATEGIES[scenario.strategy as keyof typeof STRATEGIES]}
                   </div>
@@ -264,7 +264,7 @@ export default function ScenarioComparison() {
 
             {/* Métriques de performance */}
             <div className="pt-3">
-              <div className="text-sm font-semibold text-muted-foreground mb-2">
+              <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 📊 Performance
               </div>
               <MetricRow
@@ -288,7 +288,7 @@ export default function ScenarioComparison() {
 
             {/* Métriques financières */}
             <div className="pt-3">
-              <div className="text-sm font-semibold text-muted-foreground mb-2">
+              <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 💰 Finances
               </div>
               <MetricRow
@@ -324,9 +324,9 @@ export default function ScenarioComparison() {
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-            <p className="font-medium mb-1">💡 Comment lire ce tableau ?</p>
-            <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm">
+            <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">💡 Comment lire ce tableau ?</p>
+            <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
               <li>Les valeurs marquées d'un ✓ vert sont les meilleures pour chaque métrique</li>
               <li>
                 Comparez les stratégies pour trouver le meilleur équilibre entre ponctualité et
@@ -343,7 +343,7 @@ export default function ScenarioComparison() {
       {comparisonData.length === 0 && (
         <Card className="p-12 text-center">
           <GitCompare className="h-16 w-16 mx-auto text-muted-foreground opacity-50 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Aucun scénario sélectionné</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:!text-white mb-2">Aucun scénario sélectionné</h3>
           <p className="text-muted-foreground">
             Sélectionnez jusqu'à 3 scénarios pour les comparer côte à côte
           </p>

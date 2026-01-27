@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* Correction dark mode pour text-muted-foreground */
+  .text-muted-foreground {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+}
+
 /* Respect de la préférence reduced-motion pour l'accessibilité */
 @media (prefers-reduced-motion: reduce) {
   *,

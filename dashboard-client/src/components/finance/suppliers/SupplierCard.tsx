@@ -102,8 +102,8 @@ export default function SupplierCard({ supplier, onRefresh }: SupplierCardProps)
     <Card className="p-6 hover:shadow-lg transition-shadow">
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-start gap-3 flex-1">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <Building2 className="h-5 w-5 text-blue-600" />
+          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-lg truncate">{supplier.name}</h3>
@@ -159,9 +159,9 @@ export default function SupplierCard({ supplier, onRefresh }: SupplierCardProps)
       </div>
 
       {/* Délai de paiement */}
-      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+      <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="text-xs text-muted-foreground mb-1">Délai de paiement</div>
-        <div className="font-semibold">{supplier.defaultPaymentDelay} jours</div>
+        <div className="font-semibold text-gray-900 dark:text-white">{supplier.defaultPaymentDelay} jours</div>
       </div>
 
       {/* Statistiques */}

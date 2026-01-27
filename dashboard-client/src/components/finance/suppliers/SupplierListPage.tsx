@@ -174,7 +174,7 @@ export default function SupplierListPage() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <div className="grid gap-4 md:grid-cols-4">
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Rechercher un fournisseur..."

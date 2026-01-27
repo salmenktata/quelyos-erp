@@ -277,7 +277,7 @@ export default function OptimizationPanel() {
         <div className="flex items-center gap-3 mb-4">
           <Sparkles className="h-6 w-6 text-primary" />
           <div>
-            <h3 className="text-xl font-semibold">Optimisation des paiements</h3>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Optimisation des paiements</h3>
             <p className="text-sm text-muted-foreground">
               Générez un plan de paiement optimisé selon vos contraintes
             </p>
@@ -368,7 +368,7 @@ export default function OptimizationPanel() {
               <div className="flex items-center justify-between">
                 <div>
                   {result.forecastingUsed === "prophet" && (
-                    <p className="text-sm text-blue-600">
+                    <p className="text-sm text-blue-600 dark:!text-blue-400">
                       ✨ Ce plan utilise le forecasting ML (Prophet) pour optimiser les dates de
                       paiement
                     </p>
@@ -387,7 +387,7 @@ export default function OptimizationPanel() {
               </div>
 
               {/* Exécution des paiements */}
-              <div className="flex items-center gap-4 pt-4 border-t">
+              <div className="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex-1">
                   <Label htmlFor="account-select">Compte pour les paiements</Label>
                   <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
@@ -407,7 +407,7 @@ export default function OptimizationPanel() {
                   <Button
                     onClick={handleExecutePayments}
                     disabled={isExecuting || !selectedAccountId || result.metrics.scheduledInvoices === 0}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
                   >
                     {isExecuting ? (
                       <>
@@ -433,7 +433,7 @@ export default function OptimizationPanel() {
                 <span className="text-sm text-muted-foreground">Factures planifiées</span>
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
               </div>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {result.metrics.scheduledInvoices}/{result.metrics.totalInvoices}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
@@ -450,7 +450,7 @@ export default function OptimizationPanel() {
                 <span className="text-sm text-muted-foreground">Montant factures</span>
                 <TrendingUp className="h-4 w-4 text-blue-500" />
               </div>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {result.metrics.totalAmount.toFixed(2)} €
               </div>
               <p className="text-xs text-muted-foreground mt-1">
@@ -463,7 +463,7 @@ export default function OptimizationPanel() {
                 <span className="text-sm text-muted-foreground">Taux de ponctualité</span>
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
               </div>
-              <div className="text-2xl font-bold">{result.metrics.onTimeRate.toFixed(1)}%</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{result.metrics.onTimeRate.toFixed(1)}%</div>
               <p className="text-xs text-muted-foreground mt-1">
                 {result.metrics.paymentsOnTime} à temps, {result.metrics.paymentsLate} en retard
               </p>
@@ -474,7 +474,7 @@ export default function OptimizationPanel() {
                 <span className="text-sm text-muted-foreground">Délai moyen</span>
                 <AlertTriangle className="h-4 w-4 text-orange-500" />
               </div>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {result.metrics.averagePaymentDelay} jours
               </div>
               <p className="text-xs text-muted-foreground mt-1">Par rapport à l'échéance</p>
@@ -516,7 +516,7 @@ export default function OptimizationPanel() {
                 <span className="text-sm text-muted-foreground">Coût total</span>
                 <TrendingUp className="h-4 w-4 text-primary" />
               </div>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {result.metrics.totalCost.toFixed(2)} €
               </div>
               <p className={`text-xs mt-1 ${result.metrics.netSavings > 0 ? "text-green-600" : result.metrics.netSavings < 0 ? "text-red-600" : "text-muted-foreground"}`}>
@@ -526,7 +526,7 @@ export default function OptimizationPanel() {
           </div>
 
           {result.forecastingUsed === "prophet" && (
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-900 dark:text-blue-100">
               ✨ Ce plan utilise le forecasting ML (Prophet) pour optimiser les dates de paiement selon le cash flow prévu
             </div>
           )}
@@ -542,7 +542,7 @@ export default function OptimizationPanel() {
 
           {/* Plan détaillé */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Plan de paiement détaillé</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Plan de paiement détaillé</h3>
 
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {result.plan.map((item) => (
@@ -550,14 +550,14 @@ export default function OptimizationPanel() {
                   key={item.invoiceId}
                   className={`p-4 border rounded-lg ${
                     item.status === "INSUFFICIENT_FUNDS"
-                      ? "border-red-300 bg-red-50"
-                      : "border-gray-200"
+                      ? "border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-900/20"
+                      : "border-gray-200 dark:border-gray-700"
                   }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium">{item.supplierName}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{item.supplierName}</span>
                         <Badge
                           variant={
                             item.status === "INSUFFICIENT_FUNDS" ? "destructive" : "default"
@@ -581,11 +581,11 @@ export default function OptimizationPanel() {
                       </div>
                       <div className="text-sm">
                         <span className="text-muted-foreground">Échéance: </span>
-                        <span>{format(new Date(item.dueDate), "d MMM yyyy", { locale: fr })}</span>
+                        <span className="text-gray-900 dark:text-white">{format(new Date(item.dueDate), "d MMM yyyy", { locale: fr })}</span>
                         {item.scheduledDate && (
                           <>
                             <span className="text-muted-foreground"> → Paiement: </span>
-                            <span className="font-medium">
+                            <span className="font-medium text-gray-900 dark:text-white">
                               {format(new Date(item.scheduledDate), "d MMM yyyy", {
                                 locale: fr,
                               })}
@@ -607,7 +607,7 @@ export default function OptimizationPanel() {
                     </div>
                     <div className="text-right">
                       <div className="text-xs text-muted-foreground">Score</div>
-                      <div className="text-lg font-bold">{item.score.toFixed(0)}</div>
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">{item.score.toFixed(0)}</div>
                       {item.totalCost && item.totalCost !== item.amount && (
                         <div className="text-xs text-muted-foreground mt-1">
                           Total: {item.totalCost.toFixed(2)}€

@@ -103,7 +103,7 @@ export default function PaymentScheduleCalendar() {
       {/* Calendrier */}
       <Card className="p-6 lg:col-span-2">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
             <CalendarIcon className="h-5 w-5" />
             {format(currentMonth, "MMMM yyyy", { locale: fr })}
           </h3>
@@ -135,20 +135,20 @@ export default function PaymentScheduleCalendar() {
         {/* Légende */}
         <div className="flex gap-4 mb-4 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-red-500"></div>
-            <span>En retard</span>
+            <div className="w-3 h-3 rounded bg-red-500 dark:bg-red-400"></div>
+            <span className="text-gray-900 dark:!text-white">En retard</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-orange-500"></div>
-            <span>&gt;10k€</span>
+            <div className="w-3 h-3 rounded bg-orange-500 dark:bg-orange-400"></div>
+            <span className="text-gray-900 dark:!text-white">&gt;10k€</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-blue-500"></div>
-            <span>&gt;5k€</span>
+            <div className="w-3 h-3 rounded bg-blue-500 dark:bg-blue-400"></div>
+            <span className="text-gray-900 dark:!text-white">&gt;5k€</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-green-500"></div>
-            <span>&lt;5k€</span>
+            <div className="w-3 h-3 rounded bg-green-500 dark:bg-green-400"></div>
+            <span className="text-gray-900 dark:!text-white">&lt;5k€</span>
           </div>
         </div>
 
@@ -197,7 +197,7 @@ export default function PaymentScheduleCalendar() {
 
       {/* Détails du jour sélectionné */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {format(selectedDate, "d MMMM yyyy", { locale: fr })}
         </h3>
 
@@ -219,7 +219,7 @@ export default function PaymentScheduleCalendar() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <Building2 className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium text-sm">{invoice.supplier.name}</span>
+                        <span className="font-medium text-sm text-gray-900 dark:text-white">{invoice.supplier.name}</span>
                       </div>
                       <p className="text-xs text-muted-foreground">
                         {invoice.invoiceNumber}
@@ -230,7 +230,7 @@ export default function PaymentScheduleCalendar() {
                     )}
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold">{invoice.amount.toFixed(2)} €</span>
+                    <span className="font-bold text-gray-900 dark:text-white">{invoice.amount.toFixed(2)} €</span>
                     <Badge
                       variant={invoice.status === "OVERDUE" ? "destructive" : "default"}
                       className="text-xs"
@@ -243,14 +243,14 @@ export default function PaymentScheduleCalendar() {
             </div>
 
             {/* Total */}
-            <div className="pt-4 border-t">
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-muted-foreground">Nombre de factures</span>
-                <span className="font-semibold">{selectedDateInvoices.length}</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{selectedDateInvoices.length}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="font-semibold">Total du jour</span>
-                <span className="text-xl font-bold">{totalDue.toFixed(2)} €</span>
+                <span className="font-semibold text-gray-900 dark:text-white">Total du jour</span>
+                <span className="text-xl font-bold text-gray-900 dark:text-white">{totalDue.toFixed(2)} €</span>
               </div>
             </div>
           </div>

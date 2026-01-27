@@ -35,7 +35,7 @@ export default function PaymentPlanningPage() {
 
           {/* Header */}
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Planification des paiements</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:!text-white">Planification des paiements</h1>
             <p className="text-muted-foreground">
               Optimisez vos paiements fournisseurs et gérez votre trésorerie efficacement
             </p>
