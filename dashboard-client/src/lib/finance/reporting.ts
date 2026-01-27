@@ -129,6 +129,7 @@ export type ReportingFilters = {
   from?: string;
   to?: string;
   days?: number;
+  months?: number;
   horizonDays?: number;
   groupBy?: "day" | "week" | "month";
   portfolioId?: number;
@@ -498,12 +499,15 @@ export type ForecastDailyPoint = {
 };
 
 export type ModelInfo = {
-  type: "prophet" | "simple_trend";
+  type: "prophet" | "simple_trend" | "simple" | "prophet_ml";
   trainedOn: number; // Days of historical data used
   horizonDays: number;
   accuracy?: {
     mape: number; // Mean Absolute Percentage Error
   };
+  seasonality?: string[];
+  last_trained?: string;
+  backtesting_available?: boolean;
 };
 
 export type ForecastEnhancedResponse = {

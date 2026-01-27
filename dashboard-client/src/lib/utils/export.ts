@@ -1,4 +1,4 @@
-export type ExportFormat = "csv" | "xlsx" | "pdf";
+export type ExportFormat = "csv" | "xlsx" | "excel" | "pdf";
 
 /**
  * Format a date for export filenames or display
@@ -35,7 +35,7 @@ export async function exportData<T extends Record<string, unknown>>(
       ),
     ].join("\n");
     downloadBlob(new Blob([csvContent], { type: "text/csv" }), fullFilename);
-  } else if (format === "xlsx") {
+  } else if (format === "xlsx" || format === "excel") {
     const ExcelJS = await import("exceljs");
     const wb = new ExcelJS.Workbook();
     const ws = wb.addWorksheet("Data");

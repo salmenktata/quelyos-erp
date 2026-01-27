@@ -201,7 +201,7 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
       if (editingId) {
         await api(`/transactions/${editingId}`, {
           method: "PATCH",
-          body: payload as UpdateTransactionRequest,
+          body: payload as unknown as Partial<CreateTransactionRequest>,
         });
       } else {
         // Vérifier les doublons avant de créer une nouvelle transaction
@@ -215,7 +215,7 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
                 date: payload.occurredAt,
                 accountId: payload.accountId,
               },
-            });
+            }) as any;
 
             // Si doublon détecté (similarité >= 75%), afficher modal
             if (duplicateCheck.is_likely_duplicate && duplicateCheck.matches.length > 0) {
@@ -234,7 +234,7 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
         // Pas de doublon détecté, créer la transaction
         await api("/transactions", {
           method: "POST",
-          body: payload as CreateTransactionRequest,
+          body: payload as unknown as CreateTransactionRequest,
         });
       }
 

@@ -166,9 +166,7 @@ export default function Featured() {
           ]}
         />
 
-        <PageNotice config={ecommerceNotices.featured} className="mb-6" />
-
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               Produits mis en avant
@@ -190,6 +188,8 @@ export default function Featured() {
             Ajouter un produit
           </Button>
         </div>
+
+        <PageNotice config={ecommerceNotices.featured} className="mb-6" />
 
         {/* Info drag & drop */}
         {featuredProducts.length > 1 && (

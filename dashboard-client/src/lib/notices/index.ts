@@ -1,5 +1,6 @@
 export * from './types';
 export * from './stock-notices';
+export * from './store-notices';
 export * from './ecommerce-notices';
 export * from './marketing-notices';
 export * from './crm-notices';

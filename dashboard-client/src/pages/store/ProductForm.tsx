@@ -313,11 +313,8 @@ export default function ProductForm() {
           ]}
         />
 
-        {/* PageNotice */}
-        <PageNotice config={storeNotices.productForm} className="mb-8" />
-
         {/* En-tête */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {isEditing ? 'Modifier le produit' : 'Nouveau produit'}
           </h1>
@@ -325,6 +322,9 @@ export default function ProductForm() {
             {isEditing ? 'Modifier les informations du produit' : 'Créer un nouveau produit dans le catalogue'}
           </p>
         </div>
+
+        {/* PageNotice */}
+        <PageNotice config={storeNotices.productForm} className="mb-6" />
 
         {/* Onglets (en mode édition) avec animation */}
         {isEditing && (

@@ -94,9 +94,7 @@ export default function AbandonedCarts() {
           ]}
         />
 
-        <PageNotice config={ecommerceNotices.abandonedCarts} className="mb-6" />
-
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Paniers abandonnés
           </h1>
@@ -104,6 +102,8 @@ export default function AbandonedCarts() {
             Gérer et relancer les paniers abandonnés pour récupérer des ventes
           </p>
         </div>
+
+        <PageNotice config={ecommerceNotices.abandonedCarts} className="mb-6" />
 
         {/* Statistiques de récupération */}
         {!statsLoading && stats && (

@@ -20,6 +20,7 @@ import {
 import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
+import type { ForecastEnhancedResponse } from "@/lib/finance/reporting";
 import { GlassCard, GlassStatCard, GlassPanel } from "@/components/ui/glass";
 import { EventMarkers } from "@/components/finance/forecast/EventMarkers";
 import { ForecastExport } from "@/components/finance/forecast/ForecastExport";
@@ -81,6 +82,9 @@ type ForecastResponse = {
     trainedOn: number;
     horizonDays: number;
     accuracy?: { mape: number };
+    seasonality?: string[];
+    last_trained?: string;
+    backtesting_available?: boolean;
   };
   trends?: {
     avgDailyIncome: number;
@@ -630,7 +634,7 @@ export default function ForecastPage() {
               <Zap size={14} />
               Scénarios
             </button>
-            {forecast && <ForecastExport data={forecast} />}
+            {forecast && <ForecastExport data={forecast as any} />}
           </div>
         </div>
 

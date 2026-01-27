@@ -277,8 +277,6 @@ export default function Categories() {
           ]}
         />
 
-        <PageNotice config={ecommerceNotices.categories} className="mb-6" />
-
         {/* En-tête */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -302,6 +300,8 @@ export default function Categories() {
             Nouvelle catégorie
           </Button>
         </div>
+
+        <PageNotice config={ecommerceNotices.categories} className="mb-6" />
 
         {/* Statistiques */}
         <section aria-labelledby="stats-heading" className="mb-6">

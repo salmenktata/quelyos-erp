@@ -93,8 +93,6 @@ export default function ProductDetail() {
             ]}
           />
 
-        <PageNotice config={storeNotices.productDetail} />
-
         <div>
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -140,6 +138,8 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
+
+        <PageNotice config={storeNotices.productDetail} />
 
         {/* Contenu principal */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

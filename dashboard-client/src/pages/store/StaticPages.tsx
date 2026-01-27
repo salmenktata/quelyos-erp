@@ -130,8 +130,6 @@ export default function StaticPagesPage() {
         ]}
       />
       <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
-        <PageNotice config={marketingNotices.staticPages} className="mb-6" />
-
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Pages Statiques</h1>
@@ -139,6 +137,8 @@ export default function StaticPagesPage() {
           </div>
           {!showForm && <Button onClick={handleNew}>Nouvelle page</Button>}
         </div>
+
+        <PageNotice config={marketingNotices.staticPages} className="mb-6" />
 
         <div className={`grid gap-6 ${showForm ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
           {/* Liste */}

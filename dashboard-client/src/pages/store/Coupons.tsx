@@ -143,9 +143,7 @@ export default function Coupons() {
           ]}
         />
 
-        <PageNotice config={ecommerceNotices.coupons} className="mb-6" />
-
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Codes Promo</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -156,6 +154,8 @@ export default function Coupons() {
             <Button variant="primary">Creer un coupon</Button>
           </Link>
         </div>
+
+        <PageNotice config={ecommerceNotices.coupons} className="mb-6" />
 
         {/* Filtres */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">

@@ -94,12 +94,12 @@ export default function PromoMessages() {
         ]}
       />
       <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
-        <PageNotice config={marketingNotices.promoMessages} className="mb-6" />
-
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Messages PromoBar</h1>
           {!showForm && <Button onClick={handleNew}>Nouveau</Button>}
         </div>
+
+        <PageNotice config={marketingNotices.promoMessages} className="mb-6" />
 
         <div className={`grid gap-6 ${showForm ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
           {/* Liste */}

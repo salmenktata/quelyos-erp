@@ -1,5 +1,3 @@
-"use client";
-
 import { Download, Loader2, FileText, FileSpreadsheet, FileDown, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { exportData, type ExportFormat } from "@/lib/utils/export";
@@ -39,7 +37,18 @@ export function ExportDropdown({
       setLoading(true);
       setIsOpen(false);
       const data = await onExport();
-      exportData(data, filename, format, reportTitle);
+      // Convert 2D array to array of objects for exportData
+      if (data.length > 0) {
+        const headers = data[0];
+        const rows = data.slice(1).map(row => {
+          const obj: Record<string, unknown> = {};
+          headers.forEach((header, i) => {
+            obj[String(header)] = row[i];
+          });
+          return obj;
+        });
+        await exportData(rows, format, filename);
+      }
     } catch (error) {
       logger.error('Export failed:', error);
     } finally {

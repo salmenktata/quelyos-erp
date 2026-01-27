@@ -158,8 +158,6 @@ export default function Menus() {
         ]}
       />
       <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
-        <PageNotice config={marketingNotices.menus} className="mb-6" />
-
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Menus Navigation</h1>
@@ -167,6 +165,8 @@ export default function Menus() {
           </div>
           {!showForm && <Button onClick={handleNew}>Nouveau</Button>}
         </div>
+
+        <PageNotice config={marketingNotices.menus} className="mb-6" />
 
         {error && (
           <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-800 dark:text-red-300">

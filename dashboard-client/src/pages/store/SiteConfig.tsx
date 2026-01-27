@@ -301,10 +301,7 @@ export default function SiteConfig() {
           ]}
         />
 
-        {/* PageNotice */}
-        <PageNotice config={storeNotices.siteConfig} className="mb-8" />
-
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Configuration du site
           </h1>
@@ -312,6 +309,9 @@ export default function SiteConfig() {
             Activez ou désactivez les fonctionnalités du site e-commerce
           </p>
         </div>
+
+        {/* PageNotice */}
+        <PageNotice config={storeNotices.siteConfig} className="mb-6" />
 
         {/* Section Fonctionnalités */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">

@@ -1,5 +1,5 @@
 /**
- * API Helper - Re-export from api-client for backward compatibility
+ * API Helper - Re-export from api for backward compatibility
  */
 
-export { api, apiClient } from "./api-client";
+export { api } from "./api";

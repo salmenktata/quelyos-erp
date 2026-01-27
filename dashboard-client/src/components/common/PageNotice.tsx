@@ -161,7 +161,7 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
                   </div>
 
                   {/* Sections */}
-                  {config.sections.map((section, sectionIndex) => {
+                  {config.sections?.map((section, sectionIndex) => {
                     const SectionIcon = section.icon;
                     return (
                       <div key={sectionIndex} className={sectionIndex > 0 ? "mt-3" : ""}>
@@ -260,7 +260,7 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
                     {config.purpose}
                   </p>
                 </div>
-                {config.sections.map((section, sectionIndex) => {
+                {config.sections?.map((section, sectionIndex) => {
                   const SectionIcon = section.icon;
                   return (
                     <div key={sectionIndex} className={sectionIndex > 0 ? "mt-3" : ""}>
@@ -286,6 +286,20 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
                     </div>
                   );
                 })}
+
+                {/* Fallback for old format with features/actions */}
+                {!config.sections && (config as any).features && (
+                  <div className="mt-3">
+                    <ul className="space-y-1.5">
+                      {(config as any).features.map((feature: any, idx: number) => (
+                        <li key={idx} className={`text-xs ${colorConfig.textSecondary} flex items-start gap-2`}>
+                          <span className={`${colorConfig.bullet} mt-0.5 flex-shrink-0`}>•</span>
+                          <span>{feature.text}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           </div>

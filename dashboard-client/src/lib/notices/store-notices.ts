@@ -152,16 +152,17 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
     pageId: 'store-delivery-methods',
     title: 'Méthodes de Livraison',
     purpose: 'Configurez les options de livraison : prix, délais et seuils de gratuité.',
-    features: [
-      { icon: Truck, text: 'Méthodes de livraison multiples' },
-      { icon: Settings, text: 'Prix fixe ou par règles' },
-      { icon: Package, text: 'Livraison gratuite conditionnelle' },
-    ],
-    actions: [
-      { label: 'Ajouter une méthode', description: 'Standard, express, retrait en magasin' },
-      { label: 'Configurer les prix', description: 'Prix fixe par zone' },
-      { label: 'Activer la gratuité', description: 'Seuil de montant pour livraison gratuite' },
-    ],
-    color: 'indigo',
+    icon: Truck,
+    moduleColor: 'indigo',
+    sections: [{
+      title: 'Configuration recommandée',
+      icon: Settings,
+      items: [
+        'Proposez plusieurs options : standard économique + express premium pour couvrir tous besoins',
+        'Activez livraison gratuite conditionnelle : seuil = panier moyen +20% pour booster CA',
+        'Configurez zones géographiques : tarifs dégressifs local > national > international',
+        'Testez impact franco de port : souvent rentable malgré coût (conversion +15-25%)',
+      ]
+    }]
   },
 };
