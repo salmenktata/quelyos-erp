@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos Stock Advanced',
-    'version': '19.0.2.1.0',
+    'version': '19.0.2.2.0',
     'category': 'Inventory/Inventory',
     'summary': 'Fonctionnalités Stock Avancées Quelyos (natif)',
     'description': """

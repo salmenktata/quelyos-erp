@@ -45,6 +45,34 @@
             <field name="active" eval="True"/>
         </record>
 
+        <record id="stock_reason_production" model="quelyos.stock.change.reason">
+            <field name="name">Rebut de production</field>
+            <field name="code">PROD</field>
+            <field name="description">Perte durant le processus de production ou fabrication</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="stock_reason_error" model="quelyos.stock.change.reason">
+            <field name="name">Erreur de saisie</field>
+            <field name="code">ERR</field>
+            <field name="description">Correction d'une erreur de comptage ou saisie précédente</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="stock_reason_sample" model="quelyos.stock.change.reason">
+            <field name="name">Échantillon</field>
+            <field name="code">SMPL</field>
+            <field name="description">Produit utilisé comme échantillon ou démo client</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="stock_reason_promo" model="quelyos.stock.change.reason">
+            <field name="name">Opération promotionnelle</field>
+            <field name="code">PROMO</field>
+            <field name="description">Produit offert dans le cadre d'une promotion marketing</field>
+            <field name="active" eval="True"/>
+        </record>
+
         <!-- ==================== INVENTAIRES DE STOCK ==================== -->
 
         <!-- Inventaire en cours -->
@@ -77,6 +105,26 @@
             <field name="note">Préparation inventaire fin de mois</field>
         </record>
 
+        <!-- Inventaire annulé -->
+        <record id="stock_inventory_demo_4" model="quelyos.stock.inventory">
+            <field name="name">INV/2026/004</field>
+            <field name="date" eval="(DateTime.now() - timedelta(days=15)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="state">cancelled</field>
+            <field name="note">Inventaire annulé - Erreur de périmètre (mauvais emplacement sélectionné)</field>
+        </record>
+
+        <!-- Inventaire ancien (terminé il y a longtemps) -->
+        <record id="stock_inventory_demo_5" model="quelyos.stock.inventory">
+            <field name="name">INV/2025/012</field>
+            <field name="date" eval="(DateTime.now() - timedelta(days=45)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="location_id" ref="stock.stock_location_components"/>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="state">done</field>
+            <field name="note">Inventaire trimestriel Q4 2025 - Audit externe</field>
+        </record>
+
         <!-- ==================== VERROUILLAGES D'EMPLACEMENTS ==================== -->
 
         <!-- Verrouillage actif -->
@@ -106,6 +154,46 @@
             <field name="date_start" eval="(DateTime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')"/>
             <field name="user_id" ref="base.user_admin"/>
             <field name="active" eval="True"/>
+        </record>
+
+        <!-- Verrouillage nettoyage (terminé récemment) -->
+        <record id="location_lock_cleaning" model="quelyos.stock.location.lock">
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="reason">Nettoyage et désinfection annuelle de l'entrepôt</field>
+            <field name="date_start" eval="(DateTime.now() - timedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="date_end" eval="(DateTime.now() - timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="active" eval="False"/>
+        </record>
+
+        <!-- Verrouillage inspection (futur planifié) -->
+        <record id="location_lock_inspection" model="quelyos.stock.location.lock">
+            <field name="location_id" ref="stock.stock_location_components"/>
+            <field name="reason">Inspection de sécurité incendie planifiée</field>
+            <field name="date_start" eval="(DateTime.now() + timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="date_end" eval="(DateTime.now() + timedelta(days=7, hours=4)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Verrouillage réaménagement (long terme en cours) -->
+        <record id="location_lock_renovation" model="quelyos.stock.location.lock">
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="reason">Réaménagement complet - Installation nouveau système rayonnage automatisé</field>
+            <field name="date_start" eval="(DateTime.now() - timedelta(days=5)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="date_end" eval="(DateTime.now() + timedelta(days=10)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Verrouillage ancien (archivé) -->
+        <record id="location_lock_old" model="quelyos.stock.location.lock">
+            <field name="location_id" ref="stock.stock_location_suppliers"/>
+            <field name="reason">Inventaire exhaustif annuel 2025</field>
+            <field name="date_start" eval="(DateTime.now() - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="date_end" eval="(DateTime.now() - timedelta(days=58)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="active" eval="False"/>
         </record>
 
     </data>
