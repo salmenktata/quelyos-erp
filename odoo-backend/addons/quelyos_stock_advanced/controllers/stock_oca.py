@@ -13,6 +13,10 @@ _logger = logging.getLogger(__name__)
 class StockOCAController(http.Controller):
     """API pour fonctionnalités Stock OCA"""
 
+    def _get_params(self):
+        """Extrait les paramètres de la requête JSON-RPC"""
+        return request.params if hasattr(request, 'params') and request.params else {}
+
     # ==================== STOCK QUANTITY CHANGE REASONS (OCA) ====================
 
     @http.route('/api/stock/change-reasons', type='json', auth='user', methods=['POST'], csrf=False, cors='*')
@@ -42,7 +46,7 @@ class StockOCAController(http.Controller):
                 }
 
             # Récupérer les raisons configurées
-            Reason = request.env['stock.quantity.change.reason'].sudo()
+            Reason = request.env['stock.quant.reason'].sudo()
             reasons = Reason.search([], order='name asc')
 
             return {
@@ -140,7 +144,7 @@ class StockOCAController(http.Controller):
             # Récupérer la raison pour le retour
             reason_name = ''
             if reason_id:
-                reason = request.env['stock.quantity.change.reason'].sudo().browse(reason_id)
+                reason = request.env['stock.quant.reason'].sudo().browse(reason_id)
                 reason_name = reason.name if reason else ''
 
             return {
@@ -253,8 +257,8 @@ class StockOCAController(http.Controller):
             # Récupérer les emplacements avec lockdown actif
             Location = request.env['stock.location'].sudo()
             locked_locations = Location.search([
-                ('block_inventory', '=', True)
-            ]) if hasattr(Location, 'block_inventory') else []
+                ('block_stock_entrance', '=', True)
+            ]) if hasattr(Location, 'block_stock_entrance') else []
 
             return {
                 'success': True,
@@ -300,8 +304,8 @@ class StockOCAController(http.Controller):
                 }
 
             # Verrouiller/déverrouiller si champ existe
-            if hasattr(location, 'block_inventory'):
-                location.write({'block_inventory': lock})
+            if hasattr(location, 'block_stock_entrance'):
+                location.write({'block_stock_entrance': lock})
 
                 return {
                     'success': True,
