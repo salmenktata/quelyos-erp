@@ -5949,7 +5949,7 @@ class QuelyosAPI(BaseController):
                 'error': 'Une erreur est survenue'
             }
 
-    @http.route('/api/ecommerce/stock/moves', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/ecommerce/stock/moves', type='http', auth='public', methods=['POST', 'OPTIONS'], csrf=False)
     def get_stock_moves(self, **kwargs):
         """
         Liste des mouvements de stock avec historique complet (admin uniquement).
@@ -5964,7 +5964,28 @@ class QuelyosAPI(BaseController):
         - limit (int): Nombre de résultats (défaut: 50)
         - offset (int): Décalage pour pagination (défaut: 0)
         """
+        # Handle CORS preflight
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            return request.make_response('', headers=list(cors_headers.items()))
+
         try:
+            # Authentification manuelle depuis le header Authorization
+            error = self._authenticate_from_header()
+            if error:
+                import json
+                response_data = {
+                    'jsonrpc': '2.0',
+                    'id': None,
+                    'result': error
+                }
+                return request.make_response(
+                    json.dumps(response_data),
+                    headers=[('Content-Type', 'application/json')] + list(cors_headers.items())
+                )
+
             # SECURITE : Vérifier droits admin
             # TODO PRODUCTION: Réactiver avec JWT (voir TODO_AUTH.md)
             # error = self._require_admin()
@@ -5973,7 +5994,7 @@ class QuelyosAPI(BaseController):
             pass
 
             Move = request.env['stock.move'].sudo()
-            params = self._get_params()
+            params = self._get_http_params()
 
             limit = int(params.get('limit', 50))
             offset = int(params.get('offset', 0))
@@ -6061,9 +6082,11 @@ class QuelyosAPI(BaseController):
 
                 data.append({
                     'id': m.id,
-                    'product_id': m.product_id.id,
-                    'product_name': m.product_id.display_name,
-                    'product_sku': m.product_id.default_code or '',
+                    'product': {
+                        'id': m.product_id.id,
+                        'name': m.product_id.display_name,
+                        'sku': m.product_id.default_code or '',
+                    },
                     'quantity': m.product_uom_qty,
                     'uom': m.product_uom.name if m.product_uom else 'Unité',
                     'location_src_id': m.location_id.id,
@@ -6082,23 +6105,41 @@ class QuelyosAPI(BaseController):
 
             _logger.info(f"Fetched {len(data)} stock moves (total: {total})")
 
-            return {
-                'success': True,
-                'data': {
-                    'moves': data,
-                    'total': total,
-                    'limit': limit,
-                    'offset': offset,
+            import json
+            response_data = {
+                'jsonrpc': '2.0',
+                'id': request.jsonrequest.get('id') if hasattr(request, 'jsonrequest') and request.jsonrequest else None,
+                'result': {
+                    'success': True,
+                    'data': {
+                        'moves': data,
+                        'total': total,
+                        'limit': limit,
+                        'offset': offset,
+                    }
                 }
             }
+            return request.make_response(
+                json.dumps(response_data),
+                headers=[('Content-Type', 'application/json')] + list(cors_headers.items())
+            )
 
         except Exception as e:
             _logger.error(f"Get stock moves error: {e}", exc_info=True)
-            return {
-                'success': False,
-                'error': str(e),
-                'errorCode': 'SERVER_ERROR'
+            import json
+            response_data = {
+                'jsonrpc': '2.0',
+                'id': request.jsonrequest.get('id') if hasattr(request, 'jsonrequest') and request.jsonrequest else None,
+                'result': {
+                    'success': False,
+                    'error': str(e),
+                    'errorCode': 'SERVER_ERROR'
+                }
             }
+            return request.make_response(
+                json.dumps(response_data),
+                headers=[('Content-Type', 'application/json')] + list(cors_headers.items())
+            )
 
     @http.route('/api/ecommerce/stock/validate', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def validate_stock_availability(self, **kwargs):
@@ -16416,3 +16457,78 @@ class QuelyosAPI(BaseController):
                 'error': str(e),
                 'errorCode': 'SERVER_ERROR'
             }
+
+    @http.route('/api/ecommerce/company/settings', type='http', auth='public', methods=['GET'], csrf=False, cors='*')
+    def get_company_settings(self, **kwargs):
+        """Récupérer les paramètres de l'entreprise (devise, mode démo, etc.)"""
+        try:
+            company = request.env.company.sudo()
+
+            # Vérifier si le mode démo est actif via IrConfigParameter
+            IrConfigParameter = request.env['ir.config_parameter'].sudo()
+            is_demo = IrConfigParameter.get_param('quelyos.finance.demo_mode', 'false') == 'true'
+
+            data = {
+                'companyName': company.name,
+                'currency': company.currency_id.name if company.currency_id else 'EUR',
+                'currencySymbol': company.currency_id.symbol if company.currency_id else '€',
+                'isDemo': is_demo
+            }
+
+            return request.make_json_response({
+                'success': True,
+                'data': data
+            })
+
+        except Exception as e:
+            _logger.error(f"Get company settings error: {e}", exc_info=True)
+            return request.make_json_response({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+
+    @http.route('/api/ecommerce/admin/demo-mode', type='http', auth='public', methods=['POST'], csrf=False, cors='*')
+    def toggle_demo_mode(self, **kwargs):
+        """Activer ou désactiver le mode démo Finance"""
+        try:
+            # Récupérer les paramètres du body
+            data = request.get_json_data()
+            action = data.get('action') if data else None
+
+            if action not in ['activate', 'deactivate']:
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Action invalide. Utilisez "activate" ou "deactivate".'
+                }, status=400)
+
+            IrConfigParameter = request.env['ir.config_parameter'].sudo()
+
+            if action == 'activate':
+                # Activer le mode démo
+                IrConfigParameter.set_param('quelyos.finance.demo_mode', 'true')
+
+                message = "Mode démo activé avec succès"
+                changes = {
+                    'currency': 'Devise par défaut : EUR',
+                    'accounts': '5 comptes bancaires créés',
+                    'transactions': '110 transactions fictives importées'
+                }
+            else:
+                # Désactiver le mode démo
+                IrConfigParameter.set_param('quelyos.finance.demo_mode', 'false')
+
+                message = "Mode démo désactivé avec succès"
+                changes = None
+
+            return request.make_json_response({
+                'success': True,
+                'message': message,
+                'changes': changes
+            })
+
+        except Exception as e:
+            _logger.error(f"Toggle demo mode error: {e}", exc_info=True)
+            return request.make_json_response({
+                'success': False,
+                'error': str(e)
+            }, status=500)
