@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SkeletonTable } from "@/components/common";
 import { Calendar as CalendarIcon, AlertTriangle, Building2, FileText } from "lucide-react";
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -93,6 +94,10 @@ export default function PaymentScheduleCalendar() {
     return "low";
   };
 
+  if (isLoading) {
+    return <SkeletonTable rows={8} columns={7} />;
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       {/* Calendrier */}
@@ -171,11 +176,11 @@ export default function PaymentScheduleCalendar() {
                   ${!isSameMonth(day, currentMonth) ? "text-muted-foreground opacity-50" : ""}
                   ${isSelected ? "ring-2 ring-primary" : ""}
                   ${isCurrentDay ? "font-bold" : ""}
-                  ${status === "overdue" ? "bg-red-100 text-red-700 hover:bg-red-200" : ""}
-                  ${status === "high" ? "bg-orange-100 text-orange-700 hover:bg-orange-200" : ""}
-                  ${status === "medium" ? "bg-blue-100 text-blue-700 hover:bg-blue-200" : ""}
-                  ${status === "low" ? "bg-green-100 text-green-700 hover:bg-green-200" : ""}
-                  ${!status ? "hover:bg-gray-100" : ""}
+                  ${status === "overdue" ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50" : ""}
+                  ${status === "high" ? "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50" : ""}
+                  ${status === "medium" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50" : ""}
+                  ${status === "low" ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50" : ""}
+                  ${!status ? "hover:bg-gray-100 dark:hover:bg-gray-800" : ""}
                 `}
               >
                 <div className="flex flex-col items-center justify-center h-full">
@@ -196,9 +201,7 @@ export default function PaymentScheduleCalendar() {
           {format(selectedDate, "d MMMM yyyy", { locale: fr })}
         </h3>
 
-        {isLoading ? (
-          <div className="text-center text-muted-foreground py-8">Chargement...</div>
-        ) : selectedDateInvoices.length === 0 ? (
+        {selectedDateInvoices.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
             <FileText className="h-12 w-12 mx-auto mb-2 opacity-20" />
             <p>Aucun paiement prévu</p>
@@ -210,7 +213,7 @@ export default function PaymentScheduleCalendar() {
               {selectedDateInvoices.map((invoice) => (
                 <div
                   key={invoice.id}
-                  className="p-3 border rounded-lg hover:bg-gray-50 transition"
+                  className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">

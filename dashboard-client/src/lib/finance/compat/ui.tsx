@@ -203,8 +203,8 @@ export function TabsTrigger({
     <button
       className={`px-4 py-2 text-sm font-medium transition-colors ${
         isActive
-          ? 'border-b-2 border-blue-500 text-blue-600'
-          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
       } ${className}`}
       onClick={() => context.onValueChange(value)}
       type="button"

@@ -472,4 +472,27 @@ export const financeNotices: Record<string, PageNoticeConfig> = {
       },
     ],
   },
+
+  'payment-planning': {
+    pageId: 'finance-payment-planning',
+    title: 'Planification des paiements fournisseurs',
+    purpose:
+      "Outil avancé pour optimiser vos paiements fournisseurs selon vos contraintes de trésorerie. Visualisez les échéances, créez des scénarios de paiement et comparez différentes stratégies pour maintenir l'équilibre entre relations fournisseurs et cash-flow.",
+    icon: Calendar as LucideIcon,
+    moduleColor: 'emerald',
+    sections: [
+      {
+        title: 'Fonctionnalités principales',
+        icon: Lightbulb,
+        items: [
+          'Calendrier visuel des échéances : visualisez tous vos paiements à venir sur 60 jours avec code couleur par montant',
+          'Optimisation automatique : 5 stratégies (date échéance, importance fournisseur, pénalités, remises, trésorerie)',
+          'Création de scénarios : sauvegardez différentes hypothèses de paiement pour simulation',
+          'Comparaison de scénarios : analysez côte-à-côte les métriques (économies, taux paiement à temps, pénalités)',
+          'Export Excel : téléchargez vos plans de paiement optimisés pour communication interne',
+          'Exécution directe : validez et envoyez les paiements depuis l\'interface une fois le plan approuvé',
+        ],
+      },
+    ],
+  },
 };
