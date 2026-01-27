@@ -1,4 +1,17 @@
+/**
+ * Page Pages Statiques - Gestion des pages institutionnelles
+ *
+ * Fonctionnalités :
+ * - Liste des pages statiques (À propos, CGV, CGU, etc.)
+ * - Création/édition/suppression de pages
+ * - Configuration complète (contenu, layout, sidebar, navigation)
+ * - Organisation par onglets (général, contenu, navigation)
+ * - Génération automatique du slug à partir du nom
+ * - Affichage conditionnel dans le footer et le menu
+ */
+
 import { useState } from 'react'
+import { Plus, Trash2, X, Save } from 'lucide-react'
 import { Layout } from '../../components/Layout'
 import { useStaticPages, useCreateStaticPage, useUpdateStaticPage, useDeleteStaticPage, StaticPage } from '../../hooks/useStaticPages'
 import { Button, SkeletonTable, PageNotice, Breadcrumbs } from '../../components/common'
@@ -122,59 +135,78 @@ export default function StaticPagesPage() {
 
   return (
     <Layout>
-      <Breadcrumbs
-        items={[
-          { label: 'Tableau de bord', href: '/dashboard' },
-          { label: 'Pages Statiques' },
-        ]}
-      />
-      <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
-        <div className="flex justify-between items-center mb-6">
+      <div className="p-4 md:p-8 space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Store', href: '/store' },
+            { label: 'Pages Statiques' },
+          ]}
+        />
+
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Pages Statiques</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Pages institutionnelles (À propos, CGV, etc.)</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Pages Statiques</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Pages institutionnelles (À propos, CGV, Mentions légales, etc.)
+            </p>
           </div>
-          {!showForm && <Button onClick={handleNew}>Nouvelle page</Button>}
+          {!showForm && (
+            <Button onClick={handleNew} icon={<Plus className="h-4 w-4" />}>
+              Nouvelle page
+            </Button>
+          )}
         </div>
 
         <PageNotice config={storeNotices.staticPages} className="mb-6" />
 
         <div className={`grid gap-6 ${showForm ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
           {/* Liste */}
-          <div className="overflow-hidden">
-            {isLoading ? <SkeletonTable rows={5} columns={4} /> : (
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl overflow-hidden">
+            {isLoading ? (
+              <div className="p-6">
+                <SkeletonTable rows={5} columns={4} />
+              </div>
+            ) : (
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nom</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Slug</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actif</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nom</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Slug</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actif</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {pages?.map(p => (
                     <tr
                       key={p.id}
-                      className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${editingPage?.id === p.id ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}`}
+                      className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition ${editingPage?.id === p.id ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}`}
                       onClick={() => handleEdit(p)}
                     >
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{p.name}</td>
-                      <td className="px-4 py-3 text-sm font-mono text-gray-500 dark:text-gray-400">{p.slug}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex px-2 py-1 text-xs rounded-full ${p.active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{p.name}</td>
+                      <td className="px-6 py-4 text-sm font-mono text-gray-500 dark:text-gray-400">{p.slug}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${p.active ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
                           {p.active ? 'Oui' : 'Non'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right">
-                        <Button onClick={(e) => { e.stopPropagation(); handleDelete(p.id) }} size="sm" variant="secondary">Supprimer</Button>
+                      <td className="px-6 py-4 text-right">
+                        <Button
+                          onClick={(e) => { e.stopPropagation(); handleDelete(p.id) }}
+                          size="sm"
+                          variant="danger"
+                          icon={<Trash2 className="h-3.5 w-3.5" />}
+                        >
+                          Supprimer
+                        </Button>
                       </td>
                     </tr>
                   ))}
                   {(!pages || pages.length === 0) && (
                     <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                        Aucune page. Cliquez sur "Nouvelle page" pour en créer.
+                      <td colSpan={4} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                        Aucune page. Cliquez sur "Nouvelle page" pour en créer une.
                       </td>
                     </tr>
                   )}
@@ -183,87 +215,100 @@ export default function StaticPagesPage() {
             )}
           </div>
 
-          {/* Formulaire inline */}
+          {/* Formulaire avec onglets */}
           {showForm && (
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {isCreating ? 'Nouvelle Page' : 'Modifier la Page'}
-                </h2>
-              </div>
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-xl">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                {isCreating ? 'Nouvelle Page' : 'Modifier la Page'}
+              </h2>
 
               {/* Tabs */}
-              <div className="flex border-b border-gray-200 dark:border-gray-700">
-                {(['general', 'content', 'navigation'] as const).map(tab => (
-                  <Button
-                    key={tab}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setActiveTab(tab)}
-                    className={`!rounded-none px-4 py-2 text-sm font-medium ${activeTab === tab ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-                  >
-                    {tab === 'general' ? 'Général' : tab === 'content' ? 'Contenu' : 'Navigation'}
-                  </Button>
-                ))}
+              <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+                <button
+                  onClick={() => setActiveTab('general')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
+                    activeTab === 'general'
+                      ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  Général
+                </button>
+                <button
+                  onClick={() => setActiveTab('content')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
+                    activeTab === 'content'
+                      ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  Contenu
+                </button>
+                <button
+                  onClick={() => setActiveTab('navigation')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
+                    activeTab === 'navigation'
+                      ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  Navigation
+                </button>
               </div>
 
-              <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
+              {/* Tab Content */}
+              <div className="space-y-4">
                 {activeTab === 'general' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">Nom *</label>
                       <input
                         type="text"
                         value={formData.name}
                         onChange={e => {
                           const name = e.target.value
-                          setFormData({ ...formData, name, slug: isCreating ? generateSlug(name) : formData.slug })
+                          setFormData({ ...formData, name, slug: generateSlug(name) })
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm"
-                        placeholder="À propos de nous"
+                        className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        placeholder="À propos"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug (URL) *</label>
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">Slug</label>
                       <input
                         type="text"
                         value={formData.slug}
                         onChange={e => setFormData({ ...formData, slug: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm font-mono"
-                        placeholder="about-us"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">URL : /pages/{formData.slug}</p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Titre</label>
-                      <input
-                        type="text"
-                        value={formData.title}
-                        onChange={e => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm"
-                        placeholder="Titre affiché sur la page"
+                        className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-3 text-gray-900 dark:text-white font-mono text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        placeholder="a-propos"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Layout</label>
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">Layout</label>
                       <select
                         value={formData.layout}
-                        onChange={e => setFormData({ ...formData, layout: e.target.value as typeof formData.layout })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm"
+                        onChange={e => setFormData({ ...formData, layout: e.target.value as StaticPage['layout'] })}
+                        className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-3 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                       >
-                        <option value="default">Par défaut</option>
-                        <option value="full_width">Pleine largeur</option>
-                        <option value="centered">Centré</option>
-                        <option value="with_sidebar">Avec sidebar</option>
+                        <option value="default" className="bg-white dark:bg-gray-900">Par défaut</option>
+                        <option value="full_width" className="bg-white dark:bg-gray-900">Pleine largeur</option>
+                        <option value="narrow" className="bg-white dark:bg-gray-900">Étroit</option>
                       </select>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <input type="checkbox" id="active" checked={formData.active} onChange={e => setFormData({ ...formData, active: e.target.checked })} className="w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                      <label htmlFor="active" className="text-sm text-gray-700 dark:text-gray-300">Page active</label>
+                      <input
+                        type="checkbox"
+                        id="active"
+                        checked={formData.active}
+                        onChange={e => setFormData({ ...formData, active: e.target.checked })}
+                        className="w-4 h-4 text-indigo-600 border-gray-300 dark:border-gray-600 rounded focus:ring-indigo-500"
+                      />
+                      <label htmlFor="active" className="text-sm font-medium text-gray-900 dark:text-white">
+                        Page active
+                      </label>
                     </div>
                   </>
                 )}
@@ -271,97 +316,119 @@ export default function StaticPagesPage() {
                 {activeTab === 'content' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sous-titre</label>
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">Titre</label>
                       <input
                         type="text"
-                        value={formData.subtitle}
-                        onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm"
+                        value={formData.title}
+                        onChange={e => setFormData({ ...formData, title: e.target.value })}
+                        className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        placeholder="Titre de la page"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contenu (HTML)</label>
-                      <textarea
-                        rows={8}
-                        value={formData.content}
-                        onChange={e => setFormData({ ...formData, content: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm font-mono"
-                        placeholder="<p>Contenu de la page...</p>"
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">Sous-titre</label>
+                      <input
+                        type="text"
+                        value={formData.subtitle}
+                        onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
+                        className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        placeholder="Sous-titre"
                       />
                     </div>
 
-                    {formData.layout === 'with_sidebar' && (
-                      <>
-                        <div className="flex items-center gap-2">
-                          <input type="checkbox" checked={formData.show_sidebar} onChange={e => setFormData({ ...formData, show_sidebar: e.target.checked })} className="w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">Afficher la sidebar</span>
-                        </div>
-                        {formData.show_sidebar && (
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contenu sidebar</label>
-                            <textarea
-                              rows={4}
-                              value={formData.sidebar_content}
-                              onChange={e => setFormData({ ...formData, sidebar_content: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm"
-                            />
-                          </div>
-                        )}
-                      </>
-                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">Contenu</label>
+                      <textarea
+                        value={formData.content}
+                        onChange={e => setFormData({ ...formData, content: e.target.value })}
+                        rows={10}
+                        className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        placeholder="Contenu HTML de la page"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="show_header_image"
+                        checked={formData.show_header_image}
+                        onChange={e => setFormData({ ...formData, show_header_image: e.target.checked })}
+                        className="w-4 h-4 text-indigo-600 border-gray-300 dark:border-gray-600 rounded focus:ring-indigo-500"
+                      />
+                      <label htmlFor="show_header_image" className="text-sm font-medium text-gray-900 dark:text-white">
+                        Afficher image d'en-tête
+                      </label>
+                    </div>
                   </>
                 )}
 
                 {activeTab === 'navigation' && (
                   <>
-                    <div className="space-y-3">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" checked={formData.show_in_footer} onChange={e => setFormData({ ...formData, show_in_footer: e.target.checked })} className="w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Afficher dans le footer</span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="show_in_footer"
+                        checked={formData.show_in_footer}
+                        onChange={e => setFormData({ ...formData, show_in_footer: e.target.checked })}
+                        className="w-4 h-4 text-indigo-600 border-gray-300 dark:border-gray-600 rounded focus:ring-indigo-500"
+                      />
+                      <label htmlFor="show_in_footer" className="text-sm font-medium text-gray-900 dark:text-white">
+                        Afficher dans le footer
                       </label>
-
-                      {formData.show_in_footer && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Colonne footer</label>
-                          <select
-                            value={formData.footer_column}
-                            onChange={e => setFormData({ ...formData, footer_column: e.target.value as typeof formData.footer_column })}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm"
-                          >
-                            <option value="">Sélectionner...</option>
-                            <option value="company">Entreprise</option>
-                            <option value="help">Aide</option>
-                            <option value="legal">Légal</option>
-                          </select>
-                        </div>
-                      )}
-
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" checked={formData.show_in_menu} onChange={e => setFormData({ ...formData, show_in_menu: e.target.checked })} className="w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Afficher dans le menu principal</span>
-                      </label>
-
-                      {formData.show_in_menu && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position menu</label>
-                          <input
-                            type="number"
-                            min="0"
-                            value={formData.menu_position}
-                            onChange={e => setFormData({ ...formData, menu_position: parseInt(e.target.value) || 0 })}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm"
-                          />
-                        </div>
-                      )}
                     </div>
+
+                    {formData.show_in_footer && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">Colonne footer</label>
+                        <select
+                          value={formData.footer_column}
+                          onChange={e => setFormData({ ...formData, footer_column: e.target.value as StaticPage['footer_column'] | '' })}
+                          className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-3 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        >
+                          <option value="" className="bg-white dark:bg-gray-900">-- Choisir --</option>
+                          <option value="col1" className="bg-white dark:bg-gray-900">Colonne 1</option>
+                          <option value="col2" className="bg-white dark:bg-gray-900">Colonne 2</option>
+                          <option value="col3" className="bg-white dark:bg-gray-900">Colonne 3</option>
+                        </select>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="show_in_menu"
+                        checked={formData.show_in_menu}
+                        onChange={e => setFormData({ ...formData, show_in_menu: e.target.checked })}
+                        className="w-4 h-4 text-indigo-600 border-gray-300 dark:border-gray-600 rounded focus:ring-indigo-500"
+                      />
+                      <label htmlFor="show_in_menu" className="text-sm font-medium text-gray-900 dark:text-white">
+                        Afficher dans le menu
+                      </label>
+                    </div>
+
+                    {formData.show_in_menu && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">Position menu</label>
+                        <input
+                          type="number"
+                          value={formData.menu_position}
+                          onChange={e => setFormData({ ...formData, menu_position: Number(e.target.value) })}
+                          className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-3 text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                        />
+                      </div>
+                    )}
                   </>
                 )}
               </div>
 
-              <div className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
-                <Button onClick={handleCancel} variant="secondary">Annuler</Button>
-                <Button onClick={handleSave} disabled={!formData.name || !formData.slug}>Sauvegarder</Button>
+              <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Button onClick={handleCancel} variant="secondary" icon={<X className="h-4 w-4" />}>
+                  Annuler
+                </Button>
+                <Button onClick={handleSave} disabled={!formData.name} icon={<Save className="h-4 w-4" />}>
+                  Sauvegarder
+                </Button>
               </div>
             </div>
           )}

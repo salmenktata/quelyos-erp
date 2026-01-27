@@ -1,7 +1,19 @@
+/**
+ * Page Hero Slides - Gestion des diaporamas d'accueil
+ *
+ * Fonctionnalités :
+ * - Liste des slides hero avec statut actif/inactif
+ * - Création/édition/suppression de slides
+ * - Configuration complète (titre, sous-titre, description, image, CTA)
+ * - Double CTA (principal et secondaire)
+ * - Formulaire inline d'édition avec prévisualisation
+ */
+
 import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import { Layout } from '../../components/Layout'
 import { useHeroSlides, useCreateHeroSlide, useUpdateHeroSlide, useDeleteHeroSlide, HeroSlide } from '../../hooks/useHeroSlides'
-import { Button, ToastContainer, PageNotice, Breadcrumbs } from '../../components/common'
+import { Button, PageNotice, Breadcrumbs } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
 import { storeNotices } from '@/lib/notices'
 import { HeroSlideTable } from '../../components/HeroSlideTable'
@@ -90,19 +102,27 @@ export default function HeroSlides() {
 
   return (
     <Layout>
-      <Breadcrumbs
-        items={[
-          { label: 'Tableau de bord', href: '/dashboard' },
-          { label: 'Hero Slides' },
-        ]}
-      />
-      {/* Toast Container */}
-      <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
+      <div className="p-4 md:p-8 space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Store', href: '/store' },
+            { label: 'Hero Slides' },
+          ]}
+        />
 
-      <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Hero Slides</h1>
-          {!showForm && <Button onClick={handleNew}>Nouveau</Button>}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Hero Slides</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Gérez les diaporamas d'accueil de votre site e-commerce
+            </p>
+          </div>
+          {!showForm && (
+            <Button onClick={handleNew} icon={<Plus className="h-4 w-4" />}>
+              Nouveau
+            </Button>
+          )}
         </div>
 
         <PageNotice config={storeNotices.heroSlides} className="mb-6" />
