@@ -771,4 +771,31 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
       }
     ]
   },
+  stockAlerts: {
+    pageId: 'store-stock-alerts',
+    title: 'Alertes Stock',
+    purpose: 'Surveillez les ruptures et stocks faibles pour éviter les pertes de ventes.',
+    icon: Package,
+    moduleColor: 'indigo',
+    sections: [
+      {
+        title: 'Fonctionnalités',
+        icon: Settings,
+        items: [
+          'Détection des ruptures de stock',
+          'Alertes de stock faible',
+          'Seuil d\'alerte configurable',
+          'Indicateurs visuels de niveau',
+        ]
+      },
+      {
+        title: 'Actions recommandées',
+        items: [
+          'Surveiller quotidiennement : Vérifiez les alertes régulièrement',
+          'Réapprovisionner : Commandez avant rupture',
+          'Ajuster les seuils : Adaptez selon vos produits',
+        ]
+      }
+    ]
+  },
 };
