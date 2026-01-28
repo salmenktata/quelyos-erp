@@ -11,7 +11,8 @@
 
 import { Printer, FileText } from 'lucide-react'
 import { Layout } from '../../../../components/Layout'
-import { Breadcrumbs, Button } from '../../../../components/common'
+import { Breadcrumbs, Button, PageNotice } from '../../../../components/common'
+import { posNotices } from '../../../../lib/notices/pos-notices'
 
 export default function POSSettingsReceipts() {
   return (
@@ -35,6 +36,9 @@ export default function POSSettingsReceipts() {
             Personnalisation de l'impression des reçus
           </p>
         </div>
+
+        {/* PageNotice */}
+        <PageNotice config={posNotices.receipts} className="mb-6" />
 
         {/* Receipt settings form */}
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">

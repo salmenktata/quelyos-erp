@@ -10,7 +10,7 @@ export interface PageNoticeConfig {
   purpose: string;
   sections: NoticeSection[];
   icon?: React.ComponentType<{ className?: string }>;
-  moduleColor?: 'orange' | 'indigo' | 'emerald' | 'violet' | 'pink' | 'gray';
+  moduleColor?: 'orange' | 'indigo' | 'emerald' | 'violet' | 'pink' | 'gray' | 'teal';
 }
 
 export const MODULE_COLOR_CONFIGS = {
@@ -67,5 +67,14 @@ export const MODULE_COLOR_CONFIGS = {
     textPrimary: 'text-gray-900 dark:text-gray-100',
     textSecondary: 'text-gray-700 dark:text-gray-300',
     bullet: 'text-gray-600 dark:text-gray-400',
+  },
+  teal: {
+    bg: 'bg-teal-50 dark:bg-teal-900/20',
+    border: 'border-teal-200 dark:border-teal-800',
+    iconBg: 'bg-teal-100 dark:bg-teal-900/30',
+    iconText: 'text-teal-600 dark:text-teal-400',
+    textPrimary: 'text-teal-900 dark:text-teal-100',
+    textSecondary: 'text-teal-700 dark:text-teal-300',
+    bullet: 'text-teal-600 dark:text-teal-400',
   },
 } as const;

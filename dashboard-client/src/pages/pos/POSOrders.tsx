@@ -12,12 +12,14 @@
 import { useState } from 'react'
 import { ClipboardList, Search, Filter, Download, RefreshCw, AlertCircle } from 'lucide-react'
 import { Layout } from '../../components/Layout'
-import { Breadcrumbs, Button, SkeletonTable } from '../../components/common'
+import { Breadcrumbs, Button, SkeletonTable, PageNotice } from '../../components/common'
+import { posNotices } from '../../lib/notices/pos-notices'
 import { usePOSOrders } from '../../hooks/pos/usePOSOrders'
 
 export default function POSOrders() {
   const [searchQuery, setSearchQuery] = useState('')
-  const { data: orders = [], isLoading, error, refetch } = usePOSOrders()
+  const { data, isLoading, error, refetch } = usePOSOrders()
+  const orders = data?.orders || []
 
   return (
     <Layout>
@@ -44,6 +46,9 @@ export default function POSOrders() {
             Exporter
           </Button>
         </div>
+
+        {/* PageNotice */}
+        <PageNotice config={posNotices.orders} className="mb-6" />
 
         {/* Filters */}
         <div className="flex flex-col md:flex-row gap-4">
@@ -108,10 +113,10 @@ export default function POSOrders() {
                     orders.map((order) => (
                       <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                         <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{order.reference}</td>
-                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{new Date(order.date).toLocaleDateString('fr-FR')}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{order.paidAt ? new Date(order.paidAt).toLocaleDateString('fr-FR') : '-'}</td>
                         <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{order.customerName || 'Client anonyme'}</td>
                         <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{order.itemCount} articles</td>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{order.total.toFixed(2)} TND</td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{order.amountTotal.toFixed(2)} TND</td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                             order.state === 'paid'

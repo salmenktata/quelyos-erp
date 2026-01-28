@@ -22,11 +22,11 @@ export interface POSSessionItem {
 }
 
 async function fetchSessions(): Promise<POSSessionItem[]> {
-  const response = await api.get('/api/pos/sessions')
-  if (!response.success) {
-    throw new Error(response.error || 'Erreur lors du chargement des sessions')
+  const response = await api.post('/api/pos/sessions', {})
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Erreur lors du chargement des sessions')
   }
-  return response.data?.sessions || []
+  return response.data.data?.sessions || []
 }
 
 export function usePOSSessions() {

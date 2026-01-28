@@ -35,26 +35,26 @@ async function fetchDashboard(params: DashboardParams = {}): Promise<POSDashboar
     date_from: params.dateFrom,
     date_to: params.dateTo,
   })
-  if (!response.success) {
-    throw new Error(response.error || 'Erreur lors du chargement du dashboard')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Erreur lors du chargement du dashboard')
   }
-  return response.data
+  return response.data.data
 }
 
 async function fetchActiveSessions(): Promise<POSSessionSummary[]> {
   const response = await api.post('/api/pos/sessions/active', {})
-  if (!response.success) {
-    throw new Error(response.error || 'Erreur lors du chargement des sessions')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Erreur lors du chargement des sessions')
   }
-  return response.data || []
+  return response.data.data || []
 }
 
 async function fetchZReport(sessionId: number): Promise<POSZReport> {
   const response = await api.post(`/api/pos/session/${sessionId}/report`, {})
-  if (!response.success) {
-    throw new Error(response.error || 'Erreur lors de la génération du rapport')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Erreur lors de la génération du rapport')
   }
-  return response.data
+  return response.data.data
 }
 
 // ============================================================================

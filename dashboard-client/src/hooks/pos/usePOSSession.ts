@@ -36,10 +36,10 @@ async function openSession(params: OpenSessionParams): Promise<SessionResponse> 
     config_id: params.configId,
     opening_cash: params.openingCash,
   })
-  if (!response.success) {
-    throw new Error(response.error || 'Impossible d\'ouvrir la session')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Impossible d\'ouvrir la session')
   }
-  return response.data
+  return response.data.data
 }
 
 async function closeSession(params: CloseSessionParams): Promise<POSZReport> {
@@ -48,10 +48,10 @@ async function closeSession(params: CloseSessionParams): Promise<POSZReport> {
     closing_cash: params.closingCash,
     note: params.note,
   })
-  if (!response.success) {
-    throw new Error(response.error || 'Impossible de fermer la session')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Impossible de fermer la session')
   }
-  return response.data
+  return response.data.data
 }
 
 // ============================================================================

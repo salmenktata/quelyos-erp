@@ -47,18 +47,18 @@ async function fetchPOSProducts(params: ProductParams): Promise<ProductsResponse
     limit: params.limit || 50,
     offset: params.offset || 0,
   })
-  if (!response.success) {
-    throw new Error(response.error || 'Erreur lors du chargement des produits')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Erreur lors du chargement des produits')
   }
-  return response.data
+  return response.data.data
 }
 
 async function fetchPOSCategories(configId: number): Promise<POSCategory[]> {
   const response = await api.post('/api/pos/categories', { config_id: configId })
-  if (!response.success) {
-    throw new Error(response.error || 'Erreur lors du chargement des catégories')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Erreur lors du chargement des catégories')
   }
-  return response.data || []
+  return response.data.data || []
 }
 
 async function fetchProductByBarcode(configId: number, barcode: string): Promise<POSProduct | null> {
@@ -66,10 +66,10 @@ async function fetchProductByBarcode(configId: number, barcode: string): Promise
     config_id: configId,
     barcode,
   })
-  if (!response.success) {
+  if (!response.data.success) {
     return null
   }
-  return response.data
+  return response.data.data
 }
 
 // ============================================================================

@@ -11,7 +11,8 @@
 
 import { CreditCard, Banknote, Wallet, Calendar, Download } from 'lucide-react'
 import { Layout } from '../../../../components/Layout'
-import { Breadcrumbs, Button } from '../../../../components/common'
+import { Breadcrumbs, Button, PageNotice } from '../../../../components/common'
+import { posNotices } from '../../../../lib/notices/pos-notices'
 
 export default function POSReportsPayments() {
   return (
@@ -45,6 +46,9 @@ export default function POSReportsPayments() {
             </Button>
           </div>
         </div>
+
+        {/* PageNotice */}
+        <PageNotice config={posNotices.reportsPayments} className="mb-6" />
 
         {/* Payment method summary cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -12,7 +12,8 @@
 import { Monitor, Banknote, Printer } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../../../components/Layout'
-import { Breadcrumbs } from '../../../components/common'
+import { Breadcrumbs, PageNotice } from '../../../components/common'
+import { posNotices } from '../../../lib/notices/pos-notices'
 
 const settingsSections = [
   {
@@ -59,6 +60,9 @@ export default function POSSettings() {
             Configuration du module Point de Vente
           </p>
         </div>
+
+        {/* PageNotice */}
+        <PageNotice config={posNotices.settings} className="mb-6" />
 
         {/* Settings sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

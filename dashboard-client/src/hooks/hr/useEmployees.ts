@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
+import type { Contract } from './useContracts'
 
 export interface Employee {
   id: number
@@ -50,32 +51,6 @@ export interface Employee {
   coach_name?: string
   departure_date?: string
   departure_reason?: string
-}
-
-export interface Contract {
-  id: number
-  name: string
-  employee_id: number
-  employee_name: string
-  department_id: number | null
-  department_name: string | null
-  job_id: number | null
-  job_title: string | null
-  contract_type: string
-  contract_type_label: string
-  date_start: string
-  date_end: string | null
-  trial_date_end: string | null
-  wage: number
-  wage_type: string
-  currency: string
-  schedule_pay: string
-  hours_per_week: number
-  time_type: string
-  state: string
-  state_label: string
-  notes: string
-  advantages: string
 }
 
 export interface EmployeeFilters {

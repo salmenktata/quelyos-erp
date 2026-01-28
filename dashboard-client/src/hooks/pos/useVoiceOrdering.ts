@@ -206,7 +206,7 @@ export function useVoiceOrdering(options: UseVoiceOrderingOptions = {}): UseVoic
 
     switch (command.type) {
       case 'add_product':
-        message = command.quantity > 1
+        message = (command.quantity ?? 1) > 1
           ? `${command.quantity} ${command.product} ajoutés`
           : `${command.product} ajouté`
         break

@@ -31,7 +31,7 @@ function getAuthHeaders(): HeadersInit {
  * Récupère le tenant de l'utilisateur connecté
  */
 export function useMyTenant() {
-  return useQuery<TenantConfig>({
+  const query = useQuery<TenantConfig>({
     queryKey: ['my-tenant'],
     queryFn: async () => {
       const response = await fetch(`${API_URL}/api/ecommerce/tenant/my`, {
@@ -61,6 +61,11 @@ export function useMyTenant() {
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
   })
+
+  return {
+    ...query,
+    tenant: query.data,
+  }
 }
 
 /**

@@ -45,6 +45,8 @@ import { X, LogOut } from 'lucide-react'
 interface ModuleContextType {
   currentModule: Module
   setModule: (id: ModuleId) => void
+  /** @deprecated Use document.title or Breadcrumbs instead */
+  setTitle: (title: string) => void
 }
 
 const ModuleContext = createContext<ModuleContextType | null>(null)
@@ -106,7 +108,7 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
   useAutoOpenMenus(currentModule, location.pathname, isActive, openMenu)
 
   return (
-    <ModuleContext.Provider value={{ currentModule, setModule: handleModuleChange }}>
+    <ModuleContext.Provider value={{ currentModule, setModule: handleModuleChange, setTitle: () => {} }}>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
         {/* Top Navbar */}
         <TopNavbar

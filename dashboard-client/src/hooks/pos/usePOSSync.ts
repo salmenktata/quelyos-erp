@@ -94,16 +94,16 @@ export function usePOSSync(options: UsePOSSyncOptions = {}) {
         }],
       })
 
-      if (response.success && response.data?.synced?.[0]) {
+      if (response.data.success && response.data.data?.synced?.[0]) {
         return {
           success: true,
-          serverId: response.data.synced[0].server_id,
+          serverId: response.data.data.synced[0].server_id,
         }
       }
 
       return {
         success: false,
-        error: response.error || 'Sync failed',
+        error: response.data.error || 'Sync failed',
       }
     } catch (error) {
       return {

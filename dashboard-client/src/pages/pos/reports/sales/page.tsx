@@ -11,7 +11,8 @@
 
 import { BarChart3, Calendar, Download } from 'lucide-react'
 import { Layout } from '../../../../components/Layout'
-import { Breadcrumbs, Button } from '../../../../components/common'
+import { Breadcrumbs, Button, PageNotice } from '../../../../components/common'
+import { posNotices } from '../../../../lib/notices/pos-notices'
 
 export default function POSReportsSales() {
   return (
@@ -45,6 +46,9 @@ export default function POSReportsSales() {
             </Button>
           </div>
         </div>
+
+        {/* PageNotice */}
+        <PageNotice config={posNotices.reportsSales} className="mb-6" />
 
         {/* Placeholder */}
         <div className="bg-white dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700">

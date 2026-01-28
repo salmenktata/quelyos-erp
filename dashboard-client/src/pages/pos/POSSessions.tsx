@@ -13,8 +13,9 @@ import { useState } from 'react'
 import { Clock, Search, AlertCircle, RefreshCw, PlayCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../../components/Layout'
-import { Breadcrumbs, Button, SkeletonTable } from '../../components/common'
+import { Breadcrumbs, Button, SkeletonTable, PageNotice } from '../../components/common'
 import { usePOSSessions } from '../../hooks/pos/usePOSSessions'
+import { posNotices } from '../../lib/notices/pos-notices'
 
 export default function POSSessions() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -61,6 +62,9 @@ export default function POSSessions() {
             </Button>
           </Link>
         </div>
+
+        {/* PageNotice */}
+        <PageNotice config={posNotices.sessions} className="mb-6" />
 
         {/* Filters */}
         <div className="flex flex-col md:flex-row gap-4">

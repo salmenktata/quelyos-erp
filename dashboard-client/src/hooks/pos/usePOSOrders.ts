@@ -68,18 +68,18 @@ async function fetchOrders(params: OrdersParams): Promise<OrdersResponse> {
     limit: params.limit || 50,
     offset: params.offset || 0,
   })
-  if (!response.success) {
-    throw new Error(response.error || 'Erreur lors du chargement des commandes')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Erreur lors du chargement des commandes')
   }
-  return response.data
+  return response.data.data
 }
 
 async function fetchOrder(id: number): Promise<POSOrder> {
   const response = await api.post(`/api/pos/order/${id}`, {})
-  if (!response.success) {
-    throw new Error(response.error || 'Commande non trouvée')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Commande non trouvée')
   }
-  return response.data
+  return response.data.data
 }
 
 async function createOrder(params: CreateOrderParams): Promise<POSOrder> {
@@ -92,26 +92,26 @@ async function createOrder(params: CreateOrderParams): Promise<POSOrder> {
     note: params.note,
     offline_id: params.offlineId,
   })
-  if (!response.success) {
-    throw new Error(response.error || 'Erreur lors de la création de la commande')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Erreur lors de la création de la commande')
   }
-  return response.data
+  return response.data.data
 }
 
 async function payOrder(params: PayOrderParams): Promise<POSOrder> {
   const response = await api.post(`/api/pos/order/${params.orderId}/pay`, {
     payments: params.payments,
   })
-  if (!response.success) {
-    throw new Error(response.error || 'Erreur lors du paiement')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Erreur lors du paiement')
   }
-  return response.data
+  return response.data.data
 }
 
 async function cancelOrder(orderId: number): Promise<void> {
   const response = await api.post(`/api/pos/order/${orderId}/cancel`, {})
-  if (!response.success) {
-    throw new Error(response.error || 'Erreur lors de l\'annulation')
+  if (!response.data.success) {
+    throw new Error(response.data.error || 'Erreur lors de l\'annulation')
   }
 }
 
