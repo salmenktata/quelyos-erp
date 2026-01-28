@@ -32,6 +32,14 @@ Bibliothèques utilitaires pour l'API Quelyos:
 - service_registry: Service Discovery
 - rate_plans: Plans tarifaires API
 - coalescing: Request Coalescing
+- compression: Response Compression
+- ab_testing: A/B Testing
+- audit_dashboard: Audit Dashboard API
+- health_aggregator: Health Aggregation
+- deduplication: Request Deduplication
+- graceful_degradation: Graceful Degradation
+- cache_headers: HTTP Cache Headers
+- api_analytics: API Analytics
 """
 
 from . import cache
