@@ -58,7 +58,6 @@ class POSConfig(models.Model):
         'res.company',
         string='Société',
         required=True,
-        default=lambda self: self.env.company,
         related='tenant_id.company_id',
         store=True,
         readonly=True

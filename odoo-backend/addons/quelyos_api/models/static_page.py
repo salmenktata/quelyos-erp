@@ -11,7 +11,7 @@ class StaticPage(models.Model):
     # Identification
     name = fields.Char('Nom', required=True, help='Nom interne de la page')
     slug = fields.Char('Slug', required=True, help='URL de la page (ex: about-us)')
-    active = fields.Boolean('Actif', default=True, tracking=True)
+    active = fields.Boolean('Actif', default=True)
     company_id = fields.Many2one(
         'res.company',
         string='Société',

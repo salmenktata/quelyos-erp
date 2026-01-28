@@ -10,7 +10,6 @@ class StockLocation(models.Model):
         string='Verrouillée',
         default=False,
         help='Bloquer tous les mouvements stock dans cet emplacement (utilisé durant inventaire)',
-        tracking=True,
     )
 
     lock_reason = fields.Char(

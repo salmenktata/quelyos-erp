@@ -18,7 +18,7 @@ class SeoMetadata(models.Model):
         ('collection', 'Collection'),
     ], string='Type de page', required=True, default='static')
     slug = fields.Char('Slug', required=True, help='URL slug (ex: /about-us)')
-    active = fields.Boolean('Actif', default=True, tracking=True)
+    active = fields.Boolean('Actif', default=True)
 
     # SEO Basique
     meta_title = fields.Char('Meta Title', required=True, size=60, 

@@ -11,7 +11,7 @@ class MarketingPopup(models.Model):
     # Identification
     name = fields.Char('Nom interne', required=True, help='Usage interne uniquement')
     sequence = fields.Integer('Ordre priorité', default=10, help='Ordre si plusieurs popups actives')
-    active = fields.Boolean('Actif', default=True, tracking=True)
+    active = fields.Boolean('Actif', default=True)
 
     # Type de popup
     popup_type = fields.Selection([
