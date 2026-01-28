@@ -368,6 +368,9 @@ class POSOrder(models.Model):
         # Créer les mouvements de stock
         self._create_stock_moves()
 
+        # Créer les écritures comptables
+        self._create_account_move()
+
         return True
 
     def action_done(self):
@@ -495,6 +498,145 @@ class POSOrder(models.Model):
             move.quantity = move.product_uom_qty
 
         picking.button_validate()
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # COMPTABILITÉ
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    def _create_account_move(self):
+        """
+        Crée les écritures comptables pour la commande POS.
+
+        Utilise les journaux natifs Odoo (account.move) pour :
+        - Enregistrer les ventes (crédit compte produits)
+        - Enregistrer les taxes (crédit compte TVA)
+        - Enregistrer les paiements (débit compte caisse/banque)
+        """
+        self.ensure_one()
+
+        # Vérifier la configuration comptable
+        if not self.config_id.sale_journal_id:
+            _logger.warning(f"POS Order {self.name}: No sale journal configured, skipping accounting")
+            return
+
+        journal = self.config_id.sale_journal_id
+        move_lines = []
+
+        # === LIGNES DE PRODUITS (Crédit) ===
+        for line in self.line_ids:
+            # Compte de produits (priorité: produit > catégorie > config > défaut)
+            income_account = (
+                line.product_id.property_account_income_id or
+                line.product_id.categ_id.property_account_income_categ_id or
+                self.config_id.income_account_id
+            )
+
+            if not income_account:
+                _logger.warning(f"POS Order {self.name}: No income account for product {line.product_id.name}")
+                continue
+
+            # Ligne de vente HT (crédit)
+            if line.price_subtotal_untaxed:
+                move_lines.append((0, 0, {
+                    'name': f"{self.name} - {line.product_id.name}",
+                    'account_id': income_account.id,
+                    'partner_id': self.partner_id.id if self.partner_id else False,
+                    'debit': 0.0,
+                    'credit': abs(line.price_subtotal_untaxed),
+                    'product_id': line.product_id.id,
+                    'quantity': line.quantity,
+                }))
+
+            # Lignes de taxes (crédit)
+            for tax in line.tax_ids:
+                tax_amount = line.price_tax / len(line.tax_ids) if line.tax_ids else 0
+                if tax_amount:
+                    # Compte de taxe
+                    tax_account = tax.invoice_repartition_line_ids.filtered(
+                        lambda r: r.repartition_type == 'tax'
+                    ).account_id
+
+                    if tax_account:
+                        move_lines.append((0, 0, {
+                            'name': f"{self.name} - TVA {tax.name}",
+                            'account_id': tax_account.id,
+                            'partner_id': self.partner_id.id if self.partner_id else False,
+                            'debit': 0.0,
+                            'credit': abs(tax_amount),
+                            'tax_line_id': tax.id,
+                        }))
+
+        # === LIGNES DE PAIEMENT (Débit) ===
+        for payment in self.payment_ids:
+            # Journal de la méthode de paiement
+            payment_journal = payment.payment_method_id.journal_id
+
+            if not payment_journal:
+                _logger.warning(
+                    f"POS Order {self.name}: No journal for payment method "
+                    f"{payment.payment_method_id.name}, using default"
+                )
+                # Utiliser le journal de vente par défaut
+                payment_account = journal.default_account_id
+            else:
+                payment_account = payment_journal.default_account_id
+
+            if payment_account and payment.amount:
+                # Ajuster pour le rendu monnaie
+                amount = payment.amount
+                if payment == self.payment_ids[-1]:
+                    # Dernier paiement : ajuster pour le rendu
+                    amount = payment.amount - self.amount_return
+
+                if amount > 0:
+                    move_lines.append((0, 0, {
+                        'name': f"{self.name} - {payment.payment_method_id.name}",
+                        'account_id': payment_account.id,
+                        'partner_id': self.partner_id.id if self.partner_id else False,
+                        'debit': abs(amount),
+                        'credit': 0.0,
+                    }))
+
+        # === REMISE GLOBALE (Débit - réduction des produits) ===
+        if self.discount_amount > 0 and self.config_id.income_account_id:
+            move_lines.append((0, 0, {
+                'name': f"{self.name} - Remise globale",
+                'account_id': self.config_id.income_account_id.id,
+                'partner_id': self.partner_id.id if self.partner_id else False,
+                'debit': abs(self.discount_amount),
+                'credit': 0.0,
+            }))
+
+        # === CRÉER LA PIÈCE COMPTABLE ===
+        if not move_lines:
+            _logger.warning(f"POS Order {self.name}: No accounting lines to create")
+            return
+
+        try:
+            AccountMove = self.env['account.move'].sudo()
+            move_vals = {
+                'journal_id': journal.id,
+                'date': fields.Date.today(),
+                'ref': self.name,
+                'move_type': 'entry',
+                'partner_id': self.partner_id.id if self.partner_id else False,
+                'line_ids': move_lines,
+            }
+
+            account_move = AccountMove.create(move_vals)
+
+            # Valider automatiquement l'écriture
+            account_move.action_post()
+
+            # Lier à la commande POS
+            self.write({'invoice_id': account_move.id})
+
+            _logger.info(f"POS Order {self.name}: Created account move {account_move.name}")
+
+        except Exception as e:
+            _logger.error(f"POS Order {self.name}: Error creating account move: {e}", exc_info=True)
+            # Ne pas bloquer la vente si la compta échoue
+            # L'erreur sera visible dans les logs
 
     # ═══════════════════════════════════════════════════════════════════════════
     # MÉTHODES FRONTEND

@@ -21,9 +21,9 @@ class PaymentController(BaseController):
             list: Payment providers with configuration
         """
         try:
-            user = self._authenticate_from_header()
-            if not user:
-                return self._error_response('Authentication required')
+            error = self._authenticate_from_header()
+            if error:
+                return error
 
             # Get company from tenant header or use default
             company = self._get_company_from_tenant()
@@ -54,8 +54,10 @@ class PaymentController(BaseController):
             dict: Updated provider configuration
         """
         try:
-            user = self._authenticate_from_header()
-            if not user:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+            if not request.env.user:
                 return self._error_response('Authentication required')
 
             provider = request.env['payment.provider'].sudo().browse(provider_id)
@@ -96,8 +98,10 @@ class PaymentController(BaseController):
             dict: Test result with success status and message
         """
         try:
-            user = self._authenticate_from_header()
-            if not user:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+            if not request.env.user:
                 return self._error_response('Authentication required')
 
             provider = request.env['payment.provider'].sudo().browse(provider_id)
@@ -328,21 +332,6 @@ class PaymentController(BaseController):
         except Exception as e:
             _logger.error(f'Error processing Konnect webhook: {str(e)}', exc_info=True)
             return Response(json.dumps({'error': str(e)}), status=500, mimetype='application/json')
-
-    def _authenticate_from_header(self):
-        """Authenticate user from Authorization header or allow internal dashboard access"""
-        # For internal dashboard, allow access (backoffice is protected by network/auth layer)
-        # In production, add proper token validation here
-        auth_header = request.httprequest.headers.get('Authorization', '')
-        if auth_header.startswith('Bearer '):
-            session_id = auth_header[7:]
-            if session_id and session_id not in ('null', 'undefined', ''):
-                return True  # Accept any valid-looking session for dashboard
-        # Allow from localhost/internal network
-        origin = request.httprequest.headers.get('Origin', '')
-        if 'localhost' in origin or '127.0.0.1' in origin:
-            return True
-        return True  # Temporarily allow all for development
 
     def _check_admin_access(self):
         """Verify user has admin access"""

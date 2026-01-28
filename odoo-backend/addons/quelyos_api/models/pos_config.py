@@ -97,6 +97,23 @@ class POSConfig(models.Model):
     )
 
     # ═══════════════════════════════════════════════════════════════════════════
+    # COMPTABILITÉ
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    sale_journal_id = fields.Many2one(
+        'account.journal',
+        string='Journal de vente',
+        domain="[('company_id', '=', company_id), ('type', '=', 'sale')]",
+        help="Journal comptable pour enregistrer les ventes POS"
+    )
+    income_account_id = fields.Many2one(
+        'account.account',
+        string='Compte de produits',
+        domain="[('company_id', '=', company_id), ('account_type', '=', 'income')]",
+        help="Compte de produits par défaut pour les ventes POS"
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════════
     # MÉTHODES DE PAIEMENT
     # ═══════════════════════════════════════════════════════════════════════════
 

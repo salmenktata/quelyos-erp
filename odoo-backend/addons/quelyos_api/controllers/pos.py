@@ -60,7 +60,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'configs': [c.to_frontend_dict() for c in accessible_configs],
+                'data': [c.to_frontend_dict() for c in accessible_configs],
                 'total': len(accessible_configs),
             }
 
@@ -85,7 +85,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'config': config.to_frontend_dict(),
+                'data': config.to_frontend_dict(),
             }
 
         except Exception as e:
@@ -139,7 +139,10 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'session': session.to_frontend_dict(),
+                'data': {
+                    'session': session.to_frontend_dict(),
+                    'config': config.to_frontend_dict(),
+                },
                 'message': f"Session {session.name} ouverte avec succès",
             }
 
@@ -185,8 +188,10 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'session': session.to_frontend_dict(),
-                'zReport': z_report,
+                'data': {
+                    'session': session.to_frontend_dict(),
+                    'zReport': z_report,
+                },
                 'message': f"Session {session.name} fermée avec succès",
             }
 
@@ -208,7 +213,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'session': session.to_frontend_dict(),
+                'data': session.to_frontend_dict(),
             }
 
         except Exception as e:
@@ -239,14 +244,41 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'sessions': [s.to_frontend_summary() for s in sessions],
-                'total': total,
-                'limit': limit,
-                'offset': offset,
+                'data': {
+                    'sessions': [s.to_frontend_summary() for s in sessions],
+                    'total': total,
+                    'limit': limit,
+                    'offset': offset,
+                },
             }
 
         except Exception as e:
             _logger.error(f"Error fetching sessions: {e}", exc_info=True)
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/pos/sessions/active', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_active_sessions(self, **kwargs):
+        """Liste des sessions ouvertes uniquement"""
+        try:
+            error = self._authenticate_from_header()
+            if error:
+                return error
+
+            domain = [
+                ('company_id', '=', request.env.user.company_id.id),
+                ('state', '=', 'opened'),
+            ]
+
+            Session = request.env['quelyos.pos.session'].sudo()
+            sessions = Session.search(domain, order='id desc')
+
+            return {
+                'success': True,
+                'data': [s.to_frontend_summary() for s in sessions],
+            }
+
+        except Exception as e:
+            _logger.error(f"Error fetching active sessions: {e}", exc_info=True)
             return {'success': False, 'error': str(e)}
 
     # ═══════════════════════════════════════════════════════════════════════════
@@ -327,10 +359,12 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'products': result,
-                'total': total,
-                'limit': limit,
-                'offset': offset,
+                'data': {
+                    'products': result,
+                    'total': total,
+                    'limit': limit,
+                    'offset': offset,
+                },
             }
 
         except Exception as e:
@@ -381,7 +415,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'product': {
+                'data': {
                     'id': product.id,
                     'name': product.name,
                     'sku': product.default_code or '',
@@ -419,7 +453,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'categories': result,
+                'data': result,
             }
 
         except Exception as e:
@@ -501,7 +535,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'order': order.to_frontend_dict(),
+                'data': order.to_frontend_dict(),
                 'message': f"Commande {order.name} créée",
             }
 
@@ -535,7 +569,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'order': order.to_frontend_dict(),
+                'data': order.to_frontend_dict(),
                 'message': f"Paiement validé - Rendu: {order.amount_return}",
             }
 
@@ -559,7 +593,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'order': order.to_frontend_dict(),
+                'data': order.to_frontend_dict(),
                 'message': 'Commande annulée',
             }
 
@@ -581,7 +615,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'order': order.to_frontend_dict(),
+                'data': order.to_frontend_dict(),
             }
 
         except Exception as e:
@@ -612,10 +646,12 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'orders': [o.to_frontend_summary() for o in orders],
-                'total': total,
-                'limit': limit,
-                'offset': offset,
+                'data': {
+                    'orders': [o.to_frontend_summary() for o in orders],
+                    'total': total,
+                    'limit': limit,
+                    'offset': offset,
+                },
             }
 
         except Exception as e:
@@ -665,7 +701,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'customers': result,
+                'data': result,
             }
 
         except Exception as e:
@@ -698,14 +734,14 @@ class POSController(BaseController):
                 if existing:
                     return {
                         'success': True,
-                        'customer': {
+                        'data': {
                             'id': existing.id,
                             'name': existing.name,
                             'email': existing.email,
                             'phone': existing.phone,
+                            'isExisting': True,
                         },
                         'message': 'Client existant récupéré',
-                        'isExisting': True,
                     }
 
             customer = Partner.create({
@@ -718,14 +754,14 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'customer': {
+                'data': {
                     'id': customer.id,
                     'name': customer.name,
                     'email': customer.email or '',
                     'phone': customer.phone or '',
+                    'isExisting': False,
                 },
                 'message': 'Client créé',
-                'isExisting': False,
             }
 
         except Exception as e:
@@ -781,7 +817,7 @@ class POSController(BaseController):
                     )
 
                     if create_result.get('success'):
-                        order = create_result['order']
+                        order = create_result['data']
 
                         # Si des paiements sont inclus, les traiter
                         if order_data.get('payments') and order_data.get('is_paid'):
@@ -790,7 +826,7 @@ class POSController(BaseController):
                                 payments=order_data['payments'],
                             )
                             if pay_result.get('success'):
-                                order = pay_result['order']
+                                order = pay_result['data']
 
                         results.append({
                             'offlineId': offline_id,
@@ -814,9 +850,11 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'results': results,
-                'syncedCount': len([r for r in results if r['status'] == 'synced']),
-                'errorCount': len([r for r in results if r['status'] == 'error']),
+                'data': {
+                    'results': results,
+                    'syncedCount': len([r for r in results if r['status'] == 'synced']),
+                    'errorCount': len([r for r in results if r['status'] == 'error']),
+                },
             }
 
         except Exception as e:
@@ -906,17 +944,19 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'kpis': {
-                    'totalSales': total_sales,
-                    'orderCount': order_count,
-                    'averageBasket': avg_basket,
-                    'uniqueCustomers': unique_customers,
-                },
-                'activeSessions': [s.to_frontend_summary() for s in active_sessions],
-                'topProducts': top_products,
-                'period': {
-                    'from': date_from.isoformat(),
-                    'to': date_to.isoformat(),
+                'data': {
+                    'kpis': {
+                        'totalSales': total_sales,
+                        'orderCount': order_count,
+                        'averageBasket': avg_basket,
+                        'uniqueCustomers': unique_customers,
+                    },
+                    'activeSessions': [s.to_frontend_summary() for s in active_sessions],
+                    'topProducts': top_products,
+                    'period': {
+                        'from': date_from.isoformat(),
+                        'to': date_to.isoformat(),
+                    },
                 },
             }
 
@@ -938,7 +978,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'report': session.get_z_report_data(),
+                'data': session.get_z_report_data(),
             }
 
         except Exception as e:
@@ -973,7 +1013,7 @@ class POSController(BaseController):
 
             return {
                 'success': True,
-                'paymentMethods': [m.to_frontend_dict() for m in methods],
+                'data': [m.to_frontend_dict() for m in methods],
             }
 
         except Exception as e:
