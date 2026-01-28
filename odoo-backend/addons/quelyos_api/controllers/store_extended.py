@@ -19,7 +19,7 @@ class StoreExtendedController(BaseController):
     # REVIEWS (Avis clients)
     # =========================================================================
 
-    @http.route('/api/admin/reviews', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/reviews', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_reviews(self, **kwargs):
         """Liste des avis (admin)"""
         try:
@@ -49,7 +49,7 @@ class StoreExtendedController(BaseController):
             _logger.error(f'Error fetching reviews: {e}')
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/reviews/<int:review_id>/approve', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/reviews/<int:review_id>/approve', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def approve_review(self, review_id):
         """Approuver un avis"""
         try:
@@ -61,7 +61,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/reviews/<int:review_id>/reject', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/reviews/<int:review_id>/reject', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def reject_review(self, review_id, reason=None):
         """Rejeter un avis"""
         try:
@@ -78,7 +78,7 @@ class StoreExtendedController(BaseController):
     # REVIEWS - PUBLIC API (pour vitrine-client)
     # =========================================================================
 
-    @http.route('/api/products/<int:product_id>/reviews', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/products/<int:product_id>/reviews', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_product_reviews(self, product_id, limit=10, offset=0):
         """Récupérer les avis approuvés d'un produit (API publique)"""
         try:
@@ -131,7 +131,7 @@ class StoreExtendedController(BaseController):
             _logger.error(f'Error fetching product reviews: {e}')
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/products/<int:product_id>/reviews/submit', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/products/<int:product_id>/reviews/submit', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def submit_product_review(self, product_id, rating, content, title=None, author_name=None, author_email=None, pros=None, cons=None):
         """Soumettre un nouvel avis (API publique)"""
         try:
@@ -176,7 +176,7 @@ class StoreExtendedController(BaseController):
             _logger.error(f'Error submitting review: {e}')
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/reviews/<int:review_id>/helpful', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/reviews/<int:review_id>/helpful', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def mark_review_helpful(self, review_id, helpful=True):
         """Marquer un avis comme utile ou non"""
         try:
@@ -197,7 +197,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/reviews/<int:review_id>/reply', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/reviews/<int:review_id>/reply', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def reply_review(self, review_id, reply):
         """Répondre à un avis"""
         try:
@@ -213,7 +213,7 @@ class StoreExtendedController(BaseController):
     # FAQ
     # =========================================================================
 
-    @http.route('/api/admin/faq/categories', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/faq/categories', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_faq_categories(self):
         """Liste des catégories FAQ"""
         try:
@@ -228,7 +228,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/faq/categories/save', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/faq/categories/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_faq_category(self, **kwargs):
         """Créer/modifier une catégorie FAQ"""
         try:
@@ -253,7 +253,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/faq', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/faq', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_faqs(self, category_id=None):
         """Liste des FAQ"""
         try:
@@ -270,7 +270,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/faq/save', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/faq/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_faq(self, **kwargs):
         """Créer/modifier une FAQ"""
         try:
@@ -295,7 +295,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/faq/<int:faq_id>/delete', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/faq/<int:faq_id>/delete', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def delete_faq(self, faq_id):
         """Supprimer une FAQ"""
         try:
@@ -307,7 +307,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/faq/public', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/faq/public', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_public_faqs(self, category_code=None, **kwargs):
         """Récupérer les FAQ publiées pour le frontend vitrine"""
         try:
@@ -356,7 +356,7 @@ class StoreExtendedController(BaseController):
     # COLLECTIONS
     # =========================================================================
 
-    @http.route('/api/admin/collections', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/collections', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_collections(self):
         """Liste des collections"""
         try:
@@ -371,7 +371,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/collections/save', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/collections/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_collection(self, **kwargs):
         """Créer/modifier une collection"""
         try:
@@ -407,7 +407,7 @@ class StoreExtendedController(BaseController):
     # FLASH SALES
     # =========================================================================
 
-    @http.route('/api/admin/flash-sales', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/flash-sales', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_flash_sales(self):
         """Liste des ventes flash"""
         try:
@@ -422,7 +422,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/flash-sales/save', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/flash-sales/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_flash_sale(self, **kwargs):
         """Créer/modifier une vente flash"""
         try:
@@ -465,7 +465,7 @@ class StoreExtendedController(BaseController):
     # BUNDLES
     # =========================================================================
 
-    @http.route('/api/admin/bundles', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/bundles', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_bundles(self):
         """Liste des bundles"""
         try:
@@ -480,7 +480,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/bundles/save', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/bundles/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_bundle(self, **kwargs):
         """Créer/modifier un bundle"""
         try:
@@ -520,7 +520,7 @@ class StoreExtendedController(BaseController):
     # TESTIMONIALS
     # =========================================================================
 
-    @http.route('/api/admin/testimonials', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/testimonials', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_testimonials(self):
         """Liste des témoignages"""
         try:
@@ -535,7 +535,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/testimonials/save', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/testimonials/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_testimonial(self, **kwargs):
         """Créer/modifier un témoignage"""
         try:
@@ -568,7 +568,7 @@ class StoreExtendedController(BaseController):
     # BLOG
     # =========================================================================
 
-    @http.route('/api/admin/blog/categories', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/blog/categories', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_blog_categories(self):
         """Liste des catégories blog"""
         try:
@@ -583,7 +583,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/blog/posts', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/blog/posts', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_blog_posts(self, **kwargs):
         """Liste des articles blog"""
         try:
@@ -605,7 +605,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/blog/posts/<int:post_id>', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/blog/posts/<int:post_id>', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_blog_post(self, post_id):
         """Détail d'un article"""
         try:
@@ -616,7 +616,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/blog/posts/save', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/blog/posts/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_blog_post(self, **kwargs):
         """Créer/modifier un article"""
         try:
@@ -646,7 +646,7 @@ class StoreExtendedController(BaseController):
     # LOYALTY
     # =========================================================================
 
-    @http.route('/api/admin/loyalty/program', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/loyalty/program', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_loyalty_program(self):
         """Récupérer le programme de fidélité"""
         try:
@@ -660,7 +660,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/loyalty/program/save', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/loyalty/program/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_loyalty_program(self, **kwargs):
         """Créer/modifier le programme de fidélité"""
         try:
@@ -700,7 +700,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/loyalty/members', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/loyalty/members', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_loyalty_members(self, **kwargs):
         """Liste des membres fidélité"""
         try:
@@ -719,7 +719,7 @@ class StoreExtendedController(BaseController):
     # TICKETS (SAV)
     # =========================================================================
 
-    @http.route('/api/admin/tickets', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/tickets', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_tickets(self, **kwargs):
         """Liste des tickets"""
         try:
@@ -746,7 +746,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/tickets/<int:ticket_id>', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/tickets/<int:ticket_id>', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_ticket(self, ticket_id):
         """Détail d'un ticket"""
         try:
@@ -759,7 +759,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/tickets/<int:ticket_id>/reply', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/tickets/<int:ticket_id>/reply', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def reply_ticket(self, ticket_id, content):
         """Répondre à un ticket"""
         try:
@@ -777,7 +777,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/tickets/<int:ticket_id>/status', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/tickets/<int:ticket_id>/status', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def update_ticket_status(self, ticket_id, state, resolution=None):
         """Mettre à jour le statut d'un ticket"""
         try:
@@ -801,7 +801,7 @@ class StoreExtendedController(BaseController):
     # SALES REPORTS
     # =========================================================================
 
-    @http.route('/api/admin/reports/sales', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/reports/sales', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_sales_report(self, date_from=None, date_to=None):
         """Rapport de ventes"""
         try:
@@ -859,7 +859,7 @@ class StoreExtendedController(BaseController):
     # WISHLIST ANALYTICS
     # =========================================================================
 
-    @http.route('/api/admin/analytics/wishlist', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/analytics/wishlist', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_wishlist_analytics(self):
         """Analytiques wishlist - produits les plus ajoutés en favoris"""
         try:
@@ -898,7 +898,7 @@ class StoreExtendedController(BaseController):
     # STOCK ALERTS
     # =========================================================================
 
-    @http.route('/api/admin/stock/alerts', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/stock/alerts', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_stock_alerts(self, threshold=10):
         """Produits avec stock faible"""
         try:
@@ -949,7 +949,7 @@ class StoreExtendedController(BaseController):
     # PRODUCT ATTRIBUTES
     # =========================================================================
 
-    @http.route('/api/admin/attributes', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/attributes', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_attributes(self):
         """Liste des attributs produits"""
         try:
@@ -970,7 +970,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/attributes/save', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/attributes/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_attribute(self, **kwargs):
         """Créer/modifier un attribut"""
         try:
@@ -1015,7 +1015,7 @@ class StoreExtendedController(BaseController):
     # IMPORT/EXPORT
     # =========================================================================
 
-    @http.route('/api/admin/products/export', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/products/export', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def export_products(self, format='csv'):
         """Exporter les produits"""
         try:
@@ -1048,7 +1048,7 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/products/import', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/admin/products/import', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def import_products(self, products):
         """Importer des produits"""
         try:

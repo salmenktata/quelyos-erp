@@ -26,7 +26,7 @@ class HRContractController(http.Controller):
     # CONTRACTS
     # =========================================================================
 
-    @http.route('/api/hr/contracts', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/contracts', type='jsonrpc', auth='user', methods=['POST'])
     def get_contracts(self, **kwargs):
         """Liste des contrats avec filtres"""
         try:
@@ -63,7 +63,7 @@ class HRContractController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/contracts/<int:contract_id>', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/contracts/<int:contract_id>', type='jsonrpc', auth='user', methods=['POST'])
     def get_contract(self, contract_id, **kwargs):
         """Détail d'un contrat"""
         try:
@@ -78,7 +78,7 @@ class HRContractController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/contracts/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/contracts/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_contract(self, **kwargs):
         """Créer un contrat"""
         try:
@@ -130,7 +130,7 @@ class HRContractController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/contracts/<int:contract_id>/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/contracts/<int:contract_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_contract(self, contract_id, **kwargs):
         """Mettre à jour un contrat"""
         try:
@@ -170,7 +170,7 @@ class HRContractController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/contracts/<int:contract_id>/open', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/contracts/<int:contract_id>/open', type='jsonrpc', auth='user', methods=['POST'])
     def open_contract(self, contract_id, **kwargs):
         """Activer un contrat"""
         try:
@@ -187,7 +187,7 @@ class HRContractController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/contracts/<int:contract_id>/close', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/contracts/<int:contract_id>/close', type='jsonrpc', auth='user', methods=['POST'])
     def close_contract(self, contract_id, **kwargs):
         """Clôturer un contrat"""
         try:
@@ -204,7 +204,7 @@ class HRContractController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/contracts/expiring', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/contracts/expiring', type='jsonrpc', auth='user', methods=['POST'])
     def get_expiring_contracts(self, **kwargs):
         """Contrats arrivant à expiration"""
         try:

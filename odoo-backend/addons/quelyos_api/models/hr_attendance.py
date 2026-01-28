@@ -1,64 +1,34 @@
 # -*- coding: utf-8 -*-
 """
-Modèle Présences/Pointages RH.
+Extension du modèle Présences/Pointages RH natif Odoo.
 
-Gère les entrées/sorties des employés avec support GPS et kiosk.
-Calcule automatiquement les heures travaillées et les heures supplémentaires.
+Ajoute le support multi-tenant, géolocalisation, modes de pointage et méthodes API.
+Hérite de hr.attendance pour bénéficier de l'intégration avec hr_payroll (Work Entries).
 """
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 
 class HRAttendance(models.Model):
-    _name = 'quelyos.hr.attendance'
-    _description = 'Pointage Employé'
-    _order = 'check_in desc'
+    _inherit = 'hr.attendance'
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # EMPLOYÉ
+    # MULTI-TENANT (Extension Quelyos)
     # ═══════════════════════════════════════════════════════════════════════════
 
-    employee_id = fields.Many2one(
-        'quelyos.hr.employee',
-        string='Employé',
-        required=True,
+    tenant_id = fields.Many2one(
+        'quelyos.tenant',
+        string='Tenant',
         ondelete='cascade',
-        index=True,
-        domain="[('tenant_id', '=', tenant_id)]"
-    )
-    department_id = fields.Many2one(
-        'quelyos.hr.department',
-        string='Département',
-        related='employee_id.department_id',
-        store=True
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # HORAIRES
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    check_in = fields.Datetime(
-        string='Entrée',
-        required=True,
-        default=fields.Datetime.now,
         index=True
     )
-    check_out = fields.Datetime(
-        string='Sortie'
-    )
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # HEURES CALCULÉES
+    # HEURES SUPPLÉMENTAIRES (Extension)
     # ═══════════════════════════════════════════════════════════════════════════
 
-    worked_hours = fields.Float(
-        string='Heures travaillées',
-        compute='_compute_worked_hours',
-        store=True,
-        readonly=True
-    )
     overtime = fields.Float(
         string='Heures supplémentaires',
         compute='_compute_overtime',
@@ -68,7 +38,7 @@ class HRAttendance(models.Model):
     )
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # MODE DE POINTAGE
+    # MODE DE POINTAGE (Extension)
     # ═══════════════════════════════════════════════════════════════════════════
 
     check_in_mode = fields.Selection([
@@ -88,7 +58,7 @@ class HRAttendance(models.Model):
     ], string='Mode sortie')
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # GÉOLOCALISATION
+    # GÉOLOCALISATION (Extension)
     # ═══════════════════════════════════════════════════════════════════════════
 
     check_in_latitude = fields.Float(
@@ -109,15 +79,15 @@ class HRAttendance(models.Model):
     )
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # VALIDATION
+    # VALIDATION (Extension)
     # ═══════════════════════════════════════════════════════════════════════════
 
-    state = fields.Selection([
+    attendance_state = fields.Selection([
         ('draft', 'Brouillon'),
         ('confirmed', 'Confirmé'),
         ('validated', 'Validé'),
         ('anomaly', 'Anomalie'),
-    ], string='État', default='confirmed')
+    ], string='État validation', default='confirmed')
 
     anomaly_reason = fields.Char(
         string='Raison anomalie'
@@ -131,7 +101,7 @@ class HRAttendance(models.Model):
     )
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # NOTES
+    # NOTES (Extension)
     # ═══════════════════════════════════════════════════════════════════════════
 
     notes = fields.Text(
@@ -139,78 +109,17 @@ class HRAttendance(models.Model):
     )
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # MULTI-TENANT
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    tenant_id = fields.Many2one(
-        'quelyos.tenant',
-        string='Tenant',
-        required=True,
-        ondelete='cascade',
-        index=True
-    )
-    company_id = fields.Many2one(
-        'res.company',
-        string='Société',
-        related='tenant_id.company_id',
-        store=True
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
     # COMPUTED
     # ═══════════════════════════════════════════════════════════════════════════
 
-    @api.depends('check_in', 'check_out')
-    def _compute_worked_hours(self):
-        for attendance in self:
-            if attendance.check_out and attendance.check_in:
-                delta = attendance.check_out - attendance.check_in
-                attendance.worked_hours = delta.total_seconds() / 3600.0
-            else:
-                attendance.worked_hours = 0.0
-
     @api.depends('worked_hours')
     def _compute_overtime(self):
-        standard_hours = 8.0  # TODO: Configurable
+        standard_hours = 8.0  # TODO: Configurable par tenant/pays
         for attendance in self:
             if attendance.worked_hours > standard_hours:
                 attendance.overtime = attendance.worked_hours - standard_hours
             else:
                 attendance.overtime = 0.0
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # CONTRAINTES
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    @api.constrains('check_in', 'check_out')
-    def _check_validity(self):
-        for attendance in self:
-            if attendance.check_out and attendance.check_out < attendance.check_in:
-                raise ValidationError(_("L'heure de sortie ne peut pas être antérieure à l'heure d'entrée !"))
-
-    @api.constrains('check_in', 'check_out', 'employee_id')
-    def _check_no_overlap(self):
-        for attendance in self:
-            domain = [
-                ('id', '!=', attendance.id),
-                ('employee_id', '=', attendance.employee_id.id),
-            ]
-            if attendance.check_out:
-                domain += [
-                    ('check_in', '<', attendance.check_out),
-                    '|',
-                    ('check_out', '>', attendance.check_in),
-                    ('check_out', '=', False),
-                ]
-            else:
-                domain += [
-                    '|',
-                    ('check_out', '>', attendance.check_in),
-                    ('check_out', '=', False),
-                ]
-            overlapping = self.search_count(domain)
-            if overlapping:
-                raise ValidationError(_("Il y a un chevauchement avec un autre pointage !"))
 
     # ═══════════════════════════════════════════════════════════════════════════
     # ACTIONS
@@ -219,7 +128,7 @@ class HRAttendance(models.Model):
     def action_validate(self):
         """Valider le pointage."""
         self.write({
-            'state': 'validated',
+            'attendance_state': 'validated',
             'validated_by': self.env.user.id,
             'validated_date': fields.Datetime.now(),
         })
@@ -227,22 +136,20 @@ class HRAttendance(models.Model):
     def action_mark_anomaly(self, reason=None):
         """Marquer comme anomalie."""
         self.write({
-            'state': 'anomaly',
+            'attendance_state': 'anomaly',
             'anomaly_reason': reason or _("Anomalie détectée"),
         })
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # MÉTHODES API
+    # MÉTHODES API (pour frontend React)
     # ═══════════════════════════════════════════════════════════════════════════
 
     @api.model
     def check_in_employee(self, employee_id, tenant_id, mode='manual', latitude=None, longitude=None):
         """Pointer l'entrée d'un employé."""
-        # Vérifier s'il n'y a pas déjà un pointage en cours
         existing = self.search([
             ('employee_id', '=', employee_id),
             ('check_out', '=', False),
-            ('tenant_id', '=', tenant_id),
         ], limit=1)
         if existing:
             raise ValidationError(_("L'employé a déjà un pointage en cours !"))
@@ -263,7 +170,6 @@ class HRAttendance(models.Model):
         attendance = self.search([
             ('employee_id', '=', employee_id),
             ('check_out', '=', False),
-            ('tenant_id', '=', tenant_id),
         ], limit=1, order='check_in desc')
 
         if not attendance:
@@ -284,15 +190,15 @@ class HRAttendance(models.Model):
             'id': self.id,
             'employee_id': self.employee_id.id,
             'employee_name': self.employee_id.name,
-            'employee_number': self.employee_id.employee_number,
-            'department_name': self.department_id.name if self.department_id else None,
+            'employee_number': self.employee_id.employee_number if hasattr(self.employee_id, 'employee_number') else '',
+            'department_name': self.employee_id.department_id.name if self.employee_id.department_id else None,
             'check_in': self.check_in.isoformat() if self.check_in else None,
             'check_out': self.check_out.isoformat() if self.check_out else None,
             'worked_hours': round(self.worked_hours, 2),
             'overtime': round(self.overtime, 2),
             'check_in_mode': self.check_in_mode,
             'check_out_mode': self.check_out_mode,
-            'state': self.state,
+            'state': self.attendance_state,
             'location': {
                 'check_in': {
                     'latitude': self.check_in_latitude,
@@ -318,9 +224,9 @@ class HRAttendance(models.Model):
             ('check_in', '<', today_end),
         ])
 
-        total_employees = self.env['quelyos.hr.employee'].search_count([
+        total_employees = self.env['hr.employee'].search_count([
             ('tenant_id', '=', tenant_id),
-            ('state', '=', 'active'),
+            ('employee_state', '=', 'active'),
         ])
 
         present_employees = len(attendances.mapped('employee_id'))
@@ -346,11 +252,10 @@ class HRAttendance(models.Model):
         if employee_id:
             domain.append(('employee_id', '=', employee_id))
         if department_id:
-            domain.append(('department_id', '=', department_id))
+            domain.append(('employee_id.department_id', '=', department_id))
 
         attendances = self.search(domain, order='check_in')
 
-        # Grouper par employé
         by_employee = {}
         for att in attendances:
             emp_id = att.employee_id.id
@@ -358,7 +263,7 @@ class HRAttendance(models.Model):
                 by_employee[emp_id] = {
                     'employee_id': emp_id,
                     'employee_name': att.employee_id.name,
-                    'employee_number': att.employee_id.employee_number,
+                    'employee_number': att.employee_id.employee_number if hasattr(att.employee_id, 'employee_number') else '',
                     'total_hours': 0,
                     'overtime_hours': 0,
                     'days_present': set(),
@@ -369,7 +274,6 @@ class HRAttendance(models.Model):
             by_employee[emp_id]['days_present'].add(att.check_in.date())
             by_employee[emp_id]['attendances'].append(att.get_attendance_data())
 
-        # Convertir les sets en counts
         for emp_data in by_employee.values():
             emp_data['days_present'] = len(emp_data['days_present'])
             emp_data['total_hours'] = round(emp_data['total_hours'], 2)

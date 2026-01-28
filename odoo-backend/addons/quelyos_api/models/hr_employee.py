@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Modèle Employé RH.
+Extension du modèle Employé RH natif Odoo.
 
-Gère toutes les informations relatives aux employés :
-- Données personnelles et professionnelles
-- Rattachement au département et poste
-- Hiérarchie managériale
-- Contrats et congés
+Ajoute le support multi-tenant, champs Tunisie (CNSS, CIN) et méthodes API.
+Hérite de hr.employee pour bénéficier de toutes les fonctionnalités natives
+incluant l'intégration avec hr_payroll et hr_attendance.
 """
 
 from odoo import models, fields, api, _
@@ -14,22 +12,24 @@ from odoo.exceptions import ValidationError
 
 
 class HREmployee(models.Model):
-    _name = 'quelyos.hr.employee'
-    _description = 'Employé'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'name'
+    _inherit = 'hr.employee'
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # IDENTIFICATION
+    # MULTI-TENANT (Extension Quelyos)
     # ═══════════════════════════════════════════════════════════════════════════
 
-    name = fields.Char(
-        string='Nom complet',
-        compute='_compute_name',
-        store=True,
-        readonly=False,
-        tracking=True
+    tenant_id = fields.Many2one(
+        'quelyos.tenant',
+        string='Tenant',
+        ondelete='cascade',
+        index=True,
+        help="Tenant propriétaire"
     )
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # IDENTIFICATION QUELYOS
+    # ═══════════════════════════════════════════════════════════════════════════
+
     employee_number = fields.Char(
         string='Matricule',
         required=True,
@@ -42,391 +42,65 @@ class HREmployee(models.Model):
     )
     first_name = fields.Char(
         string='Prénom',
-        required=True,
         tracking=True
     )
     last_name = fields.Char(
-        string='Nom',
-        required=True,
+        string='Nom de famille',
         tracking=True
     )
-    active = fields.Boolean(
-        string='Actif',
-        default=True
-    )
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # PHOTO
+    # CHAMPS TUNISIE (Spécifique localisation)
     # ═══════════════════════════════════════════════════════════════════════════
 
-    image_1920 = fields.Image(
-        string='Photo',
-        max_width=1920,
-        max_height=1920
-    )
-    image_128 = fields.Image(
-        string='Photo miniature',
-        related='image_1920',
-        max_width=128,
-        max_height=128,
-        store=True
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # CONTACT PROFESSIONNEL
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    work_email = fields.Char(
-        string='Email professionnel',
-        tracking=True
-    )
-    work_phone = fields.Char(
-        string='Téléphone professionnel'
-    )
-    mobile_phone = fields.Char(
-        string='Mobile'
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # POSTE & DÉPARTEMENT
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    department_id = fields.Many2one(
-        'quelyos.hr.department',
-        string='Département',
+    cnss_number = fields.Char(
+        string='N° CNSS',
         tracking=True,
-        domain="[('tenant_id', '=', tenant_id)]",
-        help="Département de rattachement"
+        help="Numéro de sécurité sociale CNSS"
     )
-    job_id = fields.Many2one(
-        'quelyos.hr.job',
-        string='Poste',
+    cin_number = fields.Char(
+        string='N° CIN',
         tracking=True,
-        domain="[('tenant_id', '=', tenant_id)]",
-        help="Poste occupé"
-    )
-    job_title = fields.Char(
-        string='Titre du poste',
-        help="Titre personnalisé si différent du poste standard"
+        help="Numéro de Carte d'Identité Nationale"
     )
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # HIÉRARCHIE
+    # STATUT EMPLOYÉ (Extension)
     # ═══════════════════════════════════════════════════════════════════════════
 
-    parent_id = fields.Many2one(
-        'quelyos.hr.employee',
-        string='Manager',
-        domain="[('tenant_id', '=', tenant_id)]",
-        tracking=True,
-        help="Supérieur hiérarchique direct"
-    )
-    coach_id = fields.Many2one(
-        'quelyos.hr.employee',
-        string='Coach/Mentor',
-        domain="[('tenant_id', '=', tenant_id)]",
-        help="Mentor ou coach assigné"
-    )
-    child_ids = fields.One2many(
-        'quelyos.hr.employee',
-        'parent_id',
-        string='Subordonnés',
-        help="Employés sous sa responsabilité"
-    )
+    employee_state = fields.Selection([
+        ('active', 'Actif'),
+        ('suspended', 'Suspendu'),
+        ('departed', 'Parti'),
+    ], string='Statut employé', default='active', tracking=True, required=True)
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # INFORMATIONS PERSONNELLES
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    gender = fields.Selection([
-        ('male', 'Homme'),
-        ('female', 'Femme'),
-        ('other', 'Autre'),
-    ], string='Genre')
-
-    birthday = fields.Date(
-        string='Date de naissance'
-    )
-    place_of_birth = fields.Char(
-        string='Lieu de naissance'
-    )
-    country_of_birth = fields.Many2one(
-        'res.country',
-        string='Pays de naissance'
-    )
-    country_id = fields.Many2one(
-        'res.country',
-        string='Nationalité'
-    )
-    identification_id = fields.Char(
-        string='N° Pièce d\'identité',
-        help="CIN, Passeport, Carte de séjour..."
-    )
-    passport_id = fields.Char(
-        string='N° Passeport'
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # SITUATION FAMILIALE
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    marital = fields.Selection([
-        ('single', 'Célibataire'),
-        ('married', 'Marié(e)'),
-        ('cohabitant', 'Concubin(e)'),
-        ('widower', 'Veuf/Veuve'),
-        ('divorced', 'Divorcé(e)'),
-    ], string='Situation familiale', default='single')
-
-    spouse_name = fields.Char(
-        string='Nom conjoint(e)'
-    )
-    spouse_birthdate = fields.Date(
-        string='Date naissance conjoint(e)'
-    )
-    children = fields.Integer(
-        string='Nombre d\'enfants',
-        default=0
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # ADRESSE PERSONNELLE
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    address_home_street = fields.Char(
-        string='Adresse'
-    )
-    address_home_street2 = fields.Char(
-        string='Adresse (suite)'
-    )
-    address_home_city = fields.Char(
-        string='Ville'
-    )
-    address_home_state_id = fields.Many2one(
-        'res.country.state',
-        string='Région/Gouvernorat'
-    )
-    address_home_zip = fields.Char(
-        string='Code postal'
-    )
-    address_home_country_id = fields.Many2one(
-        'res.country',
-        string='Pays'
-    )
-    private_email = fields.Char(
-        string='Email personnel'
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # CONTACT URGENCE
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    emergency_contact = fields.Char(
-        string='Contact d\'urgence'
-    )
-    emergency_phone = fields.Char(
-        string='Tél. urgence'
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # INFORMATIONS BANCAIRES
+    # CHAMPS BANCAIRES (Override pour Tunisie)
     # ═══════════════════════════════════════════════════════════════════════════
 
     bank_name = fields.Char(
-        string='Banque'
+        string='Banque',
+        help="Nom de la banque"
     )
     bank_account_number = fields.Char(
-        string='RIB/IBAN'
+        string='RIB',
+        help="Relevé d'Identité Bancaire (20 chiffres en Tunisie)"
     )
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # EMPLOI
+    # ANCIENNETÉ (Computed)
     # ═══════════════════════════════════════════════════════════════════════════
 
-    hire_date = fields.Date(
-        string='Date d\'embauche',
-        tracking=True,
-        help="Date de début dans l'entreprise"
-    )
     seniority = fields.Char(
         string='Ancienneté',
         compute='_compute_seniority',
         help="Ancienneté dans l'entreprise"
     )
-
-    state = fields.Selection([
-        ('active', 'Actif'),
-        ('suspended', 'Suspendu'),
-        ('departed', 'Parti'),
-    ], string='Statut', default='active', tracking=True, required=True)
-
-    departure_date = fields.Date(
-        string='Date de départ',
-        tracking=True
+    hire_date = fields.Date(
+        string="Date d'embauche",
+        tracking=True,
+        help="Date de début dans l'entreprise"
     )
-    departure_reason = fields.Selection([
-        ('fired', 'Licenciement'),
-        ('resigned', 'Démission'),
-        ('retired', 'Retraite'),
-        ('mutual', 'Rupture conventionnelle'),
-        ('end_contract', 'Fin de contrat'),
-        ('other', 'Autre'),
-    ], string='Motif de départ')
-    departure_description = fields.Text(
-        string='Commentaire départ'
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # CONTRATS
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    contract_ids = fields.One2many(
-        'quelyos.hr.contract',
-        'employee_id',
-        string='Contrats',
-        help="Historique des contrats"
-    )
-    contract_id = fields.Many2one(
-        'quelyos.hr.contract',
-        string='Contrat actif',
-        compute='_compute_contract',
-        store=True,
-        help="Contrat actuellement en vigueur"
-    )
-    contract_type = fields.Selection(
-        related='contract_id.contract_type',
-        string='Type de contrat',
-        store=True
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # CONGÉS
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    leave_ids = fields.One2many(
-        'quelyos.hr.leave',
-        'employee_id',
-        string='Demandes de congés'
-    )
-    allocation_ids = fields.One2many(
-        'quelyos.hr.leave.allocation',
-        'employee_id',
-        string='Allocations de congés'
-    )
-    remaining_leaves = fields.Float(
-        string='Solde congés',
-        compute='_compute_remaining_leaves',
-        help="Jours de congés restants"
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # PRÉSENCES
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    attendance_ids = fields.One2many(
-        'quelyos.hr.attendance',
-        'employee_id',
-        string='Pointages'
-    )
-    last_attendance_id = fields.Many2one(
-        'quelyos.hr.attendance',
-        string='Dernier pointage',
-        compute='_compute_last_attendance'
-    )
-    attendance_state = fields.Selection([
-        ('checked_out', 'Absent'),
-        ('checked_in', 'Présent'),
-    ], string='Statut présence', compute='_compute_attendance_state')
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # UTILISATEUR ODOO
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    user_id = fields.Many2one(
-        'res.users',
-        string='Utilisateur lié',
-        help="Compte utilisateur Odoo associé"
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # MULTI-TENANT
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    tenant_id = fields.Many2one(
-        'quelyos.tenant',
-        string='Tenant',
-        required=True,
-        ondelete='cascade',
-        index=True,
-        help="Tenant propriétaire"
-    )
-    company_id = fields.Many2one(
-        'res.company',
-        string='Société',
-        related='tenant_id.company_id',
-        store=True
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # COMPUTED FIELDS
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    @api.depends('first_name', 'last_name')
-    def _compute_name(self):
-        for employee in self:
-            parts = [employee.first_name or '', employee.last_name or '']
-            employee.name = ' '.join(filter(None, parts))
-
-    @api.depends('hire_date')
-    def _compute_seniority(self):
-        from dateutil.relativedelta import relativedelta
-        today = fields.Date.today()
-        for employee in self:
-            if employee.hire_date:
-                delta = relativedelta(today, employee.hire_date)
-                parts = []
-                if delta.years:
-                    parts.append(f"{delta.years} an{'s' if delta.years > 1 else ''}")
-                if delta.months:
-                    parts.append(f"{delta.months} mois")
-                employee.seniority = ' '.join(parts) if parts else 'Moins d\'un mois'
-            else:
-                employee.seniority = ''
-
-    @api.depends('contract_ids', 'contract_ids.state', 'contract_ids.date_start', 'contract_ids.date_end')
-    def _compute_contract(self):
-        today = fields.Date.today()
-        for employee in self:
-            contracts = employee.contract_ids.filtered(
-                lambda c: c.state == 'open' and c.date_start <= today and (not c.date_end or c.date_end >= today)
-            )
-            employee.contract_id = contracts[:1] if contracts else False
-
-    @api.depends('allocation_ids', 'leave_ids')
-    def _compute_remaining_leaves(self):
-        for employee in self:
-            allocated = sum(employee.allocation_ids.filtered(
-                lambda a: a.state == 'validate'
-            ).mapped('number_of_days'))
-            taken = sum(employee.leave_ids.filtered(
-                lambda l: l.state == 'validate'
-            ).mapped('number_of_days'))
-            employee.remaining_leaves = allocated - taken
-
-    def _compute_last_attendance(self):
-        for employee in self:
-            attendance = self.env['quelyos.hr.attendance'].search([
-                ('employee_id', '=', employee.id)
-            ], limit=1, order='check_in desc')
-            employee.last_attendance_id = attendance
-
-    @api.depends('last_attendance_id', 'last_attendance_id.check_out')
-    def _compute_attendance_state(self):
-        for employee in self:
-            if employee.last_attendance_id and not employee.last_attendance_id.check_out:
-                employee.attendance_state = 'checked_in'
-            else:
-                employee.attendance_state = 'checked_out'
 
     # ═══════════════════════════════════════════════════════════════════════════
     # CONTRAINTES
@@ -437,13 +111,51 @@ class HREmployee(models.Model):
          'Le matricule doit être unique par tenant !'),
         ('work_email_tenant_uniq', 'unique(work_email, tenant_id)',
          'Cet email professionnel est déjà utilisé !'),
+        ('cnss_tenant_uniq', 'unique(cnss_number, tenant_id)',
+         'Ce numéro CNSS est déjà utilisé !'),
+        ('cin_tenant_uniq', 'unique(cin_number, tenant_id)',
+         'Ce numéro CIN est déjà utilisé !'),
     ]
 
-    @api.constrains('parent_id')
-    def _check_parent_id(self):
+    # ═══════════════════════════════════════════════════════════════════════════
+    # COMPUTED FIELDS
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @api.depends('first_name', 'last_name')
+    def _compute_name_from_parts(self):
+        """Calcule le nom complet à partir du prénom et nom."""
         for employee in self:
-            if employee.parent_id == employee:
-                raise ValidationError(_("Un employé ne peut pas être son propre manager !"))
+            if employee.first_name or employee.last_name:
+                parts = [employee.first_name or '', employee.last_name or '']
+                employee.name = ' '.join(filter(None, parts))
+
+    @api.depends('hire_date')
+    def _compute_seniority(self):
+        """Calcule l'ancienneté de l'employé."""
+        from dateutil.relativedelta import relativedelta
+        today = fields.Date.today()
+        for employee in self:
+            if employee.hire_date:
+                delta = relativedelta(today, employee.hire_date)
+                parts = []
+                if delta.years:
+                    parts.append(f"{delta.years} an{'s' if delta.years > 1 else ''}")
+                if delta.months:
+                    parts.append(f"{delta.months} mois")
+                employee.seniority = ' '.join(parts) if parts else "Moins d'un mois"
+            else:
+                employee.seniority = ''
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # ONCHANGE
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @api.onchange('first_name', 'last_name')
+    def _onchange_name_parts(self):
+        """Met à jour le nom complet quand prénom/nom changent."""
+        if self.first_name or self.last_name:
+            parts = [self.first_name or '', self.last_name or '']
+            self.name = ' '.join(filter(None, parts))
 
     # ═══════════════════════════════════════════════════════════════════════════
     # CRUD
@@ -452,6 +164,7 @@ class HREmployee(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
+            # Générer matricule automatique
             if vals.get('employee_number', 'Nouveau') == 'Nouveau':
                 tenant_id = vals.get('tenant_id')
                 if tenant_id:
@@ -464,10 +177,25 @@ class HREmployee(models.Model):
                         vals['employee_number'] = sequence.next_by_id()
                     else:
                         vals['employee_number'] = self.env['ir.sequence'].next_by_code('quelyos.hr.employee') or 'EMP-0001'
+
+            # Calculer le nom complet
+            if vals.get('first_name') or vals.get('last_name'):
+                parts = [vals.get('first_name', ''), vals.get('last_name', '')]
+                vals['name'] = ' '.join(filter(None, parts))
+
         return super().create(vals_list)
 
+    def write(self, vals):
+        # Recalculer le nom complet si prénom/nom changent
+        if 'first_name' in vals or 'last_name' in vals:
+            for employee in self:
+                first = vals.get('first_name', employee.first_name) or ''
+                last = vals.get('last_name', employee.last_name) or ''
+                vals['name'] = ' '.join(filter(None, [first, last]))
+        return super().write(vals)
+
     # ═══════════════════════════════════════════════════════════════════════════
-    # MÉTHODES API
+    # MÉTHODES API (pour frontend React)
     # ═══════════════════════════════════════════════════════════════════════════
 
     def get_employee_data(self, detailed=False):
@@ -477,8 +205,8 @@ class HREmployee(models.Model):
             'id': self.id,
             'employee_number': self.employee_number,
             'name': self.name,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
+            'first_name': self.first_name or '',
+            'last_name': self.last_name or '',
             'work_email': self.work_email or '',
             'work_phone': self.work_phone or '',
             'mobile_phone': self.mobile_phone or '',
@@ -488,11 +216,11 @@ class HREmployee(models.Model):
             'job_title': self.job_title or (self.job_id.name if self.job_id else ''),
             'parent_id': self.parent_id.id if self.parent_id else None,
             'parent_name': self.parent_id.name if self.parent_id else None,
-            'state': self.state,
+            'state': self.employee_state,
             'hire_date': self.hire_date.isoformat() if self.hire_date else None,
             'seniority': self.seniority,
             'attendance_state': self.attendance_state,
-            'image_url': f"/web/image/quelyos.hr.employee/{self.id}/image_128" if self.image_128 else None,
+            'image_url': f"/web/image/hr.employee/{self.id}/image_128" if self.image_128 else None,
         }
 
         if detailed:
@@ -503,16 +231,18 @@ class HREmployee(models.Model):
                 'country_id': self.country_id.id if self.country_id else None,
                 'country_name': self.country_id.name if self.country_id else None,
                 'identification_id': self.identification_id or '',
+                'cin_number': self.cin_number or '',
+                'cnss_number': self.cnss_number or '',
                 'marital': self.marital,
-                'spouse_name': self.spouse_name or '',
+                'spouse_name': self.spouse_complete_name or '',
                 'children': self.children,
                 'address': {
-                    'street': self.address_home_street or '',
-                    'street2': self.address_home_street2 or '',
-                    'city': self.address_home_city or '',
-                    'state': self.address_home_state_id.name if self.address_home_state_id else '',
-                    'zip': self.address_home_zip or '',
-                    'country': self.address_home_country_id.name if self.address_home_country_id else '',
+                    'street': self.private_street or '',
+                    'street2': self.private_street2 or '',
+                    'city': self.private_city or '',
+                    'state': self.private_state_id.name if self.private_state_id else '',
+                    'zip': self.private_zip or '',
+                    'country': self.private_country_id.name if self.private_country_id else '',
                 },
                 'private_email': self.private_email or '',
                 'emergency_contact': self.emergency_contact or '',
@@ -532,4 +262,4 @@ class HREmployee(models.Model):
     def get_subordinates_data(self):
         """Retourne la liste des subordonnés."""
         self.ensure_one()
-        return [emp.get_employee_data() for emp in self.child_ids.filtered(lambda e: e.state == 'active')]
+        return [emp.get_employee_data() for emp in self.child_ids.filtered(lambda e: e.employee_state == 'active')]

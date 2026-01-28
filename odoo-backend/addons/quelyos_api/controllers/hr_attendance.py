@@ -27,7 +27,7 @@ class HRAttendanceController(http.Controller):
     # ATTENDANCE
     # =========================================================================
 
-    @http.route('/api/hr/attendance', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/attendance', type='jsonrpc', auth='user', methods=['POST'])
     def get_attendances(self, **kwargs):
         """Liste des pointages avec filtres"""
         try:
@@ -52,7 +52,7 @@ class HRAttendanceController(http.Controller):
             limit = kwargs.get('limit', 50)
             offset = kwargs.get('offset', 0)
 
-            Attendance = request.env['quelyos.hr.attendance'].sudo()
+            Attendance = request.env['hr.attendance'].sudo()
             total = Attendance.search_count(domain)
             attendances = Attendance.search(domain, limit=limit, offset=offset, order='check_in desc')
 
@@ -66,7 +66,7 @@ class HRAttendanceController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/attendance/today', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/attendance/today', type='jsonrpc', auth='user', methods=['POST'])
     def get_today_attendance(self, **kwargs):
         """Présences du jour"""
         try:
@@ -74,7 +74,7 @@ class HRAttendanceController(http.Controller):
             if not tenant_id:
                 return {'success': False, 'error': 'tenant_id requis'}
 
-            summary = request.env['quelyos.hr.attendance'].sudo().get_today_summary(int(tenant_id))
+            summary = request.env['hr.attendance'].sudo().get_today_summary(int(tenant_id))
 
             return {
                 'success': True,
@@ -83,7 +83,7 @@ class HRAttendanceController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/attendance/check-in', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/attendance/check-in', type='jsonrpc', auth='user', methods=['POST'])
     def check_in(self, **kwargs):
         """Pointer l'entrée d'un employé"""
         try:
@@ -98,7 +98,7 @@ class HRAttendanceController(http.Controller):
             latitude = kwargs.get('latitude')
             longitude = kwargs.get('longitude')
 
-            attendance_data = request.env['quelyos.hr.attendance'].sudo().check_in_employee(
+            attendance_data = request.env['hr.attendance'].sudo().check_in_employee(
                 employee_id=int(kwargs['employee_id']),
                 tenant_id=int(tenant_id),
                 mode=mode,
@@ -113,7 +113,7 @@ class HRAttendanceController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/attendance/check-out', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/attendance/check-out', type='jsonrpc', auth='user', methods=['POST'])
     def check_out(self, **kwargs):
         """Pointer la sortie d'un employé"""
         try:
@@ -128,7 +128,7 @@ class HRAttendanceController(http.Controller):
             latitude = kwargs.get('latitude')
             longitude = kwargs.get('longitude')
 
-            attendance_data = request.env['quelyos.hr.attendance'].sudo().check_out_employee(
+            attendance_data = request.env['hr.attendance'].sudo().check_out_employee(
                 employee_id=int(kwargs['employee_id']),
                 tenant_id=int(tenant_id),
                 mode=mode,
@@ -143,7 +143,7 @@ class HRAttendanceController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/attendance/report', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/attendance/report', type='jsonrpc', auth='user', methods=['POST'])
     def get_attendance_report(self, **kwargs):
         """Rapport de présences sur une période"""
         try:
@@ -154,7 +154,7 @@ class HRAttendanceController(http.Controller):
             if not kwargs.get('date_from') or not kwargs.get('date_to'):
                 return {'success': False, 'error': 'date_from et date_to requis'}
 
-            report = request.env['quelyos.hr.attendance'].sudo().get_period_report(
+            report = request.env['hr.attendance'].sudo().get_period_report(
                 tenant_id=int(tenant_id),
                 date_from=kwargs['date_from'],
                 date_to=kwargs['date_to'],
@@ -169,11 +169,11 @@ class HRAttendanceController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/attendance/<int:attendance_id>/validate', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/attendance/<int:attendance_id>/validate', type='jsonrpc', auth='user', methods=['POST'])
     def validate_attendance(self, attendance_id, **kwargs):
         """Valider un pointage"""
         try:
-            attendance = request.env['quelyos.hr.attendance'].sudo().browse(attendance_id)
+            attendance = request.env['hr.attendance'].sudo().browse(attendance_id)
             if not attendance.exists():
                 return {'success': False, 'error': 'Pointage introuvable'}
 
@@ -186,11 +186,11 @@ class HRAttendanceController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/attendance/<int:attendance_id>/anomaly', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/attendance/<int:attendance_id>/anomaly', type='jsonrpc', auth='user', methods=['POST'])
     def mark_anomaly(self, attendance_id, **kwargs):
         """Marquer un pointage comme anomalie"""
         try:
-            attendance = request.env['quelyos.hr.attendance'].sudo().browse(attendance_id)
+            attendance = request.env['hr.attendance'].sudo().browse(attendance_id)
             if not attendance.exists():
                 return {'success': False, 'error': 'Pointage introuvable'}
 
@@ -204,7 +204,7 @@ class HRAttendanceController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/attendance/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/attendance/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_attendance(self, **kwargs):
         """Créer manuellement un pointage (régularisation)"""
         try:
@@ -231,7 +231,7 @@ class HRAttendanceController(http.Controller):
             if kwargs.get('notes'):
                 values['notes'] = kwargs['notes']
 
-            attendance = request.env['quelyos.hr.attendance'].sudo().create(values)
+            attendance = request.env['hr.attendance'].sudo().create(values)
 
             return {
                 'success': True,
@@ -240,11 +240,11 @@ class HRAttendanceController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/attendance/<int:attendance_id>/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/attendance/<int:attendance_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_attendance(self, attendance_id, **kwargs):
         """Modifier un pointage"""
         try:
-            attendance = request.env['quelyos.hr.attendance'].sudo().browse(attendance_id)
+            attendance = request.env['hr.attendance'].sudo().browse(attendance_id)
             if not attendance.exists():
                 return {'success': False, 'error': 'Pointage introuvable'}
 

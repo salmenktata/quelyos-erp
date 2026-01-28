@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos API',
-    'version': '19.0.1.0.93',
+    'version': '19.0.1.0.96',
     'category': 'Website',
     'summary': 'API REST pour frontend e-commerce et backoffice',
     'author': 'Quelyos',
@@ -19,6 +19,11 @@
         'crm',
         'delivery',
         'payment',
+        # HR modules natifs pour héritage (Community only)
+        'hr',
+        'hr_holidays',
+        'hr_attendance',
+        'hr_skills',
     ],
     'data': [
         'security/security.xml',

@@ -199,9 +199,10 @@ Alerter AVANT : schéma DB, modèles Odoo, endpoints API
 Lancer `/no-odoo` avant chaque commit pour vérifier conformité dans vitrine-client, dashboard-client ET vitrine-quelyos.
 
 ## Commandes disponibles
-**DevOps** : `/ship`, `/deploy`, `/test`, `/security`, `/perf`, `/db-sync`
+**DevOps** : `/ship`, `/commit`, `/deploy`, `/test`, `/security`, `/perf`, `/db-sync`
 **Odoo** : `/upgrade-odoo`, `/restart-odoo`, `/restart-backoffice`, `/restart-vitrine`, `/restart-ecommerce`, `/restart-all`
 **Qualité** : `/polish`, `/parity`, `/coherence`, `/clean`, `/analyze-page`, `/docs`, `/uiux`
+**Architecture** : `/leverage` (capitalisation sur existant Odoo vs custom), `/no-odoo` (anonymisation)
 
 ## Essentiels
 1. Lire [README.md](README.md), [ARCHITECTURE.md](ARCHITECTURE.md) et [LOGME.md](docs/LOGME.md) en début de session

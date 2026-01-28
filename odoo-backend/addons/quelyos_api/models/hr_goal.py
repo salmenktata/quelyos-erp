@@ -14,8 +14,8 @@ class HRGoal(models.Model):
 
     name = fields.Char('Titre', required=True)
     description = fields.Text('Description')
-    employee_id = fields.Many2one('quelyos.hr.employee', string='Employé', required=True, ondelete='cascade')
-    manager_id = fields.Many2one('quelyos.hr.employee', string='Responsable',
+    employee_id = fields.Many2one('hr.employee', string='Employé', required=True, ondelete='cascade')
+    manager_id = fields.Many2one('hr.employee', string='Responsable',
         related='employee_id.parent_id', store=True)
 
     # Période et deadline

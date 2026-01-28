@@ -13,25 +13,67 @@ Audit et correction des mentions "Odoo" visibles par utilisateurs finaux dans le
 
 ## Workflow
 
-### Étape 1 : Détection
-**Cibles** : `frontend/src/` et `backoffice/src/`
+### Étape 1 : Détection Code Source
+**Cibles** : `vitrine-client/src/`, `dashboard-client/src/`, `vitrine-quelyos/`
 
 **Exclusions** :
-- `lib/odoo/` - Code API interne
-- `api/` - Endpoints backend
-- `frontend/src/app/legal/` - Conformité LGPL
+- `lib/odoo/`, `lib/backend/` - Code API interne
+- `api-anonymizer.ts` - Middleware transformation
+- `**/legal/` - Conformité LGPL
 - `*.test.ts`, `*.test.tsx` - Tests unitaires
 
 **Commande Grep** :
 ```bash
-grep -r "Odoo" frontend/src backoffice/src \
+grep -rE "Odoo|odoo" vitrine-client/src dashboard-client/src vitrine-quelyos \
   --include="*.tsx" --include="*.ts" \
-  --exclude-dir=lib/odoo \
-  --exclude=*test.ts* \
-  | grep -v "frontend/src/app/legal"
+  | grep -vE "legal/|api-anonymizer|\.test\.|lib/backend/"
 ```
 
-### Étape 1b : Détection Jargon Odoo
+### Étape 1b : Détection Fichiers .env
+**P1-ENV - Variables d'environnement exposant l'infrastructure**
+
+**Commande Grep** :
+```bash
+grep -rE "ODOO_|odoo|Odoo" vitrine-client/.env* dashboard-client/.env* vitrine-quelyos/.env* 2>/dev/null
+```
+
+**Mapping obligatoire** :
+| Variable Interdite | → Utiliser |
+|-------------------|------------|
+| `ODOO_URL` | `BACKEND_URL` |
+| `NEXT_PUBLIC_ODOO_URL` | `NEXT_PUBLIC_BACKEND_URL` |
+| `ODOO_DATABASE` | `BACKEND_DATABASE` |
+| `ODOO_WEBHOOK_SECRET` | `BACKEND_WEBHOOK_SECRET` |
+| `VITE_ODOO_URL` | `VITE_BACKEND_URL` |
+| `# Odoo Backend` (commentaire) | `# Backend API` |
+
+### Étape 1c : Détection Noms de Fichiers/Dossiers
+**P1-FILES - Structure révélant l'infrastructure**
+
+**Commande** :
+```bash
+find vitrine-client/src dashboard-client/src vitrine-quelyos -name "*odoo*" -o -name "*Odoo*" 2>/dev/null
+```
+
+**Exemples de violations** :
+- `src/lib/odoo/` → `src/lib/backend/`
+- `OdooClient.ts` → `BackendClient.ts`
+- `useOdooAuth.ts` → `useBackendAuth.ts`
+
+### Étape 1d : Détection URLs/Ports Hardcodés
+**P2-URL - Fingerprints techniques**
+
+**Commande** :
+```bash
+grep -rn ":8069\|odoo\.com\|odoo\.sh" vitrine-client/src dashboard-client/src \
+  --include="*.tsx" --include="*.ts" \
+  | grep -v "fallback\|default\|localhost"
+```
+
+**Toléré** : `localhost:8069` comme fallback dev uniquement
+**Interdit** : URLs production contenant `:8069` ou `odoo.com`
+
+### Étape 1e : Détection Jargon Odoo
 **Termes spécifiques révélant l'infrastructure backend** :
 
 | Terme | Signification | Risque |
@@ -51,8 +93,63 @@ grep -r "Odoo" frontend/src backoffice/src \
 grep -rE "\bOCA\b|OpenERP|OERP|\bir\.model\b|\bres\.partner\b|\bres\.users\b|\bproduct\.template\b|\bsale\.order\b|Werkzeug" \
   vitrine-client/src dashboard-client/src \
   --include="*.tsx" --include="*.ts" \
-  | grep -vE "legal/|lib/odoo|node_modules|\.test\."
+  | grep -vE "legal/|api-anonymizer|node_modules|\.test\."
 ```
+
+### Étape 1f : Détection Imports/Exports
+**P1-IMPORT - Noms de modules exposés**
+
+**Commande** :
+```bash
+grep -rE "from ['\"].*odoo|import.*[Oo]doo|export.*[Oo]doo" \
+  vitrine-client/src dashboard-client/src \
+  --include="*.tsx" --include="*.ts"
+```
+
+**Exemples de violations** :
+- `import { OdooClient } from './lib/odoo'` → `import { BackendClient } from './lib/backend'`
+- `export class OdooService` → `export class BackendService`
+
+### Étape 1g : Détection Console/Logs
+**P2-LOG - Messages debug exposés**
+
+**Commande** :
+```bash
+grep -rE "console\.(log|warn|error|info).*[Oo]doo" \
+  vitrine-client/src dashboard-client/src \
+  --include="*.tsx" --include="*.ts"
+```
+
+**Risque** : Messages visibles dans DevTools du navigateur
+
+### Étape 1h : Détection Patterns API Odoo
+**P2-API - Endpoints/structures révélateurs**
+
+**Commande** :
+```bash
+grep -rE "/web/image|/web/content|/jsonrpc|X-Openerp|session_id" \
+  vitrine-client/src dashboard-client/src \
+  --include="*.tsx" --include="*.ts" \
+  | grep -vE "api-anonymizer|image-proxy|\.test\."
+```
+
+**Toléré** :
+- `session_id` si renommé côté cookie (`_auth_token`)
+- `/web/image` si proxifié via `/api/image`
+
+**Interdit** : Exposition directe dans URLs client
+
+### Étape 1i : Détection package.json
+**P1-PKG - Métadonnées npm exposées**
+
+**Commande** :
+```bash
+grep -E "odoo|Odoo" vitrine-client/package.json dashboard-client/package.json 2>/dev/null
+```
+
+**Exemples de violations** :
+- `"name": "odoo-frontend"` → `"name": "vitrine-client"`
+- `"odoo-xmlrpc": "^1.0.0"` → supprimer ou alias
 
 ### Étape 2 : Classification des Violations
 
@@ -64,6 +161,9 @@ grep -rE "\bOCA\b|OpenERP|OERP|\bir\.model\b|\bres\.partner\b|\bres\.users\b|\bp
 **P1 - Important** (métadonnées exposées) :
 - Labels de champs : `"ID Odoo"` → `"ID Système"`
 - Headers de colonnes
+- Variables `.env` : `ODOO_*` → `BACKEND_*`
+- Imports/exports de classes : `OdooClient` → `BackendClient`
+- Noms de fichiers/dossiers
 
 **P1b - Jargon Odoo** (termes techniques) :
 - Références OCA, OpenERP, OERP
@@ -71,8 +171,10 @@ grep -rE "\bOCA\b|OpenERP|OERP|\bir\.model\b|\bres\.partner\b|\bres\.users\b|\bp
 - Références framework Werkzeug
 
 **P2 - Mineur** (optionnel) :
-- Commentaires code
-- Console.log internes
+- Commentaires code internes
+- Console.log (si non visible en prod)
+- Port 8069 comme fallback dev
+- Pattern jsonrpc (utilisé par d'autres systèmes)
 
 ### Étape 3 : Corrections Automatiques (--fix)
 

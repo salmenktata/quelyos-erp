@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 
 class EmailSettingsController(http.Controller):
 
-    @http.route('/api/admin/email/config', type='json', auth='user', methods=['POST'])
+    @http.route('/api/admin/email/config', type='jsonrpc', auth='user', methods=['POST'])
     def get_email_config(self, **kwargs):
         """Get email configuration for current company"""
         try:
@@ -27,7 +27,7 @@ class EmailSettingsController(http.Controller):
             _logger.error("Error fetching email config: %s", str(e))
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/email/config/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/admin/email/config/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_email_config(self, **kwargs):
         """Update email configuration"""
         try:
@@ -95,7 +95,7 @@ class EmailSettingsController(http.Controller):
             _logger.error("Error updating email config: %s", str(e))
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/admin/email/test', type='json', auth='user', methods=['POST'])
+    @http.route('/api/admin/email/test', type='jsonrpc', auth='user', methods=['POST'])
     def test_email_connection(self, **kwargs):
         """Test email connection and optionally send test email"""
         try:

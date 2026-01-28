@@ -53,39 +53,44 @@ class HRSkill(models.Model):
 
 
 class HREmployeeSkill(models.Model):
-    """Compétence d'un employé avec niveau"""
-    _name = 'quelyos.hr.employee.skill'
-    _description = 'Compétence employé'
-    _order = 'skill_type_id, skill_id'
+    """Extension du modèle Compétences employé natif Odoo."""
+    _inherit = 'hr.employee.skill'
 
-    employee_id = fields.Many2one('quelyos.hr.employee', string='Employé', required=True, ondelete='cascade')
-    skill_id = fields.Many2one('quelyos.hr.skill', string='Compétence', required=True, ondelete='cascade')
-    skill_type_id = fields.Many2one('quelyos.hr.skill.type', related='skill_id.skill_type_id', store=True)
-    skill_level = fields.Selection([
-        ('0', 'Débutant'),
-        ('1', 'Intermédiaire'),
-        ('2', 'Confirmé'),
-        ('3', 'Expert'),
-    ], string='Niveau', default='1', required=True)
-    level_progress = fields.Integer('Progression (%)', default=50,
-        help='Progression vers le niveau supérieur (0-100)')
-    tenant_id = fields.Many2one('quelyos.tenant', related='employee_id.tenant_id', store=True)
-
-    _sql_constraints = [
-        ('employee_skill_uniq', 'unique(employee_id, skill_id)', 'Une compétence ne peut être attribuée qu\'une fois par employé'),
-    ]
+    # Extension pour lier aux compétences Quelyos
+    quelyos_skill_id = fields.Many2one(
+        'quelyos.hr.skill',
+        string='Compétence Quelyos',
+        ondelete='cascade',
+        help="Lien vers la compétence Quelyos (optionnel)"
+    )
+    quelyos_skill_type_id = fields.Many2one(
+        'quelyos.hr.skill.type',
+        related='quelyos_skill_id.skill_type_id',
+        store=True
+    )
+    tenant_id = fields.Many2one(
+        'quelyos.tenant',
+        related='employee_id.tenant_id',
+        store=True
+    )
 
     def get_employee_skill_data(self):
-        """Retourne les données pour le frontend"""
-        return {
+        """Retourne les données pour le frontend (compatible natif + Quelyos)."""
+        self.ensure_one()
+        # Utiliser les champs natifs Odoo hr_skills
+        data = {
             'id': self.id,
             'employee_id': self.employee_id.id,
             'skill_id': self.skill_id.id,
             'skill_name': self.skill_id.name,
-            'skill_type_id': self.skill_type_id.id,
-            'skill_type_name': self.skill_type_id.name,
-            'skill_type_color': self.skill_type_id.color,
-            'level': self.skill_level,
-            'level_label': dict(self._fields['skill_level'].selection).get(self.skill_level),
+            'skill_type_id': self.skill_type_id.id if self.skill_type_id else None,
+            'skill_type_name': self.skill_type_id.name if self.skill_type_id else None,
+            'skill_level_id': self.skill_level_id.id if self.skill_level_id else None,
+            'skill_level_name': self.skill_level_id.name if self.skill_level_id else None,
             'level_progress': self.level_progress,
         }
+        # Ajouter les champs Quelyos si disponibles
+        if self.quelyos_skill_id:
+            data['quelyos_skill_id'] = self.quelyos_skill_id.id
+            data['quelyos_skill_type_color'] = self.quelyos_skill_type_id.color if self.quelyos_skill_type_id else None
+        return data

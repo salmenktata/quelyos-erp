@@ -26,7 +26,7 @@ class HRAppraisalController(http.Controller):
     # ÉVALUATIONS
     # =========================================================================
 
-    @http.route('/api/hr/appraisals', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/appraisals', type='jsonrpc', auth='user', methods=['POST'])
     def get_appraisals(self, **kwargs):
         """Liste des évaluations avec filtres"""
         try:
@@ -69,7 +69,7 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/appraisals/<int:appraisal_id>', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/appraisals/<int:appraisal_id>', type='jsonrpc', auth='user', methods=['POST'])
     def get_appraisal(self, appraisal_id, **kwargs):
         """Détails d'une évaluation"""
         try:
@@ -88,7 +88,7 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/appraisals/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/appraisals/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_appraisal(self, **kwargs):
         """Crée une nouvelle évaluation"""
         try:
@@ -130,7 +130,7 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/appraisals/<int:appraisal_id>/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/appraisals/<int:appraisal_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_appraisal(self, appraisal_id, **kwargs):
         """Met à jour une évaluation"""
         try:
@@ -160,7 +160,7 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/appraisals/<int:appraisal_id>/action', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/appraisals/<int:appraisal_id>/action', type='jsonrpc', auth='user', methods=['POST'])
     def appraisal_action(self, appraisal_id, action, **kwargs):
         """Exécute une action sur l'évaluation"""
         try:
@@ -194,7 +194,7 @@ class HRAppraisalController(http.Controller):
     # OBJECTIFS
     # =========================================================================
 
-    @http.route('/api/hr/goals', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/goals', type='jsonrpc', auth='user', methods=['POST'])
     def get_goals(self, **kwargs):
         """Liste des objectifs"""
         try:
@@ -231,7 +231,7 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/goals/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/goals/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_goal(self, **kwargs):
         """Crée un nouvel objectif"""
         try:
@@ -262,7 +262,7 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/goals/<int:goal_id>/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/goals/<int:goal_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_goal(self, goal_id, **kwargs):
         """Met à jour un objectif"""
         try:
@@ -284,7 +284,7 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/goals/<int:goal_id>/action', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/goals/<int:goal_id>/action', type='jsonrpc', auth='user', methods=['POST'])
     def goal_action(self, goal_id, action, **kwargs):
         """Action sur un objectif"""
         try:
@@ -314,7 +314,7 @@ class HRAppraisalController(http.Controller):
     # COMPÉTENCES
     # =========================================================================
 
-    @http.route('/api/hr/skill-types', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/skill-types', type='jsonrpc', auth='user', methods=['POST'])
     def get_skill_types(self, **kwargs):
         """Liste des types de compétences"""
         try:
@@ -332,7 +332,7 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/skills', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/skills', type='jsonrpc', auth='user', methods=['POST'])
     def get_skills(self, **kwargs):
         """Liste des compétences"""
         try:
@@ -354,12 +354,12 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/employees/<int:employee_id>/skills', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/employees/<int:employee_id>/skills', type='jsonrpc', auth='user', methods=['POST'])
     def get_employee_skills(self, employee_id, **kwargs):
         """Compétences d'un employé"""
         try:
             domain = [('employee_id', '=', employee_id)]
-            skills = request.env['quelyos.hr.employee.skill'].sudo().search(domain, order='skill_type_id, skill_id')
+            skills = request.env['hr.employee.skill'].sudo().search(domain, order='skill_type_id, skill_id')
 
             return {
                 'success': True,
@@ -368,11 +368,11 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/employees/<int:employee_id>/skills/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/employees/<int:employee_id>/skills/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_employee_skills(self, employee_id, skills, **kwargs):
         """Met à jour les compétences d'un employé"""
         try:
-            EmployeeSkill = request.env['quelyos.hr.employee.skill'].sudo()
+            EmployeeSkill = request.env['hr.employee.skill'].sudo()
 
             # Supprimer les compétences existantes non incluses
             existing = EmployeeSkill.search([('employee_id', '=', employee_id)])
@@ -416,7 +416,7 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/skills/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/skills/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_skill(self, **kwargs):
         """Crée une nouvelle compétence"""
         try:
@@ -447,7 +447,7 @@ class HRAppraisalController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/skill-types/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/skill-types/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_skill_type(self, **kwargs):
         """Crée un nouveau type de compétence"""
         try:

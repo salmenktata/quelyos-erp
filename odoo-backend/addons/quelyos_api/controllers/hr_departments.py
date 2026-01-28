@@ -26,7 +26,7 @@ class HRDepartmentController(http.Controller):
     # DEPARTMENTS
     # =========================================================================
 
-    @http.route('/api/hr/departments', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/departments', type='jsonrpc', auth='user', methods=['POST'])
     def get_departments(self, **kwargs):
         """Liste des départements"""
         try:
@@ -36,7 +36,7 @@ class HRDepartmentController(http.Controller):
 
             domain = [('tenant_id', '=', int(tenant_id)), ('active', '=', True)]
 
-            Department = request.env['quelyos.hr.department'].sudo()
+            Department = request.env['hr.department'].sudo()
             departments = Department.search(domain, order='sequence, name')
 
             return {
@@ -47,7 +47,7 @@ class HRDepartmentController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/departments/tree', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/departments/tree', type='jsonrpc', auth='user', methods=['POST'])
     def get_departments_tree(self, **kwargs):
         """Organigramme hiérarchique des départements"""
         try:
@@ -62,7 +62,7 @@ class HRDepartmentController(http.Controller):
                 ('parent_id', '=', False),
             ]
 
-            Department = request.env['quelyos.hr.department'].sudo()
+            Department = request.env['hr.department'].sudo()
             root_departments = Department.search(domain, order='sequence, name')
 
             return {
@@ -72,11 +72,11 @@ class HRDepartmentController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/departments/<int:department_id>', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/departments/<int:department_id>', type='jsonrpc', auth='user', methods=['POST'])
     def get_department(self, department_id, **kwargs):
         """Détail d'un département"""
         try:
-            department = request.env['quelyos.hr.department'].sudo().browse(department_id)
+            department = request.env['hr.department'].sudo().browse(department_id)
             if not department.exists():
                 return {'success': False, 'error': 'Département introuvable'}
 
@@ -91,7 +91,7 @@ class HRDepartmentController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/departments/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/departments/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_department(self, **kwargs):
         """Créer un département"""
         try:
@@ -120,7 +120,7 @@ class HRDepartmentController(http.Controller):
             if kwargs.get('note'):
                 values['note'] = kwargs['note']
 
-            department = request.env['quelyos.hr.department'].sudo().create(values)
+            department = request.env['hr.department'].sudo().create(values)
 
             return {
                 'success': True,
@@ -129,11 +129,11 @@ class HRDepartmentController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/departments/<int:department_id>/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/departments/<int:department_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_department(self, department_id, **kwargs):
         """Mettre à jour un département"""
         try:
-            department = request.env['quelyos.hr.department'].sudo().browse(department_id)
+            department = request.env['hr.department'].sudo().browse(department_id)
             if not department.exists():
                 return {'success': False, 'error': 'Département introuvable'}
 
@@ -165,11 +165,11 @@ class HRDepartmentController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/departments/<int:department_id>/delete', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/departments/<int:department_id>/delete', type='jsonrpc', auth='user', methods=['POST'])
     def delete_department(self, department_id, **kwargs):
         """Supprimer (archiver) un département"""
         try:
-            department = request.env['quelyos.hr.department'].sudo().browse(department_id)
+            department = request.env['hr.department'].sudo().browse(department_id)
             if not department.exists():
                 return {'success': False, 'error': 'Département introuvable'}
 
@@ -186,7 +186,7 @@ class HRDepartmentController(http.Controller):
     # JOBS (POSTES)
     # =========================================================================
 
-    @http.route('/api/hr/jobs', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/jobs', type='jsonrpc', auth='user', methods=['POST'])
     def get_jobs(self, **kwargs):
         """Liste des postes"""
         try:
@@ -199,7 +199,7 @@ class HRDepartmentController(http.Controller):
             if kwargs.get('department_id'):
                 domain.append(('department_id', '=', int(kwargs['department_id'])))
 
-            Job = request.env['quelyos.hr.job'].sudo()
+            Job = request.env['hr.job'].sudo()
             jobs = Job.search(domain, order='sequence, name')
 
             return {
@@ -210,7 +210,7 @@ class HRDepartmentController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/jobs/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/jobs/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_job(self, **kwargs):
         """Créer un poste"""
         try:
@@ -237,7 +237,7 @@ class HRDepartmentController(http.Controller):
             if kwargs.get('expected_employees'):
                 values['expected_employees'] = int(kwargs['expected_employees'])
 
-            job = request.env['quelyos.hr.job'].sudo().create(values)
+            job = request.env['hr.job'].sudo().create(values)
 
             return {
                 'success': True,
@@ -246,11 +246,11 @@ class HRDepartmentController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/jobs/<int:job_id>/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/jobs/<int:job_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_job(self, job_id, **kwargs):
         """Mettre à jour un poste"""
         try:
-            job = request.env['quelyos.hr.job'].sudo().browse(job_id)
+            job = request.env['hr.job'].sudo().browse(job_id)
             if not job.exists():
                 return {'success': False, 'error': 'Poste introuvable'}
 

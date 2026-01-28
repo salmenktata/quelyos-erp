@@ -120,7 +120,7 @@ class PaymentController(BaseController):
             _logger.error(f'Error testing payment provider: {str(e)}', exc_info=True)
             return self._error_response(str(e))
 
-    @http.route('/api/ecommerce/payment/providers', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/ecommerce/payment/providers', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_active_payment_providers(self):
         """
         Get list of active payment providers for checkout (public endpoint)
@@ -154,7 +154,7 @@ class PaymentController(BaseController):
             _logger.error(f'Error fetching active providers: {str(e)}', exc_info=True)
             return self._error_response(str(e))
 
-    @http.route('/api/ecommerce/payment/init', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/ecommerce/payment/init', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def init_payment(self, provider_id, amount, currency_code, order_reference, customer_data, return_url):
         """
         Initialize payment session with selected provider

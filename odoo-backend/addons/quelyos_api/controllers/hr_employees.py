@@ -27,7 +27,7 @@ class HREmployeeController(http.Controller):
     # EMPLOYEES
     # =========================================================================
 
-    @http.route('/api/hr/employees', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/employees', type='jsonrpc', auth='user', methods=['POST'])
     def get_employees(self, **kwargs):
         """Liste des employés avec filtres"""
         try:
@@ -57,7 +57,7 @@ class HREmployeeController(http.Controller):
             limit = kwargs.get('limit', 50)
             offset = kwargs.get('offset', 0)
 
-            Employee = request.env['quelyos.hr.employee'].sudo()
+            Employee = request.env['hr.employee'].sudo()
             total = Employee.search_count(domain)
             employees = Employee.search(domain, limit=limit, offset=offset, order='name')
 
@@ -71,11 +71,11 @@ class HREmployeeController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/employees/<int:employee_id>', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/employees/<int:employee_id>', type='jsonrpc', auth='user', methods=['POST'])
     def get_employee(self, employee_id, **kwargs):
         """Détail d'un employé"""
         try:
-            employee = request.env['quelyos.hr.employee'].sudo().browse(employee_id)
+            employee = request.env['hr.employee'].sudo().browse(employee_id)
             if not employee.exists():
                 return {'success': False, 'error': 'Employé introuvable'}
 
@@ -86,7 +86,7 @@ class HREmployeeController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/employees/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/employees/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_employee(self, **kwargs):
         """Créer un nouvel employé"""
         try:
@@ -127,7 +127,7 @@ class HREmployeeController(http.Controller):
             if kwargs.get('hire_date'):
                 values['hire_date'] = kwargs['hire_date']
 
-            employee = request.env['quelyos.hr.employee'].sudo().create(values)
+            employee = request.env['hr.employee'].sudo().create(values)
 
             return {
                 'success': True,
@@ -136,11 +136,11 @@ class HREmployeeController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/employees/<int:employee_id>/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/employees/<int:employee_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_employee(self, employee_id, **kwargs):
         """Mettre à jour un employé"""
         try:
-            employee = request.env['quelyos.hr.employee'].sudo().browse(employee_id)
+            employee = request.env['hr.employee'].sudo().browse(employee_id)
             if not employee.exists():
                 return {'success': False, 'error': 'Employé introuvable'}
 
@@ -178,11 +178,11 @@ class HREmployeeController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/employees/<int:employee_id>/archive', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/employees/<int:employee_id>/archive', type='jsonrpc', auth='user', methods=['POST'])
     def archive_employee(self, employee_id, **kwargs):
         """Archiver un employé"""
         try:
-            employee = request.env['quelyos.hr.employee'].sudo().browse(employee_id)
+            employee = request.env['hr.employee'].sudo().browse(employee_id)
             if not employee.exists():
                 return {'success': False, 'error': 'Employé introuvable'}
 
@@ -197,11 +197,11 @@ class HREmployeeController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/employees/<int:employee_id>/subordinates', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/employees/<int:employee_id>/subordinates', type='jsonrpc', auth='user', methods=['POST'])
     def get_subordinates(self, employee_id, **kwargs):
         """Liste des subordonnés d'un employé"""
         try:
-            employee = request.env['quelyos.hr.employee'].sudo().browse(employee_id)
+            employee = request.env['hr.employee'].sudo().browse(employee_id)
             if not employee.exists():
                 return {'success': False, 'error': 'Employé introuvable'}
 
@@ -212,16 +212,16 @@ class HREmployeeController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/employees/<int:employee_id>/leaves', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/employees/<int:employee_id>/leaves', type='jsonrpc', auth='user', methods=['POST'])
     def get_employee_leaves(self, employee_id, **kwargs):
         """Historique des congés d'un employé"""
         try:
-            employee = request.env['quelyos.hr.employee'].sudo().browse(employee_id)
+            employee = request.env['hr.employee'].sudo().browse(employee_id)
             if not employee.exists():
                 return {'success': False, 'error': 'Employé introuvable'}
 
             # Soldes
-            balances = request.env['quelyos.hr.leave.allocation'].sudo().get_employee_balances(
+            balances = request.env['hr.leave.allocation'].sudo().get_employee_balances(
                 employee.tenant_id.id, employee_id
             )
 
@@ -236,11 +236,11 @@ class HREmployeeController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/employees/<int:employee_id>/attendance', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/employees/<int:employee_id>/attendance', type='jsonrpc', auth='user', methods=['POST'])
     def get_employee_attendance(self, employee_id, **kwargs):
         """Historique des pointages d'un employé"""
         try:
-            employee = request.env['quelyos.hr.employee'].sudo().browse(employee_id)
+            employee = request.env['hr.employee'].sudo().browse(employee_id)
             if not employee.exists():
                 return {'success': False, 'error': 'Employé introuvable'}
 

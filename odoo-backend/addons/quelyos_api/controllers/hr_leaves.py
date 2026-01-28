@@ -26,7 +26,7 @@ class HRLeaveController(http.Controller):
     # LEAVE TYPES
     # =========================================================================
 
-    @http.route('/api/hr/leave-types', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leave-types', type='jsonrpc', auth='user', methods=['POST'])
     def get_leave_types(self, **kwargs):
         """Liste des types de congés"""
         try:
@@ -36,7 +36,7 @@ class HRLeaveController(http.Controller):
 
             domain = [('tenant_id', '=', int(tenant_id)), ('active', '=', True)]
 
-            LeaveType = request.env['quelyos.hr.leave.type'].sudo()
+            LeaveType = request.env['hr.leave.type'].sudo()
             leave_types = LeaveType.search(domain, order='sequence, name')
 
             return {
@@ -46,7 +46,7 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leave-types/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leave-types/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_leave_type(self, **kwargs):
         """Créer un type de congé"""
         try:
@@ -75,7 +75,7 @@ class HRLeaveController(http.Controller):
                 if field in kwargs:
                     values[field] = kwargs[field]
 
-            leave_type = request.env['quelyos.hr.leave.type'].sudo().create(values)
+            leave_type = request.env['hr.leave.type'].sudo().create(values)
 
             return {
                 'success': True,
@@ -84,11 +84,11 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leave-types/<int:leave_type_id>/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leave-types/<int:leave_type_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_leave_type(self, leave_type_id, **kwargs):
         """Mettre à jour un type de congé"""
         try:
-            leave_type = request.env['quelyos.hr.leave.type'].sudo().browse(leave_type_id)
+            leave_type = request.env['hr.leave.type'].sudo().browse(leave_type_id)
             if not leave_type.exists():
                 return {'success': False, 'error': 'Type de congé introuvable'}
 
@@ -114,7 +114,7 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leave-types/init-defaults', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leave-types/init-defaults', type='jsonrpc', auth='user', methods=['POST'])
     def init_default_leave_types(self, **kwargs):
         """Initialiser les types de congés par défaut"""
         try:
@@ -122,7 +122,7 @@ class HRLeaveController(http.Controller):
             if not tenant_id:
                 return {'success': False, 'error': 'tenant_id requis'}
 
-            request.env['quelyos.hr.leave.type'].sudo().create_default_types(int(tenant_id))
+            request.env['hr.leave.type'].sudo().create_default_types(int(tenant_id))
 
             return {'success': True, 'message': 'Types de congés par défaut créés'}
         except Exception as e:
@@ -132,7 +132,7 @@ class HRLeaveController(http.Controller):
     # LEAVES (Demandes)
     # =========================================================================
 
-    @http.route('/api/hr/leaves', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves', type='jsonrpc', auth='user', methods=['POST'])
     def get_leaves(self, **kwargs):
         """Liste des demandes de congés avec filtres"""
         try:
@@ -162,7 +162,7 @@ class HRLeaveController(http.Controller):
             limit = kwargs.get('limit', 50)
             offset = kwargs.get('offset', 0)
 
-            Leave = request.env['quelyos.hr.leave'].sudo()
+            Leave = request.env['hr.leave'].sudo()
             total = Leave.search_count(domain)
             leaves = Leave.search(domain, limit=limit, offset=offset, order='date_from desc')
 
@@ -176,11 +176,11 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leaves/<int:leave_id>', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves/<int:leave_id>', type='jsonrpc', auth='user', methods=['POST'])
     def get_leave(self, leave_id, **kwargs):
         """Détail d'une demande de congé"""
         try:
-            leave = request.env['quelyos.hr.leave'].sudo().browse(leave_id)
+            leave = request.env['hr.leave'].sudo().browse(leave_id)
             if not leave.exists():
                 return {'success': False, 'error': 'Demande introuvable'}
 
@@ -191,7 +191,7 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leaves/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_leave(self, **kwargs):
         """Créer une demande de congé"""
         try:
@@ -217,7 +217,7 @@ class HRLeaveController(http.Controller):
             if kwargs.get('request_unit_half'):
                 values['request_unit_half'] = kwargs['request_unit_half']
 
-            leave = request.env['quelyos.hr.leave'].sudo().create(values)
+            leave = request.env['hr.leave'].sudo().create(values)
 
             return {
                 'success': True,
@@ -226,11 +226,11 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leaves/<int:leave_id>/update', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves/<int:leave_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_leave(self, leave_id, **kwargs):
         """Modifier une demande de congé"""
         try:
-            leave = request.env['quelyos.hr.leave'].sudo().browse(leave_id)
+            leave = request.env['hr.leave'].sudo().browse(leave_id)
             if not leave.exists():
                 return {'success': False, 'error': 'Demande introuvable'}
 
@@ -259,11 +259,11 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leaves/<int:leave_id>/confirm', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves/<int:leave_id>/confirm', type='jsonrpc', auth='user', methods=['POST'])
     def confirm_leave(self, leave_id, **kwargs):
         """Soumettre une demande de congé"""
         try:
-            leave = request.env['quelyos.hr.leave'].sudo().browse(leave_id)
+            leave = request.env['hr.leave'].sudo().browse(leave_id)
             if not leave.exists():
                 return {'success': False, 'error': 'Demande introuvable'}
 
@@ -276,11 +276,11 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leaves/<int:leave_id>/approve', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves/<int:leave_id>/approve', type='jsonrpc', auth='user', methods=['POST'])
     def approve_leave(self, leave_id, **kwargs):
         """Approuver une demande de congé (premier niveau)"""
         try:
-            leave = request.env['quelyos.hr.leave'].sudo().browse(leave_id)
+            leave = request.env['hr.leave'].sudo().browse(leave_id)
             if not leave.exists():
                 return {'success': False, 'error': 'Demande introuvable'}
 
@@ -293,11 +293,11 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leaves/<int:leave_id>/validate', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves/<int:leave_id>/validate', type='jsonrpc', auth='user', methods=['POST'])
     def validate_leave(self, leave_id, **kwargs):
         """Valider une demande de congé (second niveau)"""
         try:
-            leave = request.env['quelyos.hr.leave'].sudo().browse(leave_id)
+            leave = request.env['hr.leave'].sudo().browse(leave_id)
             if not leave.exists():
                 return {'success': False, 'error': 'Demande introuvable'}
 
@@ -310,11 +310,11 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leaves/<int:leave_id>/refuse', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves/<int:leave_id>/refuse', type='jsonrpc', auth='user', methods=['POST'])
     def refuse_leave(self, leave_id, **kwargs):
         """Refuser une demande de congé"""
         try:
-            leave = request.env['quelyos.hr.leave'].sudo().browse(leave_id)
+            leave = request.env['hr.leave'].sudo().browse(leave_id)
             if not leave.exists():
                 return {'success': False, 'error': 'Demande introuvable'}
 
@@ -328,11 +328,11 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leaves/<int:leave_id>/cancel', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves/<int:leave_id>/cancel', type='jsonrpc', auth='user', methods=['POST'])
     def cancel_leave(self, leave_id, **kwargs):
         """Annuler une demande de congé"""
         try:
-            leave = request.env['quelyos.hr.leave'].sudo().browse(leave_id)
+            leave = request.env['hr.leave'].sudo().browse(leave_id)
             if not leave.exists():
                 return {'success': False, 'error': 'Demande introuvable'}
 
@@ -345,7 +345,7 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leaves/calendar', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves/calendar', type='jsonrpc', auth='user', methods=['POST'])
     def get_leaves_calendar(self, **kwargs):
         """Données pour le calendrier des absences"""
         try:
@@ -356,7 +356,7 @@ class HRLeaveController(http.Controller):
             if not kwargs.get('date_from') or not kwargs.get('date_to'):
                 return {'success': False, 'error': 'date_from et date_to requis'}
 
-            calendar_data = request.env['quelyos.hr.leave'].sudo().get_calendar_data(
+            calendar_data = request.env['hr.leave'].sudo().get_calendar_data(
                 tenant_id=int(tenant_id),
                 date_from=kwargs['date_from'],
                 date_to=kwargs['date_to'],
@@ -370,7 +370,7 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leaves/pending', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leaves/pending', type='jsonrpc', auth='user', methods=['POST'])
     def get_pending_leaves(self, **kwargs):
         """Demandes en attente d'approbation"""
         try:
@@ -380,7 +380,7 @@ class HRLeaveController(http.Controller):
 
             manager_employee_id = int(kwargs['manager_employee_id']) if kwargs.get('manager_employee_id') else None
 
-            pending = request.env['quelyos.hr.leave'].sudo().get_pending_approvals(
+            pending = request.env['hr.leave'].sudo().get_pending_approvals(
                 tenant_id=int(tenant_id),
                 manager_employee_id=manager_employee_id,
             )
@@ -397,7 +397,7 @@ class HRLeaveController(http.Controller):
     # ALLOCATIONS
     # =========================================================================
 
-    @http.route('/api/hr/leave-allocations', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leave-allocations', type='jsonrpc', auth='user', methods=['POST'])
     def get_allocations(self, **kwargs):
         """Liste des allocations de congés"""
         try:
@@ -417,7 +417,7 @@ class HRLeaveController(http.Controller):
             limit = kwargs.get('limit', 50)
             offset = kwargs.get('offset', 0)
 
-            Allocation = request.env['quelyos.hr.leave.allocation'].sudo()
+            Allocation = request.env['hr.leave.allocation'].sudo()
             total = Allocation.search_count(domain)
             allocations = Allocation.search(domain, limit=limit, offset=offset, order='date_from desc')
 
@@ -431,7 +431,7 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leave-allocations/create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leave-allocations/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_allocation(self, **kwargs):
         """Créer une allocation de congés"""
         try:
@@ -460,7 +460,7 @@ class HRLeaveController(http.Controller):
             if kwargs.get('notes'):
                 values['notes'] = kwargs['notes']
 
-            allocation = request.env['quelyos.hr.leave.allocation'].sudo().create(values)
+            allocation = request.env['hr.leave.allocation'].sudo().create(values)
 
             return {
                 'success': True,
@@ -469,11 +469,11 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leave-allocations/<int:allocation_id>/validate', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leave-allocations/<int:allocation_id>/validate', type='jsonrpc', auth='user', methods=['POST'])
     def validate_allocation(self, allocation_id, **kwargs):
         """Valider une allocation"""
         try:
-            allocation = request.env['quelyos.hr.leave.allocation'].sudo().browse(allocation_id)
+            allocation = request.env['hr.leave.allocation'].sudo().browse(allocation_id)
             if not allocation.exists():
                 return {'success': False, 'error': 'Allocation introuvable'}
 
@@ -486,7 +486,7 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leave-allocations/bulk-create', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leave-allocations/bulk-create', type='jsonrpc', auth='user', methods=['POST'])
     def bulk_create_allocations(self, **kwargs):
         """Créer des allocations en masse pour tous les employés"""
         try:
@@ -501,7 +501,7 @@ class HRLeaveController(http.Controller):
 
             year = kwargs.get('year')
 
-            count = request.env['quelyos.hr.leave.allocation'].sudo().create_yearly_allocations(
+            count = request.env['hr.leave.allocation'].sudo().create_yearly_allocations(
                 tenant_id=int(tenant_id),
                 leave_type_id=int(kwargs['leave_type_id']),
                 number_of_days=float(kwargs['number_of_days']),
@@ -516,7 +516,7 @@ class HRLeaveController(http.Controller):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    @http.route('/api/hr/leave-balances', type='json', auth='user', methods=['POST'])
+    @http.route('/api/hr/leave-balances', type='jsonrpc', auth='user', methods=['POST'])
     def get_balances(self, **kwargs):
         """Soldes de congés d'un employé"""
         try:
@@ -527,7 +527,7 @@ class HRLeaveController(http.Controller):
             if not kwargs.get('employee_id'):
                 return {'success': False, 'error': 'employee_id requis'}
 
-            balances = request.env['quelyos.hr.leave.allocation'].sudo().get_employee_balances(
+            balances = request.env['hr.leave.allocation'].sudo().get_employee_balances(
                 tenant_id=int(tenant_id),
                 employee_id=int(kwargs['employee_id']),
             )

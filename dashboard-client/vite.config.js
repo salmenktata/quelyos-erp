@@ -19,6 +19,11 @@ export default defineConfig({
             allow: [fileURLToPath(new URL('..', import.meta.url))],
         },
         proxy: {
+            '/api/pos': {
+                target: 'http://localhost:8069',
+                changeOrigin: true,
+                secure: false,
+            },
             '/api/ecommerce': {
                 target: 'http://localhost:8069',
                 changeOrigin: true,
@@ -36,10 +41,14 @@ export default defineConfig({
                 secure: false,
             },
             '/api/finance': {
-                target: 'http://localhost:3004',
+                target: 'http://localhost:8069',
                 changeOrigin: true,
                 secure: false,
-                rewrite: function (path) { return path.replace(/^\/api\/finance/, ''); },
+            },
+            '/api/marketing': {
+                target: 'http://localhost:8069',
+                changeOrigin: true,
+                secure: false,
             },
             '/web': {
                 target: 'http://localhost:8069',

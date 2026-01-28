@@ -13,11 +13,11 @@ class HRAppraisal(models.Model):
     _order = 'date_scheduled desc, id desc'
 
     name = fields.Char('Référence', readonly=True, copy=False)
-    employee_id = fields.Many2one('quelyos.hr.employee', string='Employé', required=True, ondelete='cascade')
-    manager_id = fields.Many2one('quelyos.hr.employee', string='Évaluateur',
+    employee_id = fields.Many2one('hr.employee', string='Employé', required=True, ondelete='cascade')
+    manager_id = fields.Many2one('hr.employee', string='Évaluateur',
         related='employee_id.parent_id', store=True, readonly=False)
-    department_id = fields.Many2one('quelyos.hr.department', related='employee_id.department_id', store=True)
-    job_id = fields.Many2one('quelyos.hr.job', related='employee_id.job_id', store=True)
+    department_id = fields.Many2one('hr.department', related='employee_id.department_id', store=True)
+    job_id = fields.Many2one('hr.job', related='employee_id.job_id', store=True)
 
     # Type et période
     appraisal_type = fields.Selection([
@@ -100,7 +100,7 @@ class HRAppraisal(models.Model):
         if not vals.get('name'):
             tenant_id = vals.get('tenant_id')
             if not tenant_id and vals.get('employee_id'):
-                employee = self.env['quelyos.hr.employee'].browse(vals['employee_id'])
+                employee = self.env['hr.employee'].browse(vals['employee_id'])
                 tenant_id = employee.tenant_id.id
 
             year = date.today().year

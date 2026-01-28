@@ -1,177 +1,51 @@
 # -*- coding: utf-8 -*-
 """
-Modèle Contrat de Travail RH.
+Modele Contrat de Travail RH standalone pour Quelyos.
 
-Gère les contrats des employés : CDI, CDD, Stage, Intérim.
-Inclut salaire, période d'essai, dates de validité.
+Modele custom independant de hr_contract (Enterprise).
+Implemente la gestion des contrats de travail pour le module RH.
 """
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
-class HRContract(models.Model):
+class QuelyosHRContract(models.Model):
     _name = 'quelyos.hr.contract'
-    _description = 'Contrat de Travail'
+    _description = 'Contrat de travail'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'date_start desc'
 
-    # ═══════════════════════════════════════════════════════════════════════════
-    # IDENTIFICATION
-    # ═══════════════════════════════════════════════════════════════════════════
+    # CHAMPS PRINCIPAUX
 
     name = fields.Char(
-        string='Référence',
+        string='Reference',
         required=True,
         copy=False,
         readonly=True,
-        default='Nouveau',
-        tracking=True,
-        help="Référence unique du contrat"
+        default=lambda self: _('New'),
+        tracking=True
     )
-    active = fields.Boolean(
-        string='Actif',
-        default=True
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # EMPLOYÉ & POSTE
-    # ═══════════════════════════════════════════════════════════════════════════
-
     employee_id = fields.Many2one(
-        'quelyos.hr.employee',
-        string='Employé',
+        'hr.employee',
+        string='Employe',
         required=True,
+        ondelete='cascade',
         tracking=True,
-        domain="[('tenant_id', '=', tenant_id)]"
+        index=True
     )
     department_id = fields.Many2one(
-        'quelyos.hr.department',
-        string='Département',
-        tracking=True,
-        domain="[('tenant_id', '=', tenant_id)]"
+        'hr.department',
+        string='Departement',
+        tracking=True
     )
     job_id = fields.Many2one(
-        'quelyos.hr.job',
+        'hr.job',
         string='Poste',
-        tracking=True,
-        domain="[('tenant_id', '=', tenant_id)]"
+        tracking=True
     )
 
-    # ═══════════════════════════════════════════════════════════════════════════
-    # TYPE DE CONTRAT
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    contract_type = fields.Selection([
-        ('cdi', 'CDI - Contrat à Durée Indéterminée'),
-        ('cdd', 'CDD - Contrat à Durée Déterminée'),
-        ('stage', 'Stage'),
-        ('interim', 'Intérim'),
-        ('apprenticeship', 'Apprentissage'),
-        ('freelance', 'Freelance'),
-    ], string='Type de contrat', required=True, default='cdi', tracking=True)
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # DATES
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    date_start = fields.Date(
-        string='Date de début',
-        required=True,
-        tracking=True,
-        help="Date de prise d'effet du contrat"
-    )
-    date_end = fields.Date(
-        string='Date de fin',
-        tracking=True,
-        help="Date de fin du contrat (obligatoire pour CDD/Stage)"
-    )
-    trial_date_end = fields.Date(
-        string='Fin période d\'essai',
-        tracking=True,
-        help="Date de fin de la période d'essai"
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # RÉMUNÉRATION
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    wage = fields.Monetary(
-        string='Salaire brut',
-        required=True,
-        tracking=True,
-        help="Salaire brut selon la périodicité"
-    )
-    wage_type = fields.Selection([
-        ('monthly', 'Mensuel'),
-        ('hourly', 'Horaire'),
-    ], string='Type de salaire', default='monthly', required=True)
-
-    currency_id = fields.Many2one(
-        'res.currency',
-        string='Devise',
-        default=lambda self: self.env.company.currency_id,
-        required=True
-    )
-
-    schedule_pay = fields.Selection([
-        ('monthly', 'Mensuel'),
-        ('bi-monthly', 'Bimensuel'),
-        ('weekly', 'Hebdomadaire'),
-    ], string='Périodicité de paie', default='monthly', required=True)
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # TEMPS DE TRAVAIL
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    hours_per_week = fields.Float(
-        string='Heures/semaine',
-        default=40.0,
-        help="Durée hebdomadaire de travail"
-    )
-    time_type = fields.Selection([
-        ('full', 'Temps plein'),
-        ('part', 'Temps partiel'),
-    ], string='Type de temps', default='full')
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # STATUT
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    state = fields.Selection([
-        ('draft', 'Brouillon'),
-        ('open', 'En cours'),
-        ('close', 'Expiré'),
-        ('cancel', 'Annulé'),
-    ], string='État', default='draft', tracking=True, required=True)
-
-    kanban_state = fields.Selection([
-        ('normal', 'En attente'),
-        ('done', 'Prêt'),
-        ('blocked', 'Bloqué'),
-    ], string='État Kanban', default='normal')
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # NOTES
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    notes = fields.Html(
-        string='Notes',
-        help="Informations complémentaires sur le contrat"
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # AVANTAGES
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    advantages = fields.Text(
-        string='Avantages',
-        help="Avantages en nature, primes, etc."
-    )
-
-    # ═══════════════════════════════════════════════════════════════════════════
     # MULTI-TENANT
-    # ═══════════════════════════════════════════════════════════════════════════
 
     tenant_id = fields.Many2one(
         'quelyos.tenant',
@@ -180,76 +54,150 @@ class HRContract(models.Model):
         ondelete='cascade',
         index=True
     )
-    company_id = fields.Many2one(
-        'res.company',
-        string='Société',
-        related='tenant_id.company_id',
-        store=True
+
+    # TYPE DE CONTRAT
+
+    contract_type = fields.Selection([
+        ('cdi', 'CDI - Contrat a Duree Indeterminee'),
+        ('cdd', 'CDD - Contrat a Duree Determinee'),
+        ('stage', 'Stage'),
+        ('interim', 'Interim'),
+        ('apprenticeship', 'Apprentissage'),
+        ('freelance', 'Freelance'),
+    ], string='Type de contrat', required=True, default='cdi', tracking=True)
+
+    # DATES
+
+    date_start = fields.Date(
+        string='Date de debut',
+        required=True,
+        tracking=True,
+        default=fields.Date.today
+    )
+    date_end = fields.Date(
+        string='Date de fin',
+        tracking=True
+    )
+    trial_date_end = fields.Date(
+        string='Fin periode essai',
+        tracking=True
     )
 
-    # ═══════════════════════════════════════════════════════════════════════════
-    # CONTRAINTES
-    # ═══════════════════════════════════════════════════════════════════════════
+    # REMUNERATION
 
-    @api.constrains('date_start', 'date_end')
-    def _check_dates(self):
-        for contract in self:
-            if contract.date_end and contract.date_start > contract.date_end:
-                raise ValidationError(_("La date de fin doit être postérieure à la date de début !"))
+    wage = fields.Monetary(
+        string='Salaire',
+        required=True,
+        tracking=True,
+        help="Salaire brut mensuel"
+    )
+    wage_type = fields.Selection([
+        ('monthly', 'Mensuel'),
+        ('hourly', 'Horaire'),
+    ], string='Type de salaire', default='monthly', required=True)
+    currency_id = fields.Many2one(
+        'res.currency',
+        string='Devise',
+        default=lambda self: self.env.company.currency_id,
+        required=True
+    )
+    schedule_pay = fields.Selection([
+        ('monthly', 'Mensuel'),
+        ('quarterly', 'Trimestriel'),
+        ('semi-annually', 'Semestriel'),
+        ('annually', 'Annuel'),
+        ('weekly', 'Hebdomadaire'),
+        ('bi-weekly', 'Bi-hebdomadaire'),
+        ('bi-monthly', 'Bi-mensuel'),
+    ], string='Periodicite de paie', default='monthly', required=True)
+
+    # TEMPS DE TRAVAIL
+
+    hours_per_week = fields.Float(
+        string='Heures/semaine',
+        default=40.0,
+        help="Duree hebdomadaire de travail (48h max en Tunisie)"
+    )
+    time_type = fields.Selection([
+        ('full', 'Temps plein'),
+        ('part', 'Temps partiel'),
+    ], string='Type de temps', default='full')
+
+    # ETAT
+
+    state = fields.Selection([
+        ('draft', 'Brouillon'),
+        ('open', 'En cours'),
+        ('close', 'Termine'),
+        ('cancel', 'Annule'),
+    ], string='Etat', default='draft', required=True, tracking=True)
+
+    # NOTES ET AVANTAGES
+
+    notes = fields.Text(string='Notes')
+    advantages = fields.Text(
+        string='Avantages',
+        help="Avantages en nature, primes, tickets restaurant, etc."
+    )
+
+    # CONTRAINTES
 
     @api.constrains('contract_type', 'date_end')
     def _check_date_end_required(self):
+        """La date de fin est obligatoire pour CDD/Stage/Interim."""
         for contract in self:
             if contract.contract_type in ('cdd', 'stage', 'interim') and not contract.date_end:
                 raise ValidationError(_("La date de fin est obligatoire pour un %s !") % dict(
                     self._fields['contract_type'].selection).get(contract.contract_type))
 
-    # ═══════════════════════════════════════════════════════════════════════════
+    @api.constrains('date_start', 'date_end')
+    def _check_dates(self):
+        """La date de fin doit etre apres la date de debut."""
+        for contract in self:
+            if contract.date_end and contract.date_start and contract.date_end < contract.date_start:
+                raise ValidationError(_("La date de fin doit etre posterieure a la date de debut !"))
+
     # CRUD
-    # ═══════════════════════════════════════════════════════════════════════════
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('name', 'Nouveau') == 'Nouveau':
+            if not vals.get('name') or vals.get('name') == _('New'):
                 vals['name'] = self.env['ir.sequence'].next_by_code('quelyos.hr.contract') or 'CTR-0001'
         return super().create(vals_list)
 
-    # ═══════════════════════════════════════════════════════════════════════════
     # ACTIONS
-    # ═══════════════════════════════════════════════════════════════════════════
 
     def action_open(self):
-        """Passer le contrat en cours."""
+        """Activer le contrat."""
         for contract in self:
-            contract.state = 'open'
-            # Mettre à jour l'employé
-            contract.employee_id.write({
-                'department_id': contract.department_id.id,
-                'job_id': contract.job_id.id,
-            })
+            if contract.state == 'draft':
+                contract.state = 'open'
 
     def action_close(self):
-        """Clôturer le contrat."""
-        self.write({'state': 'close'})
+        """Cloturer le contrat."""
+        for contract in self:
+            if contract.state == 'open':
+                contract.state = 'close'
 
     def action_cancel(self):
         """Annuler le contrat."""
-        self.write({'state': 'cancel'})
+        for contract in self:
+            if contract.state in ('draft', 'open'):
+                contract.state = 'cancel'
 
     def action_draft(self):
         """Remettre en brouillon."""
-        self.write({'state': 'draft'})
+        for contract in self:
+            if contract.state == 'cancel':
+                contract.state = 'draft'
 
-    # ═══════════════════════════════════════════════════════════════════════════
     # CRON
-    # ═══════════════════════════════════════════════════════════════════════════
 
     @api.model
     def _cron_check_contract_expiry(self):
-        """Cron pour détecter les contrats arrivant à expiration."""
+        """Cron pour detecter les contrats arrivant a expiration."""
         today = fields.Date.today()
-        # Contrats expirant dans 30 jours
         expiring_soon = self.search([
             ('state', '=', 'open'),
             ('date_end', '!=', False),
@@ -257,31 +205,26 @@ class HRContract(models.Model):
             ('date_end', '>=', today),
         ])
         for contract in expiring_soon:
-            # Créer une activité de suivi
             contract.activity_schedule(
                 'mail.mail_activity_data_todo',
                 date_deadline=contract.date_end,
-                summary=_("Contrat arrivant à expiration"),
+                summary=_("Contrat arrivant a expiration"),
                 note=_("Le contrat de %s expire le %s.") % (
                     contract.employee_id.name,
                     contract.date_end
                 ),
             )
-
-        # Contrats expirés
         expired = self.search([
             ('state', '=', 'open'),
             ('date_end', '!=', False),
             ('date_end', '<', today),
         ])
-        expired.action_close()
+        expired.write({'state': 'close'})
 
-    # ═══════════════════════════════════════════════════════════════════════════
-    # MÉTHODES API
-    # ═══════════════════════════════════════════════════════════════════════════
+    # METHODES API
 
     def get_contract_data(self):
-        """Retourne les données du contrat pour l'API."""
+        """Retourne les donnees du contrat pour l'API."""
         self.ensure_one()
         return {
             'id': self.id,
@@ -304,7 +247,6 @@ class HRContract(models.Model):
             'hours_per_week': self.hours_per_week,
             'time_type': self.time_type,
             'state': self.state,
-            'state_label': dict(self._fields['state'].selection).get(self.state),
             'notes': self.notes or '',
             'advantages': self.advantages or '',
         }
