@@ -28,8 +28,6 @@ class QuelyosStockInventory(models.Model):
         string='Date Inventaire',
         required=True,
         default=fields.Datetime.now,
-        readonly=True,
-        states={'draft': [('readonly', False)]},
         tracking=True
     )
 
@@ -38,8 +36,6 @@ class QuelyosStockInventory(models.Model):
         string='Emplacement',
         required=True,
         domain=[('usage', '=', 'internal')],
-        readonly=True,
-        states={'draft': [('readonly', False)]},
         tracking=True
     )
 
@@ -48,8 +44,6 @@ class QuelyosStockInventory(models.Model):
         string='Responsable',
         required=True,
         default=lambda self: self.env.user,
-        readonly=True,
-        states={'draft': [('readonly', False)]},
         tracking=True
     )
 
@@ -63,15 +57,11 @@ class QuelyosStockInventory(models.Model):
     line_ids = fields.One2many(
         'quelyos.stock.inventory.line',
         'inventory_id',
-        string='Lignes Inventaire',
-        readonly=True,
-        states={'in_progress': [('readonly', False)]}
+        string='Lignes Inventaire'
     )
 
     note = fields.Text(
-        string='Notes',
-        readonly=True,
-        states={'draft': [('readonly', False)], 'in_progress': [('readonly', False)]}
+        string='Notes'
     )
 
     line_count = fields.Integer(

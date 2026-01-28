@@ -209,22 +209,60 @@ grep -E "odoo|Odoo" vitrine-client/package.json dashboard-client/package.json 2>
 
 **Format** :
 ```
-🔍 Violations Odoo UI détectées : 7
+🔍 Audit /no-odoo - Anonymisation Infrastructure
 
-[P0] CRITIQUE (6)
-  ❌ backoffice/src/components/common/VariantManager.tsx:304
-     "dans Odoo" → "dans la configuration système"
+═══════════════════════════════════════════════════
+📁 CODE SOURCE (.ts/.tsx)
+═══════════════════════════════════════════════════
+[P0] CRITIQUE - UI Visible (0)
+  ✅ Aucune violation
 
-  ❌ backoffice/src/components/common/VariantManager.tsx:328
-     "modifiez cet attribut dans Odoo" → "...dans la configuration système"
+[P1] IMPORTANT - Métadonnées (0)
+  ✅ Aucune violation
 
-  [...]
+[P1b] JARGON - Termes techniques (1)
+  ⚪ vitrine-client/src/lib/api-anonymizer.ts:37
+     'res.partner' (interne - toléré)
 
-[P1] IMPORTANT (1)
-  ⚠️  backoffice/src/pages/ProductDetail.tsx:478
-     "ID Odoo" → "ID Système"
+═══════════════════════════════════════════════════
+📄 FICHIERS .ENV
+═══════════════════════════════════════════════════
+[P1-ENV] Variables d'environnement (0)
+  ✅ BACKEND_URL utilisé
+  ✅ BACKEND_DATABASE utilisé
 
-✅ Exception préservée : frontend/src/app/legal/page.tsx
+═══════════════════════════════════════════════════
+📂 STRUCTURE FICHIERS
+═══════════════════════════════════════════════════
+[P1-FILES] Noms fichiers/dossiers (0)
+  ✅ Aucun fichier *odoo*
+
+═══════════════════════════════════════════════════
+🔗 URLS/PORTS
+═══════════════════════════════════════════════════
+[P2-URL] Fingerprints (0)
+  ⚪ localhost:8069 (fallback dev - toléré)
+
+═══════════════════════════════════════════════════
+📦 PACKAGE.JSON
+═══════════════════════════════════════════════════
+[P1-PKG] Métadonnées npm (0)
+  ✅ Aucune référence
+
+═══════════════════════════════════════════════════
+⚖️ EXCEPTION LGPL
+═══════════════════════════════════════════════════
+✅ vitrine-client/src/app/legal/page.tsx préservée
+
+═══════════════════════════════════════════════════
+📊 RÉSUMÉ
+═══════════════════════════════════════════════════
+P0 Critique    : 0 ✅
+P1 Important   : 0 ✅
+P1b Jargon     : 1 ⚪ (toléré)
+P2 Mineur      : 0 ⚪
+
+RÉSULTAT : ✅ CONFORME
 ```
 
 ## Tests Post-Correction
@@ -623,3 +661,54 @@ grep -c "dark:" vitrine-quelyos/app/error.tsx
 | `app/superadmin/login/page.tsx` | Utilise routes proxy, supprimé var `odooUrl` |
 | `app/error.tsx` | Support dark/light mode |
 | `app/global-error.tsx` | CSS inline dark mode |
+
+### Phase 4 - Renforcement Contrôles + Fichiers .env ✅ (2026-01-28)
+
+**Objectif** : Étendre les contrôles et corriger les variables d'environnement
+
+#### **P1-ENV - Variables .env corrigées**
+
+| Fichier | Avant | Après |
+|---------|-------|-------|
+| `vitrine-client/.env.production` | `NEXT_PUBLIC_ODOO_URL` | `NEXT_PUBLIC_BACKEND_URL` |
+| `vitrine-client/.env.production` | `ODOO_DATABASE` | `BACKEND_DATABASE` |
+| `vitrine-client/.env.production` | `ODOO_WEBHOOK_SECRET` | `BACKEND_WEBHOOK_SECRET` |
+| `vitrine-client/.env.production` | `# Odoo Backend API` | `# Backend API` |
+| `vitrine-client/.env.local` | `NEXT_PUBLIC_ODOO_URL` | `NEXT_PUBLIC_BACKEND_URL` |
+| `vitrine-client/.env.local` | `ODOO_DATABASE` | `BACKEND_DATABASE` |
+| `vitrine-client/.env.local` | `ODOO_WEBHOOK_SECRET` | `BACKEND_WEBHOOK_SECRET` |
+| `vitrine-client/.env.local` | `# Odoo Backend` | `# Backend API` |
+| `vitrine-client/.env.example` | `# ODOO BACKEND` | `# BACKEND API` |
+| `dashboard-client/.env` | `# URL de l'API Odoo` | `# URL de l'API Backend` |
+
+#### **Nouveaux contrôles ajoutés**
+
+| Étape | Description | Niveau |
+|-------|-------------|--------|
+| 1b | Variables `.env*` | P1-ENV |
+| 1c | Noms fichiers/dossiers | P1-FILES |
+| 1d | URLs/ports hardcodés | P2-URL |
+| 1f | Imports/exports classes | P1-IMPORT |
+| 1g | Console.log avec "Odoo" | P2-LOG |
+| 1h | Patterns API Odoo | P2-API |
+| 1i | Métadonnées package.json | P1-PKG |
+
+#### **Vérification automatique Phase 4**
+
+```bash
+# Test 1 : Variables .env anonymisées
+grep -rE "ODOO_|NEXT_PUBLIC_ODOO" vitrine-client/.env* dashboard-client/.env* 2>/dev/null
+# Attendu : 0 résultats
+
+# Test 2 : Commentaires .env anonymisés
+grep -i "odoo" vitrine-client/.env* dashboard-client/.env* 2>/dev/null
+# Attendu : 0 résultats
+
+# Test 3 : Aucun fichier nommé *odoo*
+find vitrine-client/src dashboard-client/src -name "*odoo*" 2>/dev/null
+# Attendu : 0 résultats
+
+# Test 4 : Aucun import/export OdooClient
+grep -rE "OdooClient|getOdooImageUrl" vitrine-client/src dashboard-client/src --include="*.ts" --include="*.tsx"
+# Attendu : 0 résultats
+```
