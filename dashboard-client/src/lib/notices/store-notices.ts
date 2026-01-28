@@ -690,4 +690,31 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
       }
     ]
   },
+  blog: {
+    pageId: 'store-blog',
+    title: 'Blog',
+    purpose: 'Gérez vos articles et contenus pour améliorer le SEO et engager vos clients.',
+    icon: FileText,
+    moduleColor: 'indigo',
+    sections: [
+      {
+        title: 'Fonctionnalités',
+        icon: Settings,
+        items: [
+          'Gestion des articles par catégorie',
+          'États (brouillon, publié, archivé)',
+          'Statistiques de lecture',
+          'Mise en avant d\'articles',
+        ]
+      },
+      {
+        title: 'Actions recommandées',
+        items: [
+          'Créer des catégories : Organisez vos contenus',
+          'Rédiger des articles : Ajoutez du contenu régulièrement',
+          'Optimiser le SEO : Utilisez des mots-clés pertinents',
+        ]
+      }
+    ]
+  },
 };
