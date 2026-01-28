@@ -22,6 +22,7 @@ import {
   useJobs,
 } from '@/hooks/hr'
 import { hrNotices } from '@/lib/notices'
+import { odooColorToHex } from '@/lib/odooColors'
 import {
   Edit,
   Save,
@@ -500,18 +501,21 @@ export default function EmployeeDetailPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {leaves.map(leave => (
-                    <tr key={leave.id}>
-                      <td className="px-4 py-3">
-                        <span className="px-2 py-1 text-xs rounded-full" style={{ backgroundColor: `${leave.leave_type_color || '#6b7280'}20`, color: leave.leave_type_color || '#6b7280' }}>
-                          {leave.leave_type_name}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{new Date(leave.date_from).toLocaleDateString('fr-FR')} - {new Date(leave.date_to).toLocaleDateString('fr-FR')}</td>
-                      <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">{leave.number_of_days} jour{leave.number_of_days > 1 ? 's' : ''}</td>
-                      <td className="px-4 py-3"><LeaveStatus state={leave.state} label={leave.state_label} /></td>
-                    </tr>
-                  ))}
+                  {leaves.map(leave => {
+                    const colorHex = odooColorToHex((leave as { leave_type_color?: number | string }).leave_type_color)
+                    return (
+                      <tr key={leave.id}>
+                        <td className="px-4 py-3">
+                          <span className="px-2 py-1 text-xs rounded-full" style={{ backgroundColor: `${colorHex}20`, color: colorHex }}>
+                            {leave.leave_type_name}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{new Date(leave.date_from).toLocaleDateString('fr-FR')} - {new Date(leave.date_to).toLocaleDateString('fr-FR')}</td>
+                        <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">{leave.number_of_days} jour{leave.number_of_days > 1 ? 's' : ''}</td>
+                        <td className="px-4 py-3"><LeaveStatus state={leave.state} label={(leave as { state_label?: string }).state_label || leave.state} /></td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             ) : (

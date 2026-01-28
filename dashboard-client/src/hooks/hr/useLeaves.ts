@@ -84,11 +84,12 @@ export interface CalendarEvent {
   end: string
   date_from?: string
   date_to?: string
-  color: number
-  leave_type_color?: number
+  color: number | string
+  leave_type_color?: number | string
   employee_id: number
   employee_name: string
   leave_type: string
+  leave_type_name?: string
   state: string
   days: number
 }

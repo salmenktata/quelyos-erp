@@ -11,15 +11,15 @@ import { fr } from "date-fns/locale";
 import { logger } from '@quelyos/logger';
 
 interface Invoice {
-  id: string;
-  invoiceNumber: string;
-  amount: number;
+  id: number;
+  name: string;
+  supplierName: string;
   dueDate: string;
-  status: string;
-  supplier: {
-    name: string;
-    importance: string;
-  };
+  amountResidual: number;
+  daysOverdue?: number;
+  daysUntilDue?: number;
+  urgency?: string;
+  isOverdue?: boolean;
 }
 
 export default function PaymentScheduleCalendar() {
@@ -37,18 +37,18 @@ export default function PaymentScheduleCalendar() {
     setIsLoading(true);
     try {
       const [upcomingRes, overdueRes] = await Promise.all([
-        fetch("/api/ecommerce/supplier-invoices/upcoming?days=60"),
-        fetch("/api/ecommerce/supplier-invoices/overdue"),
+        fetch("/api/finance/supplier-invoices/upcoming?days=60"),
+        fetch("/api/finance/supplier-invoices/overdue"),
       ]);
 
       if (upcomingRes.ok) {
         const data = await upcomingRes.json();
-        setUpcomingInvoices(data.invoices || []);
+        setUpcomingInvoices((data.invoices || []).map((inv: Invoice) => ({ ...inv, isOverdue: false })));
       }
 
       if (overdueRes.ok) {
         const data = await overdueRes.json();
-        setOverdueInvoices(data.invoices || []);
+        setOverdueInvoices((data.invoices || []).map((inv: Invoice) => ({ ...inv, isOverdue: true })));
       }
     } catch (error) {
       logger.error("Erreur lors du chargement des factures:", error);
@@ -72,7 +72,7 @@ export default function PaymentScheduleCalendar() {
   const selectedDateInvoices = invoicesByDate[selectedDateKey] || [];
 
   // Calculer les totaux
-  const totalDue = selectedDateInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+  const totalDue = selectedDateInvoices.reduce((sum, inv) => sum + inv.amountResidual, 0);
 
   // Générer les jours du mois
   const monthStart = startOfMonth(currentMonth);
@@ -85,8 +85,8 @@ export default function PaymentScheduleCalendar() {
 
     if (invoices.length === 0) return null;
 
-    const hasOverdue = invoices.some((inv) => inv.status === "OVERDUE");
-    const total = invoices.reduce((sum, inv) => sum + inv.amount, 0);
+    const hasOverdue = invoices.some((inv) => inv.isOverdue);
+    const total = invoices.reduce((sum, inv) => sum + inv.amountResidual, 0);
 
     if (hasOverdue) return "overdue";
     if (total > 10000) return "high";
@@ -219,23 +219,23 @@ export default function PaymentScheduleCalendar() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <Building2 className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium text-sm text-gray-900 dark:text-white">{invoice.supplier.name}</span>
+                        <span className="font-medium text-sm text-gray-900 dark:text-white">{invoice.supplierName}</span>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {invoice.invoiceNumber}
+                        {invoice.name}
                       </p>
                     </div>
-                    {invoice.status === "OVERDUE" && (
+                    {invoice.isOverdue && (
                       <AlertTriangle className="h-4 w-4 text-red-500" />
                     )}
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-900 dark:text-white">{invoice.amount.toFixed(2)} €</span>
+                    <span className="font-bold text-gray-900 dark:text-white">{invoice.amountResidual.toFixed(2)} €</span>
                     <Badge
-                      variant={invoice.status === "OVERDUE" ? "destructive" : "default"}
+                      variant={invoice.isOverdue ? "destructive" : "default"}
                       className="text-xs"
                     >
-                      {invoice.status === "OVERDUE" ? "En retard" : "À payer"}
+                      {invoice.isOverdue ? "En retard" : "À payer"}
                     </Badge>
                   </div>
                 </div>

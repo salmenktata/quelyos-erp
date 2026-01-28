@@ -14,12 +14,18 @@ interface ProductVariant {
   name: string
   display_name: string
   default_code?: string
+  barcode?: string
   qty_available: number
-  virtual_available: number
+  virtual_available?: number
+  standard_price?: number
   list_price: number
+  image?: string | null
   attribute_values: Array<{
+    id?: number
+    name?: string
+    attribute_id?: number
     attribute_name: string
-    value_name: string
+    value_name?: string
   }>
 }
 

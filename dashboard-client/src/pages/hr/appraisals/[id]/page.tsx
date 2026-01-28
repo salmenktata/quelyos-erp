@@ -11,7 +11,7 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
-import { useAppraisal, useUpdateAppraisal, useAppraisalAction, useCreateGoal, useGoalAction, type Goal } from '@/hooks/hr'
+import { useAppraisal, useUpdateAppraisal, useAppraisalAction, useCreateGoal, useGoalAction, type Goal, type Appraisal } from '@/hooks/hr'
 import { hrNotices } from '@/lib/notices'
 import {
   ClipboardCheck,
@@ -215,7 +215,7 @@ export default function AppraisalDetailPage() {
   )
 }
 
-function OverviewTab({ appraisal, goals }: { appraisal: Record<string, unknown>; goals: Goal[] }) {
+function OverviewTab({ appraisal, goals }: { appraisal: Appraisal; goals: Goal[] }) {
   const goalsInProgress = goals.filter(g => g.state === 'in_progress').length
   const goalsDone = goals.filter(g => g.state === 'done').length
 
@@ -224,8 +224,8 @@ function OverviewTab({ appraisal, goals }: { appraisal: Record<string, unknown>;
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
         <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Période évaluée</h3>
         <div className="space-y-3">
-          <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Début</span><span className="text-gray-900 dark:text-white">{appraisal.period_start ? new Date(appraisal.period_start as string).toLocaleDateString('fr-FR') : 'Non défini'}</span></div>
-          <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Fin</span><span className="text-gray-900 dark:text-white">{appraisal.period_end ? new Date(appraisal.period_end as string).toLocaleDateString('fr-FR') : 'Non défini'}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Début</span><span className="text-gray-900 dark:text-white">{appraisal.period_start ? new Date(appraisal.period_start).toLocaleDateString('fr-FR') : 'Non défini'}</span></div>
+          <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Fin</span><span className="text-gray-900 dark:text-white">{appraisal.period_end ? new Date(appraisal.period_end).toLocaleDateString('fr-FR') : 'Non défini'}</span></div>
           <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Durée entretien</span><span className="text-gray-900 dark:text-white">{appraisal.duration}h</span></div>
         </div>
       </div>
@@ -233,10 +233,10 @@ function OverviewTab({ appraisal, goals }: { appraisal: Record<string, unknown>;
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
         <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Évaluations</h3>
         <div className="space-y-4">
-          <ScoreRow label="Auto-évaluation" score={appraisal.employee_score as string | null} />
-          <ScoreRow label="Évaluation manager" score={appraisal.manager_score as string | null} />
+          <ScoreRow label="Auto-évaluation" score={appraisal.employee_score} />
+          <ScoreRow label="Évaluation manager" score={appraisal.manager_score} />
           <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-            <ScoreRow label="Note finale" score={appraisal.final_score as string | null} large />
+            <ScoreRow label="Note finale" score={appraisal.final_score} large />
           </div>
         </div>
       </div>
@@ -294,7 +294,7 @@ function RecommendationItem({ icon: Icon, label, recommended }: { icon: React.Co
   )
 }
 
-function FeedbackTab({ appraisal, onUpdate, isUpdating }: { appraisal: Record<string, unknown>; onUpdate: (data: Record<string, unknown>) => void; isUpdating: boolean }) {
+function FeedbackTab({ appraisal, onUpdate, isUpdating }: { appraisal: Appraisal; onUpdate: (data: Partial<Appraisal>) => void; isUpdating: boolean }) {
   const [formData, setFormData] = useState({
     employee_score: (appraisal.employee_score as string) || '',
     manager_score: (appraisal.manager_score as string) || '',
@@ -362,7 +362,7 @@ function TextareaCard({ label, value, onChange, placeholder, rows = 5 }: { label
   )
 }
 
-function GoalsTab({ appraisal, goals, onAction, onAddGoal }: { appraisal: Record<string, unknown>; goals: Goal[]; onAction: (params: { id: number; action: string }) => void; onAddGoal: () => void }) {
+function GoalsTab({ appraisal, goals, onAction, onAddGoal }: { appraisal: Appraisal; goals: Goal[]; onAction: (params: { id: number; action: string }) => void; onAddGoal: () => void }) {
   const getStateColor = (state: string) => {
     switch (state) {
       case 'draft': return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
@@ -425,7 +425,7 @@ function GoalsTab({ appraisal, goals, onAction, onAddGoal }: { appraisal: Record
   )
 }
 
-function DevelopmentTab({ appraisal, onUpdate, isUpdating }: { appraisal: Record<string, unknown>; onUpdate: (data: Record<string, unknown>) => void; isUpdating: boolean }) {
+function DevelopmentTab({ appraisal, onUpdate, isUpdating }: { appraisal: Appraisal; onUpdate: (data: Partial<Appraisal>) => void; isUpdating: boolean }) {
   const [formData, setFormData] = useState({
     training_needs: (appraisal.training_needs as string) || '',
     training_plan: (appraisal.training_plan as string) || '',

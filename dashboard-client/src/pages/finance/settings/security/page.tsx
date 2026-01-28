@@ -219,7 +219,7 @@ export default function SecurityPage() {
               type="text"
               name="username"
               autoComplete="username"
-              value={user?.email || user?.username || ''}
+              value={user?.email || (user as { username?: string } | undefined)?.username || ''}
               readOnly
               className="sr-only"
               tabIndex={-1}

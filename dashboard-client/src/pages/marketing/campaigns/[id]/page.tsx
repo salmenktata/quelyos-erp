@@ -33,7 +33,7 @@ const getStatusBadge = (status: string) => {
 export default function CampaignDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToast } = useToast();
+  const toast = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
 
@@ -45,10 +45,10 @@ export default function CampaignDetailPage() {
     if (!campaign) return;
     try {
       await sendMutation.mutateAsync(campaign.id);
-      addToast('Campagne envoyée avec succès', 'success');
+      toast.success('Campagne envoyée avec succès');
       setShowSendModal(false);
     } catch {
-      addToast('Erreur lors de l\'envoi', 'error');
+      toast.error('Erreur lors de l\'envoi');
     }
   };
 
@@ -56,10 +56,10 @@ export default function CampaignDetailPage() {
     if (!campaign) return;
     try {
       await deleteMutation.mutateAsync(campaign.id);
-      addToast('Campagne supprimée', 'success');
+      toast.success('Campagne supprimée');
       navigate('/marketing/campaigns');
     } catch {
-      addToast('Erreur lors de la suppression', 'error');
+      toast.error('Erreur lors de la suppression');
     }
   };
 

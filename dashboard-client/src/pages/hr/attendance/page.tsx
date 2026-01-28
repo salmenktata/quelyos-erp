@@ -188,11 +188,11 @@ export default function AttendancePage() {
                       {att.worked_hours ? `${att.worked_hours.toFixed(1)}h` : '-'}
                     </td>
                     <td className="px-4 py-3">
-                      {!att.check_out && att.check_in && (
+                      {!att.check_out && att.check_in && tenant?.id && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => checkOut(att.id)}
+                          onClick={() => checkOut({ tenant_id: tenant.id, employee_id: att.employee_id })}
                         >
                           Sortie
                         </Button>

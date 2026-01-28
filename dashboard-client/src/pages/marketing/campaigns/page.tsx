@@ -38,7 +38,7 @@ const getChannelIcon = (channel: string) => {
 
 export default function CampaignsPage() {
   const navigate = useNavigate();
-  const { addToast } = useToast();
+  const toast = useToast();
   const [channelFilter, setChannelFilter] = useState<'all' | 'email' | 'sms'>('all');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,20 +61,20 @@ export default function CampaignsPage() {
     if (!deleteId) return;
     try {
       await deleteMutation.mutateAsync(deleteId);
-      addToast('Campagne supprimée', 'success');
+      toast.success('Campagne supprimée');
       setDeleteId(null);
     } catch {
-      addToast('Erreur lors de la suppression', 'error');
+      toast.error('Erreur lors de la suppression');
     }
   };
 
   const handleDuplicate = async (id: number) => {
     try {
       const newCampaign = await duplicateMutation.mutateAsync(id);
-      addToast('Campagne dupliquée', 'success');
+      toast.success('Campagne dupliquée');
       navigate(`/marketing/campaigns/${newCampaign.id}`);
     } catch {
-      addToast('Erreur lors de la duplication', 'error');
+      toast.error('Erreur lors de la duplication');
     }
     setMenuOpen(null);
   };

@@ -12,13 +12,13 @@ import { TrendingUp, TrendingDown, Filter, Loader2, AlertCircle, CreditCard, Ban
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
 import { Button } from "@/lib/finance/compat/ui";
-import type { FlowType } from "@/types/paymentFlow";
+import type { PaymentMethod, FlowType } from "@/types/paymentFlow";
 import { ReportingNav } from "@/components/finance/reporting/ReportingNav";
 import { PageNotice } from "@/components/common";
 import { financeNotices } from "@/lib/notices";
 
 // Icônes par type de flux
-const FLOW_ICONS: Record<FlowType, React.ReactNode> = {
+const FLOW_ICONS: Record<PaymentMethod, React.ReactNode> = {
   CASH: <Banknote className="h-5 w-5" />,
   CARD: <CreditCard className="h-5 w-5" />,
   CHECK: <FileText className="h-5 w-5" />,
@@ -27,6 +27,8 @@ const FLOW_ICONS: Record<FlowType, React.ReactNode> = {
   BILL_OF_EXCHANGE: <Receipt className="h-5 w-5" />,
   PROMISSORY_NOTE: <Briefcase className="h-5 w-5" />,
   BANK_CHARGE: <AlertCircle className="h-5 w-5" />,
+  MOBILE: <CreditCard className="h-5 w-5" />,
+  WIRE_TRANSFER: <ArrowLeftRight className="h-5 w-5" />,
   OTHER: <MoreHorizontal className="h-5 w-5" />,
 };
 

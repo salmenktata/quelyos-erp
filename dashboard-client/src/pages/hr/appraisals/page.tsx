@@ -294,7 +294,7 @@ function CreateAppraisalModal({
 }: {
   tenantId: number
   onClose: () => void
-  onCreate: (data: Record<string, unknown>) => void
+  onCreate: (data: { tenant_id: number; employee_id: number; appraisal_type: string; date_scheduled?: string; period_start?: string; period_end?: string; duration?: number; location?: string }) => void
   isLoading: boolean
 }) {
   const { data: employeesData } = useEmployees({ tenant_id: tenantId, limit: 200 })

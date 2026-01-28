@@ -19,7 +19,7 @@ import {
 export default function ContactListDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToast } = useToast();
+  const toast = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const listId = id ? parseInt(id, 10) : null;
@@ -30,10 +30,10 @@ export default function ContactListDetailPage() {
     if (!listId) return;
     try {
       await deleteMutation.mutateAsync(listId);
-      addToast('Liste supprimée', 'success');
+      toast.success('Liste supprimée');
       navigate('/marketing/contacts');
     } catch {
-      addToast('Erreur lors de la suppression', 'error');
+      toast.error('Erreur lors de la suppression');
     }
   };
 

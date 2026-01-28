@@ -13,6 +13,7 @@ import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeaveAllocations, useLeaveBalances, useLeaveTypes, useBulkCreateAllocations } from '@/hooks/hr'
 import { hrNotices } from '@/lib/notices'
+import { odooColorToHex } from '@/lib/odooColors'
 import { PieChart, Users, Calendar, X } from 'lucide-react'
 
 export default function AllocationsPage() {
@@ -22,17 +23,16 @@ export default function AllocationsPage() {
 
   const { data: allocationsData, isLoading } = useLeaveAllocations({
     tenant_id: tenant?.id || 0,
-    year: yearFilter,
   })
 
-  const { data: balancesData } = useLeaveBalances(tenant?.id || null)
+  const { data: balancesData } = useLeaveBalances(tenant?.id || null, null)
   const { data: leaveTypes } = useLeaveTypes(tenant?.id || null)
   const { mutate: bulkCreate, isPending: isBulkCreating } = useBulkCreateAllocations()
 
   const allocations = allocationsData?.allocations || []
   const balances = balancesData || []
 
-  const handleBulkCreate = (data: { leave_type_id: number; days: number }) => {
+  const handleBulkCreate = (data: { leave_type_id: number; number_of_days: number }) => {
     if (tenant?.id) {
       bulkCreate({ tenant_id: tenant.id, ...data })
       setShowBulkModal(false)
@@ -95,15 +95,16 @@ export default function AllocationsPage() {
               {leaveTypes?.map(type => {
                 const typeBalances = balances.filter(b => b.leave_type_id === type.id)
                 const avgBalance = typeBalances.length > 0
-                  ? typeBalances.reduce((sum, b) => sum + b.remaining_leaves, 0) / typeBalances.length
+                  ? typeBalances.reduce((sum, b) => sum + (b.remaining_leaves ?? 0), 0) / typeBalances.length
                   : 0
+                const colorHex = odooColorToHex(type.color)
                 return (
                   <div key={type.id} className="text-center">
                     <div
                       className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-2"
-                      style={{ backgroundColor: `${type.color || '#6b7280'}20` }}
+                      style={{ backgroundColor: `${colorHex}20` }}
                     >
-                      <Calendar className="w-5 h-5" style={{ color: type.color || '#6b7280' }} />
+                      <Calendar className="w-5 h-5" style={{ color: colorHex }} />
                     </div>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
                       {avgBalance.toFixed(1)}
@@ -152,15 +153,20 @@ export default function AllocationsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className="px-2 py-1 text-xs rounded-full"
-                        style={{
-                          backgroundColor: `${alloc.leave_type_color || '#6b7280'}20`,
-                          color: alloc.leave_type_color || '#6b7280',
-                        }}
-                      >
-                        {alloc.leave_type_name}
-                      </span>
+                      {(() => {
+                        const colorHex = odooColorToHex(alloc.leave_type_color)
+                        return (
+                          <span
+                            className="px-2 py-1 text-xs rounded-full"
+                            style={{
+                              backgroundColor: `${colorHex}20`,
+                              color: colorHex,
+                            }}
+                          >
+                            {alloc.leave_type_name}
+                          </span>
+                        )
+                      })()}
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
                       {alloc.number_of_days} jours
@@ -232,12 +238,12 @@ function BulkAllocationModal({
 }: {
   leaveTypes: { id: number; name: string }[]
   onClose: () => void
-  onSave: (data: { leave_type_id: number; days: number }) => void
+  onSave: (data: { leave_type_id: number; number_of_days: number }) => void
   isLoading: boolean
 }) {
   const [formData, setFormData] = useState({
     leave_type_id: leaveTypes[0]?.id || 0,
-    days: 25,
+    number_of_days: 25,
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -283,8 +289,8 @@ function BulkAllocationModal({
             <input
               type="number"
               min="1"
-              value={formData.days}
-              onChange={(e) => setFormData({ ...formData, days: Number(e.target.value) })}
+              value={formData.number_of_days}
+              onChange={(e) => setFormData({ ...formData, number_of_days: Number(e.target.value) })}
               className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
             />
           </div>

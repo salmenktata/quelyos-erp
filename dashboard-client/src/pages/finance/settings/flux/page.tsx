@@ -3,11 +3,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { Switch } from "@/components/ui/Switch";
 import { Plus, Trash2, CreditCard, Banknote, FileText, ArrowLeftRight, Landmark, Receipt, Briefcase, AlertCircle, MoreHorizontal, Check, X } from "lucide-react";
-import type { FlowType } from "@/types/paymentFlow";
+import type { PaymentMethod, FlowType } from "@/types/paymentFlow";
 import { logger } from '@quelyos/logger';
 
 // Types de flux avec labels et icônes
-const FLOW_TYPE_CONFIG: Record<FlowType, { label: string; icon: React.ReactNode; description: string }> = {
+const FLOW_TYPE_CONFIG: Record<PaymentMethod, { label: string; icon: React.ReactNode; description: string }> = {
   CASH: {
     label: "Espèces",
     icon: <Banknote className="h-5 w-5" />,
@@ -47,6 +47,16 @@ const FLOW_TYPE_CONFIG: Record<FlowType, { label: string; icon: React.ReactNode;
     label: "Frais bancaires",
     icon: <AlertCircle className="h-5 w-5" />,
     description: "Agios, commissions, frais",
+  },
+  MOBILE: {
+    label: "Paiement mobile",
+    icon: <CreditCard className="h-5 w-5" />,
+    description: "Apple Pay, Google Pay, etc.",
+  },
+  WIRE_TRANSFER: {
+    label: "Virement international",
+    icon: <ArrowLeftRight className="h-5 w-5" />,
+    description: "Virements internationaux SWIFT",
   },
   OTHER: {
     label: "Autre",

@@ -23,7 +23,7 @@ type Step = 'channel' | 'content' | 'recipients' | 'schedule' | 'review';
 
 export default function NewCampaignPage() {
   const navigate = useNavigate();
-  const { addToast } = useToast();
+  const toast = useToast();
   const createMutation = useCreateCampaign();
   const { data: listsData } = useContactLists();
   const { data: templates } = useEmailTemplates();
@@ -97,10 +97,10 @@ export default function NewCampaignPage() {
         contact_list_id: formData.contact_list_id || undefined,
         scheduled_date: formData.sendNow ? undefined : formData.scheduled_date || undefined,
       });
-      addToast('Campagne créée avec succès', 'success');
+      toast.success('Campagne créée avec succès');
       navigate(`/marketing/campaigns/${campaign.id}`);
     } catch {
-      addToast('Erreur lors de la création', 'error');
+      toast.error('Erreur lors de la création');
     }
   };
 

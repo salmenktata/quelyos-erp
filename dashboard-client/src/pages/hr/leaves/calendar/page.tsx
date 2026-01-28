@@ -13,6 +13,7 @@ import { Breadcrumbs, PageNotice } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeavesCalendar, useDepartments } from '@/hooks/hr'
 import { hrNotices } from '@/lib/notices'
+import { odooColorToHex } from '@/lib/odooColors'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function LeavesCalendarPage() {
@@ -26,12 +27,12 @@ export default function LeavesCalendarPage() {
   const startDate = new Date(year, month, 1).toISOString().split('T')[0]
   const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0]
 
-  const { data: calendarData, isLoading } = useLeavesCalendar({
-    tenant_id: tenant?.id || 0,
-    date_from: startDate,
-    date_to: endDate,
-    department_id: departmentFilter,
-  })
+  const { data: calendarData, isLoading } = useLeavesCalendar(
+    tenant?.id || null,
+    startDate,
+    endDate,
+    departmentFilter
+  )
 
   const { data: departmentsData } = useDepartments(tenant?.id || null)
   const departments = departmentsData?.departments || []
@@ -41,7 +42,7 @@ export default function LeavesCalendarPage() {
   const adjustedFirstDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1
 
   const days = useMemo(() => {
-    const result = []
+    const result: Array<{ day: number | null; date: string | null }> = []
     for (let i = 0; i < adjustedFirstDay; i++) {
       result.push({ day: null, date: null })
     }
@@ -55,9 +56,9 @@ export default function LeavesCalendarPage() {
   const getLeavesForDay = (date: string | null) => {
     if (!date || !calendarData) return []
     return calendarData.filter(leave => {
-      const from = leave.date_from.split('T')[0]
-      const to = leave.date_to.split('T')[0]
-      return date >= from && date <= to
+      const from = leave.date_from?.split('T')[0]
+      const to = leave.date_to?.split('T')[0]
+      return from && to && date >= from && date <= to
     })
   }
 
@@ -162,19 +163,22 @@ export default function LeavesCalendarPage() {
                           {item.day}
                         </div>
                         <div className="space-y-1">
-                          {leaves.slice(0, 3).map((leave, i) => (
-                            <div
-                              key={i}
-                              className="text-xs px-1 py-0.5 rounded truncate"
-                              style={{
-                                backgroundColor: `${leave.leave_type_color || '#6b7280'}20`,
-                                color: leave.leave_type_color || '#6b7280',
-                              }}
-                              title={`${leave.employee_name} - ${leave.leave_type_name}`}
-                            >
-                              {leave.employee_name.split(' ')[0]}
-                            </div>
-                          ))}
+                          {leaves.slice(0, 3).map((leave, i) => {
+                            const colorHex = odooColorToHex((leave as { leave_type_color?: number | string }).leave_type_color)
+                            return (
+                              <div
+                                key={i}
+                                className="text-xs px-1 py-0.5 rounded truncate"
+                                style={{
+                                  backgroundColor: `${colorHex}20`,
+                                  color: colorHex,
+                                }}
+                                title={`${leave.employee_name} - ${leave.leave_type_name || leave.leave_type}`}
+                              >
+                                {leave.employee_name.split(' ')[0]}
+                              </div>
+                            )
+                          })}
                           {leaves.length > 3 && (
                             <div className="text-xs text-gray-500 dark:text-gray-400">
                               +{leaves.length - 3} autres
@@ -197,13 +201,14 @@ export default function LeavesCalendarPage() {
               Légende
             </h3>
             <div className="flex flex-wrap gap-3">
-              {Array.from(new Set(calendarData.map(l => l.leave_type_name))).map(typeName => {
-                const leave = calendarData.find(l => l.leave_type_name === typeName)
+              {Array.from(new Set(calendarData.map(l => l.leave_type_name || l.leave_type))).map(typeName => {
+                const leave = calendarData.find(l => (l.leave_type_name || l.leave_type) === typeName)
+                const colorHex = odooColorToHex((leave as { leave_type_color?: number | string } | undefined)?.leave_type_color)
                 return (
                   <div key={typeName} className="flex items-center gap-2">
                     <div
                       className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: leave?.leave_type_color || '#6b7280' }}
+                      style={{ backgroundColor: colorHex }}
                     />
                     <span className="text-sm text-gray-600 dark:text-gray-400">{typeName}</span>
                   </div>

@@ -476,4 +476,30 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
       }
     ]
   },
+  collections: {
+    pageId: 'store-collections',
+    title: 'Collections',
+    purpose: 'Organisez vos produits en collections thématiques ou saisonnières pour faciliter la navigation.',
+    icon: Package,
+    moduleColor: 'indigo',
+    sections: [
+      {
+        title: 'Fonctionnalités',
+        icon: Settings,
+        items: [
+          'Collections thématiques et saisonnières',
+          'Images et descriptions personnalisées',
+          'Dates de validité programmables',
+        ]
+      },
+      {
+        title: 'Actions recommandées',
+        items: [
+          'Créer une collection : Regroupez des produits par thème',
+          'Définir la période : Configurez les dates de début et fin',
+          'Mettre en avant : Activez la mise en avant sur la page d\'accueil',
+        ]
+      }
+    ]
+  },
 };

@@ -65,7 +65,7 @@ const PREDEFINED_SEGMENTS = [
 ];
 
 export default function ContactListsPage() {
-  const { addToast } = useToast();
+  const toast = useToast();
   const { data, isLoading } = useContactLists();
   const createMutation = useCreateContactList();
   const deleteMutation = useDeleteContactList();
@@ -99,7 +99,7 @@ export default function ContactListsPage() {
 
   const handleCreate = async () => {
     if (!newListName.trim()) {
-      addToast('Nom requis', 'error');
+      toast.error('Nom requis');
       return;
     }
     try {
@@ -108,13 +108,13 @@ export default function ContactListsPage() {
         description: newListDescription,
         list_type: newListType,
       });
-      addToast('Liste créée avec succès', 'success');
+      toast.success('Liste créée avec succès');
       setShowCreateModal(false);
       setNewListName('');
       setNewListDescription('');
       setNewListType('static');
     } catch {
-      addToast('Erreur lors de la création', 'error');
+      toast.error('Erreur lors de la création');
     }
   };
 
@@ -122,10 +122,10 @@ export default function ContactListsPage() {
     if (!deleteId) return;
     try {
       await deleteMutation.mutateAsync(deleteId);
-      addToast('Liste supprimée', 'success');
+      toast.success('Liste supprimée');
       setDeleteId(null);
     } catch {
-      addToast('Erreur lors de la suppression', 'error');
+      toast.error('Erreur lors de la suppression');
     }
   };
 
@@ -133,7 +133,7 @@ export default function ContactListsPage() {
     // Vérifie si segment existe déjà
     const exists = lists.some((l) => l.name === segment.name);
     if (exists) {
-      addToast(`Le segment "${segment.name}" existe déjà`, 'info');
+      toast.info(`Le segment "${segment.name}" existe déjà`);
       return;
     }
     try {
@@ -143,9 +143,9 @@ export default function ContactListsPage() {
         list_type: 'dynamic',
         filter_domain: segment.filter_domain,
       });
-      addToast(`Segment "${segment.name}" créé`, 'success');
+      toast.success(`Segment "${segment.name}" créé`);
     } catch {
-      addToast('Erreur lors de la création', 'error');
+      toast.error('Erreur lors de la création');
     }
   };
 
@@ -164,7 +164,7 @@ export default function ContactListsPage() {
     if (!file) return;
 
     if (!file.name.endsWith('.csv')) {
-      addToast('Veuillez sélectionner un fichier CSV', 'error');
+      toast.error('Veuillez sélectionner un fichier CSV');
       return;
     }
 
@@ -181,7 +181,7 @@ export default function ContactListsPage() {
         setColumnMapping(preview.column_mapping);
         setImportStep('preview');
       } catch (err) {
-        addToast('Erreur lors de la lecture du fichier', 'error');
+        toast.error('Erreur lors de la lecture du fichier');
       }
     };
     reader.readAsBinaryString(file);
@@ -191,7 +191,7 @@ export default function ContactListsPage() {
     if (!csvData) return;
 
     if (!importListName && !importListId) {
-      addToast('Veuillez entrer un nom de liste', 'error');
+      toast.error('Veuillez entrer un nom de liste');
       return;
     }
 
@@ -209,9 +209,9 @@ export default function ContactListsPage() {
         errors: result.errors,
       });
       setImportStep('result');
-      addToast(`${result.total} contacts importés`, 'success');
+      toast.success(`${result.total} contacts importés`);
     } catch (err) {
-      addToast('Erreur lors de l\'import', 'error');
+      toast.error('Erreur lors de l\'import');
     }
   };
 

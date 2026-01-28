@@ -248,10 +248,12 @@ export function useEmployeeLeaves(employeeId: number | null) {
           id: number
           reference: string
           leave_type_name: string
+          leave_type_color?: number
           date_from: string
           date_to: string
           number_of_days: number
           state: string
+          state_label?: string
         }>
       }>(`/api/hr/employees/${employeeId}/leaves`, {})
 

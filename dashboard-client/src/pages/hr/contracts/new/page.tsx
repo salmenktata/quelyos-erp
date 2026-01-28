@@ -64,7 +64,7 @@ export default function NewContractPage() {
       date_start: formData.date_start,
       date_end: formData.date_end || undefined,
       trial_date_end: formData.trial_date_end || undefined,
-      wage: formData.wage ? Number(formData.wage) : undefined,
+      wage: Number(formData.wage) || 0,
       wage_type: formData.wage_type,
       schedule_pay: formData.schedule_pay,
       notes: formData.notes || undefined,

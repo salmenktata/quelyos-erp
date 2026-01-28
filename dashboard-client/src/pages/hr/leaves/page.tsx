@@ -14,6 +14,7 @@ import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeaves, useApproveLeave, useRefuseLeave, useLeaveTypes, type Leave } from '@/hooks/hr'
 import { hrNotices } from '@/lib/notices'
+import { odooColorToHex } from '@/lib/odooColors'
 import {
   CalendarOff,
   Plus,
@@ -46,15 +47,11 @@ export default function LeavesPage() {
   const leaves = leavesData?.leaves || []
 
   const handleApprove = (leave: Leave) => {
-    if (tenant?.id) {
-      approveLeave({ tenant_id: tenant.id, leave_id: leave.id })
-    }
+    approveLeave(leave.id)
   }
 
   const handleRefuse = (leave: Leave) => {
-    if (tenant?.id) {
-      refuseLeave({ tenant_id: tenant.id, leave_id: leave.id })
-    }
+    refuseLeave({ id: leave.id })
   }
 
   const getStateColor = (state: string) => {
@@ -205,15 +202,20 @@ export default function LeavesPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className="px-2 py-1 text-xs rounded-full"
-                        style={{
-                          backgroundColor: `${leave.leave_type_color || '#6b7280'}20`,
-                          color: leave.leave_type_color || '#6b7280',
-                        }}
-                      >
-                        {leave.leave_type_name}
-                      </span>
+                      {(() => {
+                        const colorHex = odooColorToHex((leave as { leave_type_color?: number | string }).leave_type_color)
+                        return (
+                          <span
+                            className="px-2 py-1 text-xs rounded-full"
+                            style={{
+                              backgroundColor: `${colorHex}20`,
+                              color: colorHex,
+                            }}
+                          >
+                            {leave.leave_type_name}
+                          </span>
+                        )
+                      })()}
                     </td>
                     <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
                       <div className="flex items-center gap-2">
