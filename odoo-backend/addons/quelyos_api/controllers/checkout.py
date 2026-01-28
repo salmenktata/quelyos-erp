@@ -7,6 +7,7 @@ import json
 from odoo import http
 from odoo.http import request
 from .base import BaseController
+from ..lib.rate_limiter import check_rate_limit, RateLimitConfig
 
 _logger = logging.getLogger(__name__)
 
@@ -776,6 +777,10 @@ class QuelyosCheckout(BaseController):
                 'approval_url': str
             }
         """
+        # Rate limiting: 10 tentatives paiement/min par IP
+        rate_error = check_rate_limit(request, RateLimitConfig.PAYMENT, 'paypal_create')
+        if rate_error:
+            return rate_error
         try:
             params = self._get_params()
             order_id = params.get('order_id')

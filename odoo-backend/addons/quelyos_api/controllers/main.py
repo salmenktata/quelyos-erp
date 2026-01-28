@@ -3600,6 +3600,10 @@ class QuelyosAPI(BaseController):
     @http.route('/api/ecommerce/orders/create', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def create_order(self, **kwargs):
         """Créer une commande depuis le panier"""
+        # Rate limiting: 20 créations de commandes/min par IP
+        rate_error = check_rate_limit(request, RateLimitConfig.CHECKOUT, 'create_order')
+        if rate_error:
+            return rate_error
         try:
             params = self._get_params()
             partner_id = params.get('partner_id') or request.env.user.partner_id.id
