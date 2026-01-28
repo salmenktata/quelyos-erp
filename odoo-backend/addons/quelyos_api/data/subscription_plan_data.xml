@@ -105,7 +105,7 @@
                 "Audit sécurité",
                 "Backup quotidien dédié"
             ]</field>
-            <!-- Droits d'accès Enterprise : Tous les modules (Manager) + HR -->
+            <!-- Droits d'accès Enterprise : Tous les modules (Manager) + HR + POS -->
             <field name="group_ids" eval="[(6, 0, [
                 ref('group_quelyos_home_manager'),
                 ref('group_quelyos_store_manager'),
@@ -113,7 +113,8 @@
                 ref('group_quelyos_crm_manager'),
                 ref('group_quelyos_marketing_manager'),
                 ref('group_quelyos_finance_manager'),
-                ref('group_quelyos_hr_manager')
+                ref('group_quelyos_hr_manager'),
+                ref('group_quelyos_pos_manager')
             ])]"/>
         </record>
 

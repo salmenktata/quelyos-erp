@@ -1,6 +1,6 @@
 import { useAuth } from '@/lib/finance/compat/auth'
 
-type ModuleId = 'home' | 'finance' | 'store' | 'stock' | 'crm' | 'marketing' | 'hr'
+type ModuleId = 'home' | 'finance' | 'store' | 'stock' | 'crm' | 'marketing' | 'hr' | 'pos'
 
 /**
  * Hook pour vérifier les permissions utilisateur basées sur les groupes backend.
@@ -23,6 +23,7 @@ export function usePermissions() {
     'crm': ['Quelyos CRM User', 'Quelyos CRM Manager'],
     'marketing': ['Quelyos Marketing User', 'Quelyos Marketing Manager'],
     'hr': ['Quelyos HR User', 'Quelyos HR Manager'],
+    'pos': ['Quelyos POS User', 'Quelyos POS Manager'],
   }
 
   /**
@@ -71,7 +72,7 @@ export function usePermissions() {
    * @returns Array des IDs de modules accessibles
    */
   const getAccessibleModules = (): ModuleId[] => {
-    const allModules: ModuleId[] = ['home', 'finance', 'store', 'stock', 'crm', 'marketing', 'hr']
+    const allModules: ModuleId[] = ['home', 'finance', 'store', 'stock', 'crm', 'marketing', 'hr', 'pos']
     return allModules.filter(module => canAccessModule(module))
   }
 

@@ -195,8 +195,8 @@
         <!-- Testimonials -->
         <!-- =================================================================== -->
         <record id="testimonial_1" model="quelyos.testimonial">
-            <field name="author_name">Ahmed Ben Ali</field>
-            <field name="author_title">Client fidele</field>
+            <field name="customer_name">Ahmed Ben Ali</field>
+            <field name="customer_title">Client fidele</field>
             <field name="content">Service exceptionnel ! Ma commande est arrivee en parfait etat et plus vite que prevu. Je recommande vivement !</field>
             <field name="rating">5</field>
             <field name="is_published">True</field>
@@ -204,8 +204,8 @@
         </record>
 
         <record id="testimonial_2" model="quelyos.testimonial">
-            <field name="author_name">Fatma Trabelsi</field>
-            <field name="author_title">Acheteuse reguliere</field>
+            <field name="customer_name">Fatma Trabelsi</field>
+            <field name="customer_title">Acheteuse reguliere</field>
             <field name="content">Des produits de qualite a prix raisonnables. Le service client est tres reactif et professionnel.</field>
             <field name="rating">5</field>
             <field name="is_published">True</field>
@@ -213,16 +213,16 @@
         </record>
 
         <record id="testimonial_3" model="quelyos.testimonial">
-            <field name="author_name">Mohamed Souissi</field>
-            <field name="author_title">Nouveau client</field>
+            <field name="customer_name">Mohamed Souissi</field>
+            <field name="customer_title">Nouveau client</field>
             <field name="content">Premiere commande et deja conquis ! Le site est facile a utiliser et la livraison tres rapide.</field>
             <field name="rating">4</field>
             <field name="is_published">True</field>
         </record>
 
         <record id="testimonial_4" model="quelyos.testimonial">
-            <field name="author_name">Leila Hamdi</field>
-            <field name="author_title">Cliente VIP</field>
+            <field name="customer_name">Leila Hamdi</field>
+            <field name="customer_title">Cliente VIP</field>
             <field name="content">Je fais mes achats ici depuis 2 ans. La qualite est toujours au rendez-vous et les offres sont interessantes.</field>
             <field name="rating">5</field>
             <field name="is_published">True</field>

@@ -68,9 +68,10 @@ export default function AccountWishlistPage() {
       } else {
         throw new Error(result.error || 'Erreur suppression wishlist');
       }
-    } catch (error: any) {
+    } catch (error) {
       logger.error('Erreur suppression wishlist:', error);
-      alert(error.message || 'Une erreur est survenue. Veuillez réessayer.');
+      const message = error instanceof Error ? error.message : 'Une erreur est survenue. Veuillez réessayer.';
+      alert(message);
     } finally {
       setRemovingId(null);
     }
