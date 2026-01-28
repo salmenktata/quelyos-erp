@@ -232,7 +232,7 @@ class ConditionalResponse:
     """Helper pour réponses conditionnelles"""
 
     @staticmethod
-    def check(request, data: Any, modified_at: datetime = None) -> Optional[Response]:
+    def check(request, data: Any, modified_at: datetime = None) -> Optional['Response']:
         """
         Vérifie si une réponse 304 peut être envoyée.
 

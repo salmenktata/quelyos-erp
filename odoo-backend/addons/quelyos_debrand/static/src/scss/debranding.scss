@@ -1,0 +1,172 @@
+// =============================================================================
+// Quelyos Debrand - Custom Styles
+// =============================================================================
+
+// Hide Odoo branding elements
+.o_odoo_logo,
+.o_odoo_icon,
+.o_footer_poweredby,
+.o_database_manager_link,
+[href*="odoo.com"],
+.o_odoo_about_link {
+    display: none !important;
+}
+
+// Login page customization
+.o_login_background {
+    background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #6366F1 100%) !important;
+}
+
+.o_login_panel {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 16px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+// Hide "Powered by Odoo" footer
+.o_login_footer,
+.o_footer,
+footer.o_footer {
+    display: none !important;
+}
+
+// Primary button styling
+.btn-primary {
+    background-color: #6366F1 !important;
+    border-color: #6366F1 !important;
+
+    &:hover, &:focus {
+        background-color: #4F46E5 !important;
+        border-color: #4F46E5 !important;
+    }
+
+    &:active {
+        background-color: #4338CA !important;
+        border-color: #4338CA !important;
+    }
+}
+
+// Secondary styling
+.btn-secondary {
+    border-color: #6366F1 !important;
+    color: #6366F1 !important;
+
+    &:hover {
+        background-color: #6366F1 !important;
+        color: white !important;
+    }
+}
+
+// Link colors
+a:not(.btn) {
+    color: #6366F1;
+
+    &:hover {
+        color: #4F46E5;
+    }
+}
+
+// Navbar styling
+.o_main_navbar {
+    background-color: #1E1B4B !important;
+
+    .o_menu_brand {
+        color: white !important;
+    }
+
+    .o_navbar_apps_menu .dropdown-toggle {
+        color: white !important;
+    }
+}
+
+// App menu icons
+.o_app_icon {
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important;
+}
+
+// Kanban view cards
+.o_kanban_record {
+    border-left-color: #6366F1 !important;
+}
+
+// Selection highlight
+::selection {
+    background-color: rgba(99, 102, 241, 0.3);
+}
+
+// Form view styling
+.o_form_view {
+    .o_form_uri {
+        color: #6366F1;
+    }
+}
+
+// Calendar event colors
+.fc-event {
+    background-color: #6366F1 !important;
+    border-color: #4F46E5 !important;
+}
+
+// Chatter styling
+.o_Discuss_chatWindow {
+    .o_ChatWindow_header {
+        background-color: #1E1B4B !important;
+    }
+}
+
+// Remove enterprise upgrade prompts
+.o_enterprise_upgrade,
+.o_ee_warning,
+.o_enterprise_label,
+[data-tooltip*="enterprise"],
+.badge:contains("Enterprise") {
+    display: none !important;
+}
+
+// Loading spinner color
+.o_loading {
+    background-color: #6366F1 !important;
+}
+
+// Progress bars
+.progress-bar {
+    background-color: #6366F1 !important;
+}
+
+// Toggle switches
+.o_boolean_toggle {
+    &.active {
+        background-color: #6366F1 !important;
+    }
+}
+
+// Notification badges
+.badge-primary,
+.badge.bg-primary {
+    background-color: #6366F1 !important;
+}
+
+// Tabs styling
+.nav-tabs .nav-link.active {
+    border-bottom-color: #6366F1 !important;
+    color: #6366F1 !important;
+}
+
+// Dropdown active items
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: #6366F1 !important;
+}
+
+// Focus states
+*:focus {
+    outline-color: #6366F1 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #6366F1 !important;
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25) !important;
+}

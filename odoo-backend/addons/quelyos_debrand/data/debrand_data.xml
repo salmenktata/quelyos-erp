@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <!-- Default system parameters -->
+    <record id="quelyos_system_name_param" model="ir.config_parameter">
+        <field name="key">quelyos.system_name</field>
+        <field name="value">Quelyos Suite</field>
+    </record>
+
+    <record id="quelyos_company_url_param" model="ir.config_parameter">
+        <field name="key">quelyos.company_url</field>
+        <field name="value">https://quelyos.com</field>
+    </record>
+
+    <record id="quelyos_support_url_param" model="ir.config_parameter">
+        <field name="key">quelyos.support_url</field>
+        <field name="value">https://quelyos.com/support</field>
+    </record>
+
+    <record id="quelyos_documentation_url_param" model="ir.config_parameter">
+        <field name="key">quelyos.documentation_url</field>
+        <field name="value">https://docs.quelyos.com</field>
+    </record>
+
+    <!-- Rename OdooBot to QuelyosBot -->
+    <function model="res.users" name="write">
+        <value model="res.users" search="[('login', '=', '__system__')]"/>
+        <value eval="{'name': 'QuelyosBot'}"/>
+    </function>
+
+</odoo>
