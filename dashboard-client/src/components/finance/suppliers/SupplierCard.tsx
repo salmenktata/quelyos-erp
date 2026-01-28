@@ -62,10 +62,10 @@ export default function SupplierCard({ supplier, onRefresh }: SupplierCardProps)
 
   const getImportanceBadge = (importance: string) => {
     const variants: Record<string, { color: string; label: string }> = {
-      CRITICAL: { color: "bg-red-100 text-red-700 border-red-200", label: "Critique" },
-      HIGH: { color: "bg-orange-100 text-orange-700 border-orange-200", label: "Haute" },
-      NORMAL: { color: "bg-blue-100 text-blue-700 border-blue-200", label: "Normale" },
-      LOW: { color: "bg-gray-100 text-gray-700 border-gray-200", label: "Basse" },
+      CRITICAL: { color: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800", label: "Critique" },
+      HIGH: { color: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800", label: "Haute" },
+      NORMAL: { color: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800", label: "Normale" },
+      LOW: { color: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700", label: "Basse" },
     };
     const config = variants[importance] || variants.NORMAL;
     return (
@@ -106,7 +106,7 @@ export default function SupplierCard({ supplier, onRefresh }: SupplierCardProps)
             <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg truncate">{supplier.name}</h3>
+            <h3 className="font-semibold text-lg truncate text-gray-900 dark:text-white">{supplier.name}</h3>
             <div className="flex gap-2 mt-1">
               {getCategoryBadge(supplier.category)}
               {getImportanceBadge(supplier.importance)}
