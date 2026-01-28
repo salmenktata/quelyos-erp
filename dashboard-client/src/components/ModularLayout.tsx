@@ -36,7 +36,10 @@ import { TopNavbar } from './navigation/TopNavbar'
 import { MODULES, type Module, type ModuleId } from '@/config/modules'
 
 // Icons
-import { X, LogOut } from 'lucide-react'
+import { X, LogOut, ChevronsLeft, ChevronsRight } from 'lucide-react'
+
+// Constants
+const SIDEBAR_COLLAPSED_KEY = 'sidebar_collapsed'
 
 // ============================================================================
 // CONTEXT
@@ -67,7 +70,16 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAppLauncherOpen, setIsAppLauncherOpen] = useState(false)
   const [isModuleChanging, setIsModuleChanging] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true'
+  })
   const { canAccessModule } = usePermissions()
+
+  const toggleSidebarCollapse = () => {
+    const newValue = !isSidebarCollapsed
+    setIsSidebarCollapsed(newValue)
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(newValue))
+  }
   const { isActive } = useActiveRoute()
   const { openMenus, toggleMenu, openMenu } = useMenuState()
 
@@ -138,27 +150,29 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
 
           {/* Sidebar */}
           <aside
-            className={`w-60 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed lg:sticky top-14 h-[calc(100vh-3.5rem)] z-50 transition-transform duration-300 flex flex-col ${
+            className={`${isSidebarCollapsed ? 'w-16' : 'w-60'} flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed lg:sticky top-14 h-[calc(100vh-3.5rem)] z-50 transition-all duration-300 flex flex-col ${
               isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
             }`}
           >
             {/* Module header in sidebar */}
-            <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3">
+            <div className={`border-b border-gray-200 dark:border-gray-700 flex items-center ${isSidebarCollapsed ? 'px-2 py-3 justify-center' : 'px-4 py-3 gap-3'}`}>
               <div className={`p-2 rounded-lg ${currentModule.bgColor}`}>
                 {(() => {
                   const Icon = currentModule.icon
                   return <Icon className={`h-5 w-5 ${currentModule.color}`} />
                 })()}
               </div>
-              <div>
-                <h2 className={`font-semibold ${currentModule.color}`}>{currentModule.name}</h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{currentModule.description}</p>
-              </div>
+              {!isSidebarCollapsed && (
+                <div className="flex-1 min-w-0">
+                  <h2 className={`font-semibold ${currentModule.color} truncate`}>{currentModule.name}</h2>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{currentModule.description}</p>
+                </div>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="lg:hidden ml-auto text-gray-400"
+                className={`lg:hidden text-gray-400 ${isSidebarCollapsed ? '' : 'ml-auto'}`}
                 icon={<X className="w-5 h-5" />}
               >
                 <span className="sr-only">Fermer le menu</span>
@@ -166,12 +180,14 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
+            <nav className={`flex-1 py-4 space-y-4 overflow-y-auto ${isSidebarCollapsed ? 'px-2' : 'px-3'}`}>
               {currentModule.sections.map((section) => (
                 <div key={section.title}>
-                  <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-                    {section.title}
-                  </p>
+                  {!isSidebarCollapsed && (
+                    <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+                      {section.title}
+                    </p>
+                  )}
                   <div className="space-y-0.5">
                     {section.items.map((item) => (
                       <SidebarMenuItem
@@ -181,6 +197,7 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
                         moduleColor={currentModule.color}
                         openMenus={openMenus}
                         onToggleMenu={toggleMenu}
+                        isCollapsed={isSidebarCollapsed}
                       />
                     ))}
                   </div>
@@ -189,15 +206,31 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
             </nav>
 
             {/* Footer */}
-            <div className="px-3 py-3 border-t border-gray-200 dark:border-gray-700">
+            <div className={`border-t border-gray-200 dark:border-gray-700 ${isSidebarCollapsed ? 'px-2 py-3' : 'px-3 py-3'}`}>
+              {/* Toggle collapse button - desktop only */}
+              <button
+                onClick={toggleSidebarCollapse}
+                className="hidden lg:flex w-full items-center justify-center gap-2 rounded-lg p-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mb-2"
+                title={isSidebarCollapsed ? 'Agrandir le menu' : 'Réduire le menu'}
+              >
+                {isSidebarCollapsed ? (
+                  <ChevronsRight className="h-5 w-5" />
+                ) : (
+                  <>
+                    <ChevronsLeft className="h-5 w-5" />
+                    <span>Réduire</span>
+                  </>
+                )}
+              </button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="w-full justify-start text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className={`w-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 ${isSidebarCollapsed ? 'justify-center p-2' : 'justify-start'}`}
                 icon={<LogOut className="h-5 w-5" />}
+                title={isSidebarCollapsed ? 'Déconnexion' : undefined}
               >
-                Déconnexion
+                {!isSidebarCollapsed && 'Déconnexion'}
               </Button>
             </div>
           </aside>

@@ -1,6 +1,14 @@
 /**
  * Click & Collect POS
  * Gestion des commandes web à retirer en magasin
+ *
+ * Fonctionnalités :
+ * - Liste des commandes Click & Collect par statut
+ * - Filtrage par état (en attente, prêt, retiré)
+ * - Recherche par numéro, nom ou code de retrait
+ * - Marquage des commandes comme prêtes avec notification client
+ * - Vérification du code de retrait et remise au client
+ * - Scanner QR code pour recherche rapide
  */
 
 import { useState, useMemo } from 'react'
@@ -13,17 +21,17 @@ import {
   Mail,
   QrCode,
   Search,
-  Filter,
   Bell,
   MapPin,
   User,
   ShoppingBag,
-  AlertCircle,
   CheckCircle2,
   Timer,
-  Truck,
-  RefreshCw,
 } from 'lucide-react'
+import { Layout } from '../../components/Layout'
+import { Breadcrumbs, Button, PageNotice, SkeletonTable } from '../../components/common'
+import { posNotices } from '../../lib/notices/pos-notices'
+import { AlertCircle, RefreshCw } from 'lucide-react'
 
 // Types
 interface ClickCollectOrder {
@@ -196,38 +204,45 @@ export default function POSClickCollect() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Package className="h-8 w-8 text-teal-600" />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Click & Collect</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Commandes web à retirer</p>
-            </div>
-          </div>
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'POS', href: '/pos' },
+            { label: 'Click & Collect' },
+          ]}
+        />
 
-          {/* Quick stats */}
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 rounded-full">
-              <Timer className="h-4 w-4 text-amber-600" />
-              <span className="text-amber-700 dark:text-amber-300 font-medium">{stats.pending} en attente</span>
+            <div className="p-3 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
+              <Package className="h-6 w-6 text-teal-600 dark:text-teal-400" />
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 rounded-full">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span className="text-green-700 dark:text-green-300 font-medium">{stats.ready} prêts</span>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Click & Collect</h1>
+              <p className="text-gray-500 dark:text-gray-400">Commandes web à retirer en magasin</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <button
+            {/* Quick stats */}
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 rounded-full">
+              <Timer className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              <span className="text-amber-700 dark:text-amber-300 font-medium">{stats.pending} en attente</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 rounded-full">
+              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <span className="text-green-700 dark:text-green-300 font-medium">{stats.ready} prêts</span>
+            </div>
+            <Button
+              variant="primary"
+              icon={<QrCode className="h-4 w-4" />}
               onClick={() => setShowQRScanner(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg"
             >
-              <QrCode className="h-5 w-5" />
               Scanner QR
-            </button>
+            </Button>
             <button className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg relative">
               <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               {stats.pending > 0 && (
@@ -239,20 +254,23 @@ export default function POSClickCollect() {
           </div>
         </div>
 
+        {/* PageNotice */}
+        <PageNotice config={posNotices.clickCollect} className="mb-6" />
+
         {/* Filters */}
-        <div className="flex items-center gap-4 mt-4">
-          <div className="relative flex-1 max-w-md">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div className="relative flex-1 w-full md:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Rechercher par n° commande, nom, code..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-gray-700 border-0 rounded-lg"
+              className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400"
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {(['all', 'pending', 'ready', 'collected'] as FilterStatus[]).map((status) => (
               <button
                 key={status}
@@ -260,7 +278,7 @@ export default function POSClickCollect() {
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   filterStatus === status
                     ? 'bg-teal-600 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 {status === 'all' ? 'Tous' : statusLabels[status]}
@@ -273,11 +291,9 @@ export default function POSClickCollect() {
             ))}
           </div>
         </div>
-      </header>
 
-      {/* Orders grid */}
-      <main className="p-6">
-        <div className="grid grid-cols-3 gap-4">
+        {/* Orders grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredOrders.map((order) => (
             <div
               key={order.id}
@@ -316,7 +332,7 @@ export default function POSClickCollect() {
               <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center">
-                    <User className="h-5 w-5 text-teal-600" />
+                    <User className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">{order.customerName}</p>
@@ -369,27 +385,29 @@ export default function POSClickCollect() {
               {order.status !== 'collected' && order.status !== 'cancelled' && (
                 <div className="px-4 pb-4">
                   {order.status === 'pending' ? (
-                    <button
+                    <Button
+                      variant="primary"
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      icon={<Check className="h-4 w-4" />}
                       onClick={(e) => {
                         e.stopPropagation()
                         markAsReady(order.id)
                       }}
-                      className="w-full py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg flex items-center justify-center gap-2"
                     >
-                      <Check className="h-5 w-5" />
                       Marquer Prêt
-                    </button>
+                    </Button>
                   ) : (
-                    <button
+                    <Button
+                      variant="primary"
+                      className="w-full"
+                      icon={<ShoppingBag className="h-4 w-4" />}
                       onClick={(e) => {
                         e.stopPropagation()
                         setSelectedOrder(order)
                       }}
-                      className="w-full py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg flex items-center justify-center gap-2"
                     >
-                      <ShoppingBag className="h-5 w-5" />
                       Remettre au client
-                    </button>
+                    </Button>
                   )}
                 </div>
               )}
@@ -397,13 +415,14 @@ export default function POSClickCollect() {
           ))}
         </div>
 
+        {/* Empty state */}
         {filteredOrders.length === 0 && (
-          <div className="text-center py-12">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
             <Package className="h-16 w-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
             <p className="text-gray-500 dark:text-gray-400">Aucune commande trouvée</p>
           </div>
         )}
-      </main>
+      </div>
 
       {/* Order detail modal */}
       {selectedOrder && (
@@ -430,7 +449,7 @@ export default function POSClickCollect() {
           }}
         />
       )}
-    </div>
+    </Layout>
   )
 }
 
@@ -530,15 +549,16 @@ function OrderDetailModal({
                   onChange={(e) => setVerifyCode(e.target.value.toUpperCase())}
                   placeholder="Code client"
                   maxLength={4}
-                  className="flex-1 px-4 py-3 text-center text-2xl font-mono font-bold bg-white dark:bg-gray-800 border border-teal-300 dark:border-teal-700 rounded-lg uppercase"
+                  className="flex-1 px-4 py-3 text-center text-2xl font-mono font-bold bg-white dark:bg-gray-800 border border-teal-300 dark:border-teal-700 rounded-lg uppercase text-gray-900 dark:text-white"
                 />
-                <button
+                <Button
+                  variant="primary"
                   onClick={handleCollect}
                   disabled={verifyCode.length !== 4}
-                  className="px-6 py-3 bg-teal-600 hover:bg-teal-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-bold rounded-lg"
+                  icon={<Check className="h-4 w-4" />}
                 >
                   Valider
-                </button>
+                </Button>
               </div>
               <p className="text-xs text-teal-600 dark:text-teal-400 mt-2 text-center">
                 Code attendu: <span className="font-mono font-bold">{order.pickupCode}</span>
@@ -548,18 +568,21 @@ function OrderDetailModal({
         </div>
 
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3">
-          <button
+          <Button
+            variant="danger"
             onClick={onCancel}
-            className="flex-1 py-3 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-red-900/20"
+            icon={<X className="h-4 w-4" />}
+            className="flex-1"
           >
             Annuler commande
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
             onClick={onClose}
-            className="flex-1 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600"
+            className="flex-1"
           >
             Fermer
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -613,15 +636,16 @@ function QRScannerModal({
                 onChange={(e) => setManualCode(e.target.value.toUpperCase())}
                 placeholder="CODE"
                 maxLength={4}
-                className="flex-1 px-4 py-3 text-center text-xl font-mono font-bold bg-gray-100 dark:bg-gray-700 rounded-lg uppercase"
+                className="flex-1 px-4 py-3 text-center text-xl font-mono font-bold bg-gray-100 dark:bg-gray-700 rounded-lg uppercase text-gray-900 dark:text-white"
               />
-              <button
+              <Button
+                variant="primary"
                 onClick={() => onScan(manualCode)}
                 disabled={manualCode.length !== 4}
-                className="px-6 py-3 bg-teal-600 hover:bg-teal-700 disabled:bg-gray-300 text-white font-bold rounded-lg"
+                icon={<Check className="h-4 w-4" />}
               >
                 Valider
-              </button>
+              </Button>
             </div>
           </div>
         </div>

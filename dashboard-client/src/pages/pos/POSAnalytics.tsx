@@ -1,25 +1,33 @@
 /**
  * Analytics Prédictifs POS
  * Dashboard avancé avec prédictions et insights
+ *
+ * Fonctionnalités :
+ * - Prédictions de ventes par heure basées sur l'IA
+ * - Alertes de réapprovisionnement avec sévérité
+ * - Tendances produits (hausse, baisse, stable)
+ * - Heatmap des ventes par jour/heure
+ * - Précision du modèle prédictif en temps réel
+ * - Filtrage par période (jour, semaine, mois)
  */
 
 import { useState, useMemo } from 'react'
 import {
   TrendingUp,
   TrendingDown,
-  BarChart3,
   Clock,
   ShoppingBag,
-  Users,
   AlertTriangle,
   Sparkles,
   ArrowRight,
-  Calendar,
-  Package,
   Zap,
   Target,
   RefreshCw,
+  Calendar,
 } from 'lucide-react'
+import { Layout } from '../../components/Layout'
+import { Breadcrumbs, Button, PageNotice } from '../../components/common'
+import { posNotices } from '../../lib/notices/pos-notices'
 
 // Types
 interface HourlyPrediction {
@@ -131,38 +139,49 @@ export default function POSAnalytics() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-            <Sparkles className="h-7 w-7 text-purple-500" />
-            Analytics Prédictifs
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Prévisions et tendances basées sur l'IA
-          </p>
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'POS', href: '/pos' },
+            { label: 'Analytics Prédictifs' },
+          ]}
+        />
+
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+              <Sparkles className="h-7 w-7 text-purple-500" />
+              Analytics Prédictifs
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">
+              Prévisions et tendances basées sur l'IA
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value as 'today' | 'week' | 'month')}
+              className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+            >
+              <option value="today">Aujourd'hui</option>
+              <option value="week">Cette semaine</option>
+              <option value="month">Ce mois</option>
+            </select>
+            <Button variant="primary" icon={<RefreshCw className="h-4 w-4" />} className="bg-purple-600 hover:bg-purple-700">
+              Actualiser
+            </Button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <select
-            value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value as 'today' | 'week' | 'month')}
-            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
-          >
-            <option value="today">Aujourd'hui</option>
-            <option value="week">Cette semaine</option>
-            <option value="month">Ce mois</option>
-          </select>
-          <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg">
-            <RefreshCw className="h-4 w-4" />
-            Actualiser
-          </button>
-        </div>
-      </div>
+        {/* PageNotice */}
+        <PageNotice config={posNotices.analytics} className="mb-6" />
 
-      {/* KPIs Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+        {/* KPIs Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-500 dark:text-gray-400 text-sm">Ventes réelles</span>
@@ -205,7 +224,7 @@ export default function POSAnalytics() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Prédictions horaires */}
         <div className="col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -323,14 +342,14 @@ export default function POSAnalytics() {
             ))}
           </div>
 
-          <button className="mt-4 w-full py-2 text-center text-purple-600 dark:text-purple-400 font-medium hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors">
+          <Button variant="secondary" className="mt-4 w-full">
             Voir toutes les alertes →
-          </button>
+          </Button>
         </div>
-      </div>
+        </div>
 
-      {/* Heatmap + Tendances */}
-      <div className="grid grid-cols-2 gap-6 mt-6">
+        {/* Heatmap + Tendances */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Heatmap affluence */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -428,7 +447,8 @@ export default function POSAnalytics() {
             ))}
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </Layout>
   )
 }

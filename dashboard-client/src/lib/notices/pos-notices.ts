@@ -1,4 +1,4 @@
-import { Monitor, ClipboardList, Clock, BarChart3, CreditCard, Settings, Printer, Lightbulb, Package } from 'lucide-react';
+import { Monitor, ClipboardList, Clock, BarChart3, CreditCard, Settings, Printer, Lightbulb, Package, Sparkles } from 'lucide-react';
 import type { PageNoticeConfig } from './types';
 
 export const posNotices: Record<string, PageNoticeConfig> = {
@@ -178,6 +178,42 @@ export const posNotices: Record<string, PageNoticeConfig> = {
         `Notifiez le client dès que la commande est prête`,
         `Vérifiez le code de retrait avant remise`,
         `Rangez les commandes prêtes dans une zone dédiée`,
+      ]
+    }]
+  },
+
+  sessionOpen: {
+    pageId: 'pos-session-open',
+    title: 'Ouverture de Session',
+    purpose: "Démarrez une nouvelle session de caisse en sélectionnant le terminal et en déclarant le fond de caisse.",
+    icon: Clock,
+    moduleColor: 'teal',
+    sections: [{
+      title: 'Bonnes pratiques',
+      icon: Lightbulb,
+      items: [
+        `Comptez physiquement le fond de caisse avant de le déclarer`,
+        `Choisissez le terminal correspondant à votre poste de travail`,
+        `Vérifiez qu'aucune session n'est déjà ouverte sur ce terminal`,
+        `En cas d'erreur sur le montant, fermez et rouvrez la session`,
+      ]
+    }]
+  },
+
+  analytics: {
+    pageId: 'pos-analytics',
+    title: 'Analytics Prédictifs',
+    purpose: "Dashboard avancé avec prédictions de ventes basées sur l'IA, alertes de stock et tendances produits.",
+    icon: Sparkles,
+    moduleColor: 'teal',
+    sections: [{
+      title: 'Bonnes pratiques',
+      icon: Lightbulb,
+      items: [
+        `Consultez les prédictions en début de journée pour anticiper l'affluence`,
+        `Surveillez les alertes de réapprovisionnement pour éviter les ruptures`,
+        `Identifiez les produits en tendance pour optimiser les mises en avant`,
+        `Comparez les prédictions aux ventes réelles pour affiner le modèle`,
       ]
     }]
   },

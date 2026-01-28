@@ -19,18 +19,26 @@ import {
   PlayCircle,
   BarChart3,
   CreditCard,
-  Loader2,
   ArrowRight,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react'
 import { Layout } from '../../components/Layout'
-import { Breadcrumbs, Button } from '../../components/common'
+import { Breadcrumbs, Button, PageNotice } from '../../components/common'
+import { posNotices } from '../../lib/notices/pos-notices'
 import { usePOSDashboard, usePOSActiveSessions } from '../../hooks/pos/usePOSDashboard'
 import { usePOSConfigs } from '../../hooks/pos/usePOSConfigs'
 
 export default function POSDashboard() {
-  const { data: dashboard, isLoading: dashboardLoading } = usePOSDashboard()
-  const { data: activeSessions = [], isLoading: sessionsLoading } = usePOSActiveSessions()
+  const { data: dashboard, isLoading: dashboardLoading, error: dashboardError, refetch: refetchDashboard } = usePOSDashboard()
+  const { data: activeSessions = [], isLoading: sessionsLoading, error: sessionsError, refetch: refetchSessions } = usePOSActiveSessions()
   const { data: configs = [] } = usePOSConfigs()
+
+  const hasError = dashboardError || sessionsError
+  const refetchAll = () => {
+    refetchDashboard()
+    refetchSessions()
+  }
 
   const kpis = dashboard?.kpis || {
     totalSales: 0,
@@ -66,6 +74,25 @@ export default function POSDashboard() {
             </Button>
           </Link>
         </div>
+
+        {/* PageNotice */}
+        <PageNotice config={posNotices.dashboard} className="mb-6" />
+
+        {/* Error State */}
+        {hasError && (
+          <div
+            role="alert"
+            className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-3"
+          >
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+            <p className="text-red-700 dark:text-red-300 flex-1">
+              Erreur lors du chargement des données POS
+            </p>
+            <Button variant="secondary" size="sm" icon={<RefreshCw className="h-4 w-4" />} onClick={refetchAll}>
+              Réessayer
+            </Button>
+          </div>
+        )}
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -152,8 +179,22 @@ export default function POSDashboard() {
               </div>
 
               {sessionsLoading ? (
-                <div className="p-8 flex justify-center">
-                  <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
+                <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="p-4 flex items-center justify-between animate-pulse">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                        <div>
+                          <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+                          <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+                        <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : activeSessions.length === 0 ? (
                 <div className="p-8 text-center">

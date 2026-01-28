@@ -1,10 +1,20 @@
 /**
  * Ouverture de session POS
+ *
+ * Fonctionnalités :
+ * - Sélection du terminal de caisse disponible
+ * - Saisie du fond de caisse d'ouverture
+ * - Montants rapides prédéfinis (0, 100, 200, 500 TND)
+ * - Validation et redirection vers le terminal
+ * - Gestion des erreurs et états de chargement
  */
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PlayCircle, Monitor, Banknote, Loader2, AlertCircle, ArrowLeft } from 'lucide-react'
+import { Layout } from '../../components/Layout'
+import { Breadcrumbs, Button, PageNotice } from '../../components/common'
+import { posNotices } from '../../lib/notices/pos-notices'
 import { usePOSConfigs } from '../../hooks/pos/usePOSConfigs'
 import { useOpenSession } from '../../hooks/pos/usePOSSession'
 
@@ -44,28 +54,43 @@ export default function POSSessionOpen() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-6">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-lg w-full border border-gray-200 dark:border-gray-700">
-        {/* Back button */}
-        <button
-          onClick={() => navigate('/pos')}
-          className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-6"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Retour au dashboard
-        </button>
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'POS', href: '/pos' },
+            { label: 'Ouvrir une session' },
+          ]}
+        />
 
-        <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center mb-4">
-            <PlayCircle className="h-8 w-8 text-teal-600 dark:text-teal-400" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Ouvrir une Session
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Démarrez votre journée de caisse
-          </p>
-        </div>
+        <div className="max-w-lg mx-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
+            {/* Back button */}
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<ArrowLeft className="h-4 w-4" />}
+              onClick={() => navigate('/pos')}
+              className="mb-6"
+            >
+              Retour au dashboard
+            </Button>
+
+            <div className="text-center mb-8">
+              <div className="mx-auto w-16 h-16 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center mb-4">
+                <PlayCircle className="h-8 w-8 text-teal-600 dark:text-teal-400" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Ouvrir une Session
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-2">
+                Démarrez votre journée de caisse
+              </p>
+            </div>
+
+            {/* PageNotice */}
+            <PageNotice config={posNotices.sessionOpen} className="mb-6" />
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
@@ -77,7 +102,7 @@ export default function POSSessionOpen() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Terminal selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
               Terminal
             </label>
             {configsLoading ? (
@@ -136,7 +161,7 @@ export default function POSSessionOpen() {
 
           {/* Opening cash */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
               Fond de caisse (TND)
             </label>
             <div className="relative">
@@ -177,25 +202,19 @@ export default function POSSessionOpen() {
             </div>
           </div>
 
-          <button
+          <Button
             type="submit"
+            variant="primary"
             disabled={!selectedConfigId || openSession.isPending}
-            className="w-full py-4 bg-teal-600 hover:bg-teal-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg text-lg transition-colors flex items-center justify-center gap-2"
+            icon={openSession.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <PlayCircle className="h-5 w-5" />}
+            className="w-full py-4 text-lg"
           >
-            {openSession.isPending ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Ouverture en cours...
-              </>
-            ) : (
-              <>
-                <PlayCircle className="h-5 w-5" />
-                Ouvrir la Session
-              </>
-            )}
-          </button>
+            {openSession.isPending ? 'Ouverture en cours...' : 'Ouvrir la Session'}
+          </Button>
         </form>
+          </div>
+        </div>
       </div>
-    </div>
+    </Layout>
   )
 }
