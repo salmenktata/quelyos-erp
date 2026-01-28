@@ -1,5 +1,18 @@
+/**
+ * HR Dashboard - Tableau de bord Ressources Humaines
+ *
+ * Fonctionnalités :
+ * - Affichage des KPIs RH (effectif, départements, présences, absents)
+ * - Alertes pour congés en attente et contrats expirants
+ * - Répartition des employés par département
+ * - Liste des demandes de congés récentes
+ * - Tableau des contrats arrivant à échéance
+ */
+import { Layout } from '@/components/Layout'
+import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useHRDashboard } from '@/hooks/hr'
+import { hrNotices } from '@/lib/notices'
 import {
   Users,
   Building2,
@@ -10,14 +23,18 @@ import {
   AlertCircle,
   UserCheck,
   UserX,
+  Plus,
+  RefreshCw,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function HRDashboard() {
+  const navigate = useNavigate()
   const { tenant } = useMyTenant()
   const {
     data: dashboardData,
     isLoading,
+    isError,
     todayAttendance,
     pendingLeaves,
     expiringContracts,
@@ -25,38 +42,79 @@ export default function HRDashboard() {
 
   if (isLoading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg" />
-            ))}
+      <Layout>
+        <div className="p-4 md:p-8">
+          <div className="animate-pulse space-y-6">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48" />
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </Layout>
     )
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Ressources Humaines
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Vue d'ensemble de votre équipe
-          </p>
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Accueil', href: '/' },
+            { label: 'Ressources Humaines' },
+          ]}
+        />
+
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Ressources Humaines
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">
+              Vue d'ensemble de votre équipe
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => navigate('/hr/employees/new')}
+          >
+            Nouvel employé
+          </Button>
         </div>
-        <Link
-          to="/hr/employees/new"
-          className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors"
-        >
-          + Nouvel employé
-        </Link>
-      </div>
+
+        {/* PageNotice */}
+        <PageNotice config={hrNotices.dashboard} className="mb-2" />
+
+        {/* Error State */}
+        {isError && (
+          <div
+            role="alert"
+            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4"
+          >
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+              <div className="flex-1">
+                <p className="text-red-800 dark:text-red-200">
+                  Une erreur est survenue lors du chargement des données.
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={<RefreshCw className="w-4 h-4" />}
+                onClick={() => window.location.reload()}
+              >
+                Réessayer
+              </Button>
+            </div>
+          </div>
+        )}
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -257,7 +315,8 @@ export default function HRDashboard() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </Layout>
   )
 }
 

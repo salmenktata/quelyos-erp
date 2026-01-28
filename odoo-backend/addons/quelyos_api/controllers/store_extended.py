@@ -307,6 +307,51 @@ class StoreExtendedController(BaseController):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
+    @http.route('/api/faq/public', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_public_faqs(self, category_code=None, **kwargs):
+        """Récupérer les FAQ publiées pour le frontend vitrine"""
+        try:
+            company = request.env.company
+            Category = request.env['quelyos.faq.category'].sudo()
+            categories = Category.search([
+                '|', ('company_id', '=', company.id), ('company_id', '=', False)
+            ], order='sequence')
+            categories_data = [{
+                'id': c.id,
+                'name': c.name,
+                'code': c.code,
+                'icon': c.icon,
+            } for c in categories]
+            FAQ = request.env['quelyos.faq'].sudo()
+            domain = [
+                ('is_published', '=', True),
+                '|', ('company_id', '=', company.id), ('company_id', '=', False)
+            ]
+            if category_code:
+                cat = Category.search([('code', '=', category_code)], limit=1)
+                if cat:
+                    domain.append(('category_id', '=', cat.id))
+            faqs = FAQ.search(domain, order='sequence')
+            faqs_data = [{
+                'id': f.id,
+                'question': f.question,
+                'answer': f.answer,
+                'categoryId': f.category_id.id if f.category_id else None,
+                'categoryCode': f.category_id.code if f.category_id else None,
+                'categoryName': f.category_id.name if f.category_id else None,
+                'isFeatured': f.is_featured,
+            } for f in faqs]
+            return {
+                'success': True,
+                'data': {
+                    'categories': categories_data,
+                    'faqs': faqs_data,
+                }
+            }
+        except Exception as e:
+            _logger.error(f"Get public FAQs error: {e}", exc_info=True)
+            return {'success': False, 'error': str(e)}
+
     # =========================================================================
     # COLLECTIONS
     # =========================================================================

@@ -392,6 +392,14 @@ export class BackendClient {
     return this.jsonrpc(`/wishlist/public/${token}`);
   }
 
+  async generateWishlistShareLink(): Promise<APIResponse & { share_token?: string; share_url?: string }> {
+    return this.jsonrpc('/wishlist/share');
+  }
+
+  async disableWishlistSharing(): Promise<APIResponse> {
+    return this.jsonrpc('/wishlist/unshare');
+  }
+
   // ========================================
   // MARKETING
   // ========================================
@@ -557,7 +565,12 @@ export class BackendClient {
   }
 
   async calculateLoyaltyPoints(amount: number): Promise<APIResponse & { data?: { points: number; program_active: boolean } }> {
-    return this.jsonrpc('/loyalty/calculate-points', { amount });
+    return this.jsonrpc('/loyalty/calculate', { amount });
+  }
+
+  // FAQ
+  async getPublicFAQs(categoryCode?: string): Promise<APIResponse & { data?: { categories: any[]; faqs: any[] } }> {
+    return this.jsonrpc('/faq/public', { category_code: categoryCode });
   }
 
   // Payment providers

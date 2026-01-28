@@ -24,6 +24,9 @@ export default function AccountWishlistPage() {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -77,6 +80,43 @@ export default function AccountWishlistPage() {
     await addToCart(productId, 1);
   };
 
+  const handleShare = async () => {
+    setIsSharing(true);
+    try {
+      const result = await backendClient.generateWishlistShareLink();
+      if (result.success && result.share_url) {
+        const fullUrl = `${window.location.origin}${result.share_url}`;
+        setShareUrl(fullUrl);
+      } else {
+        alert(result.error || 'Erreur lors de la génération du lien');
+      }
+    } catch (error) {
+      logger.error('Erreur partage wishlist:', error);
+      alert('Une erreur est survenue');
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    if (shareUrl) {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleDisableSharing = async () => {
+    try {
+      const result = await backendClient.disableWishlistSharing();
+      if (result.success) {
+        setShareUrl(null);
+      }
+    } catch (error) {
+      logger.error('Erreur désactivation partage:', error);
+    }
+  };
+
   if (!isAuthenticated) {
     return <LoadingPage />;
   }
@@ -100,12 +140,75 @@ export default function AccountWishlistPage() {
         {/* Titre */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Ma wishlist</h1>
-          <Link href="/account">
-            <Button variant="outline" className="rounded-full">
-              ← Retour au compte
-            </Button>
-          </Link>
+          <div className="flex gap-3">
+            {wishlist.length > 0 && (
+              <Button
+                variant="outline"
+                className="rounded-full"
+                onClick={handleShare}
+                disabled={isSharing}
+              >
+                {isSharing ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    Génération...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                    Partager
+                  </span>
+                )}
+              </Button>
+            )}
+            <Link href="/account">
+              <Button variant="outline" className="rounded-full">
+                ← Retour au compte
+              </Button>
+            </Link>
+          </div>
         </div>
+
+        {/* Modal/Banner de partage */}
+        {shareUrl && (
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 mb-1">Lien de partage</p>
+                <p className="text-sm text-gray-600 truncate">{shareUrl}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleCopyLink}
+                  className="rounded-full"
+                >
+                  {copied ? (
+                    <span className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Copié !
+                    </span>
+                  ) : (
+                    'Copier le lien'
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDisableSharing}
+                  className="rounded-full text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  Désactiver
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Contenu */}
         {isLoading ? (

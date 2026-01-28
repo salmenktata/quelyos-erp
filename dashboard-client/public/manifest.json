@@ -1,0 +1,102 @@
+{
+  "name": "Quelyos POS",
+  "short_name": "POS",
+  "description": "Point de Vente Quelyos - Caisse tactile",
+  "start_url": "/pos/terminal",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d1117",
+  "theme_color": "#0d9488",
+  "icons": [
+    {
+      "src": "/icons/pos-icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/pos-icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/pos-icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/pos-icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/pos-icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/pos-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/pos-icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/pos-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Terminal",
+      "short_name": "Caisse",
+      "description": "Ouvrir le terminal de caisse",
+      "url": "/pos/terminal",
+      "icons": [{ "src": "/icons/pos-terminal.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Mode Rush",
+      "short_name": "Rush",
+      "description": "Mode ventes rapides",
+      "url": "/pos/rush",
+      "icons": [{ "src": "/icons/pos-rush.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Kiosque",
+      "short_name": "Kiosk",
+      "description": "Mode libre-service",
+      "url": "/pos/kiosk",
+      "icons": [{ "src": "/icons/pos-kiosk.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/pos-terminal.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Terminal de caisse"
+    },
+    {
+      "src": "/screenshots/pos-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Version mobile"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

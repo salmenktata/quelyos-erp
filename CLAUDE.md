@@ -79,6 +79,30 @@ text-indigo-100  // invisible en light mode !
 
 **Si oublié** : L'utilisateur ne devrait JAMAIS avoir à rappeler cette règle.
 
+## 🎨 CRÉATION PAGES DASHBOARD - LIRE AVANT DE CODER
+**OBLIGATOIRE** : Avant de créer/modifier une page dashboard, **LIRE** `dashboard-client/.claude/UI_PATTERNS.md`
+
+**Structure obligatoire (toute page)** :
+1. JSDoc en en-tête (5+ fonctionnalités)
+2. `<Layout>` wrapper
+3. `<Breadcrumbs>` en premier
+4. Header avec `<Button>` (jamais `<button>` ou `<Link>` stylé)
+5. `<PageNotice>` après header
+6. Error state avec `role="alert"`
+7. Loading state avec `SkeletonTable`
+
+**Imports obligatoires** :
+```tsx
+import { Layout } from '@/components/Layout'
+import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common'
+import { [module]Notices } from '@/lib/notices'
+import { ... } from 'lucide-react'  // JAMAIS heroicons
+```
+
+**Menu obligatoire** : Ajouter la page dans `src/config/modules.ts` (section du module)
+
+**Voir** : `dashboard-client/.claude/UI_PATTERNS.md` pour templates complets et checklist.
+
 ## 🛣️ CONVENTIONS ROUTING - RÈGLE ABSOLUE
 **TOUJOURS utiliser l'anglais pour les routes et identifiants techniques**
 - **Routes/URLs** : `/store/products`, `/crm/customers`, `/hr/employees` (anglais)

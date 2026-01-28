@@ -1,16 +1,28 @@
+/**
+ * Congés - Gestion des demandes de congés
+ *
+ * Fonctionnalités :
+ * - Liste des demandes de congés avec filtres
+ * - Workflow de validation (approuver/refuser)
+ * - Filtrage par statut et type de congé
+ * - Visualisation détaillée des demandes
+ * - Création de nouvelles demandes
+ */
 import { useState } from 'react'
+import { Layout } from '@/components/Layout'
+import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
-import { useLeaves, usePendingLeaves, useApproveLeave, useRefuseLeave, useLeaveTypes, type Leave } from '@/hooks/hr'
+import { useLeaves, useApproveLeave, useRefuseLeave, useLeaveTypes, type Leave } from '@/hooks/hr'
+import { hrNotices } from '@/lib/notices'
 import {
   CalendarOff,
   Plus,
   Check,
   X,
-  Clock,
-  Filter,
   Eye,
   Calendar,
-  User,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react'
 
 export default function LeavesPage() {
@@ -20,7 +32,7 @@ export default function LeavesPage() {
   const [showModal, setShowModal] = useState(false)
   const [selectedLeave, setSelectedLeave] = useState<Leave | null>(null)
 
-  const { data: leavesData, isLoading } = useLeaves({
+  const { data: leavesData, isLoading, isError } = useLeaves({
     tenant_id: tenant?.id || 0,
     state: statusFilter,
     leave_type_id: typeFilter,
@@ -64,183 +76,227 @@ export default function LeavesPage() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="p-4 md:p-8 space-y-6">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse" />
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse" />
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-20" />
+            ))}
+          </div>
+        </div>
+      </Layout>
+    )
+  }
+
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Demandes de congés
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            {leavesData?.total || 0} demandes au total
-          </p>
-        </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg"
-        >
-          <Plus className="w-4 h-4" />
-          Nouvelle demande
-        </button>
-      </div>
-
-      {/* Filtres */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <select
-          value={statusFilter || ''}
-          onChange={(e) => setStatusFilter(e.target.value || undefined)}
-          className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-        >
-          <option value="">Tous les statuts</option>
-          <option value="draft">Brouillon</option>
-          <option value="confirm">À approuver</option>
-          <option value="validate1">1ère validation</option>
-          <option value="validate">Approuvé</option>
-          <option value="refuse">Refusé</option>
-          <option value="cancel">Annulé</option>
-        </select>
-
-        <select
-          value={typeFilter || ''}
-          onChange={(e) => setTypeFilter(e.target.value ? Number(e.target.value) : undefined)}
-          className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-        >
-          <option value="">Tous les types</option>
-          {leaveTypes?.map(type => (
-            <option key={type.id} value={type.id}>{type.name}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Loading */}
-      {isLoading && (
-        <div className="space-y-4">
-          {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-20" />
-          ))}
-        </div>
-      )}
-
-      {/* Liste des demandes */}
-      {!isLoading && leaves.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50 dark:bg-gray-900/50 text-left text-sm text-gray-500 dark:text-gray-400">
-                <th className="px-4 py-3 font-medium">Employé</th>
-                <th className="px-4 py-3 font-medium">Type</th>
-                <th className="px-4 py-3 font-medium">Période</th>
-                <th className="px-4 py-3 font-medium">Durée</th>
-                <th className="px-4 py-3 font-medium">Statut</th>
-                <th className="px-4 py-3 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {leaves.map(leave => (
-                <tr key={leave.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 text-sm font-semibold">
-                        {leave.employee_name?.charAt(0)}
-                      </div>
-                      <span className="font-medium text-gray-900 dark:text-white">
-                        {leave.employee_name}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className="px-2 py-1 text-xs rounded-full"
-                      style={{
-                        backgroundColor: `${leave.leave_type_color || '#6b7280'}20`,
-                        color: leave.leave_type_color || '#6b7280',
-                      }}
-                    >
-                      {leave.leave_type_name}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                      <span>
-                        {new Date(leave.date_from).toLocaleDateString('fr-FR')}
-                        {' - '}
-                        {new Date(leave.date_to).toLocaleDateString('fr-FR')}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">
-                    {leave.number_of_days} jour{leave.number_of_days > 1 ? 's' : ''}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 text-xs rounded-full ${getStateColor(leave.state)}`}>
-                      {leave.state_label}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      {(leave.state === 'confirm' || leave.state === 'validate1') && (
-                        <>
-                          <button
-                            onClick={() => handleApprove(leave)}
-                            disabled={isApproving}
-                            className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded"
-                            title="Approuver"
-                          >
-                            <Check className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleRefuse(leave)}
-                            disabled={isRefusing}
-                            className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
-                            title="Refuser"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
-                      <button
-                        onClick={() => setSelectedLeave(leave)}
-                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                        title="Voir détails"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Empty */}
-      {!isLoading && leaves.length === 0 && (
-        <div className="text-center py-12">
-          <CalendarOff className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            Aucune demande de congé
-          </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">
-            {statusFilter || typeFilter
-              ? 'Modifiez vos filtres pour voir plus de résultats'
-              : 'Aucune demande trouvée'}
-          </p>
-        </div>
-      )}
-
-      {/* Modal détails */}
-      {selectedLeave && (
-        <LeaveDetailModal
-          leave={selectedLeave}
-          onClose={() => setSelectedLeave(null)}
-          onApprove={() => handleApprove(selectedLeave)}
-          onRefuse={() => handleRefuse(selectedLeave)}
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Accueil', href: '/' },
+            { label: 'RH', href: '/hr' },
+            { label: 'Congés' },
+          ]}
         />
-      )}
-    </div>
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Demandes de congés
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">
+              {leavesData?.total || 0} demandes au total
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => setShowModal(true)}
+          >
+            Nouvelle demande
+          </Button>
+        </div>
+
+        {/* PageNotice */}
+        <PageNotice config={hrNotices.leaves} className="mb-2" />
+
+        {/* Error State */}
+        {isError && (
+          <div
+            role="alert"
+            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4"
+          >
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+              <p className="flex-1 text-red-800 dark:text-red-200">
+                Une erreur est survenue lors du chargement des congés.
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={<RefreshCw className="w-4 h-4" />}
+                onClick={() => window.location.reload()}
+              >
+                Réessayer
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Filtres */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <select
+            value={statusFilter || ''}
+            onChange={(e) => setStatusFilter(e.target.value || undefined)}
+            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+          >
+            <option value="">Tous les statuts</option>
+            <option value="draft">Brouillon</option>
+            <option value="confirm">À approuver</option>
+            <option value="validate1">1ère validation</option>
+            <option value="validate">Approuvé</option>
+            <option value="refuse">Refusé</option>
+            <option value="cancel">Annulé</option>
+          </select>
+
+          <select
+            value={typeFilter || ''}
+            onChange={(e) => setTypeFilter(e.target.value ? Number(e.target.value) : undefined)}
+            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+          >
+            <option value="">Tous les types</option>
+            {leaveTypes?.map(type => (
+              <option key={type.id} value={type.id}>{type.name}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Liste des demandes */}
+        {leaves.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50 dark:bg-gray-900/50 text-left text-sm text-gray-500 dark:text-gray-400">
+                  <th className="px-4 py-3 font-medium">Employé</th>
+                  <th className="px-4 py-3 font-medium">Type</th>
+                  <th className="px-4 py-3 font-medium">Période</th>
+                  <th className="px-4 py-3 font-medium">Durée</th>
+                  <th className="px-4 py-3 font-medium">Statut</th>
+                  <th className="px-4 py-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {leaves.map(leave => (
+                  <tr key={leave.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 text-sm font-semibold">
+                          {leave.employee_name?.charAt(0)}
+                        </div>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {leave.employee_name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className="px-2 py-1 text-xs rounded-full"
+                        style={{
+                          backgroundColor: `${leave.leave_type_color || '#6b7280'}20`,
+                          color: leave.leave_type_color || '#6b7280',
+                        }}
+                      >
+                        {leave.leave_type_name}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-400" />
+                        <span>
+                          {new Date(leave.date_from).toLocaleDateString('fr-FR')}
+                          {' - '}
+                          {new Date(leave.date_to).toLocaleDateString('fr-FR')}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">
+                      {leave.number_of_days} jour{leave.number_of_days > 1 ? 's' : ''}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 text-xs rounded-full ${getStateColor(leave.state)}`}>
+                        {leave.state_label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        {(leave.state === 'confirm' || leave.state === 'validate1') && (
+                          <>
+                            <button
+                              onClick={() => handleApprove(leave)}
+                              disabled={isApproving}
+                              className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded"
+                              title="Approuver"
+                            >
+                              <Check className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleRefuse(leave)}
+                              disabled={isRefusing}
+                              className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
+                              title="Refuser"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                        <button
+                          onClick={() => setSelectedLeave(leave)}
+                          className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                          title="Voir détails"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Empty */}
+        {leaves.length === 0 && (
+          <div className="text-center py-12">
+            <CalendarOff className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Aucune demande de congé
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
+              {statusFilter || typeFilter
+                ? 'Modifiez vos filtres pour voir plus de résultats'
+                : 'Aucune demande trouvée'}
+            </p>
+          </div>
+        )}
+
+        {/* Modal détails */}
+        {selectedLeave && (
+          <LeaveDetailModal
+            leave={selectedLeave}
+            onClose={() => setSelectedLeave(null)}
+            onApprove={() => handleApprove(selectedLeave)}
+            onRefuse={() => handleRefuse(selectedLeave)}
+          />
+        )}
+      </div>
+    </Layout>
   )
 }
 
@@ -279,7 +335,7 @@ function LeaveDetailModal({
             </div>
             <div>
               <p className="font-medium text-gray-900 dark:text-white">{leave.employee_name}</p>
-              <p className="text-sm text-gray-500">{leave.leave_type_name}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{leave.leave_type_name}</p>
             </div>
           </div>
 

@@ -292,33 +292,171 @@ class QuelyosWishlist(http.Controller):
             dict: {
                 'success': bool,
                 'data': {
-                    'wishlist': [...],
+                    'wishlist': {...},
                     'owner_name': str,
-                    'count': int,
-                    'share_token': str
+                    'total_items': int
                 }
             }
         """
         try:
-            # Pour l'instant, retourner une wishlist vide
-            # TODO: Implémenter le système de partage avec tokens
-            # Nécessite d'ajouter un champ 'share_token' au modèle product.wishlist
+            Wishlist = request.env['product.wishlist'].sudo()
 
-            _logger.warning(f"Public wishlist sharing not fully implemented - token: {token}")
+            # Récupérer les items par token
+            wishlist_items = Wishlist.get_by_share_token(token)
+
+            if not wishlist_items:
+                return {
+                    'success': False,
+                    'error': 'Wishlist introuvable ou non partagée'
+                }
+
+            # Récupérer le nom du propriétaire
+            partner = wishlist_items[0].partner_id
+            owner_name = partner.name or 'Utilisateur'
+
+            # Construire la liste des produits
+            items = []
+            for item in wishlist_items:
+                product = item.product_id
+
+                # URL image
+                image_url = None
+                if product.image_1920:
+                    image_url = f'/web/image/product.template/{product.id}/image_1920'
+
+                # Slug
+                slug = product.name.lower().replace(' ', '-').replace('/', '-')
+
+                items.append({
+                    'id': product.id,
+                    'name': product.name,
+                    'slug': slug,
+                    'description': product.description_sale or '',
+                    'price': product.list_price,
+                    'image_url': image_url,
+                    'stock_available': product.qty_available > 0 if product.type == 'product' else True,
+                    'added_date': item.create_date.isoformat() if item.create_date else None
+                })
 
             return {
                 'success': True,
                 'data': {
-                    'wishlist': [],
-                    'owner_name': 'Utilisateur',
-                    'count': 0,
-                    'share_token': token,
-                    'message': 'Partage de wishlist non encore implémenté - Nécessite extension du modèle Odoo'
+                    'wishlist': {
+                        'owner_name': owner_name,
+                        'items': items,
+                        'total_items': len(items)
+                    }
                 }
             }
 
         except Exception as e:
             _logger.error(f"Get public wishlist error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/ecommerce/wishlist/share', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def generate_share_link(self, **kwargs):
+        """
+        Générer un lien de partage pour la wishlist
+
+        Returns:
+            dict: {
+                'success': bool,
+                'share_token': str,
+                'share_url': str
+            }
+        """
+        try:
+            if not request.session.uid:
+                return {
+                    'success': False,
+                    'error': 'Authentification requise'
+                }
+
+            Partner = request.env['res.partner'].sudo()
+            partner = Partner.browse(request.session.uid)
+
+            if not partner.exists():
+                return {
+                    'success': False,
+                    'error': 'Utilisateur non trouvé'
+                }
+
+            Wishlist = request.env['product.wishlist'].sudo()
+
+            # Vérifier s'il y a des items dans la wishlist
+            wishlist_items = Wishlist.search([('partner_id', '=', partner.id)])
+            if not wishlist_items:
+                return {
+                    'success': False,
+                    'error': 'Votre wishlist est vide'
+                }
+
+            # Vérifier si un token existe déjà
+            existing_token = wishlist_items[0].share_token if wishlist_items[0].is_public else None
+
+            if existing_token:
+                token = existing_token
+            else:
+                # Générer nouveau token
+                token = Wishlist.generate_share_token(partner.id)
+
+            _logger.info(f"Share link generated for partner {partner.id}")
+
+            return {
+                'success': True,
+                'share_token': token,
+                'share_url': f'/wishlist/{token}'
+            }
+
+        except Exception as e:
+            _logger.error(f"Generate share link error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/ecommerce/wishlist/unshare', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def disable_sharing(self, **kwargs):
+        """
+        Désactiver le partage de la wishlist
+
+        Returns:
+            dict: {
+                'success': bool,
+                'message': str
+            }
+        """
+        try:
+            if not request.session.uid:
+                return {
+                    'success': False,
+                    'error': 'Authentification requise'
+                }
+
+            Partner = request.env['res.partner'].sudo()
+            partner = Partner.browse(request.session.uid)
+
+            if not partner.exists():
+                return {
+                    'success': False,
+                    'error': 'Utilisateur non trouvé'
+                }
+
+            Wishlist = request.env['product.wishlist'].sudo()
+            Wishlist.disable_sharing(partner.id)
+
+            _logger.info(f"Sharing disabled for partner {partner.id}")
+
+            return {
+                'success': True,
+                'message': 'Partage désactivé'
+            }
+
+        except Exception as e:
+            _logger.error(f"Disable sharing error: {e}", exc_info=True)
             return {
                 'success': False,
                 'error': 'Une erreur est survenue'

@@ -24,5 +24,6 @@ from . import hr_departments
 from . import hr_contracts
 from . import hr_attendance
 from . import hr_leaves
+from . import hr_appraisals
 # POS Controller
 from . import pos

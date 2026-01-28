@@ -57,6 +57,7 @@ import {
   Printer,
   ScanBarcode,
   // Store Extended Icons
+  ChefHat,
   Star,
   HelpCircle,
   BookOpen,
@@ -443,6 +444,13 @@ export const MODULES: Module[] = [
         ],
       },
       {
+        title: 'Évaluations',
+        items: [
+          { name: 'Entretiens', path: '/hr/appraisals', icon: ClipboardList },
+          { name: 'Compétences', path: '/hr/skills', icon: Award },
+        ],
+      },
+      {
         title: 'Configuration',
         items: [
           { name: 'Paramètres', path: '/hr/settings', icon: Settings },
@@ -464,7 +472,11 @@ export const MODULES: Module[] = [
         title: 'Caisse',
         items: [
           { name: 'Terminal', path: '/pos/terminal', icon: Monitor },
+          { name: 'Mode Rush', path: '/pos/rush', icon: Zap },
           { name: 'Mode Kiosk', path: '/pos/kiosk', icon: ScanBarcode },
+          { name: 'Mobile POS', path: '/pos/mobile', icon: Monitor },
+          { name: 'Écran Cuisine', path: '/pos/kds', icon: ChefHat },
+          { name: 'Écran Client', path: '/pos/customer-display', icon: Monitor },
           { name: 'Ouvrir Session', path: '/pos/session/open', icon: PlayCircle },
         ],
       },
@@ -474,6 +486,7 @@ export const MODULES: Module[] = [
           { name: 'Tableau de bord', path: '/pos', icon: LayoutDashboard },
           { name: 'Commandes', path: '/pos/orders', icon: ClipboardList },
           { name: 'Sessions', path: '/pos/sessions', icon: Clock },
+          { name: 'Click & Collect', path: '/pos/click-collect', icon: Package },
         ],
       },
       {
@@ -481,6 +494,7 @@ export const MODULES: Module[] = [
         items: [
           { name: 'Ventes', path: '/pos/reports/sales', icon: BarChart3 },
           { name: 'Paiements', path: '/pos/reports/payments', icon: CreditCard },
+          { name: 'Analytics IA', path: '/pos/analytics', icon: Sparkles },
         ],
       },
       {

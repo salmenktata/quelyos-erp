@@ -46,6 +46,12 @@ from . import hr_attendance
 from . import hr_leave_type
 from . import hr_leave
 from . import hr_leave_allocation
+# HR V2 - Évaluations
+from . import hr_skill
+from . import hr_goal
+from . import hr_appraisal
+# Wishlist Extension - Disabled (requires website_sale_wishlist module)
+# from . import wishlist
 # POS Models
 from . import pos_payment_method
 from . import pos_config

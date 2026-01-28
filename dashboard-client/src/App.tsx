@@ -178,11 +178,20 @@ const HRLeavesCalendar = lazy(() => import('./pages/hr/leaves/calendar/page'))
 const HRLeavesAllocations = lazy(() => import('./pages/hr/leaves/allocations/page'))
 const HRLeavesTypes = lazy(() => import('./pages/hr/leaves/types/page'))
 const HRSettings = lazy(() => import('./pages/hr/settings/page'))
+const HRAppraisals = lazy(() => import('./pages/hr/appraisals/page'))
+const HRAppraisalDetail = lazy(() => import('./pages/hr/appraisals/[id]/page'))
+const HRSkills = lazy(() => import('./pages/hr/skills/page'))
 
 // Lazy loaded pages - POS
 const POSDashboard = lazy(() => import('./pages/pos/POSDashboard'))
 const POSTerminal = lazy(() => import('./pages/pos/POSTerminal'))
 const POSKiosk = lazy(() => import('./pages/pos/POSKiosk'))
+const POSKDS = lazy(() => import('./pages/pos/POSKDS'))
+const POSRush = lazy(() => import('./pages/pos/POSRush'))
+const POSMobile = lazy(() => import('./pages/pos/POSMobile'))
+const POSAnalytics = lazy(() => import('./pages/pos/POSAnalytics'))
+const POSClickCollect = lazy(() => import('./pages/pos/POSClickCollect'))
+const POSCustomerDisplay = lazy(() => import('./pages/pos/POSCustomerDisplay'))
 const POSSessionOpen = lazy(() => import('./pages/pos/POSSessionOpen'))
 const POSOrders = lazy(() => import('./pages/pos/POSOrders'))
 const POSSessions = lazy(() => import('./pages/pos/POSSessions'))
@@ -1312,6 +1321,30 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/hr/appraisals"
+                element={
+                  <ProtectedRoute>
+                    <HRAppraisals />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/appraisals/:id"
+                element={
+                  <ProtectedRoute>
+                    <HRAppraisalDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/skills"
+                element={
+                  <ProtectedRoute>
+                    <HRSkills />
+                  </ProtectedRoute>
+                }
+              />
               {/* POS routes */}
               <Route
                 path="/pos"
@@ -1334,6 +1367,46 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <POSKiosk />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/kds"
+                element={
+                  <ProtectedRoute>
+                    <POSKDS />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/rush"
+                element={
+                  <ProtectedRoute>
+                    <POSRush />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/mobile"
+                element={
+                  <ProtectedRoute>
+                    <POSMobile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/analytics"
+                element={
+                  <ProtectedRoute>
+                    <POSAnalytics />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/click-collect"
+                element={
+                  <ProtectedRoute>
+                    <POSClickCollect />
                   </ProtectedRoute>
                 }
               />
@@ -1406,6 +1479,14 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <POSSettingsReceipts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/customer-display"
+                element={
+                  <ProtectedRoute>
+                    <POSCustomerDisplay />
                   </ProtectedRoute>
                 }
               />

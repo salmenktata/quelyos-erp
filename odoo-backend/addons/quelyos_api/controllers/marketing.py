@@ -514,6 +514,243 @@ class QuelyosMarketing(http.Controller):
                 'error': 'Une erreur est survenue'
             }
 
+    @http.route('/api/ecommerce/loyalty/balance', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_loyalty_balance(self, **kwargs):
+        """
+        Récupérer le solde de fidélité complet avec transactions
+
+        Returns:
+            dict: {
+                'success': bool,
+                'data': {
+                    'balance': int,
+                    'lifetime_points': int,
+                    'tier': {...},
+                    'next_tier': {...},
+                    'transactions': [...],
+                    'program': {...}
+                }
+            }
+        """
+        try:
+            if not request.session.uid:
+                return {
+                    'success': False,
+                    'error': 'Authentification requise'
+                }
+
+            Partner = request.env['res.partner'].sudo()
+            partner = Partner.browse(request.session.uid)
+
+            if not partner.exists():
+                return {
+                    'success': False,
+                    'error': 'Utilisateur non trouvé'
+                }
+
+            # Récupérer la company du tenant
+            company = request.env['res.company'].sudo().search([
+                ('partner_id', '=', partner.id)
+            ], limit=1) or request.env.company
+
+            # Récupérer le programme actif
+            LoyaltyProgram = request.env['quelyos.loyalty.program'].sudo()
+            program = LoyaltyProgram.search([
+                ('company_id', '=', company.id),
+                ('is_active', '=', True)
+            ], limit=1)
+
+            if not program:
+                return {
+                    'success': True,
+                    'data': None,
+                    'message': 'Aucun programme de fidélité actif'
+                }
+
+            # Récupérer le membre
+            LoyaltyMember = request.env['quelyos.loyalty.member'].sudo()
+            member = LoyaltyMember.search([
+                ('partner_id', '=', partner.id),
+                ('program_id', '=', program.id)
+            ], limit=1)
+
+            if not member:
+                # Créer automatiquement le membre
+                member = LoyaltyMember.create({
+                    'partner_id': partner.id,
+                    'program_id': program.id,
+                })
+
+            # Niveau actuel
+            tier_data = None
+            if member.level_id:
+                tier_data = {
+                    'id': member.level_id.id,
+                    'name': member.level_id.name,
+                    'color': member.level_id.color,
+                    'discount_percentage': member.level_id.discount_percent,
+                    'points_threshold': member.level_id.min_points,
+                }
+
+            # Niveau suivant
+            next_tier_data = None
+            levels = program.level_ids.sorted('min_points')
+            for level in levels:
+                if level.min_points > member.total_points_earned:
+                    next_tier_data = {
+                        'id': level.id,
+                        'name': level.name,
+                        'points_threshold': level.min_points,
+                        'points_needed': level.min_points - member.total_points_earned,
+                    }
+                    break
+
+            # Transactions récentes
+            transactions = []
+            for txn in member.transaction_ids[:20]:
+                transactions.append({
+                    'id': txn.id,
+                    'points': txn.points if txn.transaction_type == 'earn' else -txn.points,
+                    'description': txn.description or '',
+                    'type': txn.transaction_type,
+                    'date': txn.create_date.isoformat() if txn.create_date else None,
+                    'order_id': txn.order_id.id if txn.order_id else None,
+                    'order_name': txn.order_id.name if txn.order_id else None,
+                })
+
+            # Programme info
+            program_data = {
+                'points_per_euro': program.points_per_currency,
+                'points_to_euro_rate': int(1 / program.points_value) if program.points_value else 100,
+                'min_order_amount': 0,
+            }
+
+            return {
+                'success': True,
+                'data': {
+                    'balance': member.current_points,
+                    'lifetime_points': member.total_points_earned,
+                    'tier': tier_data,
+                    'next_tier': next_tier_data,
+                    'transactions': transactions,
+                    'program': program_data,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get loyalty balance error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/ecommerce/loyalty/tiers', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_loyalty_tiers(self, **kwargs):
+        """
+        Récupérer les niveaux de fidélité
+
+        Returns:
+            dict: {
+                'success': bool,
+                'data': {
+                    'tiers': [...]
+                }
+            }
+        """
+        try:
+            # Récupérer la company
+            company = request.env.company
+
+            # Récupérer le programme actif
+            LoyaltyProgram = request.env['quelyos.loyalty.program'].sudo()
+            program = LoyaltyProgram.search([
+                ('company_id', '=', company.id),
+                ('is_active', '=', True)
+            ], limit=1)
+
+            if not program:
+                return {
+                    'success': True,
+                    'data': {'tiers': []}
+                }
+
+            tiers = []
+            for level in program.level_ids.sorted('min_points'):
+                tiers.append({
+                    'id': level.id,
+                    'name': level.name,
+                    'points_threshold': level.min_points,
+                    'discount_percentage': level.discount_percent,
+                    'color': level.color,
+                    'free_shipping': level.free_shipping,
+                })
+
+            return {
+                'success': True,
+                'data': {'tiers': tiers}
+            }
+
+        except Exception as e:
+            _logger.error(f"Get loyalty tiers error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/ecommerce/loyalty/calculate', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def calculate_loyalty_points(self, **kwargs):
+        """
+        Calculer les points pour un montant donné
+
+        Args:
+            amount (float): Montant de la commande
+
+        Returns:
+            dict: {
+                'success': bool,
+                'data': {
+                    'points': int,
+                    'program_active': bool
+                }
+            }
+        """
+        try:
+            params = self._get_params()
+            amount = params.get('amount', 0)
+
+            # Récupérer le programme actif
+            LoyaltyProgram = request.env['quelyos.loyalty.program'].sudo()
+            program = LoyaltyProgram.search([
+                ('company_id', '=', request.env.company.id),
+                ('is_active', '=', True)
+            ], limit=1)
+
+            if not program:
+                return {
+                    'success': True,
+                    'data': {
+                        'points': 0,
+                        'program_active': False
+                    }
+                }
+
+            points = int(amount * program.points_per_currency)
+
+            return {
+                'success': True,
+                'data': {
+                    'points': points,
+                    'program_active': True
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Calculate loyalty points error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
     # ==================== NEWSLETTER ====================
 
     @http.route('/api/ecommerce/newsletter/subscribe', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')

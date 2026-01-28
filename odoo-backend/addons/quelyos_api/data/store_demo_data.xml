@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- =================================================================== -->
+        <!-- FAQ Categories -->
+        <!-- =================================================================== -->
+        <record id="faq_category_orders" model="quelyos.faq.category">
+            <field name="name">Commandes</field>
+            <field name="code">commandes</field>
+            <field name="icon">ShoppingCart</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="faq_category_shipping" model="quelyos.faq.category">
+            <field name="name">Livraison</field>
+            <field name="code">livraison</field>
+            <field name="icon">Truck</field>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="faq_category_returns" model="quelyos.faq.category">
+            <field name="name">Retours</field>
+            <field name="code">retours</field>
+            <field name="icon">RotateCcw</field>
+            <field name="sequence">3</field>
+        </record>
+
+        <record id="faq_category_payment" model="quelyos.faq.category">
+            <field name="name">Paiement</field>
+            <field name="code">paiement</field>
+            <field name="icon">CreditCard</field>
+            <field name="sequence">4</field>
+        </record>
+
+        <record id="faq_category_account" model="quelyos.faq.category">
+            <field name="name">Compte</field>
+            <field name="code">compte</field>
+            <field name="icon">User</field>
+            <field name="sequence">5</field>
+        </record>
+
+        <!-- =================================================================== -->
+        <!-- FAQs -->
+        <!-- =================================================================== -->
+        <record id="faq_order_1" model="quelyos.faq">
+            <field name="question">Comment passer une commande ?</field>
+            <field name="answer">Parcourez notre catalogue, ajoutez les produits souhaites a votre panier, puis procedez au paiement. Vous recevrez une confirmation par email des que votre commande sera validee.</field>
+            <field name="category_id" ref="faq_category_orders"/>
+            <field name="sequence">1</field>
+            <field name="is_published">True</field>
+            <field name="is_featured">True</field>
+        </record>
+
+        <record id="faq_order_2" model="quelyos.faq">
+            <field name="question">Comment suivre ma commande ?</field>
+            <field name="answer">Connectez-vous a votre compte et accedez a la section "Mes commandes". Vous y trouverez le statut de chaque commande ainsi que le numero de suivi le cas echeant.</field>
+            <field name="category_id" ref="faq_category_orders"/>
+            <field name="sequence">2</field>
+            <field name="is_published">True</field>
+        </record>
+
+        <record id="faq_order_3" model="quelyos.faq">
+            <field name="question">Puis-je modifier ou annuler ma commande ?</field>
+            <field name="answer">Vous pouvez modifier ou annuler votre commande tant qu'elle n'a pas ete expediee. Contactez notre service client le plus rapidement possible.</field>
+            <field name="category_id" ref="faq_category_orders"/>
+            <field name="sequence">3</field>
+            <field name="is_published">True</field>
+        </record>
+
+        <record id="faq_shipping_1" model="quelyos.faq">
+            <field name="question">Quels sont les delais de livraison ?</field>
+            <field name="answer">La livraison standard prend entre 3 et 5 jours ouvrables. La livraison express est disponible en 1-2 jours ouvrables pour un supplement.</field>
+            <field name="category_id" ref="faq_category_shipping"/>
+            <field name="sequence">1</field>
+            <field name="is_published">True</field>
+            <field name="is_featured">True</field>
+        </record>
+
+        <record id="faq_shipping_2" model="quelyos.faq">
+            <field name="question">La livraison est-elle gratuite ?</field>
+            <field name="answer">Oui, la livraison est gratuite pour toute commande superieure a 100 TND. En dessous de ce montant, des frais de livraison de 7 TND s'appliquent.</field>
+            <field name="category_id" ref="faq_category_shipping"/>
+            <field name="sequence">2</field>
+            <field name="is_published">True</field>
+        </record>
+
+        <record id="faq_returns_1" model="quelyos.faq">
+            <field name="question">Quelle est votre politique de retour ?</field>
+            <field name="answer">Vous disposez de 14 jours apres reception pour retourner un article. Le produit doit etre dans son etat d'origine, non utilise et dans son emballage d'origine.</field>
+            <field name="category_id" ref="faq_category_returns"/>
+            <field name="sequence">1</field>
+            <field name="is_published">True</field>
+            <field name="is_featured">True</field>
+        </record>
+
+        <record id="faq_returns_2" model="quelyos.faq">
+            <field name="question">Quand serai-je rembourse ?</field>
+            <field name="answer">Le remboursement est effectue dans un delai de 5 a 10 jours ouvrables apres reception et verification du produit retourne.</field>
+            <field name="category_id" ref="faq_category_returns"/>
+            <field name="sequence">2</field>
+            <field name="is_published">True</field>
+        </record>
+
+        <record id="faq_payment_1" model="quelyos.faq">
+            <field name="question">Quels modes de paiement acceptez-vous ?</field>
+            <field name="answer">Nous acceptons les cartes bancaires (Visa, Mastercard), les virements bancaires, et le paiement a la livraison dans certaines regions.</field>
+            <field name="category_id" ref="faq_category_payment"/>
+            <field name="sequence">1</field>
+            <field name="is_published">True</field>
+        </record>
+
+        <record id="faq_payment_2" model="quelyos.faq">
+            <field name="question">Le paiement est-il securise ?</field>
+            <field name="answer">Oui, tous les paiements sont securises par cryptage SSL. Vos informations bancaires ne sont jamais stockees sur nos serveurs.</field>
+            <field name="category_id" ref="faq_category_payment"/>
+            <field name="sequence">2</field>
+            <field name="is_published">True</field>
+        </record>
+
+        <record id="faq_account_1" model="quelyos.faq">
+            <field name="question">Comment creer un compte ?</field>
+            <field name="answer">Cliquez sur "Mon compte" en haut de page, puis sur "Creer un compte". Remplissez le formulaire avec vos informations et validez.</field>
+            <field name="category_id" ref="faq_category_account"/>
+            <field name="sequence">1</field>
+            <field name="is_published">True</field>
+        </record>
+
+        <record id="faq_account_2" model="quelyos.faq">
+            <field name="question">J'ai oublie mon mot de passe, que faire ?</field>
+            <field name="answer">Sur la page de connexion, cliquez sur "Mot de passe oublie". Entrez votre email et vous recevrez un lien pour reinitialiser votre mot de passe.</field>
+            <field name="category_id" ref="faq_category_account"/>
+            <field name="sequence">2</field>
+            <field name="is_published">True</field>
+        </record>
+
+        <!-- =================================================================== -->
+        <!-- Loyalty Program -->
+        <!-- =================================================================== -->
+        <record id="loyalty_program_default" model="quelyos.loyalty.program">
+            <field name="name">Programme Fidelite Quelyos</field>
+            <field name="is_active">True</field>
+            <field name="points_per_currency">1</field>
+            <field name="currency_per_point">1</field>
+            <field name="points_value">0.01</field>
+            <field name="min_points_redeem">100</field>
+        </record>
+
+        <!-- Loyalty Levels -->
+        <record id="loyalty_level_bronze" model="quelyos.loyalty.level">
+            <field name="name">Bronze</field>
+            <field name="program_id" ref="loyalty_program_default"/>
+            <field name="min_points">0</field>
+            <field name="points_multiplier">1.0</field>
+            <field name="discount_percent">0</field>
+            <field name="color">#CD7F32</field>
+            <field name="icon">Star</field>
+        </record>
+
+        <record id="loyalty_level_silver" model="quelyos.loyalty.level">
+            <field name="name">Argent</field>
+            <field name="program_id" ref="loyalty_program_default"/>
+            <field name="min_points">1000</field>
+            <field name="points_multiplier">1.25</field>
+            <field name="discount_percent">5</field>
+            <field name="color">#C0C0C0</field>
+            <field name="icon">Star</field>
+        </record>
+
+        <record id="loyalty_level_gold" model="quelyos.loyalty.level">
+            <field name="name">Or</field>
+            <field name="program_id" ref="loyalty_program_default"/>
+            <field name="min_points">5000</field>
+            <field name="points_multiplier">1.5</field>
+            <field name="discount_percent">10</field>
+            <field name="free_shipping">True</field>
+            <field name="color">#FFD700</field>
+            <field name="icon">Crown</field>
+        </record>
+
+        <record id="loyalty_level_platinum" model="quelyos.loyalty.level">
+            <field name="name">Platine</field>
+            <field name="program_id" ref="loyalty_program_default"/>
+            <field name="min_points">15000</field>
+            <field name="points_multiplier">2.0</field>
+            <field name="discount_percent">15</field>
+            <field name="free_shipping">True</field>
+            <field name="early_access">True</field>
+            <field name="priority_support">True</field>
+            <field name="color">#E5E4E2</field>
+            <field name="icon">Diamond</field>
+        </record>
+
+        <!-- =================================================================== -->
+        <!-- Testimonials -->
+        <!-- =================================================================== -->
+        <record id="testimonial_1" model="quelyos.testimonial">
+            <field name="author_name">Ahmed Ben Ali</field>
+            <field name="author_title">Client fidele</field>
+            <field name="content">Service exceptionnel ! Ma commande est arrivee en parfait etat et plus vite que prevu. Je recommande vivement !</field>
+            <field name="rating">5</field>
+            <field name="is_published">True</field>
+            <field name="is_featured">True</field>
+        </record>
+
+        <record id="testimonial_2" model="quelyos.testimonial">
+            <field name="author_name">Fatma Trabelsi</field>
+            <field name="author_title">Acheteuse reguliere</field>
+            <field name="content">Des produits de qualite a prix raisonnables. Le service client est tres reactif et professionnel.</field>
+            <field name="rating">5</field>
+            <field name="is_published">True</field>
+            <field name="is_featured">True</field>
+        </record>
+
+        <record id="testimonial_3" model="quelyos.testimonial">
+            <field name="author_name">Mohamed Souissi</field>
+            <field name="author_title">Nouveau client</field>
+            <field name="content">Premiere commande et deja conquis ! Le site est facile a utiliser et la livraison tres rapide.</field>
+            <field name="rating">4</field>
+            <field name="is_published">True</field>
+        </record>
+
+        <record id="testimonial_4" model="quelyos.testimonial">
+            <field name="author_name">Leila Hamdi</field>
+            <field name="author_title">Cliente VIP</field>
+            <field name="content">Je fais mes achats ici depuis 2 ans. La qualite est toujours au rendez-vous et les offres sont interessantes.</field>
+            <field name="rating">5</field>
+            <field name="is_published">True</field>
+            <field name="is_featured">True</field>
+        </record>
+
+        <!-- =================================================================== -->
+        <!-- Collections -->
+        <!-- =================================================================== -->
+        <record id="collection_bestsellers" model="quelyos.collection">
+            <field name="name">Meilleures Ventes</field>
+            <field name="code">bestsellers</field>
+            <field name="description">Decouvrez nos produits les plus populaires</field>
+            <field name="is_active">True</field>
+            <field name="is_featured">True</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="collection_new" model="quelyos.collection">
+            <field name="name">Nouveautes</field>
+            <field name="code">new-arrivals</field>
+            <field name="description">Les dernieres nouveautes de notre catalogue</field>
+            <field name="is_active">True</field>
+            <field name="is_featured">True</field>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="collection_promo" model="quelyos.collection">
+            <field name="name">Promotions</field>
+            <field name="code">promotions</field>
+            <field name="description">Profitez de nos offres speciales</field>
+            <field name="is_active">True</field>
+            <field name="is_featured">True</field>
+            <field name="sequence">3</field>
+        </record>
+
+        <record id="collection_summer" model="quelyos.collection">
+            <field name="name">Collection Ete</field>
+            <field name="code">summer-collection</field>
+            <field name="description">Selection speciale pour l'ete</field>
+            <field name="is_active">True</field>
+            <field name="sequence">4</field>
+        </record>
+
+    </data>
+</odoo>
