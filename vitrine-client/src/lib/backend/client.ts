@@ -573,6 +573,11 @@ export class BackendClient {
     return this.jsonrpc('/faq/public', { category_code: categoryCode });
   }
 
+  // Static pages
+  async getStaticPage(slug: string): Promise<APIResponse & { page?: { id: number; title: string; subtitle?: string; content: string; seo_title?: string; seo_description?: string } }> {
+    return this.jsonrpc(`/pages/${slug}`);
+  }
+
   // Payment providers
   async getPaymentProviders(): Promise<{ success: boolean; providers: any[]; error?: string }> {
     return this.jsonrpc('/payment/providers');

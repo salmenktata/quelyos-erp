@@ -2,8 +2,9 @@
 
 import { useSiteConfig } from '@/lib/config/SiteConfigProvider';
 import Link from 'next/link';
+import { StaticPageContent } from '@/components/static/StaticPageContent';
 
-export default function ShippingPage() {
+function ShippingFallback() {
   const { config } = useSiteConfig();
   const { brand, shipping, currency } = config;
 
@@ -152,4 +153,9 @@ export default function ShippingPage() {
       </div>
     </div>
   );
+}
+
+
+export default function ShippingPage() {
+  return <StaticPageContent slug="shipping" fallback={<ShippingFallback />} />;
 }

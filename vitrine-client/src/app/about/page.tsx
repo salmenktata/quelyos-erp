@@ -2,8 +2,9 @@
 
 import { useSiteConfig } from '@/lib/config/SiteConfigProvider';
 import Link from 'next/link';
+import { StaticPageContent } from '@/components/static/StaticPageContent';
 
-export default function AboutPage() {
+function AboutFallback() {
   const { config } = useSiteConfig();
   const { brand } = config;
 
@@ -117,4 +118,8 @@ export default function AboutPage() {
       </div>
     </div>
   );
+}
+
+export default function AboutPage() {
+  return <StaticPageContent slug="about" fallback={<AboutFallback />} />;
 }

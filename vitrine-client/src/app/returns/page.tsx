@@ -2,8 +2,9 @@
 
 import { useSiteConfig } from '@/lib/config/SiteConfigProvider';
 import Link from 'next/link';
+import { StaticPageContent } from '@/components/static/StaticPageContent';
 
-export default function ReturnsPage() {
+function ReturnsFallback() {
   const { config } = useSiteConfig();
   const { brand, returns } = config;
 
@@ -197,4 +198,9 @@ export default function ReturnsPage() {
       </div>
     </div>
   );
+}
+
+
+export default function ReturnsPage() {
+  return <StaticPageContent slug="returns" fallback={<ReturnsFallback />} />;
 }

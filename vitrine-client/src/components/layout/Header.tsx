@@ -26,18 +26,10 @@ const Header: React.FC = () => {
 
   const itemCount = cart?.item_count || 0;
 
-  // Promotional messages for the marquee
-  const promoMessages = [
-    { id: 1, text: `Livraison GRATUITE des ${shipping?.freeThreshold || 150} ${currency?.symbol || 'TND'}`, icon: 'truck' as const },
-    { id: 2, text: 'Retours gratuits sous 30 jours', icon: 'gift' as const },
-    { id: 3, text: 'Paiement 100% securise', icon: 'star' as const },
-    { id: 4, text: 'Support client disponible 7j/7', icon: 'clock' as const },
-  ];
-
   return (
     <header className="sticky top-0 z-50">
-      {/* Promotional Banner with Marquee */}
-      <PromoBar messages={promoMessages} backgroundColor="bg-gray-900" />
+      {/* Promotional Banner with Marquee - Uses API via usePromoMessages() */}
+      <PromoBar backgroundColor="bg-gray-900" />
 
       {/* Top Bar - Contact Info */}
       <div className="bg-primary text-white text-sm">

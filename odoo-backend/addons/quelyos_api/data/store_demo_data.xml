@@ -267,5 +267,44 @@
             <field name="sequence">4</field>
         </record>
 
+        <!-- =================================================================== -->
+        <!-- Trust Badges (Benefits Homepage) -->
+        <!-- =================================================================== -->
+        <record id="trust_badge_delivery" model="quelyos.trust.badge">
+            <field name="name">Livraison Rapide</field>
+            <field name="title">Livraison rapide</field>
+            <field name="subtitle">Gratuite des 200 TND - Partout en Tunisie 48-72h</field>
+            <field name="icon">delivery</field>
+            <field name="sequence">1</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="trust_badge_payment" model="quelyos.trust.badge">
+            <field name="name">Paiement Securise</field>
+            <field name="title">Paiement securise</field>
+            <field name="subtitle">100% securise en ligne - A la livraison disponible</field>
+            <field name="icon">shield</field>
+            <field name="sequence">2</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="trust_badge_support" model="quelyos.trust.badge">
+            <field name="name">Service Client</field>
+            <field name="title">Service client</field>
+            <field name="subtitle">Equipe a votre ecoute - Satisfait ou rembourse</field>
+            <field name="icon">support</field>
+            <field name="sequence">3</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="trust_badge_quality" model="quelyos.trust.badge">
+            <field name="name">Qualite Garantie</field>
+            <field name="title">Qualite garantie</field>
+            <field name="subtitle">Produits selectionnes - Garantie 1 an minimum</field>
+            <field name="icon">creditcard</field>
+            <field name="sequence">4</field>
+            <field name="active">True</field>
+        </record>
+
     </data>
 </odoo>

@@ -10,17 +10,18 @@ import type { PromoBanner } from '@/hooks/usePromoBanners';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { PromoBanners } from '@/components/home/PromoBanners';
 import { CategoriesSection } from '@/components/home/CategoriesSection';
+import { BenefitsSection, type Benefit } from '@/components/home/BenefitsSection';
 import { ProductGrid } from '@/components/product/ProductGrid';
 import { ProductCardHome } from '@/components/home/ProductCardHome';
 import { NewsletterForm } from '@/components/home/NewsletterForm';
 import { logger } from '@/lib/logger';
 
 // Server-side data fetching
-async function getHomeData(): Promise<{ products: Product[]; categories: Category[]; heroSlides: HeroSlide[]; promoBanners: PromoBanner[] }> {
+async function getHomeData(): Promise<{ products: Product[]; categories: Category[]; heroSlides: HeroSlide[]; promoBanners: PromoBanner[]; benefits: Benefit[] }> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
   try {
-    const [productsRes, categoriesRes, heroSlidesRes, promoBannersRes] = await Promise.all([
+    const [productsRes, categoriesRes, heroSlidesRes, promoBannersRes, benefitsRes] = await Promise.all([
       fetch(`${baseUrl}/api/products?limit=8&is_featured=true`, {
         next: { revalidate: 60 } // ISR: revalidate every 60 seconds
       }),
@@ -32,6 +33,9 @@ async function getHomeData(): Promise<{ products: Product[]; categories: Categor
       }),
       fetch(`${baseUrl}/api/promo-banners`, {
         next: { revalidate: 300 } // ISR: revalidate every 5 minutes
+      }),
+      fetch(`${baseUrl}/api/trust-badges`, {
+        next: { revalidate: 300 } // ISR: revalidate every 5 minutes
       })
     ]);
 
@@ -39,6 +43,7 @@ async function getHomeData(): Promise<{ products: Product[]; categories: Categor
     let categories: Category[] = [];
     let heroSlides: HeroSlide[] = [];
     let promoBanners: PromoBanner[] = [];
+    let benefits: Benefit[] = [];
 
     if (productsRes.ok) {
       const data = await productsRes.json();
@@ -71,15 +76,20 @@ async function getHomeData(): Promise<{ products: Product[]; categories: Categor
       promoBanners = data.success ? data.banners || [] : [];
     }
 
-    return { products, categories, heroSlides, promoBanners };
+    if (benefitsRes.ok) {
+      const data = await benefitsRes.json();
+      benefits = data.success ? data.badges || [] : [];
+    }
+
+    return { products, categories, heroSlides, promoBanners, benefits };
   } catch (error) {
     logger.error('Error fetching home data:', error);
-    return { products: [], categories: [], heroSlides: [], promoBanners: [] };
+    return { products: [], categories: [], heroSlides: [], promoBanners: [], benefits: [] };
   }
 }
 
 export default async function Home() {
-  const { products, categories, heroSlides, promoBanners } = await getHomeData();
+  const { products, categories, heroSlides, promoBanners, benefits } = await getHomeData();
 
   return (
     <div className="bg-gray-50">
@@ -118,57 +128,8 @@ export default async function Home() {
       {/* PROMO BANNERS */}
       <PromoBanners banners={promoBanners} />
 
-      {/* BENEFITS SECTION */}
-      <section className="bg-gradient-to-b from-gray-50 to-white py-16">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Livraison */}
-            <div className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-primary/20 hover:-translate-y-1">
-              <div className="flex items-start gap-4">
-                <div className="shrink-0 w-14 h-14 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg mb-2 text-gray-900 group-hover:text-primary transition-colors">Livraison rapide</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">Gratuite des 200 TND<br/>Partout en Tunisie - 48-72h</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Paiement */}
-            <div className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-primary/20 hover:-translate-y-1">
-              <div className="flex items-start gap-4">
-                <div className="shrink-0 w-14 h-14 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg mb-2 text-gray-900 group-hover:text-primary transition-colors">Paiement securise</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">100% securise en ligne<br/>A la livraison disponible</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Service client */}
-            <div className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-primary/20 hover:-translate-y-1">
-              <div className="flex items-start gap-4">
-                <div className="shrink-0 w-14 h-14 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg mb-2 text-gray-900 group-hover:text-primary transition-colors">Service client</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">Equipe a votre ecoute<br/>Satisfait ou rembourse</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* BENEFITS SECTION - Dynamic from API */}
+      <BenefitsSection benefits={benefits} />
 
       {/* NEWSLETTER */}
       <section className="container mx-auto px-4 max-w-7xl py-12">

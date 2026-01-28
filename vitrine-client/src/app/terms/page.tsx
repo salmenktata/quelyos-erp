@@ -2,8 +2,9 @@
 
 import { useSiteConfig } from '@/lib/config/SiteConfigProvider';
 import Link from 'next/link';
+import { StaticPageContent } from '@/components/static/StaticPageContent';
 
-export default function TermsPage() {
+function TermsFallback() {
   const { config } = useSiteConfig();
   const { brand, returns, shipping, currency } = config;
 
@@ -232,4 +233,8 @@ export default function TermsPage() {
       </div>
     </div>
   );
+}
+
+export default function TermsPage() {
+  return <StaticPageContent slug="terms" fallback={<TermsFallback />} />;
 }

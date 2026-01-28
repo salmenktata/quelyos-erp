@@ -2,8 +2,9 @@
 
 import { useSiteConfig } from '@/lib/config/SiteConfigProvider';
 import Link from 'next/link';
+import { StaticPageContent } from '@/components/static/StaticPageContent';
 
-export default function PrivacyPage() {
+function PrivacyFallback() {
   const { config } = useSiteConfig();
   const { brand } = config;
 
@@ -181,4 +182,9 @@ export default function PrivacyPage() {
       </div>
     </div>
   );
+}
+
+
+export default function PrivacyPage() {
+  return <StaticPageContent slug="privacy" fallback={<PrivacyFallback />} />;
 }
