@@ -1,7 +1,6 @@
 "use client";
 
 import { LazyMotion, domAnimation } from "framer-motion";
-import { useState, useEffect } from "react";
 
 const animationStyles = `
   /* Animation fade-in pour hero */
@@ -68,14 +67,6 @@ const animationStyles = `
 
 // Client Component pour animations progressives (lazy loaded)
 export default function AnimatedSections() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
   return (
     <LazyMotion features={domAnimation}>
       <style dangerouslySetInnerHTML={{ __html: animationStyles }} />

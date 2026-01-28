@@ -6,6 +6,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { OfflineOrder } from '../../types/pos'
+import { logger } from '../../lib/logger'
 
 // ============================================================================
 // INDEXEDDB SETUP
@@ -212,7 +213,7 @@ export const usePOSOfflineStore = create<OfflineState>()((set, get) => ({
       const orders = await getOrdersFromIDB()
       set({ orders })
     } catch (error) {
-      console.error('Failed to load offline orders:', error)
+      logger.error('Failed to load offline orders:', error)
     }
   },
 

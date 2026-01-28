@@ -366,7 +366,7 @@ export default function FeaturesPage() {
           >
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-2 text-sm text-violet-300">
               <Brain className="h-4 w-4" />
-              100% des modèles ML s'exécutent localement • Zero coût de tokens
+              100% des modèles ML s&apos;exécutent localement • Zero coût de tokens
             </div>
 
             <h2 className="text-4xl font-bold text-white sm:text-5xl">
@@ -438,14 +438,14 @@ export default function FeaturesPage() {
             <div className="mx-auto max-w-3xl">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
                 <CheckCircle2 className="h-4 w-4" />
-                15/15 tests d'intégration passent • Production Ready
+                15/15 tests d&apos;intégration passent • Production Ready
               </div>
               <h3 className="text-2xl font-bold text-white mb-3">
                 Les 5 algorithmes ML sont déjà déployés et opérationnels
               </h3>
               <p className="text-slate-300 mb-6">
                 Catégorisation automatique, détection de doublons (95.73% précision), alertes anomalies,
-                budgets intelligents (94% confiance), et scoring risque client. Tous validés, documentés et prêts à l'emploi.
+                budgets intelligents (94% confiance), et scoring risque client. Tous validés, documentés et prêts à l&apos;emploi.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
                 <span className="flex items-center gap-2 text-slate-400">
@@ -589,7 +589,7 @@ export default function FeaturesPage() {
                   href={config.finance.register}
                   className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-8 py-4 text-lg font-semibold text-white shadow-2xl shadow-purple-500/50 transition-all hover:scale-105"
                 >
-                  Commencer l'essai gratuit
+                  Commencer l&apos;essai gratuit
                   <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link

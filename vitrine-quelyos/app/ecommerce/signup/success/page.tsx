@@ -186,7 +186,7 @@ function SignupSuccessContent() {
             className="text-center mt-12 pt-8 border-t border-white/10"
           >
             <p className="text-gray-400">
-              Besoin d'aide ?{" "}
+              Besoin d&apos;aide ?{" "}
               <Link href="/docs" className="text-indigo-400 hover:underline">
                 Consultez la documentation
               </Link>{" "}

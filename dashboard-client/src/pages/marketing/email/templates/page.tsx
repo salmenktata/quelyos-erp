@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Badge, Skeleton } from '@/components/common';
 import { useEmailTemplates, TEMPLATE_CATEGORIES, type TemplateCategory } from '@/hooks/useEmailTemplates';
@@ -175,7 +176,7 @@ export default function EmailTemplatesPage() {
                     </label>
                     <div
                       className="mt-2 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto"
-                      dangerouslySetInnerHTML={{ __html: selectedTemplateData.content }}
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedTemplateData.content) }}
                     />
                   </div>
                 </div>

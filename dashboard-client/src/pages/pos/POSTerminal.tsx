@@ -10,6 +10,7 @@ import { usePOSProducts, usePOSCategories } from '../../hooks/pos/usePOSProducts
 import { usePOSActiveSession, useCloseSession } from '../../hooks/pos/usePOSSession'
 import { usePOSCheckout } from '../../hooks/pos/usePOSOrders'
 import { usePOSCartStore } from '../../stores/pos'
+import { logger } from '../../lib/logger'
 import type { POSProduct } from '../../types/pos'
 
 export default function POSTerminal() {
@@ -90,7 +91,7 @@ export default function POSTerminal() {
       setShowPayment(false)
       // TODO: Print receipt
     } catch (error) {
-      console.error('Checkout error:', error)
+      logger.error('Checkout error:', error)
     }
   }
 

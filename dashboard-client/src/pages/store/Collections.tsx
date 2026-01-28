@@ -13,6 +13,7 @@ import { Plus, Edit, Trash2, Eye, EyeOff, Image, Package, AlertCircle, Search } 
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { logger } from '@/lib/logger';
 
 interface Collection {
   id: number;
@@ -84,7 +85,7 @@ export default function Collections() {
         fetchCollections();
       }
     } catch (error) {
-      console.error('Error:', error);
+      logger.error('Collections fetch error:', error);
     }
   };
 
