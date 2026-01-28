@@ -98,6 +98,14 @@ export const RETRY_CONFIGS = {
     ...DEFAULT_RETRY_CONFIG,
     maxRetries: 1,
   },
+
+  /** Pour les requêtes API standard */
+  api: {
+    ...DEFAULT_RETRY_CONFIG,
+    maxRetries: 3,
+    initialDelay: 1000,
+    backoffFactor: 2,
+  },
 } as const
 
 // =============================================================================
