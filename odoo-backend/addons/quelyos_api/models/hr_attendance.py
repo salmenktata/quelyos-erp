@@ -1,0 +1,383 @@
+# -*- coding: utf-8 -*-
+"""
+Modèle Présences/Pointages RH.
+
+Gère les entrées/sorties des employés avec support GPS et kiosk.
+Calcule automatiquement les heures travaillées et les heures supplémentaires.
+"""
+
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+from datetime import datetime, timedelta
+
+
+class HRAttendance(models.Model):
+    _name = 'quelyos.hr.attendance'
+    _description = 'Pointage Employé'
+    _order = 'check_in desc'
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # EMPLOYÉ
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    employee_id = fields.Many2one(
+        'quelyos.hr.employee',
+        string='Employé',
+        required=True,
+        ondelete='cascade',
+        index=True,
+        domain="[('tenant_id', '=', tenant_id)]"
+    )
+    department_id = fields.Many2one(
+        'quelyos.hr.department',
+        string='Département',
+        related='employee_id.department_id',
+        store=True
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # HORAIRES
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    check_in = fields.Datetime(
+        string='Entrée',
+        required=True,
+        default=fields.Datetime.now,
+        index=True
+    )
+    check_out = fields.Datetime(
+        string='Sortie'
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # HEURES CALCULÉES
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    worked_hours = fields.Float(
+        string='Heures travaillées',
+        compute='_compute_worked_hours',
+        store=True,
+        readonly=True
+    )
+    overtime = fields.Float(
+        string='Heures supplémentaires',
+        compute='_compute_overtime',
+        store=True,
+        readonly=True,
+        help="Heures au-delà de 8h/jour"
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # MODE DE POINTAGE
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    check_in_mode = fields.Selection([
+        ('manual', 'Manuel'),
+        ('kiosk', 'Kiosque'),
+        ('badge', 'Badge/NFC'),
+        ('gps', 'GPS Mobile'),
+        ('qr', 'QR Code'),
+    ], string='Mode entrée', default='manual')
+
+    check_out_mode = fields.Selection([
+        ('manual', 'Manuel'),
+        ('kiosk', 'Kiosque'),
+        ('badge', 'Badge/NFC'),
+        ('gps', 'GPS Mobile'),
+        ('qr', 'QR Code'),
+    ], string='Mode sortie')
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # GÉOLOCALISATION
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    check_in_latitude = fields.Float(
+        string='Latitude entrée',
+        digits=(10, 7)
+    )
+    check_in_longitude = fields.Float(
+        string='Longitude entrée',
+        digits=(10, 7)
+    )
+    check_out_latitude = fields.Float(
+        string='Latitude sortie',
+        digits=(10, 7)
+    )
+    check_out_longitude = fields.Float(
+        string='Longitude sortie',
+        digits=(10, 7)
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # VALIDATION
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    state = fields.Selection([
+        ('draft', 'Brouillon'),
+        ('confirmed', 'Confirmé'),
+        ('validated', 'Validé'),
+        ('anomaly', 'Anomalie'),
+    ], string='État', default='confirmed')
+
+    anomaly_reason = fields.Char(
+        string='Raison anomalie'
+    )
+    validated_by = fields.Many2one(
+        'res.users',
+        string='Validé par'
+    )
+    validated_date = fields.Datetime(
+        string='Date validation'
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # NOTES
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    notes = fields.Text(
+        string='Notes'
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # MULTI-TENANT
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    tenant_id = fields.Many2one(
+        'quelyos.tenant',
+        string='Tenant',
+        required=True,
+        ondelete='cascade',
+        index=True
+    )
+    company_id = fields.Many2one(
+        'res.company',
+        string='Société',
+        related='tenant_id.company_id',
+        store=True
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # COMPUTED
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @api.depends('check_in', 'check_out')
+    def _compute_worked_hours(self):
+        for attendance in self:
+            if attendance.check_out and attendance.check_in:
+                delta = attendance.check_out - attendance.check_in
+                attendance.worked_hours = delta.total_seconds() / 3600.0
+            else:
+                attendance.worked_hours = 0.0
+
+    @api.depends('worked_hours')
+    def _compute_overtime(self):
+        standard_hours = 8.0  # TODO: Configurable
+        for attendance in self:
+            if attendance.worked_hours > standard_hours:
+                attendance.overtime = attendance.worked_hours - standard_hours
+            else:
+                attendance.overtime = 0.0
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # CONTRAINTES
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @api.constrains('check_in', 'check_out')
+    def _check_validity(self):
+        for attendance in self:
+            if attendance.check_out and attendance.check_out < attendance.check_in:
+                raise ValidationError(_("L'heure de sortie ne peut pas être antérieure à l'heure d'entrée !"))
+
+    @api.constrains('check_in', 'check_out', 'employee_id')
+    def _check_no_overlap(self):
+        for attendance in self:
+            domain = [
+                ('id', '!=', attendance.id),
+                ('employee_id', '=', attendance.employee_id.id),
+            ]
+            if attendance.check_out:
+                domain += [
+                    ('check_in', '<', attendance.check_out),
+                    '|',
+                    ('check_out', '>', attendance.check_in),
+                    ('check_out', '=', False),
+                ]
+            else:
+                domain += [
+                    '|',
+                    ('check_out', '>', attendance.check_in),
+                    ('check_out', '=', False),
+                ]
+            overlapping = self.search_count(domain)
+            if overlapping:
+                raise ValidationError(_("Il y a un chevauchement avec un autre pointage !"))
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # ACTIONS
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    def action_validate(self):
+        """Valider le pointage."""
+        self.write({
+            'state': 'validated',
+            'validated_by': self.env.user.id,
+            'validated_date': fields.Datetime.now(),
+        })
+
+    def action_mark_anomaly(self, reason=None):
+        """Marquer comme anomalie."""
+        self.write({
+            'state': 'anomaly',
+            'anomaly_reason': reason or _("Anomalie détectée"),
+        })
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # MÉTHODES API
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @api.model
+    def check_in_employee(self, employee_id, tenant_id, mode='manual', latitude=None, longitude=None):
+        """Pointer l'entrée d'un employé."""
+        # Vérifier s'il n'y a pas déjà un pointage en cours
+        existing = self.search([
+            ('employee_id', '=', employee_id),
+            ('check_out', '=', False),
+            ('tenant_id', '=', tenant_id),
+        ], limit=1)
+        if existing:
+            raise ValidationError(_("L'employé a déjà un pointage en cours !"))
+
+        attendance = self.create({
+            'employee_id': employee_id,
+            'tenant_id': tenant_id,
+            'check_in': fields.Datetime.now(),
+            'check_in_mode': mode,
+            'check_in_latitude': latitude,
+            'check_in_longitude': longitude,
+        })
+        return attendance.get_attendance_data()
+
+    @api.model
+    def check_out_employee(self, employee_id, tenant_id, mode='manual', latitude=None, longitude=None):
+        """Pointer la sortie d'un employé."""
+        attendance = self.search([
+            ('employee_id', '=', employee_id),
+            ('check_out', '=', False),
+            ('tenant_id', '=', tenant_id),
+        ], limit=1, order='check_in desc')
+
+        if not attendance:
+            raise ValidationError(_("Aucun pointage d'entrée trouvé !"))
+
+        attendance.write({
+            'check_out': fields.Datetime.now(),
+            'check_out_mode': mode,
+            'check_out_latitude': latitude,
+            'check_out_longitude': longitude,
+        })
+        return attendance.get_attendance_data()
+
+    def get_attendance_data(self):
+        """Retourne les données du pointage pour l'API."""
+        self.ensure_one()
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id.id,
+            'employee_name': self.employee_id.name,
+            'employee_number': self.employee_id.employee_number,
+            'department_name': self.department_id.name if self.department_id else None,
+            'check_in': self.check_in.isoformat() if self.check_in else None,
+            'check_out': self.check_out.isoformat() if self.check_out else None,
+            'worked_hours': round(self.worked_hours, 2),
+            'overtime': round(self.overtime, 2),
+            'check_in_mode': self.check_in_mode,
+            'check_out_mode': self.check_out_mode,
+            'state': self.state,
+            'location': {
+                'check_in': {
+                    'latitude': self.check_in_latitude,
+                    'longitude': self.check_in_longitude,
+                } if self.check_in_latitude else None,
+                'check_out': {
+                    'latitude': self.check_out_latitude,
+                    'longitude': self.check_out_longitude,
+                } if self.check_out_latitude else None,
+            },
+            'notes': self.notes or '',
+        }
+
+    @api.model
+    def get_today_summary(self, tenant_id):
+        """Résumé des présences du jour."""
+        today_start = fields.Datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = today_start + timedelta(days=1)
+
+        attendances = self.search([
+            ('tenant_id', '=', tenant_id),
+            ('check_in', '>=', today_start),
+            ('check_in', '<', today_end),
+        ])
+
+        total_employees = self.env['quelyos.hr.employee'].search_count([
+            ('tenant_id', '=', tenant_id),
+            ('state', '=', 'active'),
+        ])
+
+        present_employees = len(attendances.mapped('employee_id'))
+        currently_in = len(attendances.filtered(lambda a: not a.check_out))
+
+        return {
+            'date': today_start.date().isoformat(),
+            'total_employees': total_employees,
+            'present_today': present_employees,
+            'currently_in': currently_in,
+            'absent': total_employees - present_employees,
+            'attendances': [a.get_attendance_data() for a in attendances[:50]],
+        }
+
+    @api.model
+    def get_period_report(self, tenant_id, date_from, date_to, employee_id=None, department_id=None):
+        """Rapport de présences sur une période."""
+        domain = [
+            ('tenant_id', '=', tenant_id),
+            ('check_in', '>=', date_from),
+            ('check_in', '<=', date_to),
+        ]
+        if employee_id:
+            domain.append(('employee_id', '=', employee_id))
+        if department_id:
+            domain.append(('department_id', '=', department_id))
+
+        attendances = self.search(domain, order='check_in')
+
+        # Grouper par employé
+        by_employee = {}
+        for att in attendances:
+            emp_id = att.employee_id.id
+            if emp_id not in by_employee:
+                by_employee[emp_id] = {
+                    'employee_id': emp_id,
+                    'employee_name': att.employee_id.name,
+                    'employee_number': att.employee_id.employee_number,
+                    'total_hours': 0,
+                    'overtime_hours': 0,
+                    'days_present': set(),
+                    'attendances': [],
+                }
+            by_employee[emp_id]['total_hours'] += att.worked_hours
+            by_employee[emp_id]['overtime_hours'] += att.overtime
+            by_employee[emp_id]['days_present'].add(att.check_in.date())
+            by_employee[emp_id]['attendances'].append(att.get_attendance_data())
+
+        # Convertir les sets en counts
+        for emp_data in by_employee.values():
+            emp_data['days_present'] = len(emp_data['days_present'])
+            emp_data['total_hours'] = round(emp_data['total_hours'], 2)
+            emp_data['overtime_hours'] = round(emp_data['overtime_hours'], 2)
+
+        return {
+            'date_from': date_from,
+            'date_to': date_to,
+            'employees': list(by_employee.values()),
+            'total_entries': len(attendances),
+        }

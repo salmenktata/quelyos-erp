@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 
 export interface SeoMetadata {
   id: number
@@ -30,7 +30,7 @@ export function useSeoMetadataList() {
   return useQuery({
     queryKey: ['seoMetadata'],
     queryFn: async () => {
-      const response = await odooRpc<{ metadata: SeoMetadata[] }>('/api/ecommerce/seo-metadata')
+      const response = await backendRpc<{ metadata: SeoMetadata[] }>('/api/ecommerce/seo-metadata')
       return response.data?.metadata || []
     },
   })
@@ -40,7 +40,7 @@ export function useCreateSeoMetadata() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: Partial<SeoMetadata>) => {
-      const response = await odooRpc('/api/ecommerce/seo-metadata/create', data)
+      const response = await backendRpc('/api/ecommerce/seo-metadata/create', data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la création')
       }
@@ -54,7 +54,7 @@ export function useUpdateSeoMetadata() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: Partial<SeoMetadata> & { id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/seo-metadata/${id}/update`, data)
+      const response = await backendRpc(`/api/ecommerce/seo-metadata/${id}/update`, data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la mise à jour')
       }
@@ -68,7 +68,7 @@ export function useDeleteSeoMetadata() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await odooRpc(`/api/ecommerce/seo-metadata/${id}/delete`)
+      const response = await backendRpc(`/api/ecommerce/seo-metadata/${id}/delete`)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la suppression')
       }

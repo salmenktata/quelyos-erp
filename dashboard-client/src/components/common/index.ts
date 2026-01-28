@@ -14,6 +14,9 @@ export type { SearchAutocompleteProps, SearchSuggestion } from './SearchAutocomp
 export { Modal } from './Modal'
 export type { ModalProps } from './Modal'
 
+export { ConfirmModal } from './ConfirmModal'
+export type { ConfirmModalProps } from './ConfirmModal'
+
 export { Toast, ToastContainer } from './Toast'
 export type { ToastProps, ToastContainerProps, ToastType } from './Toast'
 

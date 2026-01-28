@@ -34,7 +34,7 @@ export class FinanceErrorBoundary extends Component<Props, State> {
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Une erreur est survenue lors du chargement du module Finance.
-              Veuillez vérifier que le backend Odoo est démarré sur le port 8069.
+              Veuillez vérifier que le serveur backend est accessible.
             </p>
             <button
               onClick={() => this.setState({ hasError: false, error: null })}

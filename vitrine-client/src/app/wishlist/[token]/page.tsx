@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/common';
 import { logger } from '@/lib/logger';
@@ -52,7 +52,7 @@ export default function PublicWishlistPage() {
       setLoading(true);
       setError(null);
 
-      const response = await odooClient.getPublicWishlist(token);
+      const response = await backendClient.getPublicWishlist(token);
 
       if (response.success && response.data?.wishlist) {
         setWishlist(response.data.wishlist);

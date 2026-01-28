@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 
 export interface PromoBanner {
   id: number
@@ -21,7 +21,7 @@ export function usePromoBanners() {
   return useQuery({
     queryKey: ['promoBanners'],
     queryFn: async () => {
-      const response = await odooRpc<{ banners: PromoBanner[] }>('/api/ecommerce/promo-banners')
+      const response = await backendRpc<{ banners: PromoBanner[] }>('/api/ecommerce/promo-banners')
       return response.data?.banners || []
     },
   })
@@ -31,7 +31,7 @@ export function useCreatePromoBanner() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: Partial<PromoBanner>) => {
-      const response = await odooRpc('/api/ecommerce/promo-banners/create', data)
+      const response = await backendRpc('/api/ecommerce/promo-banners/create', data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la création')
       }
@@ -45,7 +45,7 @@ export function useUpdatePromoBanner() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: Partial<PromoBanner> & { id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/promo-banners/${id}/update`, data)
+      const response = await backendRpc(`/api/ecommerce/promo-banners/${id}/update`, data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la mise à jour')
       }
@@ -59,7 +59,7 @@ export function useDeletePromoBanner() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await odooRpc(`/api/ecommerce/promo-banners/${id}/delete`)
+      const response = await backendRpc(`/api/ecommerce/promo-banners/${id}/delete`)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la suppression')
       }
@@ -73,7 +73,7 @@ export function useReorderPromoBanners() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (bannerIds: number[]) => {
-      const response = await odooRpc('/api/ecommerce/promo-banners/reorder', { banner_ids: bannerIds })
+      const response = await backendRpc('/api/ecommerce/promo-banners/reorder', { banner_ids: bannerIds })
       if (!response.success) {
         throw new Error(response.error || "Erreur lors de la mise à jour de l'ordre")
       }

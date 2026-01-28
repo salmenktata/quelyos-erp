@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 
 export interface StaticPage {
   id: number
@@ -28,7 +28,7 @@ export function useStaticPages() {
   return useQuery({
     queryKey: ['staticPages'],
     queryFn: async () => {
-      const response = await odooRpc<{ pages: StaticPage[] }>('/api/ecommerce/pages')
+      const response = await backendRpc<{ pages: StaticPage[] }>('/api/ecommerce/pages')
       return response.data?.pages || []
     },
   })
@@ -38,7 +38,7 @@ export function useCreateStaticPage() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: Partial<StaticPage>) => {
-      const response = await odooRpc('/api/ecommerce/pages/create', data)
+      const response = await backendRpc('/api/ecommerce/pages/create', data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la création')
       }
@@ -52,7 +52,7 @@ export function useUpdateStaticPage() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: Partial<StaticPage> & { id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/pages/${id}/update`, data)
+      const response = await backendRpc(`/api/ecommerce/pages/${id}/update`, data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la mise à jour')
       }
@@ -66,7 +66,7 @@ export function useDeleteStaticPage() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await odooRpc(`/api/ecommerce/pages/${id}/delete`)
+      const response = await backendRpc(`/api/ecommerce/pages/${id}/delete`)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la suppression')
       }

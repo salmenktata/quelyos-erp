@@ -13,7 +13,7 @@ import { useCartStore } from '@/store/cartStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import type { WishlistItem } from '@quelyos/types';
 import { logger } from '@/lib/logger';
 
@@ -34,7 +34,7 @@ export default function AccountWishlistPage() {
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
-        const result = await odooClient.getWishlist();
+        const result = await backendClient.getWishlist();
         if (result.success && result.wishlist) {
           setWishlist(result.wishlist);
         }
@@ -58,7 +58,7 @@ export default function AccountWishlistPage() {
     setRemovingId(itemId);
 
     try {
-      const result = await odooClient.removeFromWishlist(itemId);
+      const result = await backendClient.removeFromWishlist(itemId);
 
       if (result.success) {
         setWishlist((prev) => prev.filter((item) => item.id !== itemId));

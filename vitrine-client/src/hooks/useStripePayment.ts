@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useStripe, useElements, CardNumberElement } from '@stripe/react-stripe-js';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 import { getUserFriendlyErrorMessage } from '@/lib/logger';
 
@@ -59,7 +59,7 @@ export function useStripePayment({
     setError(null);
 
     try {
-      const response = await odooClient.createStripePaymentIntent(orderId);
+      const response = await backendClient.createStripePaymentIntent(orderId);
 
       if (response.success && response.client_secret && response.payment_intent_id) {
         setClientSecret(response.client_secret);
@@ -129,7 +129,7 @@ export function useStripePayment({
         logger.info('Paiement Stripe confirmé:', paymentIntent.id);
 
         // Confirmer la commande côté serveur
-        const confirmResponse = await odooClient.confirmStripePayment(
+        const confirmResponse = await backendClient.confirmStripePayment(
           paymentIntent.id,
           orderId
         );

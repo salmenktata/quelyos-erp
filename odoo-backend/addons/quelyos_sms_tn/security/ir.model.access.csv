@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sms_log_user,quelyos.sms.log user,model_quelyos_sms_log,group_sms_user,1,0,0,0
+access_sms_log_manager,quelyos.sms.log manager,model_quelyos_sms_log,group_sms_manager,1,1,1,1
+access_sms_config_user,quelyos.sms.config user,model_quelyos_sms_config,group_sms_user,1,0,0,0
+access_sms_config_manager,quelyos.sms.config manager,model_quelyos_sms_config,group_sms_manager,1,1,1,1
+access_sms_config_system,quelyos.sms.config system,model_quelyos_sms_config,base.group_system,1,1,1,1

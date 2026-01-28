@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 
 interface PayPalButtonProps {
   orderId: number;
@@ -86,7 +86,7 @@ export function PayPalButton({
             setLoading(true);
             setError(null);
 
-            const response = await odooClient.createPayPalOrder(orderId);
+            const response = await backendClient.createPayPalOrder(orderId);
 
             if (!response.success || !response.data) {
               throw new Error(response.error || 'Failed to create PayPal order');
@@ -109,7 +109,7 @@ export function PayPalButton({
             setLoading(true);
             setError(null);
 
-            const response = await odooClient.capturePayPalOrder(data.orderID, orderId);
+            const response = await backendClient.capturePayPalOrder(data.orderID, orderId);
 
             if (!response.success || !response.data) {
               throw new Error(response.error || 'Failed to capture PayPal payment');

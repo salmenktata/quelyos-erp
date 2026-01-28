@@ -49,13 +49,33 @@ import {
   GitBranch,
   Waves,
   CreditCard,
+  // POS Icons
+  Monitor,
+  PlayCircle,
+  Clock,
+  Banknote,
+  Printer,
+  ScanBarcode,
+  // Store Extended Icons
+  Star,
+  HelpCircle,
+  BookOpen,
+  Timer,
+  Gift,
+  Quote,
+  FileEdit,
+  Heart,
+  HeadphonesIcon,
+  AlertTriangle,
+  Sliders,
+  Download,
 } from 'lucide-react'
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export type ModuleId = 'home' | 'finance' | 'store' | 'stock' | 'crm' | 'marketing' | 'hr'
+export type ModuleId = 'home' | 'finance' | 'store' | 'stock' | 'crm' | 'marketing' | 'hr' | 'pos'
 
 export interface SubMenuItem {
   name: string
@@ -108,6 +128,12 @@ export const MODULES: Module[] = [
         items: [
           { name: 'Vue d\'ensemble', path: '/dashboard', icon: LayoutDashboard },
           { name: 'Analytics', path: '/analytics', icon: BarChart3 },
+        ],
+      },
+      {
+        title: 'Configuration',
+        items: [
+          { name: 'Paramètres Généraux', path: '/settings', icon: Settings },
         ],
       },
     ],
@@ -203,12 +229,17 @@ export const MODULES: Module[] = [
         items: [
           { name: 'Produits', path: '/store/products', icon: Package },
           { name: 'Catégories', path: '/store/categories', icon: Tag },
+          { name: 'Attributs', path: '/store/attributes', icon: Sliders },
+          { name: 'Collections', path: '/store/collections', icon: BookOpen },
+          { name: 'Bundles / Packs', path: '/store/bundles', icon: Gift },
+          { name: 'Import / Export', path: '/store/import-export', icon: Download },
         ],
       },
       {
         title: 'Promotions',
         items: [
           { name: 'Codes Promo', path: '/store/coupons', icon: Ticket },
+          { name: 'Ventes Flash', path: '/store/flash-sales', icon: Timer },
           { name: 'Produits Vedette', path: '/store/featured', icon: Sparkles },
           { name: 'Bannières', path: '/store/promo-banners', icon: Image },
           { name: 'Hero Slides', path: '/store/hero-slides', icon: Image },
@@ -216,12 +247,35 @@ export const MODULES: Module[] = [
         ],
       },
       {
+        title: 'Engagement Client',
+        items: [
+          { name: 'Avis Clients', path: '/store/reviews', icon: Star },
+          { name: 'Témoignages', path: '/store/testimonials', icon: Quote },
+          { name: 'Programme Fidélité', path: '/store/loyalty', icon: Heart },
+          { name: 'FAQ', path: '/store/faq', icon: HelpCircle },
+        ],
+      },
+      {
         title: 'Contenu',
         items: [
           { name: 'Pages Statiques', path: '/store/static-pages', icon: FileText },
+          { name: 'Blog / Articles', path: '/store/blog', icon: FileEdit },
           { name: 'Menus Navigation', path: '/store/menus', icon: List },
           { name: 'Messages Promo', path: '/store/promo-messages', icon: MessageSquare },
           { name: 'Badges Confiance', path: '/store/trust-badges', icon: Award },
+        ],
+      },
+      {
+        title: 'Support',
+        items: [
+          { name: 'Tickets SAV', path: '/store/tickets', icon: HeadphonesIcon },
+        ],
+      },
+      {
+        title: 'Rapports',
+        items: [
+          { name: 'Ventes', path: '/store/sales-reports', icon: BarChart3 },
+          { name: 'Alertes Stock', path: '/store/stock-alerts', icon: AlertTriangle },
         ],
       },
       {
@@ -311,27 +365,39 @@ export const MODULES: Module[] = [
   },
   {
     id: 'marketing',
-    name: 'Marketing',
+    name: 'Quelyos Marketing',
     shortName: 'Marketing',
     icon: Megaphone,
     color: 'text-pink-600',
     bgColor: 'bg-pink-100 dark:bg-pink-900/30',
-    description: 'Campagnes & Analytics',
+    description: 'Campagnes Email & SMS',
     basePath: '/marketing',
     sections: [
       {
-        title: 'Campagnes',
+        title: 'Tableau de bord',
         items: [
-          { name: 'Tableau de bord', path: '/marketing', icon: LayoutDashboard },
-          { name: 'Emails', path: '/marketing/emails', icon: FileText },
-          { name: 'SMS', path: '/marketing/sms', icon: Megaphone },
+          { name: 'Vue d\'ensemble', path: '/marketing', icon: LayoutDashboard },
         ],
       },
       {
-        title: 'Automatisation',
+        title: 'Campagnes',
         items: [
-          { name: 'Workflows', path: '/marketing/workflows', icon: ArrowRightLeft },
-          { name: 'Segments', path: '/marketing/segments', icon: Users },
+          { name: 'Toutes les campagnes', path: '/marketing/campaigns', icon: Megaphone },
+          { name: 'Emails', path: '/marketing/email', icon: FileText },
+          { name: 'SMS', path: '/marketing/sms', icon: MessageSquare },
+          { name: 'Templates', path: '/marketing/email/templates', icon: FileText },
+        ],
+      },
+      {
+        title: 'Audiences',
+        items: [
+          { name: 'Listes de contacts', path: '/marketing/contacts', icon: Users },
+        ],
+      },
+      {
+        title: 'Configuration',
+        items: [
+          { name: 'Paramètres', path: '/marketing/settings', icon: Settings },
         ],
       },
     ],
@@ -343,22 +409,87 @@ export const MODULES: Module[] = [
     icon: UsersRound,
     color: 'text-cyan-600',
     bgColor: 'bg-cyan-100 dark:bg-cyan-900/30',
-    description: 'Employés & Paie',
+    description: 'Ressources Humaines',
     basePath: '/hr',
     sections: [
+      {
+        title: 'Tableau de bord',
+        items: [
+          { name: 'Vue d\'ensemble', path: '/hr', icon: LayoutDashboard },
+        ],
+      },
       {
         title: 'Personnel',
         items: [
           { name: 'Employés', path: '/hr/employees', icon: UsersRound },
           { name: 'Départements', path: '/hr/departments', icon: Boxes },
+          { name: 'Postes', path: '/hr/jobs', icon: Briefcase },
           { name: 'Contrats', path: '/hr/contracts', icon: FileText },
         ],
       },
       {
-        title: 'Temps & Absences',
+        title: 'Temps & Présences',
         items: [
-          { name: 'Congés', path: '/hr/leaves', icon: Calendar },
           { name: 'Présences', path: '/hr/attendance', icon: ClipboardList },
+        ],
+      },
+      {
+        title: 'Congés & Absences',
+        items: [
+          { name: 'Demandes', path: '/hr/leaves', icon: Calendar },
+          { name: 'Calendrier', path: '/hr/leaves/calendar', icon: Calendar },
+          { name: 'Allocations', path: '/hr/leaves/allocations', icon: PieChart },
+          { name: 'Types de congés', path: '/hr/leaves/types', icon: Tag },
+        ],
+      },
+      {
+        title: 'Configuration',
+        items: [
+          { name: 'Paramètres', path: '/hr/settings', icon: Settings },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'pos',
+    name: 'Point de Vente',
+    shortName: 'POS',
+    icon: Monitor,
+    color: 'text-teal-600',
+    bgColor: 'bg-teal-100 dark:bg-teal-900/30',
+    description: 'Caisse & Ventes terrain',
+    basePath: '/pos',
+    sections: [
+      {
+        title: 'Caisse',
+        items: [
+          { name: 'Terminal', path: '/pos/terminal', icon: Monitor },
+          { name: 'Mode Kiosk', path: '/pos/kiosk', icon: ScanBarcode },
+          { name: 'Ouvrir Session', path: '/pos/session/open', icon: PlayCircle },
+        ],
+      },
+      {
+        title: 'Gestion',
+        items: [
+          { name: 'Tableau de bord', path: '/pos', icon: LayoutDashboard },
+          { name: 'Commandes', path: '/pos/orders', icon: ClipboardList },
+          { name: 'Sessions', path: '/pos/sessions', icon: Clock },
+        ],
+      },
+      {
+        title: 'Rapports',
+        items: [
+          { name: 'Ventes', path: '/pos/reports/sales', icon: BarChart3 },
+          { name: 'Paiements', path: '/pos/reports/payments', icon: CreditCard },
+        ],
+      },
+      {
+        title: 'Configuration',
+        items: [
+          { name: 'Terminaux', path: '/pos/settings/terminals', icon: Monitor },
+          { name: 'Paiements', path: '/pos/settings/payments', icon: Banknote },
+          { name: 'Tickets', path: '/pos/settings/receipts', icon: Printer },
+          { name: 'Paramètres', path: '/pos/settings', icon: Settings },
         ],
       },
     ],

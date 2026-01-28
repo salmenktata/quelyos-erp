@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { odooClient } from '@/lib/odoo/client'
+import { backendClient } from '@/lib/backend/client'
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic'
@@ -44,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     // Récupérer tous les produits
-    const productsResponse = await odooClient.getProducts({ limit: 1000, offset: 0 })
+    const productsResponse = await backendClient.getProducts({ limit: 1000, offset: 0 })
     const products = productsResponse.success && productsResponse.products
       ? productsResponse.products
       : []
@@ -57,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
 
     // Récupérer toutes les catégories
-    const categoriesResponse = await odooClient.getCategories({ limit: 100 })
+    const categoriesResponse = await backendClient.getCategories({ limit: 100 })
     const categories = categoriesResponse.success && categoriesResponse.categories
       ? categoriesResponse.categories
       : []

@@ -1,133 +1,211 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Suspense, lazy } from 'react'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { ToastProvider } from './contexts/ToastContext'
 import { useSessionManager } from './hooks/useSessionManager'
 import { ProtectedRoute } from './components/ProtectedRoute'
-import Dashboard from './pages/Dashboard'
-import Login from './pages/Login'
-import AuthCallback from './pages/AuthCallback'
-import Orders from './pages/store/Orders'
-import OrderDetail from './pages/store/OrderDetail'
-import Customers from './pages/crm/Customers'
-import CustomerDetail from './pages/crm/CustomerDetail'
-import Pipeline from './pages/crm/Pipeline'
-import Leads from './pages/crm/Leads'
-import LeadDetail from './pages/crm/LeadDetail'
-import Products from './pages/store/Products'
-import ProductDetail from './pages/store/ProductDetail'
-import ProductForm from './pages/store/ProductForm'
-import Categories from './pages/store/Categories'
-import Coupons from './pages/store/Coupons'
-import CouponForm from './pages/store/CouponForm'
-import Stock from './pages/Stock'
-import Inventory from './pages/Inventory'
-import StockMoves from './pages/StockMoves'
-import StockTransfers from './pages/StockTransfers'
-import StockLocations from './pages/StockLocations'
-import ReorderingRules from './pages/stock/ReorderingRules'
-import Payments from './pages/Payments'
-import Featured from './pages/store/Featured'
-import Analytics from './pages/Analytics'
-import Invoices from './pages/Invoices'
-import AbandonedCarts from './pages/store/AbandonedCarts'
-import Pricelists from './pages/Pricelists'
-import PricelistDetail from './pages/PricelistDetail'
-import CustomerCategories from './pages/crm/CustomerCategories'
-import Warehouses from './pages/Warehouses'
-import WarehouseDetail from './pages/WarehouseDetail'
-import StoreDashboard from './pages/store/StoreDashboard'
-// import Tenants from './pages/Tenants' // Désactivé - réservé super-admin
-import Menus from './pages/store/Menus'
-import HeroSlides from './pages/store/HeroSlides'
-import PromoBanners from './pages/store/PromoBanners'
-import PromoMessages from './pages/store/PromoMessages'
-import TrustBadges from './pages/store/TrustBadges'
-// SeoMetadata fusionné dans /store/settings/seo
-import MarketingPopups from './pages/store/MarketingPopups'
-import StaticPages from './pages/store/StaticPages'
-import ApiGuide from './pages/ApiGuide'
-// Finance module
-import FinanceDashboard from './pages/finance/FinanceDashboard'
-import FinanceAccounts from './pages/finance/accounts/page'
-import FinanceAccountNew from './pages/finance/accounts/new/page'
-import FinanceAccountDetail from './pages/finance/accounts/[id]/page'
-// import FinanceTransactions from './pages/finance/transactions/page' // SUPPRIMÉ - redondant avec expenses/incomes
-import FinanceBudgets from './pages/finance/budgets/page'
-import FinanceBudgetNew from './pages/finance/budgets/new/page'
-import FinanceBudgetDetail from './pages/finance/budgets/[id]/page'
-import FinanceForecast from './pages/finance/forecast/page'
-import FinanceArchives from './pages/finance/archives/page'
-import FinancePaymentPlanning from './pages/finance/payment-planning/page'
-import FinanceExpenses from './pages/finance/expenses/page'
-import FinanceExpenseNew from './pages/finance/expenses/new/page'
-import FinanceIncomes from './pages/finance/incomes/page'
-import FinanceIncomeNew from './pages/finance/incomes/new/page'
-import FinanceCategories from './pages/finance/categories/page'
-import FinanceSuppliers from './pages/finance/suppliers/page'
-import FinanceSupplierNew from './pages/finance/suppliers/new/page'
-import FinancePortfolios from './pages/finance/portfolios/page'
-import FinanceScenarios from './pages/finance/scenarios/page'
-import FinanceAlerts from './pages/finance/alerts/page'
-import FinanceCharts from './pages/finance/charts/page'
-import FinanceImport from './pages/finance/import/page'
-import FinanceReporting from './pages/finance/reporting/page'
-// import FinanceReportingOverview from './pages/finance/reporting/overview/page' // SUPPRIMÉ - fusionné avec Hub
-import FinanceReportingCashflow from './pages/finance/reporting/cashflow/page'
-import FinanceReportingByCategory from './pages/finance/reporting/by-category/page'
-import FinanceReportingByAccount from './pages/finance/reporting/by-account/page'
-import FinanceReportingByPortfolio from './pages/finance/reporting/by-portfolio/page'
-import FinanceReportingByFlow from './pages/finance/reporting/by-flow/page'
-import FinanceReportingForecast from './pages/finance/reporting/forecast/page'
-import FinanceReportingForecasts from './pages/finance/reporting/forecasts/page'
-import FinanceReportingProfitability from './pages/finance/reporting/profitability/page'
-import FinanceReportingEbitda from './pages/finance/reporting/ebitda/page'
-import FinanceReportingBfr from './pages/finance/reporting/bfr/page'
-import FinanceReportingDso from './pages/finance/reporting/dso/page'
-import FinanceReportingBreakeven from './pages/finance/reporting/breakeven/page'
-import FinanceReportingDataQuality from './pages/finance/reporting/data-quality/page'
-import SettingsLayoutWrapper from './pages/finance/settings/SettingsLayoutWrapper'
-import FinanceSettings from './pages/finance/settings/page'
-import FinanceSettingsCategories from './pages/finance/settings/categories/page'
-import FinanceSettingsDevise from './pages/finance/settings/devise/page'
-import FinanceSettingsFlux from './pages/finance/settings/flux/page'
-import FinanceSettingsTva from './pages/finance/settings/tva/page'
-import FinanceSettingsBilling from './pages/finance/settings/billing/page'
-import FinanceSettingsNotifications from './pages/finance/settings/notifications/page'
-import FinanceSettingsIntegrations from './pages/finance/settings/integrations/page'
-import FinanceSettingsSecurity from './pages/finance/settings/security/page'
-import StockValuation from './pages/stock/valuation/page'
-import StockTurnover from './pages/stock/turnover/page'
-// Store Settings
-import StoreSettingsLayoutWrapper from './pages/store/settings/SettingsLayoutWrapper'
-import StoreSettings from './pages/store/settings/page'
-import StoreSettingsBrand from './pages/store/settings/brand/page'
-import StoreSettingsContact from './pages/store/settings/contact/page'
-import StoreSettingsShipping from './pages/store/settings/shipping/page'
-import StoreSettingsShippingZones from './pages/store/settings/shipping-zones/page'
-import StoreSettingsFeatures from './pages/store/settings/features/page'
-import StoreSettingsReturns from './pages/store/settings/returns/page'
-import StoreSettingsSocial from './pages/store/settings/social/page'
-import StoreSettingsSeo from './pages/store/settings/seo/page'
-// Stock Settings
-import StockSettingsLayoutWrapper from './pages/stock/settings/SettingsLayoutWrapper'
-import StockSettings from './pages/stock/settings/page'
-import StockSettingsValuation from './pages/stock/settings/valuation/page'
-import StockSettingsReordering from './pages/stock/settings/reordering/page'
-import StockSettingsUnits from './pages/stock/settings/units/page'
-import StockSettingsAlerts from './pages/stock/settings/alerts/page'
-// CRM Settings
-import CrmSettingsLayoutWrapper from './pages/crm/settings/SettingsLayoutWrapper'
-import CrmSettings from './pages/crm/settings/page'
-import CrmSettingsStages from './pages/crm/settings/stages/page'
-import CrmSettingsPricelists from './pages/crm/settings/pricelists/page'
-import CrmSettingsCategories from './pages/crm/settings/categories/page'
-import CrmSettingsScoring from './pages/crm/settings/scoring/page'
-import NoticeAnalytics from './pages/NoticeAnalytics'
-import GlobalSettings from './pages/settings/page'
 import { CurrencyProvider } from './lib/finance/CurrencyContext'
 import { FinanceErrorBoundary } from './components/finance/FinanceErrorBoundary'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
+import { Loader2 } from 'lucide-react'
+
+// Pages essentielles (chargées immédiatement)
+import Login from './pages/Login'
+import AuthCallback from './pages/AuthCallback'
+import Dashboard from './pages/Dashboard'
+
+// Lazy loaded pages - Store
+const StoreDashboard = lazy(() => import('./pages/store/StoreDashboard'))
+const Orders = lazy(() => import('./pages/store/Orders'))
+const OrderDetail = lazy(() => import('./pages/store/OrderDetail'))
+const Products = lazy(() => import('./pages/store/Products'))
+const ProductDetail = lazy(() => import('./pages/store/ProductDetail'))
+const ProductForm = lazy(() => import('./pages/store/ProductForm'))
+const Categories = lazy(() => import('./pages/store/Categories'))
+const Coupons = lazy(() => import('./pages/store/Coupons'))
+const CouponForm = lazy(() => import('./pages/store/CouponForm'))
+const Featured = lazy(() => import('./pages/store/Featured'))
+const AbandonedCarts = lazy(() => import('./pages/store/AbandonedCarts'))
+const Menus = lazy(() => import('./pages/store/Menus'))
+const HeroSlides = lazy(() => import('./pages/store/HeroSlides'))
+const PromoBanners = lazy(() => import('./pages/store/PromoBanners'))
+const PromoMessages = lazy(() => import('./pages/store/PromoMessages'))
+const TrustBadges = lazy(() => import('./pages/store/TrustBadges'))
+const MarketingPopups = lazy(() => import('./pages/store/MarketingPopups'))
+const StaticPages = lazy(() => import('./pages/store/StaticPages'))
+const Reviews = lazy(() => import('./pages/store/Reviews'))
+const FAQ = lazy(() => import('./pages/store/FAQ'))
+const Collections = lazy(() => import('./pages/store/Collections'))
+const FlashSales = lazy(() => import('./pages/store/FlashSales'))
+const Bundles = lazy(() => import('./pages/store/Bundles'))
+const Testimonials = lazy(() => import('./pages/store/Testimonials'))
+const Blog = lazy(() => import('./pages/store/Blog'))
+const Loyalty = lazy(() => import('./pages/store/Loyalty'))
+const Tickets = lazy(() => import('./pages/store/Tickets'))
+const SalesReports = lazy(() => import('./pages/store/SalesReports'))
+const StoreStockAlerts = lazy(() => import('./pages/store/StockAlerts'))
+const Attributes = lazy(() => import('./pages/store/Attributes'))
+const ProductImport = lazy(() => import('./pages/store/ProductImport'))
+
+// Lazy loaded pages - Store Settings
+const StoreSettingsLayoutWrapper = lazy(() => import('./pages/store/settings/SettingsLayoutWrapper'))
+const StoreSettings = lazy(() => import('./pages/store/settings/page'))
+const StoreSettingsBrand = lazy(() => import('./pages/store/settings/brand/page'))
+const StoreSettingsContact = lazy(() => import('./pages/store/settings/contact/page'))
+const StoreSettingsShipping = lazy(() => import('./pages/store/settings/shipping/page'))
+const StoreSettingsShippingZones = lazy(() => import('./pages/store/settings/shipping-zones/page'))
+const StoreSettingsFeatures = lazy(() => import('./pages/store/settings/features/page'))
+const StoreSettingsReturns = lazy(() => import('./pages/store/settings/returns/page'))
+const StoreSettingsSocial = lazy(() => import('./pages/store/settings/social/page'))
+const StoreSettingsSeo = lazy(() => import('./pages/store/settings/seo/page'))
+const StoreSettingsPaymentMethods = lazy(() => import('./pages/store/settings/payment-methods/page'))
+const StoreSettingsNotifications = lazy(() => import('./pages/store/settings/notifications/page'))
+
+// Lazy loaded pages - CRM
+const Customers = lazy(() => import('./pages/crm/Customers'))
+const CustomerDetail = lazy(() => import('./pages/crm/CustomerDetail'))
+const Pipeline = lazy(() => import('./pages/crm/Pipeline'))
+const Leads = lazy(() => import('./pages/crm/Leads'))
+const LeadDetail = lazy(() => import('./pages/crm/LeadDetail'))
+const CustomerCategories = lazy(() => import('./pages/crm/CustomerCategories'))
+
+// Lazy loaded pages - CRM Settings
+const CrmSettingsLayoutWrapper = lazy(() => import('./pages/crm/settings/SettingsLayoutWrapper'))
+const CrmSettings = lazy(() => import('./pages/crm/settings/page'))
+const CrmSettingsStages = lazy(() => import('./pages/crm/settings/stages/page'))
+const CrmSettingsPricelists = lazy(() => import('./pages/crm/settings/pricelists/page'))
+const CrmSettingsCategories = lazy(() => import('./pages/crm/settings/categories/page'))
+const CrmSettingsScoring = lazy(() => import('./pages/crm/settings/scoring/page'))
+
+// Lazy loaded pages - Stock
+const Stock = lazy(() => import('./pages/Stock'))
+const Inventory = lazy(() => import('./pages/Inventory'))
+const StockMoves = lazy(() => import('./pages/StockMoves'))
+const StockTransfers = lazy(() => import('./pages/StockTransfers'))
+const StockLocations = lazy(() => import('./pages/StockLocations'))
+const ReorderingRules = lazy(() => import('./pages/stock/ReorderingRules'))
+const StockValuation = lazy(() => import('./pages/stock/valuation/page'))
+const StockTurnover = lazy(() => import('./pages/stock/turnover/page'))
+const Warehouses = lazy(() => import('./pages/Warehouses'))
+const WarehouseDetail = lazy(() => import('./pages/WarehouseDetail'))
+
+// Lazy loaded pages - Stock Settings
+const StockSettingsLayoutWrapper = lazy(() => import('./pages/stock/settings/SettingsLayoutWrapper'))
+const StockSettings = lazy(() => import('./pages/stock/settings/page'))
+const StockSettingsValuation = lazy(() => import('./pages/stock/settings/valuation/page'))
+const StockSettingsReordering = lazy(() => import('./pages/stock/settings/reordering/page'))
+const StockSettingsUnits = lazy(() => import('./pages/stock/settings/units/page'))
+const StockSettingsAlerts = lazy(() => import('./pages/stock/settings/alerts/page'))
+
+// Lazy loaded pages - Finance
+const FinanceDashboard = lazy(() => import('./pages/finance/FinanceDashboard'))
+const FinanceAccounts = lazy(() => import('./pages/finance/accounts/page'))
+const FinanceAccountNew = lazy(() => import('./pages/finance/accounts/new/page'))
+const FinanceAccountDetail = lazy(() => import('./pages/finance/accounts/[id]/page'))
+const FinanceBudgets = lazy(() => import('./pages/finance/budgets/page'))
+const FinanceBudgetNew = lazy(() => import('./pages/finance/budgets/new/page'))
+const FinanceBudgetDetail = lazy(() => import('./pages/finance/budgets/[id]/page'))
+const FinanceForecast = lazy(() => import('./pages/finance/forecast/page'))
+const FinanceArchives = lazy(() => import('./pages/finance/archives/page'))
+const FinancePaymentPlanning = lazy(() => import('./pages/finance/payment-planning/page'))
+const FinanceExpenses = lazy(() => import('./pages/finance/expenses/page'))
+const FinanceExpenseNew = lazy(() => import('./pages/finance/expenses/new/page'))
+const FinanceIncomes = lazy(() => import('./pages/finance/incomes/page'))
+const FinanceIncomeNew = lazy(() => import('./pages/finance/incomes/new/page'))
+const FinanceCategories = lazy(() => import('./pages/finance/categories/page'))
+const FinanceSuppliers = lazy(() => import('./pages/finance/suppliers/page'))
+const FinanceSupplierNew = lazy(() => import('./pages/finance/suppliers/new/page'))
+const FinancePortfolios = lazy(() => import('./pages/finance/portfolios/page'))
+const FinanceScenarios = lazy(() => import('./pages/finance/scenarios/page'))
+const FinanceAlerts = lazy(() => import('./pages/finance/alerts/page'))
+const FinanceCharts = lazy(() => import('./pages/finance/charts/page'))
+const FinanceImport = lazy(() => import('./pages/finance/import/page'))
+const FinanceReporting = lazy(() => import('./pages/finance/reporting/page'))
+const FinanceReportingCashflow = lazy(() => import('./pages/finance/reporting/cashflow/page'))
+const FinanceReportingByCategory = lazy(() => import('./pages/finance/reporting/by-category/page'))
+const FinanceReportingByAccount = lazy(() => import('./pages/finance/reporting/by-account/page'))
+const FinanceReportingByPortfolio = lazy(() => import('./pages/finance/reporting/by-portfolio/page'))
+const FinanceReportingByFlow = lazy(() => import('./pages/finance/reporting/by-flow/page'))
+const FinanceReportingForecast = lazy(() => import('./pages/finance/reporting/forecast/page'))
+const FinanceReportingForecasts = lazy(() => import('./pages/finance/reporting/forecasts/page'))
+const FinanceReportingProfitability = lazy(() => import('./pages/finance/reporting/profitability/page'))
+const FinanceReportingEbitda = lazy(() => import('./pages/finance/reporting/ebitda/page'))
+const FinanceReportingBfr = lazy(() => import('./pages/finance/reporting/bfr/page'))
+const FinanceReportingDso = lazy(() => import('./pages/finance/reporting/dso/page'))
+const FinanceReportingBreakeven = lazy(() => import('./pages/finance/reporting/breakeven/page'))
+const FinanceReportingDataQuality = lazy(() => import('./pages/finance/reporting/data-quality/page'))
+
+// Lazy loaded pages - Finance Settings
+const SettingsLayoutWrapper = lazy(() => import('./pages/finance/settings/SettingsLayoutWrapper'))
+const FinanceSettings = lazy(() => import('./pages/finance/settings/page'))
+const FinanceSettingsCategories = lazy(() => import('./pages/finance/settings/categories/page'))
+const FinanceSettingsDevise = lazy(() => import('./pages/finance/settings/devise/page'))
+const FinanceSettingsFlux = lazy(() => import('./pages/finance/settings/flux/page'))
+const FinanceSettingsTva = lazy(() => import('./pages/finance/settings/tva/page'))
+const FinanceSettingsBilling = lazy(() => import('./pages/finance/settings/billing/page'))
+const FinanceSettingsNotifications = lazy(() => import('./pages/finance/settings/notifications/page'))
+const FinanceSettingsIntegrations = lazy(() => import('./pages/finance/settings/integrations/page'))
+const FinanceSettingsSecurity = lazy(() => import('./pages/finance/settings/security/page'))
+
+// Lazy loaded pages - Marketing
+const MarketingDashboard = lazy(() => import('./pages/marketing/MarketingDashboard'))
+const MarketingCampaigns = lazy(() => import('./pages/marketing/campaigns/page'))
+const MarketingCampaignNew = lazy(() => import('./pages/marketing/campaigns/new/page'))
+const MarketingCampaignDetail = lazy(() => import('./pages/marketing/campaigns/[id]/page'))
+const MarketingEmail = lazy(() => import('./pages/marketing/email/page'))
+const MarketingEmailTemplates = lazy(() => import('./pages/marketing/email/templates/page'))
+const MarketingSMS = lazy(() => import('./pages/marketing/sms/page'))
+const MarketingContacts = lazy(() => import('./pages/marketing/contacts/page'))
+const MarketingContactDetail = lazy(() => import('./pages/marketing/contacts/[id]/page'))
+const MarketingSettingsLayoutWrapper = lazy(() => import('./pages/marketing/settings/SettingsLayoutWrapper'))
+const MarketingSettings = lazy(() => import('./pages/marketing/settings/page'))
+const MarketingSettingsEmail = lazy(() => import('./pages/marketing/settings/email/page'))
+const MarketingSettingsSMS = lazy(() => import('./pages/marketing/settings/sms/page'))
+
+// Lazy loaded pages - HR
+const HRDashboard = lazy(() => import('./pages/hr/page'))
+const HREmployees = lazy(() => import('./pages/hr/employees/page'))
+const HREmployeeNew = lazy(() => import('./pages/hr/employees/new/page'))
+const HREmployeeDetail = lazy(() => import('./pages/hr/employees/[id]/page'))
+const HRDepartments = lazy(() => import('./pages/hr/departments/page'))
+const HRJobs = lazy(() => import('./pages/hr/jobs/page'))
+const HRContracts = lazy(() => import('./pages/hr/contracts/page'))
+const HRContractNew = lazy(() => import('./pages/hr/contracts/new/page'))
+const HRAttendance = lazy(() => import('./pages/hr/attendance/page'))
+const HRLeaves = lazy(() => import('./pages/hr/leaves/page'))
+const HRLeavesCalendar = lazy(() => import('./pages/hr/leaves/calendar/page'))
+const HRLeavesAllocations = lazy(() => import('./pages/hr/leaves/allocations/page'))
+const HRLeavesTypes = lazy(() => import('./pages/hr/leaves/types/page'))
+const HRSettings = lazy(() => import('./pages/hr/settings/page'))
+
+// Lazy loaded pages - POS
+const POSDashboard = lazy(() => import('./pages/pos/POSDashboard'))
+const POSTerminal = lazy(() => import('./pages/pos/POSTerminal'))
+const POSKiosk = lazy(() => import('./pages/pos/POSKiosk'))
+const POSSessionOpen = lazy(() => import('./pages/pos/POSSessionOpen'))
+const POSOrders = lazy(() => import('./pages/pos/POSOrders'))
+const POSSessions = lazy(() => import('./pages/pos/POSSessions'))
+const POSReportsSales = lazy(() => import('./pages/pos/reports/sales/page'))
+const POSReportsPayments = lazy(() => import('./pages/pos/reports/payments/page'))
+const POSSettings = lazy(() => import('./pages/pos/settings/page'))
+const POSSettingsTerminals = lazy(() => import('./pages/pos/settings/terminals/page'))
+const POSSettingsPayments = lazy(() => import('./pages/pos/settings/payments/page'))
+const POSSettingsReceipts = lazy(() => import('./pages/pos/settings/receipts/page'))
+
+// Lazy loaded pages - Global Settings
+const GlobalSettings = lazy(() => import('./pages/settings/page'))
+const GlobalSettingsEmail = lazy(() => import('./pages/settings/email/page'))
+const GlobalSettingsSMS = lazy(() => import('./pages/settings/sms/page'))
+
+// Lazy loaded pages - Others
+const Analytics = lazy(() => import('./pages/Analytics'))
+const Invoices = lazy(() => import('./pages/Invoices'))
+const Payments = lazy(() => import('./pages/Payments'))
+const Pricelists = lazy(() => import('./pages/Pricelists'))
+const PricelistDetail = lazy(() => import('./pages/PricelistDetail'))
+const ApiGuide = lazy(() => import('./pages/ApiGuide'))
+const NoticeAnalytics = lazy(() => import('./pages/NoticeAnalytics'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -138,6 +216,15 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+// Spinner de chargement pour Suspense
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[50vh]">
+      <Loader2 className="w-8 h-8 animate-spin text-indigo-600 dark:text-indigo-400" />
+    </div>
+  )
+}
 
 // TEMPORAIRE : SessionManager désactivé en DEV (voir TODO_AUTH.md)
 function SessionManager() {
@@ -153,6 +240,28 @@ function SessionManager() {
   return null
 }
 
+// Wrapper pour les routes Finance avec ErrorBoundary et CurrencyProvider
+function FinanceWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <FinanceErrorBoundary>
+      <CurrencyProvider>
+        {children}
+      </CurrencyProvider>
+    </FinanceErrorBoundary>
+  )
+}
+
+// Wrapper pour les routes Finance Settings avec layout
+function FinanceSettingsWrapper() {
+  return (
+    <FinanceErrorBoundary>
+      <Suspense fallback={<PageLoader />}>
+        <SettingsLayoutWrapper />
+      </Suspense>
+    </FinanceErrorBoundary>
+  )
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -160,6 +269,7 @@ export default function App() {
         <ThemeProvider>
           <ToastProvider>
               <SessionManager />
+              <Suspense fallback={<PageLoader />}>
               <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/login" element={<Login />} />
@@ -172,6 +282,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* Store routes */}
               <Route
                 path="/store"
                 element={
@@ -193,23 +304,6 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <OrderDetail />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/crm" element={<Navigate to="/crm/customers" replace />} />
-              <Route
-                path="/crm/customers"
-                element={
-                  <ProtectedRoute>
-                    <Customers />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/crm/customers/:id"
-                element={
-                  <ProtectedRoute>
-                    <CustomerDetail />
                   </ProtectedRoute>
                 }
               />
@@ -269,6 +363,274 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/store/featured"
+                element={
+                  <ProtectedRoute>
+                    <Featured />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/abandoned-carts"
+                element={
+                  <ProtectedRoute>
+                    <AbandonedCarts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/menus"
+                element={
+                  <ProtectedRoute>
+                    <Menus />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/hero-slides"
+                element={
+                  <ProtectedRoute>
+                    <HeroSlides />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/promo-banners"
+                element={
+                  <ProtectedRoute>
+                    <PromoBanners />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/promo-messages"
+                element={
+                  <ProtectedRoute>
+                    <PromoMessages />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/trust-badges"
+                element={
+                  <ProtectedRoute>
+                    <TrustBadges />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/marketing-popups"
+                element={
+                  <ProtectedRoute>
+                    <MarketingPopups />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/static-pages"
+                element={
+                  <ProtectedRoute>
+                    <StaticPages />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/reviews"
+                element={
+                  <ProtectedRoute>
+                    <Reviews />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/faq"
+                element={
+                  <ProtectedRoute>
+                    <FAQ />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/collections"
+                element={
+                  <ProtectedRoute>
+                    <Collections />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/flash-sales"
+                element={
+                  <ProtectedRoute>
+                    <FlashSales />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/bundles"
+                element={
+                  <ProtectedRoute>
+                    <Bundles />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/testimonials"
+                element={
+                  <ProtectedRoute>
+                    <Testimonials />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/blog"
+                element={
+                  <ProtectedRoute>
+                    <Blog />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/loyalty"
+                element={
+                  <ProtectedRoute>
+                    <Loyalty />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/tickets"
+                element={
+                  <ProtectedRoute>
+                    <Tickets />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/sales-reports"
+                element={
+                  <ProtectedRoute>
+                    <SalesReports />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/stock-alerts"
+                element={
+                  <ProtectedRoute>
+                    <StoreStockAlerts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/attributes"
+                element={
+                  <ProtectedRoute>
+                    <Attributes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/store/import-export"
+                element={
+                  <ProtectedRoute>
+                    <ProductImport />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Redirections Store */}
+              <Route path="/store/delivery" element={<Navigate to="/store/settings/shipping" replace />} />
+              <Route path="/store/site-config" element={<Navigate to="/store/settings" replace />} />
+              <Route path="/store/seo-metadata" element={<Navigate to="/store/settings/seo" replace />} />
+              <Route path="/store/my-shop" element={<Navigate to="/store/settings/brand" replace />} />
+              {/* Store Settings */}
+              <Route
+                path="/store/settings"
+                element={
+                  <ProtectedRoute>
+                    <StoreSettingsLayoutWrapper />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<StoreSettings />} />
+                <Route path="brand" element={<StoreSettingsBrand />} />
+                <Route path="contact" element={<StoreSettingsContact />} />
+                <Route path="shipping" element={<StoreSettingsShipping />} />
+                <Route path="shipping-zones" element={<StoreSettingsShippingZones />} />
+                <Route path="features" element={<StoreSettingsFeatures />} />
+                <Route path="returns" element={<StoreSettingsReturns />} />
+                <Route path="social" element={<StoreSettingsSocial />} />
+                <Route path="seo" element={<StoreSettingsSeo />} />
+                <Route path="payment-methods" element={<StoreSettingsPaymentMethods />} />
+                <Route path="notifications" element={<StoreSettingsNotifications />} />
+              </Route>
+              {/* CRM routes */}
+              <Route path="/crm" element={<Navigate to="/crm/customers" replace />} />
+              <Route
+                path="/crm/customers"
+                element={
+                  <ProtectedRoute>
+                    <Customers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crm/customers/:id"
+                element={
+                  <ProtectedRoute>
+                    <CustomerDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crm/customer-categories"
+                element={
+                  <ProtectedRoute>
+                    <CustomerCategories />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crm/pipeline"
+                element={
+                  <ProtectedRoute>
+                    <Pipeline />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crm/leads"
+                element={
+                  <ProtectedRoute>
+                    <Leads />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crm/leads/:id"
+                element={
+                  <ProtectedRoute>
+                    <LeadDetail />
+                  </ProtectedRoute>
+                }
+              />
+              {/* CRM Settings */}
+              <Route
+                path="/crm/settings"
+                element={
+                  <ProtectedRoute>
+                    <CrmSettingsLayoutWrapper />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<CrmSettings />} />
+                <Route path="stages" element={<CrmSettingsStages />} />
+                <Route path="pricelists" element={<CrmSettingsPricelists />} />
+                <Route path="categories" element={<CrmSettingsCategories />} />
+                <Route path="scoring" element={<CrmSettingsScoring />} />
+              </Route>
+              {/* Stock routes */}
               <Route
                 path="/stock"
                 element={
@@ -337,6 +699,22 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/warehouses"
+                element={
+                  <ProtectedRoute>
+                    <Warehouses />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/warehouses/:id"
+                element={
+                  <ProtectedRoute>
+                    <WarehouseDetail />
+                  </ProtectedRoute>
+                }
+              />
               {/* Stock Settings */}
               <Route
                 path="/stock/settings"
@@ -352,45 +730,715 @@ export default function App() {
                 <Route path="units" element={<StockSettingsUnits />} />
                 <Route path="alerts" element={<StockSettingsAlerts />} />
               </Route>
-              {/* Redirection ancienne page delivery vers settings/shipping */}
-              <Route path="/store/delivery" element={<Navigate to="/store/settings/shipping" replace />} />
-              {/* Redirection ancienne page site-config vers settings */}
-              <Route path="/store/site-config" element={<Navigate to="/store/settings" replace />} />
-              {/* Store Settings */}
+              {/* Finance routes */}
               <Route
-                path="/store/settings"
+                path="/finance"
                 element={
                   <ProtectedRoute>
-                    <StoreSettingsLayoutWrapper />
+                    <FinanceWrapper>
+                      <FinanceDashboard />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/accounts"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceAccounts />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/accounts/new"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceAccountNew />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/accounts/:id"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceAccountDetail />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/budgets"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceBudgets />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/budgets/new"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceBudgetNew />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/budgets/:id"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceBudgetDetail />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/forecast"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceForecast />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/archives"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceArchives />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/payment-planning"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinancePaymentPlanning />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/expenses"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceExpenses />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/expenses/new"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceExpenseNew />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/incomes"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceIncomes />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/incomes/new"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceIncomeNew />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/categories"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceCategories />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/suppliers"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceSuppliers />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/suppliers/new"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceSupplierNew />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/portfolios"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinancePortfolios />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/scenarios"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceScenarios />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/alerts"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceAlerts />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/charts"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceCharts />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/import"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceImport />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReporting />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              {/* Redirection /finance/transactions vers /finance/expenses */}
+              <Route path="/finance/transactions" element={<Navigate to="/finance/expenses" replace />} />
+              <Route path="/finance/reporting/overview" element={<Navigate to="/finance/reporting" replace />} />
+              <Route
+                path="/finance/reporting/cashflow"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingCashflow />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/by-category"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingByCategory />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/by-account"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingByAccount />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/by-portfolio"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingByPortfolio />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/by-flow"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingByFlow />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/forecast"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingForecast />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/forecasts"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingForecasts />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/profitability"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingProfitability />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/ebitda"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingEbitda />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/bfr"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingBfr />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/dso"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingDso />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/breakeven"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingBreakeven />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance/reporting/data-quality"
+                element={
+                  <ProtectedRoute>
+                    <FinanceWrapper>
+                      <FinanceReportingDataQuality />
+                    </FinanceWrapper>
+                  </ProtectedRoute>
+                }
+              />
+              {/* Finance Settings */}
+              <Route
+                path="/finance/settings"
+                element={
+                  <ProtectedRoute>
+                    <FinanceSettingsWrapper />
                   </ProtectedRoute>
                 }
               >
-                <Route index element={<StoreSettings />} />
-                <Route path="brand" element={<StoreSettingsBrand />} />
-                <Route path="contact" element={<StoreSettingsContact />} />
-                <Route path="shipping" element={<StoreSettingsShipping />} />
-                <Route path="shipping-zones" element={<StoreSettingsShippingZones />} />
-                <Route path="features" element={<StoreSettingsFeatures />} />
-                <Route path="returns" element={<StoreSettingsReturns />} />
-                <Route path="social" element={<StoreSettingsSocial />} />
-                <Route path="seo" element={<StoreSettingsSeo />} />
+                <Route index element={<FinanceSettings />} />
+                <Route path="devise" element={<FinanceSettingsDevise />} />
+                <Route path="tva" element={<FinanceSettingsTva />} />
+                <Route path="categories" element={<FinanceSettingsCategories />} />
+                <Route path="flux" element={<FinanceSettingsFlux />} />
+                <Route path="billing" element={<FinanceSettingsBilling />} />
+                <Route path="security" element={<FinanceSettingsSecurity />} />
+                <Route path="notifications" element={<FinanceSettingsNotifications />} />
+                <Route path="integrations" element={<FinanceSettingsIntegrations />} />
               </Route>
+              {/* Marketing routes */}
               <Route
-                path="/payments"
+                path="/marketing"
                 element={
                   <ProtectedRoute>
-                    <Payments />
+                    <MarketingDashboard />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/store/featured"
+                path="/marketing/campaigns"
                 element={
                   <ProtectedRoute>
-                    <Featured />
+                    <MarketingCampaigns />
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/marketing/campaigns/new"
+                element={
+                  <ProtectedRoute>
+                    <MarketingCampaignNew />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/marketing/campaigns/:id"
+                element={
+                  <ProtectedRoute>
+                    <MarketingCampaignDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/marketing/email"
+                element={
+                  <ProtectedRoute>
+                    <MarketingEmail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/marketing/email/templates"
+                element={
+                  <ProtectedRoute>
+                    <MarketingEmailTemplates />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/marketing/sms"
+                element={
+                  <ProtectedRoute>
+                    <MarketingSMS />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/marketing/contacts"
+                element={
+                  <ProtectedRoute>
+                    <MarketingContacts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/marketing/contacts/:id"
+                element={
+                  <ProtectedRoute>
+                    <MarketingContactDetail />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Marketing Settings */}
+              <Route
+                path="/marketing/settings"
+                element={
+                  <ProtectedRoute>
+                    <MarketingSettingsLayoutWrapper />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<MarketingSettings />} />
+                <Route path="email" element={<MarketingSettingsEmail />} />
+                <Route path="sms" element={<MarketingSettingsSMS />} />
+              </Route>
+              {/* HR routes */}
+              <Route
+                path="/hr"
+                element={
+                  <ProtectedRoute>
+                    <HRDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/employees"
+                element={
+                  <ProtectedRoute>
+                    <HREmployees />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/employees/new"
+                element={
+                  <ProtectedRoute>
+                    <HREmployeeNew />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/employees/:id"
+                element={
+                  <ProtectedRoute>
+                    <HREmployeeDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/departments"
+                element={
+                  <ProtectedRoute>
+                    <HRDepartments />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/jobs"
+                element={
+                  <ProtectedRoute>
+                    <HRJobs />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/contracts"
+                element={
+                  <ProtectedRoute>
+                    <HRContracts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/contracts/new"
+                element={
+                  <ProtectedRoute>
+                    <HRContractNew />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/attendance"
+                element={
+                  <ProtectedRoute>
+                    <HRAttendance />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/leaves"
+                element={
+                  <ProtectedRoute>
+                    <HRLeaves />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/leaves/calendar"
+                element={
+                  <ProtectedRoute>
+                    <HRLeavesCalendar />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/leaves/allocations"
+                element={
+                  <ProtectedRoute>
+                    <HRLeavesAllocations />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/leaves/types"
+                element={
+                  <ProtectedRoute>
+                    <HRLeavesTypes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/settings"
+                element={
+                  <ProtectedRoute>
+                    <HRSettings />
+                  </ProtectedRoute>
+                }
+              />
+              {/* POS routes */}
+              <Route
+                path="/pos"
+                element={
+                  <ProtectedRoute>
+                    <POSDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/terminal"
+                element={
+                  <ProtectedRoute>
+                    <POSTerminal />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/kiosk"
+                element={
+                  <ProtectedRoute>
+                    <POSKiosk />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/session/open"
+                element={
+                  <ProtectedRoute>
+                    <POSSessionOpen />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/orders"
+                element={
+                  <ProtectedRoute>
+                    <POSOrders />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/sessions"
+                element={
+                  <ProtectedRoute>
+                    <POSSessions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/reports/sales"
+                element={
+                  <ProtectedRoute>
+                    <POSReportsSales />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/reports/payments"
+                element={
+                  <ProtectedRoute>
+                    <POSReportsPayments />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/settings"
+                element={
+                  <ProtectedRoute>
+                    <POSSettings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/settings/terminals"
+                element={
+                  <ProtectedRoute>
+                    <POSSettingsTerminals />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/settings/payments"
+                element={
+                  <ProtectedRoute>
+                    <POSSettingsPayments />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pos/settings/receipts"
+                element={
+                  <ProtectedRoute>
+                    <POSSettingsReceipts />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Global Settings */}
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <GlobalSettings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings/email"
+                element={
+                  <ProtectedRoute>
+                    <GlobalSettingsEmail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings/sms"
+                element={
+                  <ProtectedRoute>
+                    <GlobalSettingsSMS />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/settings"
+                element={<Navigate to="/settings" replace />}
+              />
+              {/* Other routes */}
               <Route
                 path="/analytics"
                 element={
@@ -408,10 +1456,10 @@ export default function App() {
                 }
               />
               <Route
-                path="/store/abandoned-carts"
+                path="/payments"
                 element={
                   <ProtectedRoute>
-                    <AbandonedCarts />
+                    <Payments />
                   </ProtectedRoute>
                 }
               />
@@ -432,86 +1480,6 @@ export default function App() {
                 }
               />
               <Route
-                path="/crm/customer-categories"
-                element={
-                  <ProtectedRoute>
-                    <CustomerCategories />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/crm/pipeline"
-                element={
-                  <ProtectedRoute>
-                    <Pipeline />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/crm/leads"
-                element={
-                  <ProtectedRoute>
-                    <Leads />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/crm/leads/:id"
-                element={
-                  <ProtectedRoute>
-                    <LeadDetail />
-                  </ProtectedRoute>
-                }
-              />
-              {/* CRM Settings */}
-              <Route
-                path="/crm/settings"
-                element={
-                  <ProtectedRoute>
-                    <CrmSettingsLayoutWrapper />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<CrmSettings />} />
-                <Route path="stages" element={<CrmSettingsStages />} />
-                <Route path="pricelists" element={<CrmSettingsPricelists />} />
-                <Route path="categories" element={<CrmSettingsCategories />} />
-                <Route path="scoring" element={<CrmSettingsScoring />} />
-              </Route>
-              <Route
-                path="/warehouses"
-                element={
-                  <ProtectedRoute>
-                    <Warehouses />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/warehouses/:id"
-                element={
-                  <ProtectedRoute>
-                    <WarehouseDetail />
-                  </ProtectedRoute>
-                }
-              />
-              {/* Route Tenants désactivée - réservée super-admin */}
-              <Route
-                path="/store/menus"
-                element={
-                  <ProtectedRoute>
-                    <Menus />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/store/hero-slides"
-                element={
-                  <ProtectedRoute>
-                    <HeroSlides />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="/api-guide"
                 element={
                   <ProtectedRoute>
@@ -527,517 +1495,8 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/store/promo-banners"
-                element={
-                  <ProtectedRoute>
-                    <PromoBanners />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/store/promo-messages"
-                element={
-                  <ProtectedRoute>
-                    <PromoMessages />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/store/trust-badges"
-                element={
-                  <ProtectedRoute>
-                    <TrustBadges />
-                  </ProtectedRoute>
-                }
-              />
-              {/* Redirection après fusion avec settings/seo */}
-              <Route path="/store/seo-metadata" element={<Navigate to="/store/settings/seo" replace />} />
-              <Route
-                path="/store/marketing-popups"
-                element={
-                  <ProtectedRoute>
-                    <MarketingPopups />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/store/static-pages"
-                element={
-                  <ProtectedRoute>
-                    <StaticPages />
-                  </ProtectedRoute>
-                }
-              />
-              {/* /store/my-shop redirige vers /store/settings/brand après suppression */}
-              <Route path="/store/my-shop" element={<Navigate to="/store/settings/brand" replace />} />
-              {/* Finance routes */}
-              <Route
-                path="/finance"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceDashboard />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/accounts"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceAccounts />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              {/* Redirection /finance/transactions vers /finance/expenses */}
-              <Route path="/finance/transactions" element={<Navigate to="/finance/expenses" replace />} />
-              <Route
-                path="/finance/budgets"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceBudgets />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/forecast"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceForecast />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/archives"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceArchives />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/payment-planning"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinancePaymentPlanning />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/expenses"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceExpenses />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/incomes"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceIncomes />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/expenses/new"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceExpenseNew />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/incomes/new"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceIncomeNew />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/accounts/new"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceAccountNew />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/accounts/:id"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceAccountDetail />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/budgets/new"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceBudgetNew />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/budgets/:id"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceBudgetDetail />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/categories"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceCategories />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/suppliers"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSuppliers />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/suppliers/new"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceSupplierNew />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/portfolios"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinancePortfolios />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/scenarios"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceScenarios />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/alerts"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceAlerts />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/charts"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceCharts />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/import"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceImport />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReporting />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              {/* Redirection /finance/reporting/overview vers /finance/reporting */}
-              <Route path="/finance/reporting/overview" element={<Navigate to="/finance/reporting" replace />} />
-              <Route
-                path="/finance/reporting/cashflow"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingCashflow />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/by-category"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingByCategory />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/by-account"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingByAccount />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/by-portfolio"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingByPortfolio />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/by-flow"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingByFlow />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/forecast"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingForecast />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/forecasts"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingForecasts />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/profitability"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingProfitability />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/ebitda"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingEbitda />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/bfr"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingBfr />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/dso"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingDso />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/breakeven"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingBreakeven />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/reporting/data-quality"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <CurrencyProvider>
-                        <FinanceReportingDataQuality />
-                      </CurrencyProvider>
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/finance/settings"
-                element={
-                  <ProtectedRoute>
-                    <FinanceErrorBoundary>
-                      <SettingsLayoutWrapper />
-                    </FinanceErrorBoundary>
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<FinanceSettings />} />
-                <Route path="devise" element={<FinanceSettingsDevise />} />
-                <Route path="tva" element={<FinanceSettingsTva />} />
-                <Route path="categories" element={<FinanceSettingsCategories />} />
-                <Route path="flux" element={<FinanceSettingsFlux />} />
-                <Route path="billing" element={<FinanceSettingsBilling />} />
-                <Route path="security" element={<FinanceSettingsSecurity />} />
-                <Route path="notifications" element={<FinanceSettingsNotifications />} />
-                <Route path="integrations" element={<FinanceSettingsIntegrations />} />
-              </Route>
-              {/* Route Paramètres Globaux (temporaire - redirige vers Finance) */}
-              <Route
-                path="/dashboard/settings"
-                element={
-                  <ProtectedRoute>
-                    <GlobalSettings />
-                  </ProtectedRoute>
-                }
-              />
             </Routes>
+            </Suspense>
           </ToastProvider>
         </ThemeProvider>
       </ErrorBoundary>

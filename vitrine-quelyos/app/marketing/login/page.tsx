@@ -129,8 +129,8 @@ function LoginForm() {
     setError('');
 
     try {
-      // Validate credentials against Odoo via proxy
-      const response = await fetch('/api/odoo-auth', {
+      // Validate credentials against backend via proxy
+      const response = await fetch('/api/backend-auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ login: email, password }),

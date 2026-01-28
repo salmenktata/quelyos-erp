@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 
 interface Subcategory {
@@ -67,7 +67,7 @@ export function MegaMenu() {
     try {
       setLoading(true);
 
-      const response = await odooClient.getCategories({
+      const response = await backendClient.getCategories({
         include_featured_products: true,
         featured_limit: 4,
       });

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/common';
 import { logger } from '@/lib/logger';
@@ -66,7 +66,7 @@ export function QuickViewModal({ productId, isOpen, onClose }: QuickViewModalPro
     try {
       setLoading(true);
 
-      const response = await odooClient.getProduct(productId);
+      const response = await backendClient.getProduct(productId);
 
       if (response.success && response.product) {
         setProduct(response.product as any);

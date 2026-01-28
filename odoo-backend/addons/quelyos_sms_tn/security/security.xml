@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- SMS Manager Group -->
+        <record id="group_sms_manager" model="res.groups">
+            <field name="name">SMS Manager</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- SMS User Group -->
+        <record id="group_sms_user" model="res.groups">
+            <field name="name">SMS User</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- Multi-company Rules -->
+        <record id="sms_log_company_rule" model="ir.rule">
+            <field name="name">SMS Log: Multi-company</field>
+            <field name="model_id" ref="model_quelyos_sms_log"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="sms_config_company_rule" model="ir.rule">
+            <field name="name">SMS Config: Multi-company</field>
+            <field name="model_id" ref="model_quelyos_sms_config"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+    </data>
+</odoo>

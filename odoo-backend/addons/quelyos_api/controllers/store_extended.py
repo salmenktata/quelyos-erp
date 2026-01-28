@@ -1,0 +1,1074 @@
+# -*- coding: utf-8 -*-
+"""
+Controller API étendu pour le module Store.
+Gère: Reviews, FAQ, Collections, Flash Sales, Bundles, Testimonials, Blog, Loyalty, Tickets
+"""
+import json
+import logging
+from odoo import http
+from odoo.http import request
+from .base import BaseController
+
+_logger = logging.getLogger(__name__)
+
+
+class StoreExtendedController(BaseController):
+    """Controller pour les fonctionnalités étendues du Store"""
+
+    # =========================================================================
+    # REVIEWS (Avis clients)
+    # =========================================================================
+
+    @http.route('/api/admin/reviews', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_reviews(self, **kwargs):
+        """Liste des avis (admin)"""
+        try:
+            company = self._get_company_from_tenant()
+            domain = [('company_id', '=', company.id)]
+
+            # Filtres
+            if kwargs.get('state'):
+                domain.append(('state', '=', kwargs['state']))
+            if kwargs.get('product_id'):
+                domain.append(('product_id', '=', kwargs['product_id']))
+            if kwargs.get('rating'):
+                domain.append(('rating', '=', int(kwargs['rating'])))
+
+            reviews = request.env['quelyos.product.review'].sudo().search(
+                domain, limit=kwargs.get('limit', 50), offset=kwargs.get('offset', 0),
+                order='create_date desc'
+            )
+            total = request.env['quelyos.product.review'].sudo().search_count(domain)
+
+            return {
+                'success': True,
+                'reviews': [r.to_dict() for r in reviews],
+                'total': total,
+            }
+        except Exception as e:
+            _logger.error(f'Error fetching reviews: {e}')
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/reviews/<int:review_id>/approve', type='json', auth='public', methods=['POST'], csrf=False)
+    def approve_review(self, review_id):
+        """Approuver un avis"""
+        try:
+            review = request.env['quelyos.product.review'].sudo().browse(review_id)
+            if review.exists():
+                review.action_approve()
+                return {'success': True, 'review': review.to_dict()}
+            return {'success': False, 'error': 'Review not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/reviews/<int:review_id>/reject', type='json', auth='public', methods=['POST'], csrf=False)
+    def reject_review(self, review_id, reason=None):
+        """Rejeter un avis"""
+        try:
+            review = request.env['quelyos.product.review'].sudo().browse(review_id)
+            if review.exists():
+                review.write({'rejection_reason': reason})
+                review.action_reject()
+                return {'success': True, 'review': review.to_dict()}
+            return {'success': False, 'error': 'Review not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # REVIEWS - PUBLIC API (pour vitrine-client)
+    # =========================================================================
+
+    @http.route('/api/products/<int:product_id>/reviews', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_product_reviews(self, product_id, limit=10, offset=0):
+        """Récupérer les avis approuvés d'un produit (API publique)"""
+        try:
+            domain = [
+                ('product_id', '=', product_id),
+                ('state', '=', 'approved'),
+            ]
+
+            reviews = request.env['quelyos.product.review'].sudo().search(
+                domain, limit=limit, offset=offset, order='create_date desc'
+            )
+            total = request.env['quelyos.product.review'].sudo().search_count(domain)
+
+            # Calculer la note moyenne et distribution
+            all_reviews = request.env['quelyos.product.review'].sudo().search([
+                ('product_id', '=', product_id),
+                ('state', '=', 'approved'),
+            ])
+
+            avg_rating = 0
+            rating_distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+            if all_reviews:
+                ratings = [r.rating for r in all_reviews]
+                avg_rating = sum(ratings) / len(ratings)
+                for r in all_reviews:
+                    rating_distribution[r.rating] = rating_distribution.get(r.rating, 0) + 1
+
+            return {
+                'success': True,
+                'reviews': [{
+                    'id': r.id,
+                    'authorName': r.author_name,
+                    'rating': r.rating,
+                    'title': r.title,
+                    'content': r.content,
+                    'pros': r.pros,
+                    'cons': r.cons,
+                    'verifiedPurchase': r.verified_purchase,
+                    'sellerReply': r.seller_reply,
+                    'sellerReplyDate': r.seller_reply_date.isoformat() if r.seller_reply_date else None,
+                    'helpfulYes': r.helpful_yes,
+                    'helpfulNo': r.helpful_no,
+                    'createdAt': r.create_date.isoformat() if r.create_date else None,
+                } for r in reviews],
+                'total': total,
+                'avgRating': round(avg_rating, 1),
+                'ratingDistribution': rating_distribution,
+            }
+        except Exception as e:
+            _logger.error(f'Error fetching product reviews: {e}')
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/products/<int:product_id>/reviews/submit', type='json', auth='public', methods=['POST'], csrf=False)
+    def submit_product_review(self, product_id, rating, content, title=None, author_name=None, author_email=None, pros=None, cons=None):
+        """Soumettre un nouvel avis (API publique)"""
+        try:
+            # Vérifier que le produit existe
+            product = request.env['product.product'].sudo().browse(product_id)
+            if not product.exists():
+                return {'success': False, 'error': 'Product not found'}
+
+            # Déterminer l'auteur
+            partner_id = None
+            if request.env.user and request.env.user.partner_id:
+                partner_id = request.env.user.partner_id.id
+                if not author_name:
+                    author_name = request.env.user.partner_id.name
+                if not author_email:
+                    author_email = request.env.user.partner_id.email
+
+            if not author_name:
+                author_name = 'Anonyme'
+
+            # Créer l'avis (en attente de modération)
+            review = request.env['quelyos.product.review'].sudo().create({
+                'product_id': product_id,
+                'rating': int(rating),
+                'title': title or '',
+                'content': content,
+                'author_name': author_name,
+                'author_email': author_email or '',
+                'partner_id': partner_id,
+                'pros': pros or '',
+                'cons': cons or '',
+                'state': 'pending',
+                'company_id': product.company_id.id if product.company_id else request.env.company.id,
+            })
+
+            return {
+                'success': True,
+                'message': 'Votre avis a été soumis et sera publié après modération.',
+                'reviewId': review.id,
+            }
+        except Exception as e:
+            _logger.error(f'Error submitting review: {e}')
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/reviews/<int:review_id>/helpful', type='json', auth='public', methods=['POST'], csrf=False)
+    def mark_review_helpful(self, review_id, helpful=True):
+        """Marquer un avis comme utile ou non"""
+        try:
+            review = request.env['quelyos.product.review'].sudo().browse(review_id)
+            if not review.exists() or review.state != 'approved':
+                return {'success': False, 'error': 'Review not found'}
+
+            if helpful:
+                review.helpful_yes += 1
+            else:
+                review.helpful_no += 1
+
+            return {
+                'success': True,
+                'helpfulYes': review.helpful_yes,
+                'helpfulNo': review.helpful_no,
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/reviews/<int:review_id>/reply', type='json', auth='public', methods=['POST'], csrf=False)
+    def reply_review(self, review_id, reply):
+        """Répondre à un avis"""
+        try:
+            review = request.env['quelyos.product.review'].sudo().browse(review_id)
+            if review.exists():
+                review.action_reply(reply)
+                return {'success': True, 'review': review.to_dict()}
+            return {'success': False, 'error': 'Review not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # FAQ
+    # =========================================================================
+
+    @http.route('/api/admin/faq/categories', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_faq_categories(self):
+        """Liste des catégories FAQ"""
+        try:
+            company = self._get_company_from_tenant()
+            categories = request.env['quelyos.faq.category'].sudo().search([
+                ('company_id', '=', company.id)
+            ])
+            return {
+                'success': True,
+                'categories': [c.to_dict() for c in categories],
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/faq/categories/save', type='json', auth='public', methods=['POST'], csrf=False)
+    def save_faq_category(self, **kwargs):
+        """Créer/modifier une catégorie FAQ"""
+        try:
+            company = self._get_company_from_tenant()
+            Category = request.env['quelyos.faq.category'].sudo()
+
+            vals = {
+                'name': kwargs.get('name'),
+                'code': kwargs.get('code'),
+                'icon': kwargs.get('icon'),
+                'sequence': kwargs.get('sequence', 10),
+                'company_id': company.id,
+            }
+
+            if kwargs.get('id'):
+                cat = Category.browse(kwargs['id'])
+                cat.write(vals)
+            else:
+                cat = Category.create(vals)
+
+            return {'success': True, 'category': cat.to_dict()}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/faq', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_faqs(self, category_id=None):
+        """Liste des FAQ"""
+        try:
+            company = self._get_company_from_tenant()
+            domain = [('company_id', '=', company.id)]
+            if category_id:
+                domain.append(('category_id', '=', category_id))
+
+            faqs = request.env['quelyos.faq'].sudo().search(domain, order='sequence')
+            return {
+                'success': True,
+                'faqs': [f.to_dict() for f in faqs],
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/faq/save', type='json', auth='public', methods=['POST'], csrf=False)
+    def save_faq(self, **kwargs):
+        """Créer/modifier une FAQ"""
+        try:
+            FAQ = request.env['quelyos.faq'].sudo()
+
+            vals = {
+                'question': kwargs.get('question'),
+                'answer': kwargs.get('answer'),
+                'category_id': kwargs.get('category_id'),
+                'sequence': kwargs.get('sequence', 10),
+                'is_published': kwargs.get('is_published', True),
+                'is_featured': kwargs.get('is_featured', False),
+            }
+
+            if kwargs.get('id'):
+                faq = FAQ.browse(kwargs['id'])
+                faq.write(vals)
+            else:
+                faq = FAQ.create(vals)
+
+            return {'success': True, 'faq': faq.to_dict()}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/faq/<int:faq_id>/delete', type='json', auth='public', methods=['POST'], csrf=False)
+    def delete_faq(self, faq_id):
+        """Supprimer une FAQ"""
+        try:
+            faq = request.env['quelyos.faq'].sudo().browse(faq_id)
+            if faq.exists():
+                faq.unlink()
+                return {'success': True}
+            return {'success': False, 'error': 'FAQ not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # COLLECTIONS
+    # =========================================================================
+
+    @http.route('/api/admin/collections', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_collections(self):
+        """Liste des collections"""
+        try:
+            company = self._get_company_from_tenant()
+            collections = request.env['quelyos.collection'].sudo().search([
+                ('company_id', '=', company.id)
+            ], order='sequence')
+            return {
+                'success': True,
+                'collections': [c.to_dict() for c in collections],
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/collections/save', type='json', auth='public', methods=['POST'], csrf=False)
+    def save_collection(self, **kwargs):
+        """Créer/modifier une collection"""
+        try:
+            company = self._get_company_from_tenant()
+            Collection = request.env['quelyos.collection'].sudo()
+
+            vals = {
+                'name': kwargs.get('name'),
+                'slug': kwargs.get('slug'),
+                'description': kwargs.get('description'),
+                'short_description': kwargs.get('short_description'),
+                'is_published': kwargs.get('is_published', False),
+                'is_featured': kwargs.get('is_featured', False),
+                'date_start': kwargs.get('date_start'),
+                'date_end': kwargs.get('date_end'),
+                'company_id': company.id,
+            }
+
+            if kwargs.get('product_ids'):
+                vals['product_ids'] = [(6, 0, kwargs['product_ids'])]
+
+            if kwargs.get('id'):
+                col = Collection.browse(kwargs['id'])
+                col.write(vals)
+            else:
+                col = Collection.create(vals)
+
+            return {'success': True, 'collection': col.to_dict()}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # FLASH SALES
+    # =========================================================================
+
+    @http.route('/api/admin/flash-sales', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_flash_sales(self):
+        """Liste des ventes flash"""
+        try:
+            company = self._get_company_from_tenant()
+            sales = request.env['quelyos.flash.sale'].sudo().search([
+                ('company_id', '=', company.id)
+            ], order='date_start desc')
+            return {
+                'success': True,
+                'flashSales': [s.to_dict() for s in sales],
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/flash-sales/save', type='json', auth='public', methods=['POST'], csrf=False)
+    def save_flash_sale(self, **kwargs):
+        """Créer/modifier une vente flash"""
+        try:
+            company = self._get_company_from_tenant()
+            FlashSale = request.env['quelyos.flash.sale'].sudo()
+
+            vals = {
+                'name': kwargs.get('name'),
+                'description': kwargs.get('description'),
+                'date_start': kwargs.get('date_start'),
+                'date_end': kwargs.get('date_end'),
+                'is_active': kwargs.get('is_active', True),
+                'background_color': kwargs.get('background_color', '#ef4444'),
+                'company_id': company.id,
+            }
+
+            if kwargs.get('id'):
+                sale = FlashSale.browse(kwargs['id'])
+                sale.write(vals)
+            else:
+                sale = FlashSale.create(vals)
+
+            # Gérer les lignes produits
+            if kwargs.get('products'):
+                sale.line_ids.unlink()
+                for p in kwargs['products']:
+                    request.env['quelyos.flash.sale.line'].sudo().create({
+                        'flash_sale_id': sale.id,
+                        'product_id': p['product_id'],
+                        'original_price': p['original_price'],
+                        'flash_price': p['flash_price'],
+                        'qty_available': p.get('qty_available', 100),
+                    })
+
+            return {'success': True, 'flashSale': sale.to_dict()}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # BUNDLES
+    # =========================================================================
+
+    @http.route('/api/admin/bundles', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_bundles(self):
+        """Liste des bundles"""
+        try:
+            company = self._get_company_from_tenant()
+            bundles = request.env['quelyos.bundle'].sudo().search([
+                ('company_id', '=', company.id)
+            ], order='sequence')
+            return {
+                'success': True,
+                'bundles': [b.to_dict() for b in bundles],
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/bundles/save', type='json', auth='public', methods=['POST'], csrf=False)
+    def save_bundle(self, **kwargs):
+        """Créer/modifier un bundle"""
+        try:
+            company = self._get_company_from_tenant()
+            Bundle = request.env['quelyos.bundle'].sudo()
+
+            vals = {
+                'name': kwargs.get('name'),
+                'slug': kwargs.get('slug'),
+                'description': kwargs.get('description'),
+                'bundle_price': kwargs.get('bundle_price'),
+                'is_published': kwargs.get('is_published', False),
+                'company_id': company.id,
+            }
+
+            if kwargs.get('id'):
+                bundle = Bundle.browse(kwargs['id'])
+                bundle.write(vals)
+            else:
+                bundle = Bundle.create(vals)
+
+            # Gérer les lignes produits
+            if kwargs.get('products'):
+                bundle.line_ids.unlink()
+                for p in kwargs['products']:
+                    request.env['quelyos.bundle.line'].sudo().create({
+                        'bundle_id': bundle.id,
+                        'product_id': p['product_id'],
+                        'quantity': p.get('quantity', 1),
+                    })
+
+            return {'success': True, 'bundle': bundle.to_dict()}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # TESTIMONIALS
+    # =========================================================================
+
+    @http.route('/api/admin/testimonials', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_testimonials(self):
+        """Liste des témoignages"""
+        try:
+            company = self._get_company_from_tenant()
+            testimonials = request.env['quelyos.testimonial'].sudo().search([
+                ('company_id', '=', company.id)
+            ], order='sequence')
+            return {
+                'success': True,
+                'testimonials': [t.to_dict() for t in testimonials],
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/testimonials/save', type='json', auth='public', methods=['POST'], csrf=False)
+    def save_testimonial(self, **kwargs):
+        """Créer/modifier un témoignage"""
+        try:
+            company = self._get_company_from_tenant()
+            Testimonial = request.env['quelyos.testimonial'].sudo()
+
+            vals = {
+                'customer_name': kwargs.get('customer_name'),
+                'customer_title': kwargs.get('customer_title'),
+                'customer_company': kwargs.get('customer_company'),
+                'content': kwargs.get('content'),
+                'rating': kwargs.get('rating', 5),
+                'is_published': kwargs.get('is_published', False),
+                'is_featured': kwargs.get('is_featured', False),
+                'display_on': kwargs.get('display_on', 'homepage'),
+                'company_id': company.id,
+            }
+
+            if kwargs.get('id'):
+                testimonial = Testimonial.browse(kwargs['id'])
+                testimonial.write(vals)
+            else:
+                testimonial = Testimonial.create(vals)
+
+            return {'success': True, 'testimonial': testimonial.to_dict()}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # BLOG
+    # =========================================================================
+
+    @http.route('/api/admin/blog/categories', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_blog_categories(self):
+        """Liste des catégories blog"""
+        try:
+            company = self._get_company_from_tenant()
+            categories = request.env['quelyos.blog.category'].sudo().search([
+                ('company_id', '=', company.id)
+            ])
+            return {
+                'success': True,
+                'categories': [c.to_dict() for c in categories],
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/blog/posts', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_blog_posts(self, **kwargs):
+        """Liste des articles blog"""
+        try:
+            company = self._get_company_from_tenant()
+            domain = [('company_id', '=', company.id)]
+
+            if kwargs.get('category_id'):
+                domain.append(('category_id', '=', kwargs['category_id']))
+            if kwargs.get('state'):
+                domain.append(('state', '=', kwargs['state']))
+
+            posts = request.env['quelyos.blog.post'].sudo().search(
+                domain, limit=kwargs.get('limit', 50), order='published_date desc'
+            )
+            return {
+                'success': True,
+                'posts': [p.to_dict(include_content=False) for p in posts],
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/blog/posts/<int:post_id>', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_blog_post(self, post_id):
+        """Détail d'un article"""
+        try:
+            post = request.env['quelyos.blog.post'].sudo().browse(post_id)
+            if post.exists():
+                return {'success': True, 'post': post.to_dict()}
+            return {'success': False, 'error': 'Post not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/blog/posts/save', type='json', auth='public', methods=['POST'], csrf=False)
+    def save_blog_post(self, **kwargs):
+        """Créer/modifier un article"""
+        try:
+            Post = request.env['quelyos.blog.post'].sudo()
+
+            vals = {
+                'title': kwargs.get('title'),
+                'slug': kwargs.get('slug'),
+                'excerpt': kwargs.get('excerpt'),
+                'content': kwargs.get('content'),
+                'category_id': kwargs.get('category_id'),
+                'state': kwargs.get('state', 'draft'),
+                'is_featured': kwargs.get('is_featured', False),
+            }
+
+            if kwargs.get('id'):
+                post = Post.browse(kwargs['id'])
+                post.write(vals)
+            else:
+                post = Post.create(vals)
+
+            return {'success': True, 'post': post.to_dict()}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # LOYALTY
+    # =========================================================================
+
+    @http.route('/api/admin/loyalty/program', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_loyalty_program(self):
+        """Récupérer le programme de fidélité"""
+        try:
+            company = self._get_company_from_tenant()
+            program = request.env['quelyos.loyalty.program'].sudo().search([
+                ('company_id', '=', company.id)
+            ], limit=1)
+            if program:
+                return {'success': True, 'program': program.to_dict()}
+            return {'success': True, 'program': None}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/loyalty/program/save', type='json', auth='public', methods=['POST'], csrf=False)
+    def save_loyalty_program(self, **kwargs):
+        """Créer/modifier le programme de fidélité"""
+        try:
+            company = self._get_company_from_tenant()
+            Program = request.env['quelyos.loyalty.program'].sudo()
+
+            vals = {
+                'name': kwargs.get('name'),
+                'is_active': kwargs.get('is_active', True),
+                'points_per_currency': kwargs.get('points_per_currency', 1),
+                'points_value': kwargs.get('points_value', 0.01),
+                'min_points_redeem': kwargs.get('min_points_redeem', 100),
+                'company_id': company.id,
+            }
+
+            program = Program.search([('company_id', '=', company.id)], limit=1)
+            if program:
+                program.write(vals)
+            else:
+                program = Program.create(vals)
+
+            # Gérer les niveaux
+            if kwargs.get('levels'):
+                program.level_ids.unlink()
+                for level in kwargs['levels']:
+                    request.env['quelyos.loyalty.level'].sudo().create({
+                        'program_id': program.id,
+                        'name': level['name'],
+                        'min_points': level['min_points'],
+                        'points_multiplier': level.get('points_multiplier', 1),
+                        'discount_percent': level.get('discount_percent', 0),
+                        'free_shipping': level.get('free_shipping', False),
+                        'color': level.get('color', '#6b7280'),
+                    })
+
+            return {'success': True, 'program': program.to_dict()}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/loyalty/members', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_loyalty_members(self, **kwargs):
+        """Liste des membres fidélité"""
+        try:
+            company = self._get_company_from_tenant()
+            members = request.env['quelyos.loyalty.member'].sudo().search([
+                ('company_id', '=', company.id)
+            ], limit=kwargs.get('limit', 50), order='current_points desc')
+            return {
+                'success': True,
+                'members': [m.to_dict() for m in members],
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # TICKETS (SAV)
+    # =========================================================================
+
+    @http.route('/api/admin/tickets', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_tickets(self, **kwargs):
+        """Liste des tickets"""
+        try:
+            company = self._get_company_from_tenant()
+            domain = [('company_id', '=', company.id)]
+
+            if kwargs.get('state'):
+                domain.append(('state', '=', kwargs['state']))
+            if kwargs.get('category'):
+                domain.append(('category', '=', kwargs['category']))
+            if kwargs.get('priority'):
+                domain.append(('priority', '=', kwargs['priority']))
+
+            tickets = request.env['quelyos.ticket'].sudo().search(
+                domain, limit=kwargs.get('limit', 50), order='create_date desc'
+            )
+            total = request.env['quelyos.ticket'].sudo().search_count(domain)
+
+            return {
+                'success': True,
+                'tickets': [t.to_dict() for t in tickets],
+                'total': total,
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/tickets/<int:ticket_id>', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_ticket(self, ticket_id):
+        """Détail d'un ticket"""
+        try:
+            ticket = request.env['quelyos.ticket'].sudo().browse(ticket_id)
+            if ticket.exists():
+                data = ticket.to_dict()
+                data['messages'] = [m.to_dict() for m in ticket.message_ids]
+                return {'success': True, 'ticket': data}
+            return {'success': False, 'error': 'Ticket not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/tickets/<int:ticket_id>/reply', type='json', auth='public', methods=['POST'], csrf=False)
+    def reply_ticket(self, ticket_id, content):
+        """Répondre à un ticket"""
+        try:
+            ticket = request.env['quelyos.ticket'].sudo().browse(ticket_id)
+            if ticket.exists():
+                request.env['quelyos.ticket.message'].sudo().create({
+                    'ticket_id': ticket_id,
+                    'content': content,
+                    'author_id': request.env.user.partner_id.id,
+                })
+                if ticket.state == 'new':
+                    ticket.action_open()
+                return {'success': True, 'ticket': ticket.to_dict()}
+            return {'success': False, 'error': 'Ticket not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/tickets/<int:ticket_id>/status', type='json', auth='public', methods=['POST'], csrf=False)
+    def update_ticket_status(self, ticket_id, state, resolution=None):
+        """Mettre à jour le statut d'un ticket"""
+        try:
+            ticket = request.env['quelyos.ticket'].sudo().browse(ticket_id)
+            if ticket.exists():
+                if state == 'resolved':
+                    ticket.write({'resolution': resolution})
+                    ticket.action_resolve()
+                elif state == 'closed':
+                    ticket.action_close()
+                elif state == 'open':
+                    ticket.action_open()
+                elif state == 'pending':
+                    ticket.action_pending()
+                return {'success': True, 'ticket': ticket.to_dict()}
+            return {'success': False, 'error': 'Ticket not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # SALES REPORTS
+    # =========================================================================
+
+    @http.route('/api/admin/reports/sales', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_sales_report(self, date_from=None, date_to=None):
+        """Rapport de ventes"""
+        try:
+            company = self._get_company_from_tenant()
+            domain = [
+                ('company_id', '=', company.id),
+                ('state', 'in', ['sale', 'done'])
+            ]
+            if date_from:
+                domain.append(('date_order', '>=', date_from))
+            if date_to:
+                domain.append(('date_order', '<=', date_to))
+
+            orders = request.env['sale.order'].sudo().search(domain)
+
+            # Calculs
+            total_revenue = sum(o.amount_total for o in orders)
+            total_orders = len(orders)
+            avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
+
+            # Top produits
+            product_sales = {}
+            for order in orders:
+                for line in order.order_line:
+                    pid = line.product_id.product_tmpl_id.id
+                    if pid not in product_sales:
+                        product_sales[pid] = {
+                            'id': pid,
+                            'name': line.product_id.name,
+                            'quantity': 0,
+                            'revenue': 0,
+                        }
+                    product_sales[pid]['quantity'] += line.product_uom_qty
+                    product_sales[pid]['revenue'] += line.price_subtotal
+
+            top_products = sorted(
+                product_sales.values(),
+                key=lambda x: x['revenue'],
+                reverse=True
+            )[:10]
+
+            return {
+                'success': True,
+                'report': {
+                    'totalRevenue': total_revenue,
+                    'totalOrders': total_orders,
+                    'avgOrderValue': round(avg_order_value, 2),
+                    'topProducts': top_products,
+                }
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # WISHLIST ANALYTICS
+    # =========================================================================
+
+    @http.route('/api/admin/analytics/wishlist', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_wishlist_analytics(self):
+        """Analytiques wishlist - produits les plus ajoutés en favoris"""
+        try:
+            company = self._get_company_from_tenant()
+
+            # Requête SQL directe pour performance
+            query = """
+                SELECT
+                    pt.id as product_id,
+                    pt.name as product_name,
+                    COUNT(DISTINCT wl.partner_id) as wishlist_count
+                FROM quelyos_wishlist_item wl
+                JOIN product_product pp ON pp.id = wl.product_id
+                JOIN product_template pt ON pt.id = pp.product_tmpl_id
+                WHERE pt.company_id = %s OR pt.company_id IS NULL
+                GROUP BY pt.id, pt.name
+                ORDER BY wishlist_count DESC
+                LIMIT 20
+            """
+
+            try:
+                request.env.cr.execute(query, (company.id,))
+                results = request.env.cr.dictfetchall()
+            except Exception:
+                # Table n'existe peut-être pas
+                results = []
+
+            return {
+                'success': True,
+                'products': results,
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # STOCK ALERTS
+    # =========================================================================
+
+    @http.route('/api/admin/stock/alerts', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_stock_alerts(self, threshold=10):
+        """Produits avec stock faible"""
+        try:
+            company = self._get_company_from_tenant()
+
+            # Récupérer tous les produits stockables
+            all_products = request.env['product.product'].sudo().search([
+                ('type', '=', 'product'),
+                '|',
+                ('company_id', '=', company.id),
+                ('company_id', '=', False),
+            ])
+
+            # Filtrer en Python car qty_available est un champ calculé
+            low_stock = []
+            out_of_stock = []
+
+            for p in all_products:
+                qty = p.qty_available
+                if qty <= 0:
+                    out_of_stock.append({
+                        'id': p.id,
+                        'name': p.name,
+                        'sku': p.default_code or '',
+                    })
+                elif qty <= threshold:
+                    low_stock.append({
+                        'id': p.id,
+                        'name': p.name,
+                        'sku': p.default_code or '',
+                        'qtyAvailable': qty,
+                        'virtualAvailable': p.virtual_available,
+                    })
+
+            # Trier par quantité et limiter
+            low_stock = sorted(low_stock, key=lambda x: x['qtyAvailable'])[:50]
+            out_of_stock = out_of_stock[:50]
+
+            return {
+                'success': True,
+                'lowStock': low_stock,
+                'outOfStock': out_of_stock,
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # PRODUCT ATTRIBUTES
+    # =========================================================================
+
+    @http.route('/api/admin/attributes', type='json', auth='public', methods=['POST'], csrf=False)
+    def get_attributes(self):
+        """Liste des attributs produits"""
+        try:
+            attributes = request.env['product.attribute'].sudo().search([])
+            return {
+                'success': True,
+                'attributes': [{
+                    'id': a.id,
+                    'name': a.name,
+                    'displayType': a.display_type,
+                    'createVariant': a.create_variant,
+                    'values': [{
+                        'id': v.id,
+                        'name': v.name,
+                    } for v in a.value_ids],
+                } for a in attributes],
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/attributes/save', type='json', auth='public', methods=['POST'], csrf=False)
+    def save_attribute(self, **kwargs):
+        """Créer/modifier un attribut"""
+        try:
+            Attribute = request.env['product.attribute'].sudo()
+
+            vals = {
+                'name': kwargs.get('name'),
+                'display_type': kwargs.get('display_type', 'radio'),
+                'create_variant': kwargs.get('create_variant', 'always'),
+            }
+
+            if kwargs.get('id'):
+                attr = Attribute.browse(kwargs['id'])
+                attr.write(vals)
+            else:
+                attr = Attribute.create(vals)
+
+            # Gérer les valeurs
+            if kwargs.get('values'):
+                existing_ids = [v['id'] for v in kwargs['values'] if v.get('id')]
+                attr.value_ids.filtered(lambda v: v.id not in existing_ids).unlink()
+
+                for val in kwargs['values']:
+                    if val.get('id'):
+                        request.env['product.attribute.value'].sudo().browse(val['id']).write({
+                            'name': val['name']
+                        })
+                    else:
+                        request.env['product.attribute.value'].sudo().create({
+                            'attribute_id': attr.id,
+                            'name': val['name'],
+                        })
+
+            return {'success': True, 'attribute': {
+                'id': attr.id,
+                'name': attr.name,
+            }}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # =========================================================================
+    # IMPORT/EXPORT
+    # =========================================================================
+
+    @http.route('/api/admin/products/export', type='json', auth='public', methods=['POST'], csrf=False)
+    def export_products(self, format='csv'):
+        """Exporter les produits"""
+        try:
+            company = self._get_company_from_tenant()
+            products = request.env['product.template'].sudo().search([
+                '|',
+                ('company_id', '=', company.id),
+                ('company_id', '=', False),
+            ])
+
+            data = []
+            for p in products:
+                data.append({
+                    'id': p.id,
+                    'name': p.name,
+                    'sku': p.default_code or '',
+                    'price': p.list_price,
+                    'cost': p.standard_price,
+                    'category': p.categ_id.name if p.categ_id else '',
+                    'type': p.type,
+                    'active': p.active,
+                    'description': p.description_sale or '',
+                })
+
+            return {
+                'success': True,
+                'products': data,
+                'count': len(data),
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/admin/products/import', type='json', auth='public', methods=['POST'], csrf=False)
+    def import_products(self, products):
+        """Importer des produits"""
+        try:
+            company = self._get_company_from_tenant()
+            Product = request.env['product.template'].sudo()
+
+            created = 0
+            updated = 0
+            errors = []
+
+            for idx, p in enumerate(products):
+                try:
+                    vals = {
+                        'name': p.get('name'),
+                        'default_code': p.get('sku'),
+                        'list_price': float(p.get('price', 0)),
+                        'standard_price': float(p.get('cost', 0)),
+                        'type': p.get('type', 'consu'),
+                        'sale_ok': True,
+                        'purchase_ok': True,
+                    }
+
+                    # Chercher catégorie
+                    if p.get('category'):
+                        categ = request.env['product.category'].sudo().search([
+                            ('name', '=', p['category'])
+                        ], limit=1)
+                        if categ:
+                            vals['categ_id'] = categ.id
+
+                    # Update ou create
+                    existing = None
+                    if p.get('id'):
+                        existing = Product.browse(int(p['id']))
+                    elif p.get('sku'):
+                        existing = Product.search([
+                            ('default_code', '=', p['sku'])
+                        ], limit=1)
+
+                    if existing and existing.exists():
+                        existing.write(vals)
+                        updated += 1
+                    else:
+                        Product.create(vals)
+                        created += 1
+
+                except Exception as e:
+                    errors.append(f"Ligne {idx + 1}: {str(e)}")
+
+            return {
+                'success': True,
+                'created': created,
+                'updated': updated,
+                'errors': errors,
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    def _get_company_from_tenant(self):
+        """Helper pour récupérer la company du tenant"""
+        tenant_domain = request.httprequest.headers.get('X-Tenant-Domain')
+        if tenant_domain:
+            tenant = request.env['quelyos.tenant'].sudo().search([
+                ('domain', '=', tenant_domain)
+            ], limit=1)
+            if tenant and tenant.company_id:
+                return tenant.company_id
+        return request.env.company

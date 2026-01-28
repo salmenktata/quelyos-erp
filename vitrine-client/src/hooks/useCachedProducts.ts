@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import type { Product } from '@quelyos/types';
 
 interface UseCachedProductsOptions {
@@ -50,7 +50,7 @@ export function useCachedProducts(
       // Use regular endpoint - caching is handled transparently by backend
       const endpoint = '/products';
 
-      const response = await odooClient.getProducts({
+      const response = await backendClient.getProducts({
         limit,
         offset,
         ...filters,
@@ -108,7 +108,7 @@ export function useCachedProduct(
       setError(null);
 
       // Use regular endpoint - caching is handled transparently by backend
-      const response = await odooClient.getProduct(productId);
+      const response = await backendClient.getProduct(productId);
 
       if (response.success && response.product) {
         setProduct(response.product);

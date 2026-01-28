@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { odooRpc } from '../lib/odoo-rpc';
+import { backendRpc } from '../lib/backend-rpc';
 import { logger } from '@quelyos/logger';
 
 export interface Warehouse {
@@ -52,7 +52,7 @@ export function useWarehouses(params: WarehousesParams = {}) {
     queryKey: ['warehouses', params],
     queryFn: async () => {
       try {
-        const response = await odooRpc('/api/ecommerce/warehouses', params);
+        const response = await backendRpc('/api/ecommerce/warehouses', params);
 
         if (!response.success) {
           logger.error('[useWarehouses] API error:', response.error);
@@ -74,7 +74,7 @@ export function useWarehouseDetail(warehouseId: number) {
   return useQuery({
     queryKey: ['warehouse', warehouseId],
     queryFn: async () => {
-      const response = await odooRpc(`/api/ecommerce/warehouses/${warehouseId}`, {});
+      const response = await backendRpc(`/api/ecommerce/warehouses/${warehouseId}`, {});
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch warehouse detail');
       }
@@ -116,7 +116,7 @@ export function useWarehouseStock(
   return useQuery({
     queryKey: ['warehouse-stock', warehouseId, params],
     queryFn: async () => {
-      const response = await odooRpc(`/api/ecommerce/warehouses/${warehouseId}/stock`, params || {});
+      const response = await backendRpc(`/api/ecommerce/warehouses/${warehouseId}/stock`, params || {});
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch warehouse stock');
       }
@@ -131,7 +131,7 @@ export function useProductStockByLocation(productId: number, warehouseId?: numbe
     queryKey: ['product-stock-by-location', productId, warehouseId],
     queryFn: async () => {
       const params = warehouseId ? { warehouse_id: warehouseId } : {};
-      const response = await odooRpc(`/api/ecommerce/products/${productId}/stock-by-location`, params);
+      const response = await backendRpc(`/api/ecommerce/products/${productId}/stock-by-location`, params);
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch product stock by location');
       }
@@ -152,7 +152,7 @@ export function useCreateStockTransfer() {
       to_location_id: number;
       note?: string;
     }) => {
-      const response = await odooRpc('/api/ecommerce/stock/transfer', data);
+      const response = await backendRpc('/api/ecommerce/stock/transfer', data);
       if (!response.success) {
         throw new Error(response.error || 'Failed to create stock transfer');
       }
@@ -194,7 +194,7 @@ export function useCreateWarehouse() {
 
   return useMutation({
     mutationFn: async (data: CreateWarehouseData) => {
-      const response = await odooRpc('/api/ecommerce/warehouses/create', data);
+      const response = await backendRpc('/api/ecommerce/warehouses/create', data);
       if (!response.success) {
         throw new Error(response.error || 'Échec de la création de l\'entrepôt');
       }
@@ -215,7 +215,7 @@ export function useUpdateWarehouse() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: number; data: UpdateWarehouseData }) => {
-      const response = await odooRpc(`/api/ecommerce/warehouses/${id}/update`, data);
+      const response = await backendRpc(`/api/ecommerce/warehouses/${id}/update`, data);
       if (!response.success) {
         throw new Error(response.error || 'Échec de la mise à jour de l\'entrepôt');
       }
@@ -237,7 +237,7 @@ export function useArchiveWarehouse() {
 
   return useMutation({
     mutationFn: async (warehouseId: number) => {
-      const response = await odooRpc(`/api/ecommerce/warehouses/${warehouseId}/archive`, {});
+      const response = await backendRpc(`/api/ecommerce/warehouses/${warehouseId}/archive`, {});
       if (!response.success) {
         throw new Error(response.error || 'Échec de l\'archivage de l\'entrepôt');
       }

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { ProductGrid, ProductCard } from '@/components/product';
 import { Loading } from '@/components/common';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import type { Product } from '@quelyos/types';
 import { logger } from '@/lib/logger';
 
@@ -47,7 +47,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
         case 'similar':
           if (productId) {
             // Get similar products based on category or tags
-            const response = await odooClient.getProducts({
+            const response = await backendClient.getProducts({
               category_id: productId,
               limit,
             });
@@ -59,7 +59,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
 
         case 'complementary':
           // In a real app, this would use purchase history data
-          const compResponse = await odooClient.getProducts({
+          const compResponse = await backendClient.getProducts({
               is_featured: true,
               limit,
           });
@@ -72,7 +72,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
           // Get from localStorage
           const recentlyViewed = getRecentlyViewedProducts();
           if (recentlyViewed.length > 0) {
-            const viewedResponse = await odooClient.getProducts({
+            const viewedResponse = await backendClient.getProducts({
               limit,
             });
             if (viewedResponse.success) {
@@ -83,7 +83,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
           break;
 
         case 'popular':
-          const popularResponse = await odooClient.getProducts({
+          const popularResponse = await backendClient.getProducts({
             is_bestseller: true,
             limit,
           });

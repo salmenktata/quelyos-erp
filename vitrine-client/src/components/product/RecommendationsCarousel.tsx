@@ -3,7 +3,7 @@
 import React, { useState, useEffect, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { Button } from '@/components/common';
 import type { Product } from '@quelyos/types';
 import { logger } from '@/lib/logger';
@@ -39,12 +39,12 @@ export const RecommendationsCarousel = memo(function RecommendationsCarousel({
       setError(null);
 
       if (type === 'upsell') {
-        const response = await odooClient.getUpsellProducts(productId, limit);
+        const response = await backendClient.getUpsellProducts(productId, limit);
         if (response.success && response.products) {
           setProducts(response.products);
         }
       } else {
-        const response = await odooClient.getRecommendations(productId, limit);
+        const response = await backendClient.getRecommendations(productId, limit);
         if (response.success && response.data?.products) {
           setProducts(response.data.products);
         }

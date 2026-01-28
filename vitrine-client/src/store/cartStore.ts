@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Cart } from '@quelyos/types';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 
 interface CartState {
   cart: Cart | null;
@@ -28,7 +28,7 @@ export const useCartStore = create<CartState>()(
       fetchCart: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.getCart();
+          const response = await backendClient.getCart();
           if (response.success && response.cart) {
             set({ cart: response.cart, isLoading: false });
           } else {
@@ -42,7 +42,7 @@ export const useCartStore = create<CartState>()(
       addToCart: async (productId: number, quantity: number = 1) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.addToCart(productId, quantity);
+          const response = await backendClient.addToCart(productId, quantity);
           if (response.success && response.cart) {
             set({ cart: response.cart, isLoading: false });
             return true;
@@ -59,7 +59,7 @@ export const useCartStore = create<CartState>()(
       updateQuantity: async (lineId: number, quantity: number) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.updateCartLine(lineId, quantity);
+          const response = await backendClient.updateCartLine(lineId, quantity);
           if (response.success && response.cart) {
             set({ cart: response.cart, isLoading: false });
             return true;
@@ -76,7 +76,7 @@ export const useCartStore = create<CartState>()(
       removeItem: async (lineId: number) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.removeCartLine(lineId);
+          const response = await backendClient.removeCartLine(lineId);
           if (response.success && response.cart) {
             set({ cart: response.cart, isLoading: false });
             return true;
@@ -93,7 +93,7 @@ export const useCartStore = create<CartState>()(
       clearCart: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.clearCart();
+          const response = await backendClient.clearCart();
           if (response.success) {
             set({ cart: null, isLoading: false });
             return true;
@@ -110,7 +110,7 @@ export const useCartStore = create<CartState>()(
       applyCoupon: async (code: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.validateCoupon(code);
+          const response = await backendClient.validateCoupon(code);
           if (response.success && response.cart) {
             set({ cart: response.cart, isLoading: false });
             return { success: true, message: response.message };
@@ -127,7 +127,7 @@ export const useCartStore = create<CartState>()(
       removeCoupon: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.removeCoupon();
+          const response = await backendClient.removeCoupon();
           if (response.success && response.cart) {
             set({ cart: response.cart, isLoading: false });
             return true;

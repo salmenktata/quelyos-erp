@@ -17,6 +17,211 @@ class QuelyosCheckout(http.Controller):
         """Extrait les paramètres de la requête JSON-RPC"""
         return request.params if hasattr(request, 'params') and request.params else {}
 
+    # ==================== STATES / GOVERNORATES ====================
+
+    @http.route('/api/ecommerce/states', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_states(self, **kwargs):
+        """
+        Récupérer les états/gouvernorats d'un pays avec leurs zones de livraison
+
+        Args:
+            country_code (str): Code ISO du pays (défaut: 'TN')
+
+        Returns:
+            dict: {
+                'success': bool,
+                'states': [
+                    {
+                        'id': int,
+                        'name': str,
+                        'code': str,
+                        'zone': str,
+                        'zone_label': str,
+                        'shipping_price': float
+                    }
+                ],
+                'zones': {
+                    'grand-tunis': {'label': 'Grand Tunis', 'price': 7.0},
+                    ...
+                },
+                'free_threshold': float
+            }
+        """
+        try:
+            params = self._get_params()
+            country_code = params.get('country_code', 'TN')
+
+            # Récupérer le pays
+            Country = request.env['res.country'].sudo()
+            country = Country.search([('code', '=', country_code.upper())], limit=1)
+
+            if not country:
+                return {
+                    'success': False,
+                    'error': f'Pays non trouvé: {country_code}'
+                }
+
+            # Récupérer les états du pays
+            State = request.env['res.country.state'].sudo()
+            states = State.search([('country_id', '=', country.id)], order='name')
+
+            # Récupérer les tarifs par zone depuis ir.config_parameter
+            IrConfig = request.env['ir.config_parameter'].sudo()
+            zone_prices = {
+                'grand-tunis': float(IrConfig.get_param('shipping.zone.grand-tunis.price', '7.0')),
+                'nord': float(IrConfig.get_param('shipping.zone.nord.price', '9.0')),
+                'centre': float(IrConfig.get_param('shipping.zone.centre.price', '9.0')),
+                'sud': float(IrConfig.get_param('shipping.zone.sud.price', '12.0')),
+            }
+            free_threshold = float(IrConfig.get_param('shipping.free_threshold', '150.0'))
+
+            zone_labels = {
+                'grand-tunis': 'Grand Tunis',
+                'nord': 'Nord',
+                'centre': 'Centre',
+                'sud': 'Sud',
+            }
+
+            states_data = []
+            for state in states:
+                zone = state.x_shipping_zone or 'nord'  # Default to nord if not set
+                states_data.append({
+                    'id': state.id,
+                    'name': state.name,
+                    'code': state.code,
+                    'zone': zone,
+                    'zone_label': zone_labels.get(zone, zone),
+                    'shipping_price': zone_prices.get(zone, 9.0),
+                })
+
+            zones_data = {
+                zone: {
+                    'label': zone_labels.get(zone, zone),
+                    'price': price
+                }
+                for zone, price in zone_prices.items()
+            }
+
+            return {
+                'success': True,
+                'states': states_data,
+                'zones': zones_data,
+                'free_threshold': free_threshold,
+                'country': {
+                    'id': country.id,
+                    'name': country.name,
+                    'code': country.code,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get states error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/admin/shipping/zones', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_shipping_zones(self, **kwargs):
+        """
+        Récupérer les zones de livraison et leurs tarifs (Admin)
+
+        Returns:
+            dict: {
+                'success': bool,
+                'zones': [
+                    {
+                        'code': str,
+                        'label': str,
+                        'price': float,
+                        'governorates': [str]
+                    }
+                ],
+                'free_threshold': float
+            }
+        """
+        try:
+            IrConfig = request.env['ir.config_parameter'].sudo()
+            State = request.env['res.country.state'].sudo()
+            Country = request.env['res.country'].sudo()
+
+            tunisia = Country.search([('code', '=', 'TN')], limit=1)
+            states = State.search([('country_id', '=', tunisia.id)]) if tunisia else State.browse()
+
+            zone_codes = ['grand-tunis', 'nord', 'centre', 'sud']
+            zone_labels = {
+                'grand-tunis': 'Grand Tunis',
+                'nord': 'Nord',
+                'centre': 'Centre',
+                'sud': 'Sud',
+            }
+
+            zones = []
+            for zone_code in zone_codes:
+                price = float(IrConfig.get_param(f'shipping.zone.{zone_code}.price', '9.0'))
+                governorates = [s.name for s in states if s.x_shipping_zone == zone_code]
+                zones.append({
+                    'code': zone_code,
+                    'label': zone_labels.get(zone_code, zone_code),
+                    'price': price,
+                    'governorates': governorates,
+                })
+
+            free_threshold = float(IrConfig.get_param('shipping.free_threshold', '150.0'))
+
+            return {
+                'success': True,
+                'zones': zones,
+                'free_threshold': free_threshold,
+            }
+
+        except Exception as e:
+            _logger.error(f"Get shipping zones error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/admin/shipping/zones/update', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
+    def update_shipping_zones(self, **kwargs):
+        """
+        Mettre à jour les tarifs des zones de livraison (Admin)
+
+        Args:
+            zones (dict): {'grand-tunis': 7.0, 'nord': 9.0, ...}
+            free_threshold (float, optional): Seuil livraison gratuite
+
+        Returns:
+            dict: {'success': bool}
+        """
+        try:
+            params = self._get_params()
+            zones = params.get('zones', {})
+            free_threshold = params.get('free_threshold')
+
+            IrConfig = request.env['ir.config_parameter'].sudo()
+
+            for zone_code, price in zones.items():
+                if zone_code in ['grand-tunis', 'nord', 'centre', 'sud']:
+                    IrConfig.set_param(f'shipping.zone.{zone_code}.price', str(float(price)))
+                    _logger.info(f"Updated shipping zone {zone_code} price to {price}")
+
+            if free_threshold is not None:
+                IrConfig.set_param('shipping.free_threshold', str(float(free_threshold)))
+                _logger.info(f"Updated free shipping threshold to {free_threshold}")
+
+            return {
+                'success': True,
+                'message': 'Zones de livraison mises à jour'
+            }
+
+        except Exception as e:
+            _logger.error(f"Update shipping zones error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
     # ==================== CHECKOUT ====================
 
     @http.route('/api/ecommerce/checkout/validate', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
@@ -169,7 +374,8 @@ class QuelyosCheckout(http.Controller):
         Calculer les frais de livraison
 
         Args:
-            delivery_method_id (int): ID de la méthode de livraison
+            delivery_method_id (int, optional): ID de la méthode de livraison
+            state_id (int, optional): ID du gouvernorat pour calcul par zone
             guest_email (str, optional): Email invité
 
         Returns:
@@ -177,27 +383,94 @@ class QuelyosCheckout(http.Controller):
                 'success': bool,
                 'shipping_cost': float,
                 'is_free': bool,
+                'zone': str,
+                'zone_label': str,
                 'delivery_method': {
                     'id': int,
                     'name': str,
                     'description': str
                 },
                 'estimated_days_min': int,
-                'estimated_days_max': int
+                'estimated_days_max': int,
+                'free_threshold': float
             }
         """
         try:
             params = self._get_params()
             delivery_method_id = params.get('delivery_method_id')
+            state_id = params.get('state_id')
             guest_email = params.get('guest_email')
 
+            IrConfig = request.env['ir.config_parameter'].sudo()
+            free_threshold = float(IrConfig.get_param('shipping.free_threshold', '150.0'))
+
+            # Récupérer le panier pour vérifier le montant
+            Order = request.env['sale.order'].sudo()
+            domain = [('state', '=', 'draft')]
+
+            if request.session.uid:
+                domain.append(('partner_id', '=', request.session.uid))
+            elif guest_email:
+                partner = request.env['res.partner'].sudo().search([('email', '=', guest_email)], limit=1)
+                if partner:
+                    domain.append(('partner_id', '=', partner.id))
+
+            cart = Order.search(domain, limit=1, order='write_date desc')
+            cart_total = cart.amount_untaxed if cart else 0.0
+
+            # Calcul par zone (prioritaire si state_id fourni)
+            if state_id:
+                State = request.env['res.country.state'].sudo()
+                state = State.browse(state_id)
+
+                if not state.exists():
+                    return {
+                        'success': False,
+                        'error': 'Gouvernorat non trouvé'
+                    }
+
+                zone = state.x_shipping_zone or 'nord'
+                zone_labels = {
+                    'grand-tunis': 'Grand Tunis',
+                    'nord': 'Nord',
+                    'centre': 'Centre',
+                    'sud': 'Sud',
+                }
+                zone_label = zone_labels.get(zone, zone)
+
+                # Récupérer le tarif de la zone
+                shipping_cost = float(IrConfig.get_param(f'shipping.zone.{zone}.price', '9.0'))
+
+                # Vérifier livraison gratuite
+                is_free = False
+                if free_threshold > 0 and cart_total >= free_threshold:
+                    shipping_cost = 0.0
+                    is_free = True
+
+                return {
+                    'success': True,
+                    'shipping_cost': shipping_cost,
+                    'is_free': is_free,
+                    'zone': zone,
+                    'zone_label': zone_label,
+                    'state': {
+                        'id': state.id,
+                        'name': state.name,
+                        'code': state.code,
+                    },
+                    'estimated_days_min': 2 if zone == 'grand-tunis' else 3,
+                    'estimated_days_max': 3 if zone == 'grand-tunis' else 5,
+                    'free_threshold': free_threshold,
+                    'cart_total': cart_total,
+                }
+
+            # Fallback: calcul par delivery_method_id (ancien comportement)
             if not delivery_method_id:
                 return {
                     'success': False,
-                    'error': 'delivery_method_id est requis'
+                    'error': 'state_id ou delivery_method_id requis'
                 }
 
-            # Récupérer la méthode de livraison
             DeliveryCarrier = request.env['delivery.carrier'].sudo()
             carrier = DeliveryCarrier.browse(delivery_method_id)
 
@@ -207,35 +480,10 @@ class QuelyosCheckout(http.Controller):
                     'error': 'Méthode de livraison non trouvée'
                 }
 
-            # Récupérer le panier
-            Order = request.env['sale.order'].sudo()
-            domain = [('state', '=', 'draft')]
-
-            if request.session.uid:
-                domain.append(('partner_id', '=', request.session.uid))
-            elif guest_email:
-                # SUDO justifié : Recherche partner par email pour panier invité.
-                # sudo() nécessaire car pas de session utilisateur (guest checkout).
-                # Sécurité : Email fourni par frontend, filtrage strict après sur partner.id
-                partner = request.env['res.partner'].sudo().search([('email', '=', guest_email)], limit=1)
-                if partner:
-                    domain.append(('partner_id', '=', partner.id))
-
-            cart = Order.search(domain, limit=1, order='write_date desc')
-
-            if not cart:
-                return {
-                    'success': False,
-                    'error': 'Panier non trouvé'
-                }
-
-            # Calculer les frais de livraison
-            # Si le carrier a un prix fixe, l'utiliser
             shipping_cost = carrier.fixed_price
 
-            # Vérifier si livraison gratuite au-dessus d'un seuil
             is_free = False
-            if carrier.free_over and cart.amount_untaxed >= carrier.free_over:
+            if carrier.free_over and cart_total >= carrier.free_over:
                 shipping_cost = 0.0
                 is_free = True
 
@@ -248,8 +496,10 @@ class QuelyosCheckout(http.Controller):
                     'name': carrier.name,
                     'description': carrier.product_id.description_sale or ''
                 },
-                'estimated_days_min': 2,  # À configurer selon le carrier
-                'estimated_days_max': 5
+                'estimated_days_min': 2,
+                'estimated_days_max': 5,
+                'free_threshold': free_threshold,
+                'cart_total': cart_total,
             }
 
         except Exception as e:

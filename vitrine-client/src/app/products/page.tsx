@@ -4,7 +4,7 @@
  */
 
 import { Suspense } from 'react';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import type { ProductFilters } from '@quelyos/types';
 import ProductsClientView from './ProductsClientView';
 import { ProductGridSkeleton } from '@/components/common/Skeleton';
@@ -58,8 +58,8 @@ export default async function ProductsPage({
 
   // Fetch SSR des produits et catégories en parallèle
   const [productsResponse, categoriesResponse] = await Promise.all([
-    odooClient.getProducts(filters),
-    odooClient.getCategories(),
+    backendClient.getProducts(filters),
+    backendClient.getCategories(),
   ]);
 
   const initialProducts = productsResponse.success ? productsResponse.products : [];

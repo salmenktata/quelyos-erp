@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { cmsService } from '@/lib/odoo/cms';
+import { cmsService } from '@/lib/backend/cms';
 import { useAuthStore } from '@/store/authStore';
 import type { Menu, MenuItem } from '@/types/cms';
 import { logger } from '@/lib/logger';

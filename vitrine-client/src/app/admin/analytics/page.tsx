@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { LoadingPage } from '@/components/common/Loading';
 
 interface DashboardData {
@@ -57,7 +57,7 @@ export default function AnalyticsPage() {
       setLoading(true);
       setError(null);
 
-      const response = await odooClient.getAnalyticsDashboard(period);
+      const response = await backendClient.getAnalyticsDashboard(period);
 
       if (response.success && response.data) {
         setData(response.data);

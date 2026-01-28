@@ -3,7 +3,7 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, EnvelopeIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 
 interface CartSaveModalProps {
@@ -41,7 +41,7 @@ export function CartSaveModal({ isOpen, onClose }: CartSaveModalProps) {
     setIsLoading(true);
 
     try {
-      const response = await odooClient.saveCart(email);
+      const response = await backendClient.saveCart(email);
 
       if (response.success) {
         setSuccess(true);

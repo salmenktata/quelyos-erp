@@ -13,7 +13,7 @@ import { CheckoutStepper } from '@/components/checkout/CheckoutStepper';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
 import { PaymentForm, PaymentMethod } from '@/components/checkout/PaymentForm';
 import { LoadingPage } from '@/components/common/Loading';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 
 // Méthodes de paiement disponibles
@@ -93,7 +93,7 @@ export default function CheckoutPaymentPage() {
       const shipping = JSON.parse(shippingData);
 
       // Confirmer la commande via l'API
-      const result = await odooClient.completeCheckout({
+      const result = await backendClient.completeCheckout({
         shipping_address: shipping,
         payment_method: methodId,
       });

@@ -4,7 +4,7 @@
  */
 
 import { Metadata } from 'next';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 
 export interface SeoData {
@@ -29,7 +29,7 @@ export interface SeoData {
  */
 export async function getProductSeoMetadata(productId: number): Promise<Metadata> {
   try {
-    const response = await odooClient.getProductSeoMetadata(productId);
+    const response = await backendClient.getProductSeoMetadata(productId);
 
     if (!response.success || !response.data) {
       return getDefaultMetadata();
@@ -86,7 +86,7 @@ export async function getProductSeoMetadata(productId: number): Promise<Metadata
  */
 export async function getProductStructuredData(productId: number): Promise<string | null> {
   try {
-    const response = await odooClient.getProductSeoMetadata(productId);
+    const response = await backendClient.getProductSeoMetadata(productId);
 
     if (!response.success || !response.data?.structured_data) {
       return null;
@@ -104,7 +104,7 @@ export async function getProductStructuredData(productId: number): Promise<strin
  */
 export async function getBreadcrumbStructuredData(productId: number): Promise<string | null> {
   try {
-    const response = await odooClient.getBreadcrumbsData(productId);
+    const response = await backendClient.getBreadcrumbsData(productId);
 
     if (!response.success || !response.data?.structured_data) {
       return null;
@@ -122,7 +122,7 @@ export async function getBreadcrumbStructuredData(productId: number): Promise<st
  */
 export async function getOrganizationStructuredData(): Promise<string | null> {
   try {
-    const response = await odooClient.getOrganizationSeoData();
+    const response = await backendClient.getOrganizationSeoData();
 
     if (!response.success || !response.data?.structured_data) {
       return null;

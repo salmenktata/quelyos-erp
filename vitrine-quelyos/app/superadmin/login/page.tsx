@@ -86,7 +86,7 @@ function LoginForm() {
   const odooUrl = process.env.NEXT_PUBLIC_ODOO_URL || 'http://localhost:8069';
 
   function handlePasskeyLogin() {
-    // Redirect to Odoo passkey page (same origin as passkey registration)
+    // Redirect to backend passkey page (same origin as passkey registration)
     window.location.href = `${odooUrl}/auth/passkey-page?redirect=/web`;
   }
 
@@ -96,8 +96,8 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      // Use proxy API to authenticate against Odoo (avoids CORS)
-      const response = await fetch('/api/odoo-auth', {
+      // Use proxy API to authenticate against backend (avoids CORS)
+      const response = await fetch('/api/backend-auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ login: email, password }),
@@ -110,10 +110,10 @@ function LoginForm() {
         return;
       }
 
-      // Redirect via SSO endpoint (creates Odoo session and redirects)
+      // Redirect via SSO endpoint (creates Backend session and redirects)
       const odooUrl = data.odooUrl || 'http://localhost:8069';
 
-      // Create form to POST to Odoo SSO endpoint
+      // Create form to POST to backend SSO endpoint
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = `${odooUrl}/api/auth/sso-redirect`;

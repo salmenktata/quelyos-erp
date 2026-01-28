@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 import type { ReorderingRule, CreateReorderingRuleParams, UpdateReorderingRuleParams } from '@/types/stock'
 import { logger } from '@quelyos/logger'
 
@@ -26,7 +26,7 @@ export function useReorderingRules(params?: UseReorderingRulesParams) {
     queryKey: ['stock', 'reordering-rules', params],
     queryFn: async () => {
       try {
-        const response = await odooRpc('/api/ecommerce/stock/reordering-rules', params || {})
+        const response = await backendRpc('/api/ecommerce/stock/reordering-rules', params || {})
 
         if (!response.success) {
           logger.error('[useReorderingRules] API error:', response.error)
@@ -56,7 +56,7 @@ export function useCreateReorderingRule() {
 
   return useMutation({
     mutationFn: async (params: CreateReorderingRuleParams) => {
-      const response = await odooRpc('/api/ecommerce/stock/reordering-rules/create', params)
+      const response = await backendRpc('/api/ecommerce/stock/reordering-rules/create', params)
 
       if (!response.success) {
         throw new Error(response.error || 'Échec de la création de la règle')
@@ -82,7 +82,7 @@ export function useUpdateReorderingRule() {
 
   return useMutation({
     mutationFn: async ({ id, ...params }: UpdateReorderingRuleParams & { id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/stock/reordering-rules/${id}/update`, params)
+      const response = await backendRpc(`/api/ecommerce/stock/reordering-rules/${id}/update`, params)
 
       if (!response.success) {
         throw new Error(response.error || 'Échec de la mise à jour de la règle')
@@ -108,7 +108,7 @@ export function useDeleteReorderingRule() {
 
   return useMutation({
     mutationFn: async (ruleId: number) => {
-      const response = await odooRpc(`/api/ecommerce/stock/reordering-rules/${ruleId}/delete`, {})
+      const response = await backendRpc(`/api/ecommerce/stock/reordering-rules/${ruleId}/delete`, {})
 
       if (!response.success) {
         throw new Error(response.error || 'Échec de la suppression de la règle')
@@ -134,7 +134,7 @@ export function useToggleReorderingRule() {
 
   return useMutation({
     mutationFn: async ({ id, active }: { id: number; active: boolean }) => {
-      const response = await odooRpc(`/api/ecommerce/stock/reordering-rules/${id}/update`, { active })
+      const response = await backendRpc(`/api/ecommerce/stock/reordering-rules/${id}/update`, { active })
 
       if (!response.success) {
         throw new Error(response.error || 'Échec de la modification de la règle')

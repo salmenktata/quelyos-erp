@@ -19,7 +19,7 @@ const FIELD_MAPPINGS: Record<string, string> = {
   outgoing_qty: 'reserved_quantity',
   incoming_qty: 'incoming_quantity',
 
-  // Dates (snake_case Odoo → snake_case standard)
+  // Dates (snake_case backend → snake_case standard)
   create_date: 'created_at',
   write_date: 'updated_at',
 
@@ -70,7 +70,7 @@ function encodeImageUrl(url: string): string {
 function anonymizeImageUrl(value: unknown): unknown {
   if (typeof value !== 'string') return value;
 
-  // Détecter les URLs Odoo
+  // Détecter les URLs backend
   if (value.includes('/web/image')) {
     const encoded = encodeImageUrl(value);
     return `/api/image?id=${encodeURIComponent(encoded)}`;

@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/finance/compat/auth'
 type ModuleId = 'home' | 'finance' | 'store' | 'stock' | 'crm' | 'marketing' | 'hr'
 
 /**
- * Hook pour vérifier les permissions utilisateur basées sur les groupes Odoo.
+ * Hook pour vérifier les permissions utilisateur basées sur les groupes backend.
  *
  * Les groupes sont récupérés depuis l'API backend et stockés dans le profil utilisateur.
  * Chaque module du backoffice nécessite un groupe minimum pour être accessible.

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { useCartStore } from '@/store/cartStore';
 import type { Product } from '@quelyos/types';
 import { formatPrice } from '@/lib/utils/formatting';
@@ -39,7 +39,7 @@ export function BundleSuggestions({ currentProduct, className = '' }: BundleSugg
       setIsLoading(true);
 
       // Récupérer les produits de la même catégorie ou produits liés
-      const response = await odooClient.getProducts({
+      const response = await backendClient.getProducts({
         category_id: currentProduct.category?.id,
         limit: 3,
         offset: 0,

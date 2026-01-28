@@ -120,7 +120,7 @@ export default function ShippingZonesPage() {
         />
         <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4">
           <p className="text-red-800 dark:text-red-200">
-            Erreur lors du chargement des zones. Vérifiez que le module Odoo est à jour.
+            Erreur lors du chargement des zones. Vérifiez la configuration backend.
           </p>
         </div>
       </div>
@@ -257,7 +257,7 @@ export default function ShippingZonesPage() {
         {zones.length === 0 && (
           <div className="p-8 text-center">
             <p className="text-gray-500 dark:text-gray-400">
-              Aucune zone configurée. Exécutez <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">/upgrade-odoo</code> pour initialiser les données.
+              Aucune zone configurée. Contactez l'administrateur système.
             </p>
           </div>
         )}

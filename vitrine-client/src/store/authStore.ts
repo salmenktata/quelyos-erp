@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User } from '@quelyos/types';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 
 interface AuthState {
   user: User | null;
@@ -28,7 +28,7 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.login(email, password);
+          const response = await backendClient.login(email, password);
           if (response.success && response.user) {
             set({
               user: response.user,
@@ -56,7 +56,7 @@ export const useAuthStore = create<AuthState>()(
       logout: async () => {
         set({ isLoading: true });
         try {
-          await odooClient.logout();
+          await backendClient.logout();
           set({
             user: null,
             isAuthenticated: false,
@@ -77,7 +77,7 @@ export const useAuthStore = create<AuthState>()(
       register: async (data: { name: string; email: string; password: string; phone?: string }) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.register(data);
+          const response = await backendClient.register(data);
           if (response.success) {
             // Auto-login après inscription
             const loginSuccess = await get().login(data.email, data.password);
@@ -101,7 +101,7 @@ export const useAuthStore = create<AuthState>()(
       checkSession: async () => {
         set({ isLoading: true });
         try {
-          const response = await odooClient.getSession();
+          const response = await backendClient.getSession();
           if (response.authenticated && response.user) {
             set({
               user: response.user,
@@ -127,10 +127,10 @@ export const useAuthStore = create<AuthState>()(
       updateProfile: async (data: Partial<User>) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.updateProfile(data);
+          const response = await backendClient.updateProfile(data);
           if (response.success) {
             // Rafraîchir le profil
-            const profileResponse = await odooClient.getProfile();
+            const profileResponse = await backendClient.getProfile();
             if (profileResponse.success && profileResponse.profile) {
               set({
                 user: profileResponse.profile,

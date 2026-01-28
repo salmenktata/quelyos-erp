@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 
 export interface MenuItem {
   id: number
@@ -23,7 +23,7 @@ export function useMenus() {
   return useQuery({
     queryKey: ['menus'],
     queryFn: async () => {
-      const response = await odooRpc<{ menus: MenuItem[] }>('/api/ecommerce/menus/list')
+      const response = await backendRpc<{ menus: MenuItem[] }>('/api/ecommerce/menus/list')
       return response
     },
   })
@@ -33,7 +33,7 @@ export function useCreateMenu() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: Partial<MenuItem>) => {
-      const response = await odooRpc('/api/ecommerce/menus/create', data)
+      const response = await backendRpc('/api/ecommerce/menus/create', data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la création')
       }
@@ -49,7 +49,7 @@ export function useUpdateMenu() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: Partial<MenuItem> & { id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/menus/${id}/update`, data)
+      const response = await backendRpc(`/api/ecommerce/menus/${id}/update`, data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la mise à jour')
       }
@@ -65,7 +65,7 @@ export function useDeleteMenu() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await odooRpc(`/api/ecommerce/menus/${id}/delete`)
+      const response = await backendRpc(`/api/ecommerce/menus/${id}/delete`)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la suppression')
       }
@@ -81,7 +81,7 @@ export function useReorderMenus() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (menuIds: number[]) => {
-      const response = await odooRpc('/api/ecommerce/menus/reorder', { menu_ids: menuIds })
+      const response = await backendRpc('/api/ecommerce/menus/reorder', { menu_ids: menuIds })
       if (!response.success) {
         throw new Error(response.error || "Erreur lors de la mise à jour de l'ordre")
       }

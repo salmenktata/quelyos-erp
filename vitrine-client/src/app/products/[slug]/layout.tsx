@@ -4,7 +4,7 @@
  */
 
 import { Metadata } from 'next';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { siteConfig } from '@/lib/config/site';
 import { logger } from '@/lib/logger';
 
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
 
   try {
-    const response = await odooClient.getProductBySlug(slug);
+    const response = await backendClient.getProductBySlug(slug);
 
     if (!response.success || !response.product) {
       return {

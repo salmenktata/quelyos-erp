@@ -24,7 +24,7 @@ export default function ValuationSettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // TODO: Appel API Odoo pour sauvegarder
+      // TODO: Appel API backend pour sauvegarder
       await new Promise((resolve) => setTimeout(resolve, 500));
       toast.success("Configuration de valorisation mise à jour");
     } catch {

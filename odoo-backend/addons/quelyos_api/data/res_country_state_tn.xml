@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            Gouvernorats de Tunisie avec zones de livraison
+            Zones: grand-tunis, nord, centre, sud
+        -->
+
+        <!-- ==================== ZONE GRAND TUNIS ==================== -->
+        <record id="state_tn_tunis" model="res.country.state">
+            <field name="name">Tunis</field>
+            <field name="code">TUN</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">grand-tunis</field>
+        </record>
+
+        <record id="state_tn_ariana" model="res.country.state">
+            <field name="name">Ariana</field>
+            <field name="code">ARI</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">grand-tunis</field>
+        </record>
+
+        <record id="state_tn_ben_arous" model="res.country.state">
+            <field name="name">Ben Arous</field>
+            <field name="code">BEN</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">grand-tunis</field>
+        </record>
+
+        <record id="state_tn_manouba" model="res.country.state">
+            <field name="name">Manouba</field>
+            <field name="code">MAN</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">grand-tunis</field>
+        </record>
+
+        <!-- ==================== ZONE NORD ==================== -->
+        <record id="state_tn_nabeul" model="res.country.state">
+            <field name="name">Nabeul</field>
+            <field name="code">NAB</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">nord</field>
+        </record>
+
+        <record id="state_tn_zaghouan" model="res.country.state">
+            <field name="name">Zaghouan</field>
+            <field name="code">ZAG</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">nord</field>
+        </record>
+
+        <record id="state_tn_bizerte" model="res.country.state">
+            <field name="name">Bizerte</field>
+            <field name="code">BIZ</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">nord</field>
+        </record>
+
+        <record id="state_tn_beja" model="res.country.state">
+            <field name="name">Beja</field>
+            <field name="code">BEJ</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">nord</field>
+        </record>
+
+        <record id="state_tn_jendouba" model="res.country.state">
+            <field name="name">Jendouba</field>
+            <field name="code">JEN</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">nord</field>
+        </record>
+
+        <record id="state_tn_kef" model="res.country.state">
+            <field name="name">Le Kef</field>
+            <field name="code">KEF</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">nord</field>
+        </record>
+
+        <record id="state_tn_siliana" model="res.country.state">
+            <field name="name">Siliana</field>
+            <field name="code">SIL</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">nord</field>
+        </record>
+
+        <!-- ==================== ZONE CENTRE ==================== -->
+        <record id="state_tn_sousse" model="res.country.state">
+            <field name="name">Sousse</field>
+            <field name="code">SOU</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">centre</field>
+        </record>
+
+        <record id="state_tn_monastir" model="res.country.state">
+            <field name="name">Monastir</field>
+            <field name="code">MON</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">centre</field>
+        </record>
+
+        <record id="state_tn_mahdia" model="res.country.state">
+            <field name="name">Mahdia</field>
+            <field name="code">MAH</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">centre</field>
+        </record>
+
+        <record id="state_tn_sfax" model="res.country.state">
+            <field name="name">Sfax</field>
+            <field name="code">SFA</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">centre</field>
+        </record>
+
+        <record id="state_tn_kairouan" model="res.country.state">
+            <field name="name">Kairouan</field>
+            <field name="code">KAI</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">centre</field>
+        </record>
+
+        <record id="state_tn_kasserine" model="res.country.state">
+            <field name="name">Kasserine</field>
+            <field name="code">KAS</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">centre</field>
+        </record>
+
+        <record id="state_tn_sidi_bouzid" model="res.country.state">
+            <field name="name">Sidi Bouzid</field>
+            <field name="code">SID</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">centre</field>
+        </record>
+
+        <!-- ==================== ZONE SUD ==================== -->
+        <record id="state_tn_gabes" model="res.country.state">
+            <field name="name">Gabes</field>
+            <field name="code">GAB</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">sud</field>
+        </record>
+
+        <record id="state_tn_medenine" model="res.country.state">
+            <field name="name">Medenine</field>
+            <field name="code">MED</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">sud</field>
+        </record>
+
+        <record id="state_tn_tataouine" model="res.country.state">
+            <field name="name">Tataouine</field>
+            <field name="code">TAT</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">sud</field>
+        </record>
+
+        <record id="state_tn_gafsa" model="res.country.state">
+            <field name="name">Gafsa</field>
+            <field name="code">GAF</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">sud</field>
+        </record>
+
+        <record id="state_tn_tozeur" model="res.country.state">
+            <field name="name">Tozeur</field>
+            <field name="code">TOZ</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">sud</field>
+        </record>
+
+        <record id="state_tn_kebili" model="res.country.state">
+            <field name="name">Kebili</field>
+            <field name="code">KEB</field>
+            <field name="country_id" ref="base.tn"/>
+            <field name="x_shipping_zone">sud</field>
+        </record>
+
+        <!-- ==================== TARIFS PAR ZONE (ir.config_parameter) ==================== -->
+        <record id="config_shipping_zone_grand_tunis" model="ir.config_parameter">
+            <field name="key">shipping.zone.grand-tunis.price</field>
+            <field name="value">7.0</field>
+        </record>
+
+        <record id="config_shipping_zone_nord" model="ir.config_parameter">
+            <field name="key">shipping.zone.nord.price</field>
+            <field name="value">9.0</field>
+        </record>
+
+        <record id="config_shipping_zone_centre" model="ir.config_parameter">
+            <field name="key">shipping.zone.centre.price</field>
+            <field name="value">9.0</field>
+        </record>
+
+        <record id="config_shipping_zone_sud" model="ir.config_parameter">
+            <field name="key">shipping.zone.sud.price</field>
+            <field name="value">12.0</field>
+        </record>
+
+        <record id="config_shipping_free_threshold" model="ir.config_parameter">
+            <field name="key">shipping.free_threshold</field>
+            <field name="value">150.0</field>
+        </record>
+
+    </data>
+</odoo>

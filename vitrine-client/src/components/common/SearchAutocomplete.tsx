@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { useSearchHistoryStore } from '@/store/searchHistoryStore';
 import { logger } from '@/lib/logger';
 import { sanitizeHighlight } from '@/lib/utils/sanitize';
@@ -90,7 +90,7 @@ export function SearchAutocomplete({
   useEffect(() => {
     const fetchPopular = async () => {
       try {
-        const response = await odooClient.getPopularSearches(5) as any;
+        const response = await backendClient.getPopularSearches(5) as any;
         // Backend returns popular_searches at root level or in data
         const popularSearches = response.popular_searches || response.data?.popular_searches;
         if (response.success && popularSearches) {
@@ -122,7 +122,7 @@ export function SearchAutocomplete({
     setShowHistory(false);
 
     try {
-      const response = await odooClient.searchAutocomplete(searchQuery, 8, true) as any;
+      const response = await backendClient.searchAutocomplete(searchQuery, 8, true) as any;
 
       if (response.success) {
         // Backend returns products/categories at root level, not in data

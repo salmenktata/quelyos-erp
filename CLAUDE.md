@@ -116,9 +116,9 @@ Voir `.claude/reference/` pour conventions TS/Python, anti-patterns, UX/UI, pari
 Alerter AVANT : schéma DB, modèles Odoo, endpoints API
 
 ## 🔒 ANONYMISATION ODOO - RÈGLES STRICTES
-**Objectif** : Masquer toute trace d'Odoo dans le frontend public (vitrine-client)
+**Objectif** : Masquer toute trace d'Odoo dans TOUS les frontends (vitrine-client ET dashboard-client)
 
-### Champs API (vitrine-client uniquement)
+### Champs API
 **TOUJOURS utiliser les noms standards** :
 | Interdit (Odoo) | → Utiliser (Standard) |
 |-----------------|----------------------|
@@ -138,7 +138,7 @@ Alerter AVANT : schéma DB, modèles Odoo, endpoints API
 - ✅ Utiliser `getProxiedImageUrl(url)` pour toutes images backend
 
 ### Variables/Classes
-**Dans vitrine-client** :
+**Dans tous les clients** :
 - ❌ `OdooClient` → ✅ `BackendClient`
 - ❌ `ODOO_URL` → ✅ `BACKEND_URL`
 - ❌ `getOdooImageUrl` → ✅ `getBackendImageUrl`
@@ -147,7 +147,7 @@ Alerter AVANT : schéma DB, modèles Odoo, endpoints API
 - ❌ `"Odoo returned error"` → ✅ `"Backend error"`
 
 ### Jargon Odoo (termes révélateurs)
-**Termes interdits dans vitrine-client** :
+**Termes interdits dans TOUS les clients** :
 | Interdit | → Utiliser |
 |----------|-----------|
 | `OCA` | `communauté open-source` |
@@ -160,9 +160,7 @@ Alerter AVANT : schéma DB, modèles Odoo, endpoints API
 | `Werkzeug` | (supprimer) |
 
 ### Vérification
-Lancer `/no-odoo` avant chaque commit pour vérifier conformité.
-
-**Note** : Le dashboard-client (admin interne) n'est PAS concerné par ces règles.
+Lancer `/no-odoo` avant chaque commit pour vérifier conformité dans vitrine-client ET dashboard-client.
 
 ## Commandes disponibles
 **DevOps** : `/ship`, `/deploy`, `/test`, `/security`, `/perf`, `/db-sync`

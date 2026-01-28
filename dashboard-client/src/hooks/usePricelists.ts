@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { odooRpc } from '../lib/odoo-rpc';
+import { backendRpc } from '../lib/backend-rpc';
 
 export interface Pricelist {
   id: number;
@@ -39,7 +39,7 @@ export function usePricelists(params: PricelistsParams = {}) {
   return useQuery({
     queryKey: ['pricelists', params],
     queryFn: async () => {
-      const response = await odooRpc<{ data: Pricelist[]; total: number }>('/api/ecommerce/pricelists', params);
+      const response = await backendRpc<{ data: Pricelist[]; total: number }>('/api/ecommerce/pricelists', params);
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch pricelists');
       }
@@ -53,7 +53,7 @@ export function usePricelistDetail(pricelistId: number) {
   return useQuery({
     queryKey: ['pricelist', pricelistId],
     queryFn: async () => {
-      const response = await odooRpc(`/api/ecommerce/pricelists/${pricelistId}`, {});
+      const response = await backendRpc(`/api/ecommerce/pricelists/${pricelistId}`, {});
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch pricelist detail');
       }
@@ -68,7 +68,7 @@ export function useAssignPricelistToCustomer() {
 
   return useMutation({
     mutationFn: async ({ customerId, pricelistId }: { customerId: number; pricelistId: number }) => {
-      const response = await odooRpc(`/api/ecommerce/customers/${customerId}/assign-pricelist`, {
+      const response = await backendRpc(`/api/ecommerce/customers/${customerId}/assign-pricelist`, {
         pricelist_id: pricelistId,
       });
       if (!response.success) {
@@ -94,7 +94,7 @@ export function useCreatePricelist() {
 
   return useMutation({
     mutationFn: async (params: CreatePricelistParams) => {
-      const response = await odooRpc('/api/ecommerce/pricelists/create', params);
+      const response = await backendRpc('/api/ecommerce/pricelists/create', params);
       if (!response.success) {
         throw new Error(response.error || 'Failed to create pricelist');
       }
@@ -118,7 +118,7 @@ export function useUpdatePricelist() {
 
   return useMutation({
     mutationFn: async ({ pricelistId, params }: { pricelistId: number; params: UpdatePricelistParams }) => {
-      const response = await odooRpc(`/api/ecommerce/pricelists/${pricelistId}/update`, params);
+      const response = await backendRpc(`/api/ecommerce/pricelists/${pricelistId}/update`, params);
       if (!response.success) {
         throw new Error(response.error || 'Failed to update pricelist');
       }
@@ -149,7 +149,7 @@ export function useCreatePricelistItem() {
 
   return useMutation({
     mutationFn: async ({ pricelistId, params }: { pricelistId: number; params: CreatePricelistItemParams }) => {
-      const response = await odooRpc(`/api/ecommerce/pricelists/${pricelistId}/items/create`, params);
+      const response = await backendRpc(`/api/ecommerce/pricelists/${pricelistId}/items/create`, params);
       if (!response.success) {
         throw new Error(response.error || 'Failed to create pricelist item');
       }
@@ -166,7 +166,7 @@ export function useDeletePricelist() {
 
   return useMutation({
     mutationFn: async (pricelistId: number) => {
-      const response = await odooRpc(`/api/ecommerce/pricelists/${pricelistId}/delete`, {});
+      const response = await backendRpc(`/api/ecommerce/pricelists/${pricelistId}/delete`, {});
       if (!response.success) {
         throw new Error(response.error || 'Failed to delete pricelist');
       }
@@ -204,7 +204,7 @@ export function useUpdatePricelistItem() {
       itemId: number;
       params: UpdatePricelistItemParams;
     }) => {
-      const response = await odooRpc(`/api/ecommerce/pricelists/${pricelistId}/items/${itemId}/update`, params);
+      const response = await backendRpc(`/api/ecommerce/pricelists/${pricelistId}/items/${itemId}/update`, params);
       if (!response.success) {
         throw new Error(response.error || 'Failed to update pricelist item');
       }
@@ -221,7 +221,7 @@ export function useDeletePricelistItem() {
 
   return useMutation({
     mutationFn: async ({ pricelistId, itemId }: { pricelistId: number; itemId: number }) => {
-      const response = await odooRpc(`/api/ecommerce/pricelists/${pricelistId}/items/${itemId}/delete`, {});
+      const response = await backendRpc(`/api/ecommerce/pricelists/${pricelistId}/items/${itemId}/delete`, {});
       if (!response.success) {
         throw new Error(response.error || 'Failed to delete pricelist item');
       }

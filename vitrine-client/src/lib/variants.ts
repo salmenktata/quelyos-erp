@@ -4,7 +4,7 @@
  */
 
 import { VariantsResponse } from '@quelyos/types';
-import { odooClient } from './odoo/client';
+import { backendClient } from './backend/client';
 import { logger } from '@/lib/logger';
 
 // Cache globale avec TTL 5 minutes
@@ -28,7 +28,7 @@ export async function fetchVariantsLazy(productId: number): Promise<VariantsResp
     }
 
     // Fetch depuis l'API
-    const response = await odooClient.getProductVariants(productId);
+    const response = await backendClient.getProductVariants(productId);
 
     // Stocker en cache si succès
     if (response.success) {

@@ -6,6 +6,12 @@ export interface SMSConfig {
   senderName: string;
   endpoint: string;
   isActive: boolean;
+  storeEnabled: boolean;
+  financeEnabled: boolean;
+  marketingEnabled: boolean;
+  crmEnabled: boolean;
+  hrEnabled: boolean;
+  stockEnabled: boolean;
 }
 
 export interface SMSPreferences {
@@ -51,8 +57,6 @@ export function useSMSConfig() {
       }
       return response.data.config;
     },
-    // Désactiver temporairement jusqu'à ce que l'API soit prête
-    enabled: false,
   });
 }
 
@@ -83,7 +87,6 @@ export function useSMSPreferences() {
       }
       return response.data.preferences;
     },
-    enabled: false,
   });
 }
 
@@ -126,7 +129,6 @@ export function useSMSHistory() {
       }
       return response.data.logs;
     },
-    enabled: false,
     refetchInterval: 30000, // Refresh every 30s
   });
 }
@@ -141,6 +143,5 @@ export function useSMSQuota() {
       }
       return response.data.quota;
     },
-    enabled: false,
   });
 }

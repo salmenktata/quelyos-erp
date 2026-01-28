@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/common';
 import { PayPalButton } from './PayPalButton';
+import { TunisianPaymentGateway } from './TunisianPaymentGateway';
 import { logger } from '@/lib/logger';
 
 // Lazy load Stripe (chargé uniquement si paiement carte sélectionné)
@@ -26,6 +27,8 @@ export interface PaymentMethod {
   name: string;
   description: string;
   icon: string;
+  code?: string; // Provider code (stripe, flouci, konnect)
+  providerId?: number; // Backend provider ID
 }
 
 interface PaymentFormProps {
@@ -33,8 +36,14 @@ interface PaymentFormProps {
   onSubmit: (methodId: string) => void;
   onBack: () => void;
   isLoading?: boolean;
-  orderId?: number;  // For PayPal
-  orderAmount?: number;  // For PayPal
+  orderId?: number;
+  orderAmount?: number;
+  customerData?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+  };
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({
@@ -44,8 +53,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   isLoading = false,
   orderId,
   orderAmount,
+  customerData,
 }) => {
   const [selectedMethod, setSelectedMethod] = useState<string>(methods[0]?.id || '');
+
+  // Find selected method details
+  const selectedMethodData = methods.find(m => m.id === selectedMethod);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +74,14 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
           </svg>
+        );
+      case 'flouci':
+        return (
+          <div className="text-4xl">📱</div>
+        );
+      case 'konnect':
+        return (
+          <div className="text-4xl">🔗</div>
         );
       case 'paypal':
         return (
@@ -136,8 +157,20 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         </div>
       </div>
 
-      {/* Stripe Card Payment (if Card is selected) */}
-      {selectedMethod === 'card' && orderAmount && orderId ? (
+      {/* Tunisian Payment Gateway (Flouci, Konnect) */}
+      {selectedMethodData?.code && ['flouci', 'konnect'].includes(selectedMethodData.code) &&
+       orderAmount && orderId && customerData && selectedMethodData.providerId ? (
+        <TunisianPaymentGateway
+          providerId={selectedMethodData.providerId}
+          providerCode={selectedMethodData.code as 'flouci' | 'konnect'}
+          providerName={selectedMethodData.name}
+          orderAmount={orderAmount}
+          orderId={orderId}
+          customerData={customerData}
+          onBack={onBack}
+        />
+      ) : selectedMethod === 'card' && orderAmount && orderId ? (
+        /* Stripe Card Payment (if Card is selected) */
         <StripePaymentForm
           orderAmount={orderAmount}
           orderId={orderId}

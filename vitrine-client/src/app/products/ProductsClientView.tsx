@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import type { Product, ProductFilters, Category } from '@quelyos/types';
 import { ProductGridSkeleton } from '@/components/common/Skeleton';
 import { FilterDrawer } from '@/components/product/FilterDrawer';
@@ -70,7 +70,7 @@ export default function ProductsClientView({
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const response = await odooClient.getProducts(filters);
+        const response = await backendClient.getProducts(filters);
         if (response.success) {
           setProducts(response.products);
           setTotal(response.total);

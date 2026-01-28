@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 
 export interface PromoMessage {
   id: number
@@ -14,7 +14,7 @@ export function usePromoMessages() {
   return useQuery({
     queryKey: ['promoMessages'],
     queryFn: async () => {
-      const response = await odooRpc<{ messages: PromoMessage[] }>('/api/ecommerce/promo-messages')
+      const response = await backendRpc<{ messages: PromoMessage[] }>('/api/ecommerce/promo-messages')
       return response.data?.messages || []
     },
   })
@@ -24,7 +24,7 @@ export function useCreatePromoMessage() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: Partial<PromoMessage>) => {
-      const response = await odooRpc('/api/ecommerce/promo-messages/create', data)
+      const response = await backendRpc('/api/ecommerce/promo-messages/create', data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la création')
       }
@@ -38,7 +38,7 @@ export function useUpdatePromoMessage() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: Partial<PromoMessage> & { id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/promo-messages/${id}/update`, data)
+      const response = await backendRpc(`/api/ecommerce/promo-messages/${id}/update`, data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la mise à jour')
       }
@@ -52,7 +52,7 @@ export function useDeletePromoMessage() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await odooRpc(`/api/ecommerce/promo-messages/${id}/delete`)
+      const response = await backendRpc(`/api/ecommerce/promo-messages/${id}/delete`)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la suppression')
       }
@@ -66,7 +66,7 @@ export function useReorderPromoMessages() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (messageIds: number[]) => {
-      const response = await odooRpc('/api/ecommerce/promo-messages/reorder', { message_ids: messageIds })
+      const response = await backendRpc('/api/ecommerce/promo-messages/reorder', { message_ids: messageIds })
       if (!response.success) {
         throw new Error(response.error || "Erreur lors de la mise à jour de l'ordre")
       }

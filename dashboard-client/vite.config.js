@@ -23,14 +23,17 @@ export default defineConfig({
                 target: 'http://localhost:8069',
                 changeOrigin: true,
                 secure: false,
-                // Ne pas transmettre les cookies pour éviter les erreurs Odoo avec sessions invalides
                 cookieDomainRewrite: '',
                 configure: function (proxy) {
                     proxy.on('proxyReq', function (proxyReq) {
-                        // Supprimer les cookies invalides pour éviter Access Denied Odoo
                         proxyReq.removeHeader('cookie');
                     });
                 },
+            },
+            '/api/admin': {
+                target: 'http://localhost:8069',
+                changeOrigin: true,
+                secure: false,
             },
             '/api/finance': {
                 target: 'http://localhost:3004',

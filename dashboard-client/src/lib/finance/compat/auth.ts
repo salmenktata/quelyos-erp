@@ -10,7 +10,7 @@ export interface User {
   name: string
   email: string
   role?: string
-  groups: string[] // Groupes de sécurité Odoo (ex: ['Quelyos Stock User', ...])
+  groups: string[] // Groupes de sécurité backend (ex: ['Quelyos Stock User', ...])
 }
 
 export interface AuthContextType {

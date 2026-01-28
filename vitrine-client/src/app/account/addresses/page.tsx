@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import type { Address } from '@quelyos/types';
 import { logger } from '@/lib/logger';
 
@@ -29,7 +29,7 @@ export default function AccountAddressesPage() {
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        const result = await odooClient.getAddresses();
+        const result = await backendClient.getAddresses();
         if (result.success && result.addresses) {
           setAddresses(result.addresses);
         }

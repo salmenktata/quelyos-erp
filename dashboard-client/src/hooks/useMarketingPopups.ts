@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 
 export interface MarketingPopup {
   id: number
@@ -40,7 +40,7 @@ export function useMarketingPopups() {
   return useQuery({
     queryKey: ['marketingPopups'],
     queryFn: async () => {
-      const response = await odooRpc<{ popups: MarketingPopup[] }>('/api/ecommerce/popups')
+      const response = await backendRpc<{ popups: MarketingPopup[] }>('/api/ecommerce/popups')
       return response.data?.popups || []
     },
   })
@@ -50,7 +50,7 @@ export function useCreateMarketingPopup() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: Partial<MarketingPopup>) => {
-      const response = await odooRpc('/api/ecommerce/popups/create', data)
+      const response = await backendRpc('/api/ecommerce/popups/create', data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la création')
       }
@@ -64,7 +64,7 @@ export function useUpdateMarketingPopup() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: Partial<MarketingPopup> & { id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/popups/${id}/update`, data)
+      const response = await backendRpc(`/api/ecommerce/popups/${id}/update`, data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la mise à jour')
       }
@@ -78,7 +78,7 @@ export function useDeleteMarketingPopup() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await odooRpc(`/api/ecommerce/popups/${id}/delete`)
+      const response = await backendRpc(`/api/ecommerce/popups/${id}/delete`)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la suppression')
       }

@@ -1,7 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/common';
+import { GovernorateSelect } from './GovernorateSelect';
+import {
+  GOVERNORATES,
+  SHIPPING_ZONES,
+  getDefaultShippingPrice,
+  type ShippingZone,
+} from '@/data/tunisia-governorates';
 
 interface ShippingFormData {
   firstName: string;
@@ -12,21 +19,28 @@ interface ShippingFormData {
   city: string;
   postalCode: string;
   country: string;
+  governorate: string;
   shippingMethod: 'standard' | 'express';
 }
 
 interface ShippingFormProps {
   initialData?: Partial<ShippingFormData>;
-  onSubmit: (data: ShippingFormData) => Promise<void>;
+  onSubmit: (data: ShippingFormData, shippingCost: number) => Promise<void>;
   onBack: () => void;
   isLoading?: boolean;
+  cartTotal?: number;
+  freeThreshold?: number;
+  zonePrices?: Record<ShippingZone, number>;
 }
 
 const ShippingForm: React.FC<ShippingFormProps> = ({
   initialData = {},
   onSubmit,
   onBack,
-  isLoading = false
+  isLoading = false,
+  cartTotal = 0,
+  freeThreshold = 150,
+  zonePrices,
 }) => {
   const [data, setData] = useState<ShippingFormData>({
     firstName: initialData.firstName || '',
@@ -37,10 +51,23 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
     city: initialData.city || '',
     postalCode: initialData.postalCode || '',
     country: initialData.country || 'TN',
+    governorate: initialData.governorate || '',
     shippingMethod: initialData.shippingMethod || 'standard',
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof ShippingFormData, string>>>({});
+
+  const selectedGovernorate = useMemo(
+    () => GOVERNORATES.find((g) => g.code === data.governorate),
+    [data.governorate]
+  );
+
+  const shippingCost = useMemo(() => {
+    if (!selectedGovernorate) return 0;
+    const basePrice = zonePrices?.[selectedGovernorate.zone] ?? getDefaultShippingPrice(selectedGovernorate.zone);
+    if (freeThreshold > 0 && cartTotal >= freeThreshold) return 0;
+    return basePrice;
+  }, [selectedGovernorate, zonePrices, cartTotal, freeThreshold]);
 
   const handleChange = (field: keyof ShippingFormData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -63,9 +90,9 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
     }
     if (!data.phone.trim()) newErrors.phone = 'Téléphone requis';
     if (!data.address.trim()) newErrors.address = 'Adresse requise';
-    if (!data.city.trim()) newErrors.city = 'Ville requise';
+    if (!data.city.trim()) newErrors.city = 'Ville/Delegation requise';
     if (!data.postalCode.trim()) newErrors.postalCode = 'Code postal requis';
-    if (!data.country) newErrors.country = 'Pays requis';
+    if (!data.governorate) newErrors.governorate = 'Gouvernorat requis';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -78,14 +105,21 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
       return;
     }
 
-    await onSubmit(data);
+    await onSubmit(data, shippingCost);
+  };
+
+  const handleGovernorateChange = (code: string) => {
+    setData((prev) => ({ ...prev, governorate: code }));
+    if (errors.governorate) {
+      setErrors((prev) => ({ ...prev, governorate: undefined }));
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Personal Information */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Informations personnelles
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -132,10 +166,20 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
 
       {/* Shipping Address */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Adresse de livraison
         </h3>
         <div className="space-y-4">
+          <GovernorateSelect
+            value={data.governorate}
+            onChange={handleGovernorateChange}
+            zonePrices={zonePrices}
+            freeThreshold={freeThreshold}
+            cartTotal={cartTotal}
+            error={errors.governorate}
+            disabled={isLoading}
+          />
+
           <Input
             label="Adresse complète *"
             type="text"
@@ -145,14 +189,15 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
             placeholder="Numéro, rue, appartement..."
             required
           />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Ville *"
+              label="Ville / Délégation *"
               type="text"
               value={data.city}
               onChange={handleChange('city')}
               error={errors.city}
-              placeholder="Ville"
+              placeholder="Ville ou délégation"
               required
             />
             <Input
@@ -164,113 +209,57 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
               placeholder="XXXX"
               required
             />
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Pays *
-              </label>
-              <select
-                value={data.country}
-                onChange={handleChange('country')}
-                className={`
-                  w-full px-4 py-2 border rounded-lg text-gray-900
-                  focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent
-                  ${errors.country ? 'border-red-500' : 'border-gray-300'}
-                `}
-                required
-              >
-                <option value="">Sélectionner</option>
-                <option value="TN">Tunisie</option>
-                <option value="FR">France</option>
-                <option value="DZ">Algérie</option>
-                <option value="MA">Maroc</option>
-              </select>
-              {errors.country && (
-                <p className="mt-1 text-sm text-red-600">{errors.country}</p>
-              )}
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Shipping Method */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Mode de livraison
-        </h3>
-        <div className="space-y-3">
-          <label
-            className={`
-              flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all
-              ${
-                data.shippingMethod === 'standard'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-gray-200 hover:border-gray-300'
-              }
-            `}
-          >
-            <input
-              type="radio"
-              name="shippingMethod"
-              value="standard"
-              checked={data.shippingMethod === 'standard'}
-              onChange={handleChange('shippingMethod')}
-              className="mt-1 text-primary focus:ring-ring"
-            />
-            <div className="ml-3 flex-1">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-gray-900">Livraison Standard</span>
-                <span className="font-bold text-green-600">Gratuite</span>
+      {/* Shipping Summary */}
+      {selectedGovernorate && (
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Récapitulatif livraison
+          </h3>
+          <div className="p-4 rounded-lg border-2 border-primary bg-primary/5 dark:bg-primary/10">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">
+                  Livraison vers {selectedGovernorate.name}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Zone: {SHIPPING_ZONES.find((z) => z.code === selectedGovernorate.zone)?.label || selectedGovernorate.zone}
+                  {' - '}
+                  Délai: {selectedGovernorate.zone === 'grand-tunis' ? '2-3' : '3-5'} jours ouvrés
+                </p>
               </div>
-              <p className="text-sm text-gray-600 mt-1">
-                Délai: 2-3 jours ouvrés
-              </p>
-            </div>
-          </label>
-
-          <label
-            className={`
-              flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all
-              ${
-                data.shippingMethod === 'express'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-gray-200 hover:border-gray-300'
-              }
-            `}
-          >
-            <input
-              type="radio"
-              name="shippingMethod"
-              value="express"
-              checked={data.shippingMethod === 'express'}
-              onChange={handleChange('shippingMethod')}
-              className="mt-1 text-primary focus:ring-ring"
-            />
-            <div className="ml-3 flex-1">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-gray-900">Livraison Express</span>
-                <span className="font-bold text-gray-900">15 DT</span>
+              <div className="text-right">
+                {shippingCost === 0 ? (
+                  <span className="font-bold text-green-600 dark:text-green-400 text-lg">
+                    Gratuit
+                  </span>
+                ) : (
+                  <span className="font-bold text-gray-900 dark:text-white text-lg">
+                    {shippingCost.toFixed(2)} TND
+                  </span>
+                )}
               </div>
-              <p className="text-sm text-gray-600 mt-1">
-                Délai: 24-48 heures
-              </p>
             </div>
-          </label>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t">
+      <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
         <button
           type="button"
           onClick={onBack}
           disabled={isLoading}
-          className="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Retour au panier
         </button>
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !data.governorate}
           className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
           {isLoading ? (

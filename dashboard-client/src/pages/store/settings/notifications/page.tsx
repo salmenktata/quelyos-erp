@@ -1,30 +1,19 @@
-import { useState } from "react";
 import { Breadcrumbs } from "@/components/common";
-import { Button } from "@/components/common/Button";
 import { useToast } from "@/contexts/ToastContext";
 import {
   Mail,
   MessageSquare,
-  Send,
-  Eye,
-  EyeOff,
-  Loader2,
-  Check,
   Clock,
   ShoppingCart,
   Package,
   Truck,
-  TrendingUp,
-  AlertCircle,
+  Settings,
+  ExternalLink,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
-  useSMSConfig,
-  useUpdateSMSConfig,
   useSMSPreferences,
   useUpdateSMSPreferences,
-  useSendTestSMS,
-  useSMSHistory,
-  useSMSQuota,
 } from "@/hooks/useSMSConfig";
 
 const NOTIFICATION_TYPES = [
@@ -51,34 +40,11 @@ const NOTIFICATION_TYPES = [
   },
 ];
 
-const SMS_STATUS_LABELS = {
-  pending: { label: "En attente", color: "text-yellow-600 dark:text-yellow-400" },
-  sent: { label: "Envoyé", color: "text-blue-600 dark:text-blue-400" },
-  delivered: { label: "Délivré", color: "text-green-600 dark:text-green-400" },
-  failed: { label: "Échec", color: "text-red-600 dark:text-red-400" },
-  fallback_email: { label: "Fallback email", color: "text-purple-600 dark:text-purple-400" },
-};
-
 export default function NotificationsPage() {
   const toast = useToast();
-
-  // SMS Config hooks (will be enabled when backend is ready)
-  const { data: smsConfig } = useSMSConfig();
   const { data: preferences } = useSMSPreferences();
-  const { data: history } = useSMSHistory();
-  const { data: quota } = useSMSQuota();
-
-  const updateSMSConfigMutation = useUpdateSMSConfig();
   const updatePreferencesMutation = useUpdateSMSPreferences();
-  const sendTestSMSMutation = useSendTestSMS();
 
-  const [showApiKey, setShowApiKey] = useState(false);
-  const [smsApiKey, setSmsApiKey] = useState("");
-  const [smsSenderName, setSmsSenderName] = useState("");
-  const [testMobile, setTestMobile] = useState("");
-  const [testMessage, setTestMessage] = useState("");
-
-  // Temporary mock data until backend is ready
   const mockPreferences = preferences || {
     abandonedCartEmailEnabled: true,
     abandonedCartSmsEnabled: false,
@@ -87,45 +53,6 @@ export default function NotificationsPage() {
     orderConfirmationSmsEnabled: false,
     shippingUpdateEmailEnabled: true,
     shippingUpdateSmsEnabled: false,
-  };
-
-  const mockQuota = quota || {
-    used: 234,
-    total: 1000,
-    period: "month",
-  };
-
-  const quotaPercentage = (mockQuota.used / mockQuota.total) * 100;
-
-  const handleSaveSMSConfig = async () => {
-    try {
-      await updateSMSConfigMutation.mutateAsync({
-        apiKey: smsApiKey,
-        senderName: smsSenderName,
-      });
-      toast.success("Configuration SMS enregistrée");
-    } catch (error) {
-      toast.error(`Erreur: ${error}`);
-    }
-  };
-
-  const handleSendTestSMS = async () => {
-    if (!testMobile || !testMessage) {
-      toast.error("Veuillez remplir tous les champs");
-      return;
-    }
-
-    try {
-      await sendTestSMSMutation.mutateAsync({
-        mobile: testMobile,
-        message: testMessage,
-      });
-      toast.success("SMS de test envoyé avec succès");
-      setTestMobile("");
-      setTestMessage("");
-    } catch (error) {
-      toast.error(`Erreur lors de l'envoi: ${error}`);
-    }
   };
 
   const handleTogglePreference = async (key: string, value: boolean | number) => {
@@ -150,96 +77,44 @@ export default function NotificationsPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Notifications
+            Notifications Store
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Configurez les notifications par email et SMS pour vos clients
+            Configurez les événements qui déclenchent des notifications clients
           </p>
         </div>
 
-        {/* SMS Configuration Section */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-6">
-          <div className="flex items-center space-x-3">
-            <MessageSquare className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Configuration SMS
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Paramètres API Tunisie SMS
+        {/* Link to global settings */}
+        <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
+          <div className="flex items-start space-x-3">
+            <Settings className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-indigo-900 dark:text-indigo-100">
+                Configuration globale
+              </h3>
+              <p className="text-sm text-indigo-700 dark:text-indigo-300 mt-1">
+                Les paramètres de connexion Email et SMS se trouvent dans les Paramètres Généraux.
               </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* API Key */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                API Key *
-              </label>
-              <div className="relative">
-                <input
-                  type={showApiKey ? "text" : "password"}
-                  value={smsApiKey}
-                  onChange={(e) => setSmsApiKey(e.target.value)}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                  placeholder="Entrez votre API Key"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowApiKey(!showApiKey)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              <div className="flex space-x-4 mt-3">
+                <Link
+                  to="/settings/email"
+                  className="inline-flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
                 >
-                  {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+                  <Mail className="w-4 h-4 mr-1.5" />
+                  Config Email
+                  <ExternalLink className="w-3 h-3 ml-1" />
+                </Link>
+                <Link
+                  to="/settings/sms"
+                  className="inline-flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                >
+                  <MessageSquare className="w-4 h-4 mr-1.5" />
+                  Config SMS
+                  <ExternalLink className="w-3 h-3 ml-1" />
+                </Link>
               </div>
             </div>
-
-            {/* Sender Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Nom de l'expéditeur (max 11 caractères)
-              </label>
-              <input
-                type="text"
-                value={smsSenderName}
-                onChange={(e) => setSmsSenderName(e.target.value.slice(0, 11))}
-                maxLength={11}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                placeholder="Quelyos"
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {smsSenderName.length}/11 caractères
-              </p>
-            </div>
           </div>
-
-          {/* Endpoint (read-only) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Endpoint API
-            </label>
-            <input
-              type="text"
-              value="https://api.tunisiesms.tn/api/v1/send"
-              readOnly
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400"
-            />
-          </div>
-
-          <Button onClick={handleSaveSMSConfig} disabled={updateSMSConfigMutation.isPending}>
-            {updateSMSConfigMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Enregistrement...
-              </>
-            ) : (
-              <>
-                <Check className="w-4 h-4 mr-2" />
-                Enregistrer la configuration
-              </>
-            )}
-          </Button>
         </div>
 
         {/* Notification Preferences */}
@@ -248,10 +123,10 @@ export default function NotificationsPage() {
             <Mail className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Préférences par type de notification
+                Préférences par événement
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Activez les canaux de notification pour chaque type d'événement
+                Activez les canaux de notification pour chaque type d'événement Store
               </p>
             </div>
           </div>
@@ -292,8 +167,9 @@ export default function NotificationsPage() {
                       />
                       <label
                         htmlFor={`${type.key}-email`}
-                        className="text-sm text-gray-700 dark:text-gray-300"
+                        className="flex items-center text-sm text-gray-700 dark:text-gray-300"
                       >
+                        <Mail className="w-4 h-4 mr-1.5 text-gray-400" />
                         Email
                       </label>
                     </div>
@@ -309,8 +185,9 @@ export default function NotificationsPage() {
                       />
                       <label
                         htmlFor={`${type.key}-sms`}
-                        className="text-sm text-gray-700 dark:text-gray-300"
+                        className="flex items-center text-sm text-gray-700 dark:text-gray-300"
                       >
+                        <MessageSquare className="w-4 h-4 mr-1.5 text-gray-400" />
                         SMS
                       </label>
                     </div>
@@ -337,170 +214,6 @@ export default function NotificationsPage() {
               );
             })}
           </div>
-        </div>
-
-        {/* Test SMS Section */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-4">
-          <div className="flex items-center space-x-3">
-            <Send className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Test SMS
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Envoyez un SMS de test pour vérifier la configuration
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Numéro de téléphone
-              </label>
-              <input
-                type="tel"
-                value={testMobile}
-                onChange={(e) => setTestMobile(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                placeholder="+216 12 345 678"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Message
-              </label>
-              <input
-                type="text"
-                value={testMessage}
-                onChange={(e) => setTestMessage(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                placeholder="Message de test"
-                maxLength={160}
-              />
-            </div>
-          </div>
-
-          <Button onClick={handleSendTestSMS} disabled={sendTestSMSMutation.isPending}>
-            {sendTestSMSMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Envoi en cours...
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4 mr-2" />
-                Envoyer le test
-              </>
-            )}
-          </Button>
-        </div>
-
-        {/* SMS Quota */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <TrendingUp className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Quota SMS
-                </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Utilisation ce mois
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {mockQuota.used} / {mockQuota.total}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">SMS envoyés</p>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  quotaPercentage > 80
-                    ? "bg-red-500"
-                    : quotaPercentage > 50
-                    ? "bg-yellow-500"
-                    : "bg-green-500"
-                }`}
-                style={{ width: `${quotaPercentage}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">
-                {quotaPercentage.toFixed(1)}% utilisé
-              </span>
-              {quotaPercentage > 80 && (
-                <span className="flex items-center text-red-600 dark:text-red-400">
-                  <AlertCircle className="w-4 h-4 mr-1" />
-                  Quota bientôt atteint
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* SMS History */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-4">
-          <div className="flex items-center space-x-3">
-            <Clock className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Historique récent
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                10 derniers SMS envoyés
-              </p>
-            </div>
-          </div>
-
-          {/* Placeholder for when backend is ready */}
-          <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
-            <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-600 dark:text-gray-400">
-              L'historique des SMS s'affichera ici une fois la configuration activée
-            </p>
-          </div>
-
-          {/* Future table structure (commented for now)
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-900">
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">Date</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">Numéro</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">Message</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">Type</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400">Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history?.map((log) => (
-                  <tr key={log.id} className="border-t border-gray-200 dark:border-gray-700">
-                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                      {new Date(log.createdAt).toLocaleString('fr-FR')}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{log.mobile}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{log.message}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{log.notificationType}</td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className={SMS_STATUS_LABELS[log.status].color}>
-                        {SMS_STATUS_LABELS[log.status].label}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          */}
         </div>
       </div>
     </div>

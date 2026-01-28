@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useToast } from '@/store/toastStore';
 import { useSiteConfig } from '@/lib/config/SiteConfigProvider';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
 
@@ -43,7 +43,7 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await odooClient.submitContactForm({
+      const response = await backendClient.submitContactForm({
         name: data.name.trim(),
         email: data.email.trim().toLowerCase(),
         phone: data.phone?.trim() || undefined,

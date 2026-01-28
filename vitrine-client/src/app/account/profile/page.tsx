@@ -11,7 +11,7 @@ import { useAuthStore } from '@/store/authStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 
 export default function AccountProfilePage() {
@@ -106,7 +106,7 @@ export default function AccountProfilePage() {
         profileData.new_password = formData.newPassword;
       }
 
-      const result = await odooClient.updateProfile(profileData);
+      const result = await backendClient.updateProfile(profileData);
 
       if (result.success) {
         alert('Profil mis à jour avec succès');

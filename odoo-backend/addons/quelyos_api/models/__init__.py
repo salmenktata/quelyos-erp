@@ -21,3 +21,33 @@ from . import marketing_popup
 from . import static_page
 from . import api_settings
 from . import cycle_count
+from . import country_state
+from . import payment_provider
+from . import payment_transaction
+from . import email_config
+from . import contact_list
+from . import marketing_campaign
+# Store Extended Models
+from . import product_review
+from . import faq
+from . import collection
+from . import flash_sale
+from . import bundle
+from . import testimonial
+from . import blog
+from . import loyalty
+from . import ticket
+# HR Models
+from . import hr_department
+from . import hr_job
+from . import hr_employee
+from . import hr_contract
+from . import hr_attendance
+from . import hr_leave_type
+from . import hr_leave
+from . import hr_leave_allocation
+# POS Models
+from . import pos_payment_method
+from . import pos_config
+from . import pos_session
+from . import pos_order

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 
 interface LoyaltyTier {
@@ -64,7 +64,7 @@ export const useLoyaltyStore = create<LoyaltyStore>((set, get) => ({
     try {
       set({ loading: true, error: null });
 
-      const response = await odooClient.getLoyaltyBalance();
+      const response = await backendClient.getLoyaltyBalance();
 
       if (response.success && response.data) {
         set({ balance: response.data, loading: false });
@@ -82,7 +82,7 @@ export const useLoyaltyStore = create<LoyaltyStore>((set, get) => ({
 
   fetchTiers: async () => {
     try {
-      const response = await odooClient.getLoyaltyTiers();
+      const response = await backendClient.getLoyaltyTiers();
 
       if (response.success && response.data) {
         set({ tiers: response.data.tiers });
@@ -96,7 +96,7 @@ export const useLoyaltyStore = create<LoyaltyStore>((set, get) => ({
     try {
       set({ loading: true, error: null });
 
-      const response = await odooClient.redeemLoyaltyPoints(points, orderId);
+      const response = await backendClient.redeemLoyaltyPoints(points, orderId);
 
       if (response.success && response.data) {
         // Refresh balance after redemption
@@ -137,7 +137,7 @@ export const useLoyaltyStore = create<LoyaltyStore>((set, get) => ({
 
   calculatePoints: async (amount: number) => {
     try {
-      const response = await odooClient.calculateLoyaltyPoints(amount);
+      const response = await backendClient.calculateLoyaltyPoints(amount);
 
       if (response.success && response.data) {
         return {

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 
 export const DEFAULT_COLORS = {
   primary: '#4f46e5',
@@ -214,7 +214,7 @@ export function useTenants() {
   return useQuery({
     queryKey: ['tenants'],
     queryFn: async () => {
-      const response = await odooRpc<{ tenants: Tenant[]; total: number }>('/api/ecommerce/tenant/list')
+      const response = await backendRpc<{ tenants: Tenant[]; total: number }>('/api/ecommerce/tenant/list')
       return response.data?.tenants || []
     },
   })
@@ -224,7 +224,7 @@ export function useTenant(id: number) {
   return useQuery({
     queryKey: ['tenants', id],
     queryFn: async () => {
-      const response = await odooRpc<{ tenant: Tenant }>(`/api/ecommerce/tenant/${id}`)
+      const response = await backendRpc<{ tenant: Tenant }>(`/api/ecommerce/tenant/${id}`)
       return response.data?.tenant
     },
     enabled: !!id,
@@ -236,7 +236,7 @@ export function useUpdateTenantTheme() {
 
   return useMutation({
     mutationFn: async ({ id, theme }: { id: number; theme: TenantThemeUpdate }) => {
-      const response = await odooRpc(`/api/ecommerce/tenants/${id}/theme/update`, theme)
+      const response = await backendRpc(`/api/ecommerce/tenants/${id}/theme/update`, theme)
       return response
     },
     onSuccess: (_, variables) => {

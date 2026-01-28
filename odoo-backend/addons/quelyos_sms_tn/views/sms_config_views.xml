@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- SMS Config Form View -->
+    <record id="view_sms_config_form" model="ir.ui.view">
+        <field name="name">quelyos.sms.config.form</field>
+        <field name="model">quelyos.sms.config</field>
+        <field name="arch" type="xml">
+            <form string="Configuration SMS">
+                <sheet>
+                    <group>
+                        <group string="Configuration API">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="is_active" widget="boolean_toggle"/>
+                            <field name="api_key" password="True" groups="base.group_system"/>
+                            <field name="sender_name"/>
+                            <field name="endpoint"/>
+                        </group>
+                        <group string="Préférences Notifications">
+                            <field name="abandoned_cart_sms_enabled"/>
+                            <field name="abandoned_cart_delay" invisible="not abandoned_cart_sms_enabled"/>
+                            <field name="order_confirmation_sms_enabled"/>
+                            <field name="shipping_update_sms_enabled"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- SMS Config Action -->
+    <record id="action_sms_config" model="ir.actions.act_window">
+        <field name="name">Configuration SMS</field>
+        <field name="res_model">quelyos.sms.config</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_sms_config" name="Configuration"
+              parent="menu_sms_root"
+              action="action_sms_config"
+              sequence="20"/>
+</odoo>

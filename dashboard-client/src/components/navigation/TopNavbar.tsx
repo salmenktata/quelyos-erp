@@ -8,6 +8,7 @@ import {
   Moon,
   Menu,
   ExternalLink,
+  Settings,
 } from 'lucide-react'
 
 interface TopNavbarProps {
@@ -117,6 +118,15 @@ export function TopNavbar({
           <ExternalLink className="h-4 w-4" />
           <span className="hidden md:inline">Voir mon site</span>
         </a>
+
+        {/* Global Settings */}
+        <Link
+          to="/settings"
+          className="p-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all"
+          title="Paramètres Généraux"
+        >
+          <Settings className="h-5 w-5" />
+        </Link>
 
         <Button
           variant="ghost"

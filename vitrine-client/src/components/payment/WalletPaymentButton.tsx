@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { loadStripe, Stripe, PaymentRequest } from '@stripe/stripe-js';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 
 interface WalletPaymentButtonProps {
@@ -108,7 +108,7 @@ export function WalletPaymentButton({
       const { paymentMethod, shippingAddress, payerName, payerEmail } = event;
 
       // Create payment intent on backend
-      const response = await odooClient.createWalletPayment({
+      const response = await backendClient.createWalletPayment({
         amount: Math.round(amount * 100),
         payment_method_id: paymentMethod.id,
         shipping_address: shippingAddress,

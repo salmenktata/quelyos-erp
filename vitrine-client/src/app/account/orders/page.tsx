@@ -11,7 +11,7 @@ import { useAuthStore } from '@/store/authStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import type { Order } from '@quelyos/types';
 import { logger } from '@/lib/logger';
 
@@ -38,7 +38,7 @@ export default function AccountOrdersPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const result = await odooClient.getOrders();
+        const result = await backendClient.getOrders();
         if (result.success && result.orders) {
           setOrders(result.orders);
         }

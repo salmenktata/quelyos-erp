@@ -46,8 +46,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
 
         {/* Preconnect to backend API for faster data fetching */}
-        <link rel="preconnect" href={process.env.NEXT_PUBLIC_ODOO_URL || "http://localhost:8069"} />
-        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_ODOO_URL || "http://localhost:8069"} />
+        <link rel="preconnect" href={process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8069"} />
+        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8069"} />
 
         {/* Organization Schema.org JSON-LD */}
         <script

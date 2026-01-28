@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { Button } from '@/components/common';
 import { Product } from '@quelyos/types';
 import { logger } from '@/lib/logger';
@@ -54,7 +54,7 @@ export function UpsellModal({
     try {
       setLoading(true);
 
-      const response = await odooClient.getUpsellProducts(productId, 3);
+      const response = await backendClient.getUpsellProducts(productId, 3);
 
       if (response.success && response.products) {
         setUpsellProducts(response.products);

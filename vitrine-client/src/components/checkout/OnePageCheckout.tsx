@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/common';
@@ -77,7 +77,7 @@ export function OnePageCheckout() {
 
   const loadDeliveryMethods = async () => {
     try {
-      const response = await odooClient.getDeliveryMethods();
+      const response = await backendClient.getDeliveryMethods();
 
       if (response.success && response.data?.delivery_methods) {
         setDeliveryMethods(response.data.delivery_methods);
@@ -149,7 +149,7 @@ export function OnePageCheckout() {
       setError(null);
 
       // Submit complete checkout
-      const response = await odooClient.completeCheckout({
+      const response = await backendClient.completeCheckout({
         shipping_address: shippingAddress,
         delivery_method_id: selectedDelivery,
         payment_method: paymentMethod,

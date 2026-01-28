@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 
 export interface HeroSlide {
   id: number
@@ -22,7 +22,7 @@ export function useHeroSlides() {
   return useQuery({
     queryKey: ['heroSlides'],
     queryFn: async () => {
-      const response = await odooRpc<{ slides: HeroSlide[] }>('/api/ecommerce/hero-slides')
+      const response = await backendRpc<{ slides: HeroSlide[] }>('/api/ecommerce/hero-slides')
       return response.data?.slides || []
     },
   })
@@ -32,7 +32,7 @@ export function useCreateHeroSlide() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: Partial<HeroSlide>) => {
-      const response = await odooRpc('/api/ecommerce/hero-slides/create', data)
+      const response = await backendRpc('/api/ecommerce/hero-slides/create', data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la création')
       }
@@ -46,7 +46,7 @@ export function useUpdateHeroSlide() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: Partial<HeroSlide> & { id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/hero-slides/${id}/update`, data)
+      const response = await backendRpc(`/api/ecommerce/hero-slides/${id}/update`, data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la mise à jour')
       }
@@ -60,7 +60,7 @@ export function useDeleteHeroSlide() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await odooRpc(`/api/ecommerce/hero-slides/${id}/delete`)
+      const response = await backendRpc(`/api/ecommerce/hero-slides/${id}/delete`)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la suppression')
       }
@@ -74,7 +74,7 @@ export function useReorderHeroSlides() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (slideIds: number[]) => {
-      const response = await odooRpc('/api/ecommerce/hero-slides/reorder', { slide_ids: slideIds })
+      const response = await backendRpc('/api/ecommerce/hero-slides/reorder', { slide_ids: slideIds })
       if (!response.success) {
         throw new Error(response.error || "Erreur lors de la mise à jour de l'ordre")
       }

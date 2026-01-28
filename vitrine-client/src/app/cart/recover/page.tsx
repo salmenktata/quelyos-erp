@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/common';
 import { logger } from '@/lib/logger';
@@ -49,7 +49,7 @@ function CartRecoverContent() {
       setLoading(true);
       setError(null);
 
-      const response = await odooClient.recoverCart(token);
+      const response = await backendClient.recoverCart(token);
 
       if (response.success && response.data) {
         setSuccess(true);

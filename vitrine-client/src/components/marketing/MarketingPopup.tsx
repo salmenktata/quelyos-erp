@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { useExitIntent } from '@/hooks/useExitIntent';
 import { logger } from '@/lib/logger';
 import { sanitizeHtml } from '@/lib/utils/sanitize';
@@ -115,7 +115,7 @@ export function MarketingPopup() {
     try {
       setLoading(true);
 
-      const response = await odooClient.getActivePopups(pathname);
+      const response = await backendClient.getActivePopups(pathname);
 
       if (response.success && response.data?.popup) {
         setPopup(response.data.popup);
@@ -200,7 +200,7 @@ export function MarketingPopup() {
     if (popup) {
       // Track click
       try {
-        await odooClient.trackPopupClick(popup.id);
+        await backendClient.trackPopupClick(popup.id);
       } catch (error) {
         logger.error('Error tracking popup click:', error);
       }

@@ -12,7 +12,7 @@ import { useAuthStore } from '@/store/authStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import type { Order } from '@quelyos/types';
 import { logger } from '@/lib/logger';
 
@@ -41,7 +41,7 @@ export default function OrderDetailPage() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const result = await odooClient.getOrder(parseInt(orderId));
+        const result = await backendClient.getOrder(parseInt(orderId));
         if (result.success && result.order) {
           setOrder(result.order);
         } else {

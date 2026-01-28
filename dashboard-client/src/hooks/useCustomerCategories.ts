@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { odooRpc } from '../lib/odoo-rpc';
+import { backendRpc } from '../lib/backend-rpc';
 import { logger } from '@quelyos/logger';
 
 export interface CustomerCategory {
@@ -16,7 +16,7 @@ export function useCustomerCategories() {
     queryKey: ['customer-categories'],
     queryFn: async () => {
       try {
-        const response = await odooRpc('/api/ecommerce/customer-categories', {});
+        const response = await backendRpc('/api/ecommerce/customer-categories', {});
 
         if (!response.success) {
           logger.error('[useCustomerCategories] API error:', response.error);
@@ -38,7 +38,7 @@ export function useCreateCustomerCategory() {
 
   return useMutation({
     mutationFn: async (data: { name: string; parent_id?: number; color?: number }) => {
-      const response = await odooRpc('/api/ecommerce/customer-categories/create', data);
+      const response = await backendRpc('/api/ecommerce/customer-categories/create', data);
       if (!response.success) {
         throw new Error(response.error || 'Failed to create category');
       }
@@ -55,7 +55,7 @@ export function useUpdateCustomerCategory() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: number; data: { name?: string; color?: number } }) => {
-      const response = await odooRpc(`/api/ecommerce/customer-categories/${id}/update`, data);
+      const response = await backendRpc(`/api/ecommerce/customer-categories/${id}/update`, data);
       if (!response.success) {
         logger.error('[useUpdateCustomerCategory] Update error:', response.error);
         throw new Error(response.error || 'Échec de la modification');
@@ -73,7 +73,7 @@ export function useDeleteCustomerCategory() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await odooRpc(`/api/ecommerce/customer-categories/${id}/delete`, {});
+      const response = await backendRpc(`/api/ecommerce/customer-categories/${id}/delete`, {});
       if (!response.success) {
         logger.error('[useDeleteCustomerCategory] Delete error:', response.error);
         throw new Error(response.error || 'Échec de la suppression');
@@ -91,7 +91,7 @@ export function useAssignCategoriesToCustomer() {
 
   return useMutation({
     mutationFn: async ({ customerId, categoryIds }: { customerId: number; categoryIds: number[] }) => {
-      const response = await odooRpc(`/api/ecommerce/customers/${customerId}/assign-categories`, {
+      const response = await backendRpc(`/api/ecommerce/customers/${customerId}/assign-categories`, {
         category_ids: categoryIds,
       });
       if (!response.success) {

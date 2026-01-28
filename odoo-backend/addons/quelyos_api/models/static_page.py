@@ -12,6 +12,14 @@ class StaticPage(models.Model):
     name = fields.Char('Nom', required=True, help='Nom interne de la page')
     slug = fields.Char('Slug', required=True, help='URL de la page (ex: about-us)')
     active = fields.Boolean('Actif', default=True, tracking=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string='Société',
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
+        help="Société propriétaire de cette page"
+    )
 
     # Contenu
     title = fields.Char('Titre', required=True, size=100, translate=True, 
@@ -61,7 +69,7 @@ class StaticPage(models.Model):
     updated_date = fields.Datetime('Dernière modification', readonly=True)
 
     _sql_constraints = [
-        ('unique_slug', 'UNIQUE(slug)', 'Le slug doit être unique'),
+        ('unique_slug_company', 'UNIQUE(slug, company_id)', 'Le slug doit être unique par société'),
     ]
 
     @api.constrains('slug')
@@ -78,17 +86,18 @@ class StaticPage(models.Model):
                 if page.slug in reserved_slugs:
                     raise ValidationError(_('Ce slug est réservé : %s') % page.slug)
 
-    @api.model
-    def create(self, vals):
-        # Auto-générer slug depuis name si non fourni
-        if not vals.get('slug') and vals.get('name'):
-            vals['slug'] = self._generate_slug(vals['name'])
-        
-        # Auto-remplir meta_title si vide
-        if not vals.get('meta_title') and vals.get('title'):
-            vals['meta_title'] = vals['title'][:60]
-        
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            # Auto-générer slug depuis name si non fourni
+            if not vals.get('slug') and vals.get('name'):
+                vals['slug'] = self._generate_slug(vals['name'])
+
+            # Auto-remplir meta_title si vide
+            if not vals.get('meta_title') and vals.get('title'):
+                vals['meta_title'] = vals['title'][:60]
+
+        return super().create(vals_list)
 
     def write(self, vals):
         vals['updated_date'] = fields.Datetime.now()

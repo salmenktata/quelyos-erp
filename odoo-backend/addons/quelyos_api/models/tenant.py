@@ -9,6 +9,14 @@ Workflow automatique lors de la création :
 1. Création de la company Odoo (si non fournie)
 2. Création de l'abonnement (subscription) avec le plan choisi
 3. Création de l'utilisateur admin (si email fourni)
+4. Création des providers de paiement (Flouci + Konnect)
+5. Création de l'entrepôt par défaut
+6. Création de la pricelist par défaut (TND)
+7. Création des séquences (commandes, factures, livraisons)
+8. Création des taxes TVA (19%, 7%, 0%)
+9. Création des méthodes de livraison
+10. Création des pages légales (CGV, Mentions)
+11. Création du menu navigation par défaut
 """
 
 import json
@@ -616,6 +624,14 @@ class QuelyosTenant(models.Model):
         1. Créer la company Odoo si non fournie
         2. Créer l'abonnement avec le plan choisi
         3. Créer l'utilisateur admin si email fourni
+        4. Créer les providers de paiement (Flouci + Konnect)
+        5. Créer l'entrepôt par défaut
+        6. Créer la pricelist par défaut (TND)
+        7. Créer les séquences (commandes, factures, livraisons)
+        8. Créer les taxes TVA (19%, 7%, 0%)
+        9. Créer les méthodes de livraison
+        10. Créer les pages légales (CGV, Mentions)
+        11. Créer le menu navigation par défaut
         """
         for vals in vals_list:
             # 1. Créer company si pas fournie
@@ -647,7 +663,508 @@ class QuelyosTenant(models.Model):
             if vals.get('admin_email'):
                 tenant._create_admin_user(vals['admin_email'])
 
+            # 4. Créer les providers de paiement (Flouci + Konnect)
+            tenant._create_payment_providers()
+
+            # 5. Créer l'entrepôt par défaut
+            tenant._create_default_warehouse()
+
+            # 6. Créer la pricelist par défaut (TND)
+            tenant._create_default_pricelist()
+
+            # 7. Créer les séquences (commandes, factures)
+            tenant._create_default_sequences()
+
+            # 8. Créer les taxes TVA (19%, 7%, 0%)
+            tenant._create_default_taxes()
+
+            # 9. Créer les méthodes de livraison
+            tenant._create_default_delivery_methods()
+
+            # 10. Créer les pages légales (CGV, Mentions)
+            tenant._create_default_legal_pages()
+
+            # 11. Créer le menu navigation par défaut
+            tenant._create_default_menu()
+
         return tenants
+
+    def _create_payment_providers(self):
+        """
+        Crée les providers de paiement Flouci et Konnect pour le tenant.
+        Appelé automatiquement à la création du tenant.
+        """
+        self.ensure_one()
+        PaymentProvider = self.env['payment.provider'].sudo()
+
+        providers_config = [
+            {
+                'name': 'Flouci',
+                'code': 'flouci',
+                'state': 'disabled',
+                'sequence': 10,
+                'company_id': self.company_id.id,
+                'flouci_timeout': 60,
+                'flouci_accept_cards': True,
+            },
+            {
+                'name': 'Konnect',
+                'code': 'konnect',
+                'state': 'disabled',
+                'sequence': 20,
+                'company_id': self.company_id.id,
+                'konnect_lifespan': 10,
+                'konnect_theme': 'light',
+            },
+        ]
+
+        for config in providers_config:
+            existing = PaymentProvider.search([
+                ('code', '=', config['code']),
+                ('company_id', '=', self.company_id.id)
+            ], limit=1)
+            if not existing:
+                PaymentProvider.create(config)
+
+    def _create_default_warehouse(self):
+        """
+        Crée un entrepôt par défaut pour le tenant.
+        Inclut les emplacements stock, entrée et sortie.
+        """
+        self.ensure_one()
+        Warehouse = self.env['stock.warehouse'].sudo()
+
+        # Vérifier si un entrepôt existe déjà pour cette company
+        existing = Warehouse.search([
+            ('company_id', '=', self.company_id.id)
+        ], limit=1)
+
+        if not existing:
+            # Générer un code court unique (max 5 chars)
+            code = self.code[:5].upper() if self.code else self.name[:5].upper()
+
+            warehouse = Warehouse.create({
+                'name': f"Entrepôt {self.name}",
+                'code': code,
+                'company_id': self.company_id.id,
+                'partner_id': self.company_id.partner_id.id,
+            })
+            return warehouse
+        return existing
+
+    def _create_default_pricelist(self):
+        """
+        Configure la pricelist par défaut en TND pour le tenant.
+        Si une pricelist existe déjà, on la modifie pour utiliser TND.
+        """
+        self.ensure_one()
+        Pricelist = self.env['product.pricelist'].sudo()
+        Currency = self.env['res.currency'].sudo()
+
+        # Trouver la devise TND (même inactive) ou la créer
+        tnd = Currency.with_context(active_test=False).search([('name', '=', 'TND')], limit=1)
+        if tnd:
+            # S'assurer qu'elle est active
+            if not tnd.active:
+                tnd.write({'active': True})
+        else:
+            tnd = Currency.create({
+                'name': 'TND',
+                'symbol': 'DT',
+                'rounding': 0.001,
+                'decimal_places': 3,
+                'active': True,
+            })
+
+        # Vérifier si une pricelist existe déjà pour cette company
+        existing = Pricelist.search([
+            ('company_id', '=', self.company_id.id)
+        ], limit=1)
+
+        if existing:
+            # Modifier la pricelist existante pour utiliser TND
+            existing.write({
+                'name': f"Liste de prix {self.name} (TND)",
+                'currency_id': tnd.id,
+            })
+            return existing
+        else:
+            # Créer une nouvelle pricelist
+            pricelist = Pricelist.create({
+                'name': f"Liste de prix {self.name} (TND)",
+                'currency_id': tnd.id,
+                'company_id': self.company_id.id,
+                'active': True,
+            })
+            return pricelist
+
+    def _create_default_sequences(self):
+        """
+        Crée les séquences par défaut pour le tenant :
+        - Commandes de vente (SO)
+        - Factures (INV)
+        - Bons de livraison (OUT)
+        """
+        self.ensure_one()
+        Sequence = self.env['ir.sequence'].sudo()
+
+        # Préfixe basé sur le code tenant
+        prefix = self.code[:3].upper() if self.code else self.name[:3].upper()
+
+        sequences_config = [
+            {
+                'name': f"Commandes {self.name}",
+                'code': 'sale.order',
+                'prefix': f"{prefix}/SO/%(year)s/",
+                'padding': 5,
+                'company_id': self.company_id.id,
+            },
+            {
+                'name': f"Factures {self.name}",
+                'code': 'account.move',
+                'prefix': f"{prefix}/INV/%(year)s/",
+                'padding': 5,
+                'company_id': self.company_id.id,
+            },
+            {
+                'name': f"Livraisons {self.name}",
+                'code': 'stock.picking',
+                'prefix': f"{prefix}/OUT/%(year)s/",
+                'padding': 5,
+                'company_id': self.company_id.id,
+            },
+        ]
+
+        for config in sequences_config:
+            existing = Sequence.search([
+                ('code', '=', config['code']),
+                ('company_id', '=', self.company_id.id)
+            ], limit=1)
+            if not existing:
+                Sequence.create(config)
+
+    def _create_default_taxes(self):
+        """
+        Crée les taxes TVA tunisiennes pour le tenant :
+        - TVA 19% (taux normal)
+        - TVA 7% (taux réduit)
+        - TVA 0% (exonéré)
+        """
+        self.ensure_one()
+        Tax = self.env['account.tax'].sudo()
+        TaxGroup = self.env['account.tax.group'].sudo()
+        Country = self.env['res.country'].sudo()
+
+        # Trouver la Tunisie
+        tunisia = Country.search([('code', '=', 'TN')], limit=1)
+        if not tunisia:
+            return  # Skip si Tunisie non trouvée
+
+        # Trouver ou créer les groupes de taxes
+        tax_group_19 = TaxGroup.search([
+            ('name', '=', 'TVA 19%'),
+            ('company_id', '=', self.company_id.id)
+        ], limit=1)
+        if not tax_group_19:
+            tax_group_19 = TaxGroup.create({
+                'name': 'TVA 19%',
+                'sequence': 1,
+                'company_id': self.company_id.id,
+            })
+
+        tax_group_7 = TaxGroup.search([
+            ('name', '=', 'TVA 7%'),
+            ('company_id', '=', self.company_id.id)
+        ], limit=1)
+        if not tax_group_7:
+            tax_group_7 = TaxGroup.create({
+                'name': 'TVA 7%',
+                'sequence': 2,
+                'company_id': self.company_id.id,
+            })
+
+        tax_group_0 = TaxGroup.search([
+            ('name', '=', 'TVA 0%'),
+            ('company_id', '=', self.company_id.id)
+        ], limit=1)
+        if not tax_group_0:
+            tax_group_0 = TaxGroup.create({
+                'name': 'TVA 0%',
+                'sequence': 3,
+                'company_id': self.company_id.id,
+            })
+
+        taxes_config = [
+            {
+                'name': 'TVA 19%',
+                'type_tax_use': 'sale',
+                'amount_type': 'percent',
+                'amount': 19.0,
+                'company_id': self.company_id.id,
+                'country_id': tunisia.id,
+                'tax_group_id': tax_group_19.id,
+                'sequence': 1,
+            },
+            {
+                'name': 'TVA 7%',
+                'type_tax_use': 'sale',
+                'amount_type': 'percent',
+                'amount': 7.0,
+                'company_id': self.company_id.id,
+                'country_id': tunisia.id,
+                'tax_group_id': tax_group_7.id,
+                'sequence': 2,
+            },
+            {
+                'name': 'TVA 0%',
+                'type_tax_use': 'sale',
+                'amount_type': 'percent',
+                'amount': 0.0,
+                'company_id': self.company_id.id,
+                'country_id': tunisia.id,
+                'tax_group_id': tax_group_0.id,
+                'sequence': 3,
+            },
+        ]
+
+        for config in taxes_config:
+            existing = Tax.search([
+                ('name', '=', config['name']),
+                ('company_id', '=', self.company_id.id)
+            ], limit=1)
+            if not existing:
+                Tax.create(config)
+
+    def _create_default_delivery_methods(self):
+        """
+        Crée les méthodes de livraison par défaut :
+        - Livraison standard
+        - Livraison express
+        - Retrait en magasin
+        """
+        self.ensure_one()
+        Carrier = self.env['delivery.carrier'].sudo()
+
+        # Trouver ou créer un produit de livraison
+        Product = self.env['product.product'].sudo()
+        delivery_product = Product.search([
+            ('default_code', '=', 'DELIVERY'),
+            ('company_id', 'in', [self.company_id.id, False])
+        ], limit=1)
+
+        if not delivery_product:
+            delivery_product = Product.create({
+                'name': 'Frais de livraison',
+                'default_code': 'DELIVERY',
+                'type': 'service',
+                'list_price': 0.0,
+                'sale_ok': False,
+                'purchase_ok': False,
+            })
+
+        carriers_config = [
+            {
+                'name': 'Livraison standard',
+                'delivery_type': 'fixed',
+                'fixed_price': 7.0,
+                'product_id': delivery_product.id,
+                'company_id': self.company_id.id,
+                'sequence': 10,
+            },
+            {
+                'name': 'Livraison express',
+                'delivery_type': 'fixed',
+                'fixed_price': 15.0,
+                'product_id': delivery_product.id,
+                'company_id': self.company_id.id,
+                'sequence': 20,
+            },
+            {
+                'name': 'Paiement à la livraison (COD)',
+                'delivery_type': 'fixed',
+                'fixed_price': 10.0,
+                'product_id': delivery_product.id,
+                'company_id': self.company_id.id,
+                'sequence': 25,
+            },
+            {
+                'name': 'Retrait en magasin',
+                'delivery_type': 'fixed',
+                'fixed_price': 0.0,
+                'product_id': delivery_product.id,
+                'company_id': self.company_id.id,
+                'sequence': 30,
+            },
+        ]
+
+        for config in carriers_config:
+            existing = Carrier.search([
+                ('name', '=', config['name']),
+                ('company_id', '=', self.company_id.id)
+            ], limit=1)
+            if not existing:
+                Carrier.create(config)
+
+    def _create_default_legal_pages(self):
+        """
+        Crée les pages légales par défaut :
+        - Conditions Générales de Vente (CGV)
+        - Mentions légales
+        - Politique de confidentialité
+        - Politique de retour
+        """
+        self.ensure_one()
+        StaticPage = self.env['quelyos.static.page'].sudo()
+
+        pages_config = [
+            {
+                'name': 'CGV',
+                'title': 'Conditions Générales de Vente',
+                'slug': 'cgv',
+                'content': '''<h1>Conditions Générales de Vente</h1>
+<p>Les présentes conditions générales de vente régissent les relations contractuelles entre la société et ses clients.</p>
+<h2>Article 1 - Objet</h2>
+<p>Les présentes conditions générales de vente ont pour objet de définir les droits et obligations des parties dans le cadre de la vente en ligne de produits.</p>
+<h2>Article 2 - Prix</h2>
+<p>Les prix sont indiqués en Dinars Tunisiens (TND) toutes taxes comprises.</p>
+<h2>Article 3 - Commande</h2>
+<p>Toute commande implique l'acceptation des présentes conditions générales de vente.</p>''',
+                'active': True,
+                'show_in_footer': True,
+                'footer_column': 'legal',
+                'company_id': self.company_id.id,
+            },
+            {
+                'name': 'Mentions',
+                'title': 'Mentions Légales',
+                'slug': 'mentions-legales',
+                'content': '''<h1>Mentions Légales</h1>
+<h2>Éditeur du site</h2>
+<p>Ce site est édité par la société.</p>
+<h2>Hébergement</h2>
+<p>Ce site est hébergé par Quelyos.</p>
+<h2>Propriété intellectuelle</h2>
+<p>L'ensemble du contenu de ce site est protégé par le droit d'auteur.</p>''',
+                'active': True,
+                'show_in_footer': True,
+                'footer_column': 'legal',
+                'company_id': self.company_id.id,
+            },
+            {
+                'name': 'Confidentialité',
+                'title': 'Politique de Confidentialité',
+                'slug': 'confidentialite',
+                'content': '''<h1>Politique de Confidentialité</h1>
+<h2>Collecte des données</h2>
+<p>Nous collectons les données nécessaires au traitement de vos commandes.</p>
+<h2>Utilisation des données</h2>
+<p>Vos données sont utilisées uniquement pour le traitement de vos commandes et la gestion de votre compte.</p>
+<h2>Protection des données</h2>
+<p>Nous mettons en œuvre toutes les mesures nécessaires pour protéger vos données personnelles.</p>''',
+                'active': True,
+                'show_in_footer': True,
+                'footer_column': 'legal',
+                'company_id': self.company_id.id,
+            },
+            {
+                'name': 'Retours',
+                'title': 'Politique de Retour',
+                'slug': 'retours',
+                'content': '''<h1>Politique de Retour</h1>
+<h2>Délai de rétractation</h2>
+<p>Vous disposez d'un délai de 14 jours pour retourner votre commande.</p>
+<h2>Conditions de retour</h2>
+<p>Les produits doivent être retournés dans leur emballage d'origine, non utilisés.</p>
+<h2>Remboursement</h2>
+<p>Le remboursement sera effectué dans les 14 jours suivant la réception du retour.</p>''',
+                'active': True,
+                'show_in_footer': True,
+                'footer_column': 'legal',
+                'company_id': self.company_id.id,
+            },
+        ]
+
+        for config in pages_config:
+            existing = StaticPage.search([
+                ('slug', '=', config['slug']),
+                ('company_id', '=', self.company_id.id)
+            ], limit=1)
+            if not existing:
+                StaticPage.create(config)
+
+    def _create_default_menu(self):
+        """
+        Crée le menu de navigation par défaut :
+        - Accueil
+        - Boutique
+        - À propos
+        - Contact
+        """
+        self.ensure_one()
+        Menu = self.env['quelyos.menu'].sudo()
+
+        # Vérifier si un menu existe déjà
+        existing = Menu.search([
+            ('company_id', '=', self.company_id.id)
+        ], limit=1)
+
+        if not existing:
+            menus_config = [
+                {
+                    'name': 'Menu Principal',
+                    'code': 'header',
+                    'label': 'Menu Principal',
+                    'url': '#',
+                    'sequence': 1,
+                    'company_id': self.company_id.id,
+                },
+            ]
+
+            # Créer le menu racine
+            header_menu = Menu.create(menus_config[0])
+
+            # Créer les sous-menus
+            submenus = [
+                {
+                    'name': 'Accueil',
+                    'code': 'home',
+                    'label': 'Accueil',
+                    'url': '/',
+                    'sequence': 10,
+                    'parent_id': header_menu.id,
+                    'company_id': self.company_id.id,
+                },
+                {
+                    'name': 'Boutique',
+                    'code': 'shop',
+                    'label': 'Boutique',
+                    'url': '/products',
+                    'sequence': 20,
+                    'parent_id': header_menu.id,
+                    'company_id': self.company_id.id,
+                },
+                {
+                    'name': 'À propos',
+                    'code': 'about',
+                    'label': 'À propos',
+                    'url': '/about',
+                    'sequence': 30,
+                    'parent_id': header_menu.id,
+                    'company_id': self.company_id.id,
+                },
+                {
+                    'name': 'Contact',
+                    'code': 'contact',
+                    'label': 'Contact',
+                    'url': '/contact',
+                    'sequence': 40,
+                    'parent_id': header_menu.id,
+                    'company_id': self.company_id.id,
+                },
+            ]
+
+            for config in submenus:
+                Menu.create(config)
 
     def _create_admin_user(self, email):
         """

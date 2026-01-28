@@ -4,6 +4,43 @@ import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // ExcelJS dans son propre chunk (lazy loaded)
+          if (id.includes('exceljs')) {
+            return 'exceljs';
+          }
+          // Recharts dans son propre chunk
+          if (id.includes('recharts') || id.includes('d3-')) {
+            return 'charts';
+          }
+          // Lucide icons séparément
+          if (id.includes('lucide-react')) {
+            return 'icons';
+          }
+          // React core
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'react-vendor';
+          }
+          // React Router
+          if (id.includes('react-router')) {
+            return 'router';
+          }
+          // TanStack (React Query, React Table)
+          if (id.includes('@tanstack')) {
+            return 'tanstack';
+          }
+          // Date-fns
+          if (id.includes('date-fns')) {
+            return 'date-fns';
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600,
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

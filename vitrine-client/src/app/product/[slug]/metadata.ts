@@ -5,7 +5,7 @@
 
 import { Metadata } from 'next';
 import { getProductSeoMetadata } from '@/lib/seo/metadata';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 
 interface Props {
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       productId = Number(lastPart);
     } else {
       // Fallback: search by slug
-      const response = await odooClient.getProductBySlug(slug);
+      const response = await backendClient.getProductBySlug(slug);
 
       if (!response.success || !response.product) {
         return {
@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  */
 // export async function generateStaticParams() {
 //   try {
-//     const response = await odooClient.post('/api/ecommerce/products/list', {
+//     const response = await backendClient.post('/api/ecommerce/products/list', {
 //       limit: 100, // Generate first 100 products
 //       filters: { website_published: true },
 //     });

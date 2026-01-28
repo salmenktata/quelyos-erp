@@ -4,7 +4,7 @@
  * Fetches from backend with fallback to defaults
  */
 
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 
 // Type definitions for site config
@@ -150,7 +150,7 @@ export async function fetchSiteConfig(): Promise<SiteConfig> {
   }
 
   try {
-    const response = await odooClient.getSiteConfig();
+    const response = await backendClient.getSiteConfig();
     if (response.success && response.data?.config) {
       cachedConfig = response.data.config as SiteConfig;
       cacheTimestamp = now;

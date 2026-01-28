@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 import { buildLocationTree } from '@/lib/stock/tree-utils'
 import type { StockLocation, LocationTreeNode, CreateLocationParams, UpdateLocationParams } from '@/types/stock'
 import { logger } from '@quelyos/logger'
@@ -24,7 +24,7 @@ export function useLocationsTree(params?: UseLocationsTreeParams) {
     queryKey: ['stock', 'locations', 'tree', params],
     queryFn: async () => {
       try {
-        const response = await odooRpc('/api/ecommerce/stock/locations/tree', params || {})
+        const response = await backendRpc('/api/ecommerce/stock/locations/tree', params || {})
 
         if (!response.success) {
           logger.error('[useLocationsTree] API error:', response.error)
@@ -66,7 +66,7 @@ export function useCreateLocation() {
 
   return useMutation({
     mutationFn: async (params: CreateLocationParams) => {
-      const response = await odooRpc('/api/ecommerce/stock/locations/create', params)
+      const response = await backendRpc('/api/ecommerce/stock/locations/create', params)
 
       if (!response.success) {
         throw new Error(response.error || 'Échec de la création de l\'emplacement')
@@ -92,7 +92,7 @@ export function useUpdateLocation() {
 
   return useMutation({
     mutationFn: async ({ id, ...params }: UpdateLocationParams & { id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/stock/locations/${id}/update`, params)
+      const response = await backendRpc(`/api/ecommerce/stock/locations/${id}/update`, params)
 
       if (!response.success) {
         throw new Error(response.error || 'Échec de la mise à jour de l\'emplacement')
@@ -148,7 +148,7 @@ export function useArchiveLocation() {
 
   return useMutation({
     mutationFn: async (locationId: number) => {
-      const response = await odooRpc(`/api/ecommerce/stock/locations/${locationId}/archive`, {})
+      const response = await backendRpc(`/api/ecommerce/stock/locations/${locationId}/archive`, {})
 
       if (!response.success) {
         throw new Error(response.error || 'Échec de l\'archivage de l\'emplacement')
@@ -174,7 +174,7 @@ export function useMoveLocation() {
 
   return useMutation({
     mutationFn: async ({ id, new_parent_id }: { id: number; new_parent_id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/stock/locations/${id}/move`, {
+      const response = await backendRpc(`/api/ecommerce/stock/locations/${id}/move`, {
         new_parent_id
       })
 

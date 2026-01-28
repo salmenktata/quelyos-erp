@@ -15,6 +15,14 @@ class MenuNavigation(models.Model):
     code = fields.Char('Code unique', required=True, help='Ex: header, footer_quick, footer_service')
     active = fields.Boolean('Actif', default=True)
     sequence = fields.Integer('Ordre', default=10)
+    company_id = fields.Many2one(
+        'res.company',
+        string='Société',
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
+        help="Société propriétaire de ce menu"
+    )
 
     # Hiérarchie
     parent_id = fields.Many2one('quelyos.menu', 'Menu Parent', ondelete='cascade')
@@ -34,13 +42,18 @@ class MenuNavigation(models.Model):
     # Sécurité
     requires_auth = fields.Boolean('Requiert authentification', default=False)
 
-    @api.constrains('code')
+    @api.constrains('code', 'company_id')
     def _check_code_unique(self):
         for menu in self:
-            # Code unique uniquement pour menus racines
+            # Code unique uniquement pour menus racines par company
             if not menu.parent_id:
-                if self.search([('code', '=', menu.code), ('id', '!=', menu.id), ('parent_id', '=', False)], limit=1):
-                    raise ValidationError(_('Le code "%s" existe déjà pour un menu racine.') % menu.code)
+                if self.search([
+                    ('code', '=', menu.code),
+                    ('id', '!=', menu.id),
+                    ('parent_id', '=', False),
+                    ('company_id', '=', menu.company_id.id)
+                ], limit=1):
+                    raise ValidationError(_('Le code "%s" existe déjà pour un menu racine de cette société.') % menu.code)
 
     def get_menu_tree(self):
         """Retourne l'arbre du menu avec enfants"""

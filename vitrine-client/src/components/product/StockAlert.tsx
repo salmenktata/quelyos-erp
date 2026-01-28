@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/common';
 import { logger } from '@/lib/logger';
@@ -39,7 +39,7 @@ export function StockAlert({ productId, productName }: StockAlertProps) {
     if (!user) return;
 
     try {
-      const response = await odooClient.getStockAlertStatus(productId);
+      const response = await backendClient.getStockAlertStatus(productId);
 
       if (response.success && response.data) {
         setSubscribed(response.data.subscribed);
@@ -61,7 +61,7 @@ export function StockAlert({ productId, productName }: StockAlertProps) {
       setError(null);
       setSuccess(null);
 
-      const response = await odooClient.subscribeToStockAlert(productId, email);
+      const response = await backendClient.subscribeToStockAlert(productId, email);
 
       if (response.success && response.data) {
         setSuccess(response.data.message);
@@ -91,7 +91,7 @@ export function StockAlert({ productId, productName }: StockAlertProps) {
       setLoading(true);
       setError(null);
 
-      const response = await odooClient.unsubscribeFromStockAlert(subscriptionId);
+      const response = await backendClient.unsubscribeFromStockAlert(subscriptionId);
 
       if (response.success) {
         setSubscribed(false);

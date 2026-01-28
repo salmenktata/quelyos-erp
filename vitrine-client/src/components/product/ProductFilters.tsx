@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
 
 interface PriceRange {
@@ -104,7 +104,7 @@ export function ProductFilters({ categoryId, onFiltersChange }: ProductFiltersPr
     try {
       setLoading(true);
 
-      const response = await odooClient.getProductFacets(categoryId);
+      const response = await backendClient.getProductFacets(categoryId);
 
       if (response.success && response.data) {
         setFacets(response.data);

@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ============================================ -->
+        <!-- CATÉGORIE: BIENVENUE / ONBOARDING (welcome) -->
+        <!-- ============================================ -->
+
+        <record id="email_template_welcome" model="quelyos.email.template">
+            <field name="name">Bienvenue</field>
+            <field name="category">welcome</field>
+            <field name="subject">Bienvenue chez {{company}} !</field>
+            <field name="preview_text">Merci de nous avoir rejoint</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333; margin-bottom: 20px;">Bienvenue {{prenom}} !</h1>
+    <p style="color: #666; line-height: 1.6;">Nous sommes ravis de vous compter parmi nos clients.</p>
+    <p style="color: #666; line-height: 1.6;">Découvrez nos produits et profitez de nos offres exclusives.</p>
+    <a href="{{site_url}}" style="display: inline-block; background: #e91e63; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px;">Découvrir la boutique</a>
+    <p style="color: #999; font-size: 12px; margin-top: 30px;">À bientôt,<br>L'équipe {{company}}</p>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_confirm_registration" model="quelyos.email.template">
+            <field name="name">Confirmation d'inscription</field>
+            <field name="category">welcome</field>
+            <field name="subject">Confirmez votre inscription - {{company}}</field>
+            <field name="preview_text">Un dernier clic pour activer votre compte</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333;">Confirmez votre email</h1>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Merci de vous être inscrit ! Cliquez sur le bouton ci-dessous pour activer votre compte.</p>
+    <a href="{{confirmation_url}}" style="display: inline-block; background: #4CAF50; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0;">Confirmer mon email</a>
+    <p style="color: #999; font-size: 12px;">Ce lien expire dans 24 heures.</p>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_first_purchase" model="quelyos.email.template">
+            <field name="name">Premier achat</field>
+            <field name="category">welcome</field>
+            <field name="subject">Merci pour votre premier achat {{prenom}} !</field>
+            <field name="preview_text">Votre fidélité commence ici</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333;">Félicitations pour votre premier achat !</h1>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Nous sommes ravis que vous ayez choisi {{company}} pour votre premier achat. Pour vous remercier, voici un code promo exclusif pour votre prochaine commande :</p>
+    <div style="background: #f5f5f5; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 0; font-size: 24px; font-weight: bold; color: #e91e63;">BIENVENUE10</p>
+        <p style="margin: 5px 0 0; color: #666;">-10% sur votre prochaine commande</p>
+    </div>
+    <a href="{{site_url}}" style="display: inline-block; background: #e91e63; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Continuer mes achats</a>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- CATÉGORIE: E-COMMERCE (ecommerce)           -->
+        <!-- ============================================ -->
+
+        <record id="email_template_order_confirmation" model="quelyos.email.template">
+            <field name="name">Confirmation de commande</field>
+            <field name="category">ecommerce</field>
+            <field name="subject">Commande #{{order_number}} confirmée</field>
+            <field name="preview_text">Merci pour votre commande</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 8px;">
+        <h1 style="margin: 0;">Commande confirmée !</h1>
+    </div>
+    <p style="color: #666; line-height: 1.6; margin-top: 20px;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Votre commande <strong>#{{order_number}}</strong> a bien été enregistrée.</p>
+    <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; margin: 20px 0;">
+        <p style="margin: 0 0 10px; color: #333; font-weight: bold;">Récapitulatif :</p>
+        <p style="margin: 5px 0; color: #666;">Total : {{total}} €</p>
+        <p style="margin: 5px 0; color: #666;">Livraison estimée : {{delivery_date}}</p>
+    </div>
+    <a href="{{order_url}}" style="display: inline-block; background: #2196F3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Suivre ma commande</a>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_order_shipped" model="quelyos.email.template">
+            <field name="name">Commande expédiée</field>
+            <field name="category">ecommerce</field>
+            <field name="subject">Votre commande #{{order_number}} est en route !</field>
+            <field name="preview_text">Suivez votre colis</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: #2196F3; color: white; padding: 20px; text-align: center; border-radius: 8px;">
+        <h1 style="margin: 0;">📦 Colis expédié !</h1>
+    </div>
+    <p style="color: #666; line-height: 1.6; margin-top: 20px;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Bonne nouvelle ! Votre commande a quitté nos entrepôts.</p>
+    <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; margin: 20px 0;">
+        <p style="margin: 0 0 5px; color: #333; font-weight: bold;">N° de suivi :</p>
+        <p style="margin: 0; font-size: 18px; color: #2196F3;">{{tracking_number}}</p>
+    </div>
+    <a href="{{tracking_url}}" style="display: inline-block; background: #2196F3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Suivre mon colis</a>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_abandoned_cart" model="quelyos.email.template">
+            <field name="name">Panier abandonné</field>
+            <field name="category">ecommerce</field>
+            <field name="subject">Vous avez oublié quelque chose...</field>
+            <field name="preview_text">Votre panier vous attend</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333; text-align: center;">Oups ! Vous avez oublié votre panier</h1>
+    <p style="color: #666; line-height: 1.6; text-align: center;">Bonjour {{prenom}}, vos articles vous attendent patiemment.</p>
+    <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0;">
+        <p style="margin: 0; color: #e65100; font-weight: bold;">Offre spéciale : -10% avec le code REVIENS10</p>
+    </div>
+    <a href="{{cart_url}}" style="display: block; background: #e91e63; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Finaliser ma commande</a>
+    <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">Cette offre expire dans 24h</p>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_back_in_stock" model="quelyos.email.template">
+            <field name="name">Produit de retour en stock</field>
+            <field name="category">ecommerce</field>
+            <field name="subject">{{product_name}} est de retour !</field>
+            <field name="preview_text">L'article que vous attendiez est disponible</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333; text-align: center;">De retour en stock !</h1>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">L'article que vous aviez demandé est à nouveau disponible :</p>
+    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+        <p style="margin: 0 0 10px; font-size: 18px; font-weight: bold; color: #333;">{{product_name}}</p>
+        <p style="margin: 0; font-size: 24px; color: #e91e63; font-weight: bold;">{{product_price}} €</p>
+    </div>
+    <a href="{{product_url}}" style="display: block; background: #4CAF50; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Commander maintenant</a>
+    <p style="color: #ff9800; text-align: center; margin-top: 15px; font-size: 14px;">⚠️ Stock limité - Faites vite !</p>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_review_request" model="quelyos.email.template">
+            <field name="name">Demande d'avis</field>
+            <field name="category">ecommerce</field>
+            <field name="subject">Qu'avez-vous pensé de votre achat ?</field>
+            <field name="preview_text">Votre avis compte pour nous</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333; text-align: center;">Donnez-nous votre avis !</h1>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Nous espérons que vous êtes satisfait de votre commande. Votre avis nous aide à nous améliorer et aide les autres clients dans leurs choix.</p>
+    <div style="text-align: center; margin: 25px 0;">
+        <span style="font-size: 32px;">⭐⭐⭐⭐⭐</span>
+    </div>
+    <a href="{{review_url}}" style="display: block; background: #ff9800; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Laisser un avis</a>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- CATÉGORIE: PROMOTIONS (promo)               -->
+        <!-- ============================================ -->
+
+        <record id="email_template_promo" model="quelyos.email.template">
+            <field name="name">Promotion</field>
+            <field name="category">promo</field>
+            <field name="subject">Offre spéciale : -{{reduction}}% sur votre prochaine commande</field>
+            <field name="preview_text">Profitez de notre offre limitée</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #e91e63, #9c27b0); color: white; padding: 30px; text-align: center; border-radius: 10px;">
+        <h1 style="margin: 0; font-size: 28px;">OFFRE SPÉCIALE</h1>
+        <p style="font-size: 48px; margin: 15px 0; font-weight: bold;">-{{reduction}}%</p>
+        <p style="margin: 0;">Sur votre prochaine commande</p>
+    </div>
+    <p style="color: #666; line-height: 1.6; margin-top: 20px;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Profitez de cette offre exceptionnelle valable jusqu'au {{date_fin}}.</p>
+    <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; text-align: center; margin: 20px 0;">
+        <p style="margin: 0; color: #333;">Votre code promo :</p>
+        <p style="font-size: 24px; font-weight: bold; color: #e91e63; margin: 10px 0;">{{code_promo}}</p>
+    </div>
+    <a href="{{site_url}}" style="display: block; background: #e91e63; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">J'en profite maintenant</a>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_flash_sale" model="quelyos.email.template">
+            <field name="name">Vente flash</field>
+            <field name="category">promo</field>
+            <field name="subject">⚡ VENTE FLASH - {{hours}}H seulement !</field>
+            <field name="preview_text">Offre exceptionnelle - Dépêchez-vous !</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: #f44336; color: white; padding: 30px; text-align: center; border-radius: 10px;">
+        <p style="font-size: 48px; margin: 0;">⚡</p>
+        <h1 style="margin: 10px 0; font-size: 32px;">VENTE FLASH</h1>
+        <p style="font-size: 20px; margin: 0;">Pendant {{hours}} heures seulement</p>
+    </div>
+    <p style="color: #666; line-height: 1.6; margin-top: 20px;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Ne manquez pas cette occasion unique ! Jusqu'à <strong>-{{reduction}}%</strong> sur une sélection d'articles.</p>
+    <a href="{{site_url}}" style="display: block; background: #f44336; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center; font-size: 18px;">Profiter de la vente flash</a>
+    <p style="color: #999; text-align: center; margin-top: 15px; font-size: 12px;">Offre non cumulable, dans la limite des stocks disponibles</p>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_seasonal_sale" model="quelyos.email.template">
+            <field name="name">Soldes saisonnières</field>
+            <field name="category">promo</field>
+            <field name="subject">Les {{saison}} sont là ! Jusqu'à -{{reduction}}%</field>
+            <field name="preview_text">Découvrez nos meilleures offres</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #3f51b5, #2196F3); color: white; padding: 30px; text-align: center; border-radius: 10px;">
+        <h1 style="margin: 0; font-size: 36px;">{{saison}}</h1>
+        <p style="font-size: 24px; margin: 10px 0;">Jusqu'à <strong>-{{reduction}}%</strong></p>
+    </div>
+    <p style="color: #666; line-height: 1.6; margin-top: 20px;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Les {{saison}} ont commencé ! C'est le moment idéal pour vous faire plaisir avec nos offres exceptionnelles.</p>
+    <a href="{{site_url}}" style="display: block; background: #3f51b5; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Découvrir les soldes</a>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_exclusive_code" model="quelyos.email.template">
+            <field name="name">Code promo exclusif</field>
+            <field name="category">promo</field>
+            <field name="subject">{{prenom}}, un code rien que pour vous !</field>
+            <field name="preview_text">Offre exclusive réservée à nos meilleurs clients</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333; text-align: center;">Un cadeau pour vous</h1>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Pour vous remercier de votre fidélité, nous vous offrons un code promo exclusif :</p>
+    <div style="background: linear-gradient(135deg, #9c27b0, #673ab7); color: white; padding: 25px; border-radius: 10px; text-align: center; margin: 25px 0;">
+        <p style="margin: 0; font-size: 14px; opacity: 0.9;">VOTRE CODE EXCLUSIF</p>
+        <p style="font-size: 28px; font-weight: bold; margin: 10px 0; letter-spacing: 3px;">{{code_promo}}</p>
+        <p style="margin: 0; font-size: 16px;">-{{reduction}}% sur tout le site</p>
+    </div>
+    <a href="{{site_url}}" style="display: block; background: #9c27b0; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Utiliser mon code</a>
+    <p style="color: #999; text-align: center; font-size: 12px; margin-top: 15px;">Valable jusqu'au {{date_fin}}</p>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_birthday" model="quelyos.email.template">
+            <field name="name">Anniversaire</field>
+            <field name="category">promo</field>
+            <field name="subject">Joyeux anniversaire {{prenom}} ! 🎂</field>
+            <field name="preview_text">Un cadeau vous attend</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="text-align: center; padding: 30px;">
+        <p style="font-size: 64px; margin: 0;">🎂</p>
+        <h1 style="color: #333; margin: 15px 0;">Joyeux anniversaire {{prenom}} !</h1>
+    </div>
+    <p style="color: #666; line-height: 1.6; text-align: center;">Toute l'équipe {{company}} vous souhaite un merveilleux anniversaire !</p>
+    <div style="background: #fff8e1; border: 2px dashed #ffc107; padding: 20px; border-radius: 8px; text-align: center; margin: 25px 0;">
+        <p style="margin: 0; color: #f57f17; font-weight: bold;">VOTRE CADEAU D'ANNIVERSAIRE</p>
+        <p style="font-size: 32px; font-weight: bold; color: #e91e63; margin: 10px 0;">-{{reduction}}%</p>
+        <p style="margin: 0; color: #666;">Code : <strong>HAPPYBDAY</strong></p>
+    </div>
+    <a href="{{site_url}}" style="display: block; background: #e91e63; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Me faire plaisir</a>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- CATÉGORIE: NEWSLETTER (newsletter)          -->
+        <!-- ============================================ -->
+
+        <record id="email_template_newsletter" model="quelyos.email.template">
+            <field name="name">Newsletter</field>
+            <field name="category">newsletter</field>
+            <field name="subject">Les nouveautés de {{company}}</field>
+            <field name="preview_text">Découvrez nos dernières actualités</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333; border-bottom: 2px solid #e91e63; padding-bottom: 10px;">Newsletter</h1>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Voici les dernières nouvelles de {{company}}.</p>
+    <div style="margin: 25px 0;">
+        <h2 style="color: #333; font-size: 18px;">Actualités</h2>
+        <p style="color: #666; line-height: 1.6;">{{contenu}}</p>
+    </div>
+    <a href="{{site_url}}" style="display: inline-block; background: #e91e63; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Voir plus</a>
+    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+    <p style="color: #999; font-size: 12px; text-align: center;"><a href="{{unsubscribe_url}}" style="color: #999;">Se désabonner</a></p>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_new_products" model="quelyos.email.template">
+            <field name="name">Nouveaux produits</field>
+            <field name="category">newsletter</field>
+            <field name="subject">Découvrez nos nouveautés !</field>
+            <field name="preview_text">Les derniers arrivages sont là</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333; text-align: center;">Nouveautés</h1>
+    <p style="color: #666; line-height: 1.6; text-align: center;">Bonjour {{prenom}}, découvrez nos derniers produits sélectionnés pour vous.</p>
+    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        {{products_list}}
+    </div>
+    <a href="{{site_url}}/nouveautes" style="display: block; background: #4CAF50; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Voir toutes les nouveautés</a>
+    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+    <p style="color: #999; font-size: 12px; text-align: center;"><a href="{{unsubscribe_url}}" style="color: #999;">Se désabonner</a></p>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_blog" model="quelyos.email.template">
+            <field name="name">Article de blog</field>
+            <field name="category">newsletter</field>
+            <field name="subject">Nouvel article : {{article_title}}</field>
+            <field name="preview_text">Un nouvel article à découvrir</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Nous venons de publier un nouvel article sur notre blog qui pourrait vous intéresser :</p>
+    <div style="border-left: 4px solid #e91e63; padding-left: 20px; margin: 25px 0;">
+        <h2 style="color: #333; margin: 0 0 10px;">{{article_title}}</h2>
+        <p style="color: #666; line-height: 1.6; margin: 0;">{{article_excerpt}}</p>
+    </div>
+    <a href="{{article_url}}" style="display: inline-block; background: #e91e63; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Lire l'article</a>
+    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+    <p style="color: #999; font-size: 12px; text-align: center;"><a href="{{unsubscribe_url}}" style="color: #999;">Se désabonner</a></p>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- CATÉGORIE: FIDÉLITÉ (loyalty)               -->
+        <!-- ============================================ -->
+
+        <record id="email_template_loyalty_points" model="quelyos.email.template">
+            <field name="name">Points fidélité gagnés</field>
+            <field name="category">loyalty</field>
+            <field name="subject">Vous avez gagné {{points}} points !</field>
+            <field name="preview_text">Vos points fidélité ont été crédités</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #ff9800, #f57c00); color: white; padding: 30px; text-align: center; border-radius: 10px;">
+        <p style="font-size: 48px; margin: 0;">⭐</p>
+        <h1 style="margin: 10px 0;">+{{points}} points</h1>
+    </div>
+    <p style="color: #666; line-height: 1.6; margin-top: 20px;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Suite à votre dernière commande, nous avons crédité <strong>{{points}} points</strong> sur votre compte fidélité.</p>
+    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+        <p style="margin: 0; color: #666;">Votre solde actuel</p>
+        <p style="font-size: 32px; font-weight: bold; color: #ff9800; margin: 10px 0;">{{total_points}} points</p>
+    </div>
+    <a href="{{loyalty_url}}" style="display: block; background: #ff9800; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Utiliser mes points</a>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_loyalty_reward" model="quelyos.email.template">
+            <field name="name">Récompense fidélité</field>
+            <field name="category">loyalty</field>
+            <field name="subject">{{prenom}}, votre récompense vous attend !</field>
+            <field name="preview_text">Vous avez atteint le palier de récompense</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="text-align: center; padding: 20px;">
+        <p style="font-size: 64px; margin: 0;">🎁</p>
+        <h1 style="color: #333;">Félicitations !</h1>
+    </div>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Vous avez accumulé suffisamment de points pour débloquer une récompense :</p>
+    <div style="background: #e8f5e9; border: 2px solid #4CAF50; padding: 20px; border-radius: 8px; text-align: center; margin: 25px 0;">
+        <p style="margin: 0; font-size: 20px; font-weight: bold; color: #2e7d32;">{{reward_name}}</p>
+        <p style="margin: 10px 0 0; color: #666;">{{reward_description}}</p>
+    </div>
+    <a href="{{reward_url}}" style="display: block; background: #4CAF50; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Réclamer ma récompense</a>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_vip_status" model="quelyos.email.template">
+            <field name="name">Statut VIP</field>
+            <field name="category">loyalty</field>
+            <field name="subject">Bienvenue dans le club VIP {{prenom}} !</field>
+            <field name="preview_text">Découvrez vos avantages exclusifs</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #212121, #424242); color: white; padding: 30px; text-align: center; border-radius: 10px;">
+        <p style="font-size: 48px; margin: 0;">👑</p>
+        <h1 style="margin: 10px 0; font-size: 28px;">BIENVENUE AU CLUB VIP</h1>
+    </div>
+    <p style="color: #666; line-height: 1.6; margin-top: 20px;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Grâce à votre fidélité, vous êtes désormais membre de notre programme VIP !</p>
+    <div style="margin: 25px 0;">
+        <p style="color: #333; font-weight: bold; margin-bottom: 15px;">Vos avantages exclusifs :</p>
+        <ul style="color: #666; line-height: 2;">
+            <li>-{{reduction}}% permanent sur tout le site</li>
+            <li>Livraison gratuite illimitée</li>
+            <li>Accès aux ventes privées</li>
+            <li>Service client prioritaire</li>
+        </ul>
+    </div>
+    <a href="{{site_url}}" style="display: block; background: #212121; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Profiter de mes avantages VIP</a>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- CATÉGORIE: TRANSACTIONNEL (transactional)   -->
+        <!-- ============================================ -->
+
+        <record id="email_template_invoice" model="quelyos.email.template">
+            <field name="name">Facture</field>
+            <field name="category">transactional</field>
+            <field name="subject">Votre facture #{{invoice_number}}</field>
+            <field name="preview_text">Facture disponible pour votre commande</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333;">Votre facture</h1>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Veuillez trouver ci-joint la facture correspondant à votre commande.</p>
+    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr><td style="color: #666; padding: 5px 0;">Facture N°</td><td style="color: #333; font-weight: bold; text-align: right;">{{invoice_number}}</td></tr>
+            <tr><td style="color: #666; padding: 5px 0;">Date</td><td style="color: #333; text-align: right;">{{invoice_date}}</td></tr>
+            <tr><td style="color: #666; padding: 5px 0;">Montant TTC</td><td style="color: #e91e63; font-weight: bold; font-size: 18px; text-align: right;">{{total}} €</td></tr>
+        </table>
+    </div>
+    <a href="{{invoice_url}}" style="display: inline-block; background: #2196F3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Télécharger la facture</a>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_refund" model="quelyos.email.template">
+            <field name="name">Remboursement</field>
+            <field name="category">transactional</field>
+            <field name="subject">Votre remboursement a été effectué</field>
+            <field name="preview_text">Confirmation de remboursement</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 8px;">
+        <h1 style="margin: 0;">Remboursement confirmé</h1>
+    </div>
+    <p style="color: #666; line-height: 1.6; margin-top: 20px;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Nous vous confirmons que votre remboursement a été effectué.</p>
+    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr><td style="color: #666; padding: 5px 0;">Commande N°</td><td style="color: #333; text-align: right;">{{order_number}}</td></tr>
+            <tr><td style="color: #666; padding: 5px 0;">Montant remboursé</td><td style="color: #4CAF50; font-weight: bold; font-size: 18px; text-align: right;">{{refund_amount}} €</td></tr>
+            <tr><td style="color: #666; padding: 5px 0;">Délai</td><td style="color: #333; text-align: right;">3-5 jours ouvrés</td></tr>
+        </table>
+    </div>
+    <p style="color: #666; line-height: 1.6;">Le montant sera crédité sur votre moyen de paiement d'origine.</p>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_return_confirmed" model="quelyos.email.template">
+            <field name="name">Retour confirmé</field>
+            <field name="category">transactional</field>
+            <field name="subject">Retour reçu - Commande #{{order_number}}</field>
+            <field name="preview_text">Nous avons bien reçu votre retour</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: #2196F3; color: white; padding: 20px; text-align: center; border-radius: 8px;">
+        <h1 style="margin: 0;">Retour reçu</h1>
+    </div>
+    <p style="color: #666; line-height: 1.6; margin-top: 20px;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Nous vous confirmons la bonne réception de votre retour pour la commande <strong>#{{order_number}}</strong>.</p>
+    <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; margin: 20px 0;">
+        <p style="margin: 0; color: #1976d2;">Le remboursement sera effectué sous 3-5 jours ouvrés après validation du retour.</p>
+    </div>
+    <p style="color: #666; line-height: 1.6;">Merci de votre confiance.</p>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- CATÉGORIE: RELANCE (reminder)               -->
+        <!-- ============================================ -->
+
+        <record id="email_template_inactive" model="quelyos.email.template">
+            <field name="name">Relance client inactif</field>
+            <field name="category">reminder</field>
+            <field name="subject">{{prenom}}, vous nous manquez !</field>
+            <field name="preview_text">Revenez nous voir avec une offre spéciale</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333; text-align: center;">Vous nous manquez !</h1>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Cela fait un moment que nous n'avons pas eu de vos nouvelles. Nous espérons que tout va bien !</p>
+    <p style="color: #666; line-height: 1.6;">Pour vous souhaiter un bon retour, voici une offre rien que pour vous :</p>
+    <div style="background: #e91e63; color: white; padding: 25px; border-radius: 10px; text-align: center; margin: 25px 0;">
+        <p style="margin: 0; font-size: 14px;">CODE EXCLUSIF</p>
+        <p style="font-size: 28px; font-weight: bold; margin: 10px 0;">COMEBACK15</p>
+        <p style="margin: 0;">-15% sur votre prochaine commande</p>
+    </div>
+    <a href="{{site_url}}" style="display: block; background: #e91e63; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Revenir sur la boutique</a>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_reengagement" model="quelyos.email.template">
+            <field name="name">Réengagement</field>
+            <field name="category">reminder</field>
+            <field name="subject">Une surprise vous attend {{prenom}} !</field>
+            <field name="preview_text">Découvrez ce que vous avez manqué</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="text-align: center; padding: 20px;">
+        <p style="font-size: 64px; margin: 0;">🎁</p>
+    </div>
+    <h1 style="color: #333; text-align: center;">Une surprise pour vous</h1>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Beaucoup de choses ont changé depuis votre dernière visite ! Nouveaux produits, nouvelles collections... Venez découvrir nos dernières nouveautés.</p>
+    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+        <p style="margin: 0 0 10px; color: #333; font-weight: bold;">Votre cadeau de bienvenue</p>
+        <p style="font-size: 24px; color: #4CAF50; font-weight: bold; margin: 0;">Livraison OFFERTE</p>
+        <p style="margin: 10px 0 0; color: #666; font-size: 14px;">Code : FREEDELIVERY</p>
+    </div>
+    <a href="{{site_url}}" style="display: block; background: #4CAF50; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Découvrir les nouveautés</a>
+</div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_wishlist_reminder" model="quelyos.email.template">
+            <field name="name">Rappel liste de souhaits</field>
+            <field name="category">reminder</field>
+            <field name="subject">Vos articles favoris vous attendent !</field>
+            <field name="preview_text">N'oubliez pas votre liste de souhaits</field>
+            <field name="content"><![CDATA[
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #333; text-align: center;">Votre liste de souhaits</h1>
+    <p style="color: #666; line-height: 1.6;">Bonjour {{prenom}},</p>
+    <p style="color: #666; line-height: 1.6;">Vous avez des articles qui attendent dans votre liste de souhaits. C'est peut-être le moment de vous faire plaisir !</p>
+    <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0;">
+        <p style="margin: 0; color: #e65100;">Certains articles de votre liste sont en promotion !</p>
+    </div>
+    <a href="{{wishlist_url}}" style="display: block; background: #ff9800; color: white; padding: 15px; text-decoration: none; border-radius: 6px; text-align: center;">Voir ma liste de souhaits</a>
+</div>
+            ]]></field>
+        </record>
+
+    </data>
+</odoo>

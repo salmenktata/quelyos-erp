@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Default SMS Config (will be created per company on first access) -->
+        <!-- Config is created dynamically via get_config_for_company() -->
+    </data>
+</odoo>

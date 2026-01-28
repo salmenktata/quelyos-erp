@@ -35,7 +35,7 @@ import type {
 } from '@quelyos/types'
 import { logger } from '@quelyos/logger'
 
-// Développement : accès direct à Odoo via VITE_API_URL
+// Développement : accès direct au backend via VITE_API_URL
 // Production : URL backend configurée dans .env.production
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -73,7 +73,7 @@ class ApiClient {
     const response = await fetch(url, {
       method: 'POST',
       headers,
-      // credentials: 'omit' car Odoo utilise Access-Control-Allow-Origin: *
+      // credentials: 'omit' car le backend utilise Access-Control-Allow-Origin: *
       // qui est incompatible avec credentials: 'include'
       // Authentification via X-Session-Id header à la place
       credentials: 'omit',
@@ -167,12 +167,12 @@ class ApiClient {
   }
 
   async getUserInfo(): Promise<APIResponse<{ user: { id: number; name: string; email: string; login: string; groups: string[] } }>> {
-    // Utiliser credentials: 'include' pour envoyer les cookies de session Odoo
+    // Utiliser credentials: 'include' pour envoyer les cookies de session backend
     const url = `${this.baseUrl}/api/auth/user-info`
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // Envoyer cookies pour auth Odoo
+      credentials: 'include', // Envoyer cookies pour auth backend
       body: JSON.stringify({
         jsonrpc: '2.0',
         method: 'call',

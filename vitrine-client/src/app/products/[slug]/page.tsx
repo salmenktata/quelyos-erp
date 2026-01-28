@@ -7,7 +7,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import type { Product } from '@quelyos/types';
 import { formatPrice } from '@/lib/utils/formatting';
 import { useCartStore } from '@/store/cartStore';
@@ -27,6 +27,7 @@ import { CountdownTimer } from '@/components/product/CountdownTimer';
 import { BundleSuggestions } from '@/components/product/BundleSuggestions';
 import { logger } from '@/lib/logger';
 import { sanitizeHtml } from '@/lib/utils/sanitize';
+import { ProductReviews } from '@/components/product/ProductReviews';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -36,7 +37,7 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'shipping'>('description');
+  const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'shipping' | 'reviews'>('description');
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [hoveredImageUrl, setHoveredImageUrl] = useState<string>(''); // Image au survol des couleurs
 
@@ -67,7 +68,7 @@ export default function ProductDetailPage() {
   const fetchProduct = async () => {
     setIsLoading(true);
     try {
-      const response = await odooClient.getProductBySlug(slug);
+      const response = await backendClient.getProductBySlug(slug);
       if (response.success && response.product) {
         setProduct(response.product);
 
@@ -86,7 +87,7 @@ export default function ProductDetailPage() {
 
   const fetchRelatedProducts = async (productId: number) => {
     try {
-      const response = await odooClient.getUpsellProducts(productId);
+      const response = await backendClient.getUpsellProducts(productId);
       if (response.success && response.products) {
         setRelatedProducts(response.products);
       }
@@ -585,6 +586,16 @@ export default function ProductDetailPage() {
             >
               🚚 Livraison & Retours
             </button>
+            <button
+              onClick={() => setActiveTab('reviews')}
+              className={`flex-1 px-6 py-4 font-bold text-sm sm:text-base transition-all duration-300 border-l border-gray-200 ${
+                activeTab === 'reviews'
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              ⭐ Avis clients
+            </button>
           </div>
 
           {/* Tab Content */}
@@ -726,6 +737,12 @@ export default function ProductDetailPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'reviews' && product && (
+              <div className="animate-fadeIn">
+                <ProductReviews productId={product.id} productName={product.name} />
               </div>
             )}
           </div>

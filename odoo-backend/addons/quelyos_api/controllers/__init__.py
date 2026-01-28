@@ -13,3 +13,16 @@ from . import tenant
 from . import theme_preset
 from . import api_settings
 from . import finance
+from . import payment
+from . import email_settings
+from . import marketing_campaigns
+# Store Extended Controllers
+from . import store_extended
+# HR Controllers
+from . import hr_employees
+from . import hr_departments
+from . import hr_contracts
+from . import hr_attendance
+from . import hr_leaves
+# POS Controller
+from . import pos

@@ -7,7 +7,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 import { StructuredData } from './StructuredData';
 import { logger } from '@/lib/logger';
 
@@ -41,7 +41,7 @@ export function Breadcrumbs({ productId, customItems }: BreadcrumbsProps) {
     try {
       setLoading(true);
 
-      const response = await odooClient.getBreadcrumbsData(productId!);
+      const response = await backendClient.getBreadcrumbsData(productId!);
 
       if (response.success && response.data) {
         setBreadcrumbs(response.data.breadcrumbs || []);

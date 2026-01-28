@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { odooRpc } from '@/lib/odoo-rpc'
+import { backendRpc } from '@/lib/backend-rpc'
 
 export interface TrustBadge {
   id: number
@@ -15,7 +15,7 @@ export function useTrustBadges() {
   return useQuery({
     queryKey: ['trustBadges'],
     queryFn: async () => {
-      const response = await odooRpc<{ badges: TrustBadge[] }>('/api/ecommerce/trust-badges')
+      const response = await backendRpc<{ badges: TrustBadge[] }>('/api/ecommerce/trust-badges')
       return response.data?.badges || []
     },
   })
@@ -25,7 +25,7 @@ export function useCreateTrustBadge() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: Partial<TrustBadge>) => {
-      const response = await odooRpc('/api/ecommerce/trust-badges/create', data)
+      const response = await backendRpc('/api/ecommerce/trust-badges/create', data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la création')
       }
@@ -39,7 +39,7 @@ export function useUpdateTrustBadge() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...data }: Partial<TrustBadge> & { id: number }) => {
-      const response = await odooRpc(`/api/ecommerce/trust-badges/${id}/update`, data)
+      const response = await backendRpc(`/api/ecommerce/trust-badges/${id}/update`, data)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la mise à jour')
       }
@@ -53,7 +53,7 @@ export function useDeleteTrustBadge() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await odooRpc(`/api/ecommerce/trust-badges/${id}/delete`)
+      const response = await backendRpc(`/api/ecommerce/trust-badges/${id}/delete`)
       if (!response.success) {
         throw new Error(response.error || 'Erreur lors de la suppression')
       }
@@ -67,7 +67,7 @@ export function useReorderTrustBadges() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (badgeIds: number[]) => {
-      const response = await odooRpc('/api/ecommerce/trust-badges/reorder', { badge_ids: badgeIds })
+      const response = await backendRpc('/api/ecommerce/trust-badges/reorder', { badge_ids: badgeIds })
       if (!response.success) {
         throw new Error(response.error || "Erreur lors de la mise à jour de l'ordre")
       }

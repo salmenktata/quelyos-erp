@@ -110,6 +110,24 @@
         </record>
 
         <!-- ========================================== -->
+        <!-- Groupes POS (Point de Vente) -->
+        <!-- ========================================== -->
+
+        <record id="group_quelyos_pos_user" model="res.groups">
+            <field name="name">Quelyos POS User</field>
+            <field name="sequence">80</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Caissier - Accès aux opérations de caisse</field>
+        </record>
+
+        <record id="group_quelyos_pos_manager" model="res.groups">
+            <field name="name">Quelyos POS Manager</field>
+            <field name="sequence">81</field>
+            <field name="implied_ids" eval="[(4, ref('group_quelyos_pos_user'))]"/>
+            <field name="comment">Manager POS - Tous droits sur le point de vente</field>
+        </record>
+
+        <!-- ========================================== -->
         <!-- Groupes Home (CMS) -->
         <!-- ========================================== -->
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { odooClient } from '@/lib/odoo/client';
+import { backendClient } from '@/lib/backend/client';
 
 interface WishlistState {
   items: number[];
@@ -25,7 +25,7 @@ export const useWishlistStore = create<WishlistState>()(
       fetchWishlist: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.getWishlist();
+          const response = await backendClient.getWishlist();
           if (response.success && response.wishlist) {
             set({
               items: response.wishlist.map((item) => item.product.id),
@@ -42,7 +42,7 @@ export const useWishlistStore = create<WishlistState>()(
       addToWishlist: async (productId: number) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.addToWishlist(productId);
+          const response = await backendClient.addToWishlist(productId);
           if (response.success) {
             set((state) => ({
               items: [...state.items, productId],
@@ -62,7 +62,7 @@ export const useWishlistStore = create<WishlistState>()(
       removeFromWishlist: async (productId: number) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await odooClient.removeFromWishlist(productId);
+          const response = await backendClient.removeFromWishlist(productId);
           if (response.success) {
             set((state) => ({
               items: state.items.filter((id) => id !== productId),
