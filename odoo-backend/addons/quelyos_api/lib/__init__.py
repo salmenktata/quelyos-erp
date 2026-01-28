@@ -71,6 +71,14 @@ from . import migrations
 from . import service_registry
 from . import rate_plans
 from . import coalescing
+from . import compression
+from . import ab_testing
+from . import audit_dashboard
+from . import health_aggregator
+from . import deduplication
+from . import graceful_degradation
+from . import cache_headers
+from . import api_analytics
 
 # Raccourcis pratiques
 from .rate_limiter import rate_limited, RateLimitConfig
@@ -102,3 +110,11 @@ from .migrations import MigrationRunner, migration
 from .service_registry import get_service_registry, register_service, discover_service
 from .rate_plans import get_rate_plan_manager, RatePlanTier
 from .coalescing import coalesce, get_coalescer
+from .compression import compressed_response, compress_response
+from .ab_testing import ab_test, get_ab_manager, Experiment, Variant
+from .audit_dashboard import get_audit_dashboard, AlertSeverity
+from .health_aggregator import get_health_aggregator, ServiceStatus
+from .deduplication import deduplicate, get_deduplicator
+from .graceful_degradation import with_fallback, degradable, DegradationLevel
+from .cache_headers import with_cache_headers, CacheControl, cache_preset
+from .api_analytics import track_api_call, get_analytics
