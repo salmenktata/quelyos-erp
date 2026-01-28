@@ -1,63 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Override login page template -->
-    <template id="login" inherit_id="web.login" priority="100">
-        <!-- Replace Odoo logo with Quelyos logo -->
-        <xpath expr="//div[hasclass('o_login_header')]" position="replace">
-            <div class="o_login_header text-center mb-4">
-                <img src="/quelyos_debrand/static/img/quelyos_logo.svg"
-                     alt="Quelyos Suite"
-                     style="max-height: 80px; width: auto;"/>
-            </div>
-        </xpath>
-
-        <!-- Hide "Powered by Odoo" footer -->
-        <xpath expr="//footer" position="replace"/>
-
-        <!-- Hide database manager link -->
-        <xpath expr="//a[contains(@href, 'database')]" position="replace"/>
-    </template>
-
     <!-- Override layout template for title -->
-    <template id="web_layout" inherit_id="web.layout" priority="100">
-        <xpath expr="//title" position="replace">
-            <title><t t-if="title"><t t-esc="title"/> - </t>Quelyos Suite</title>
-        </xpath>
-
-        <!-- Replace favicon -->
-        <xpath expr="//link[@rel='shortcut icon']" position="replace">
-            <link rel="shortcut icon" href="/quelyos_debrand/static/img/favicon.ico" type="image/x-icon"/>
-        </xpath>
-        <xpath expr="//link[@rel='icon']" position="replace">
-            <link rel="icon" href="/quelyos_debrand/static/img/favicon.ico" type="image/x-icon"/>
-        </xpath>
-    </template>
-
-    <!-- Override webclient template -->
-    <template id="webclient" inherit_id="web.webclient_bootstrap" priority="100">
-        <xpath expr="//title" position="replace">
-            <title>Quelyos Suite</title>
-        </xpath>
-    </template>
-
-    <!-- Override database selector (hide Odoo branding) -->
-    <template id="database_selector" inherit_id="web.database_selector" priority="100">
-        <xpath expr="//footer" position="replace"/>
-        <xpath expr="//div[hasclass('o_database_logo')]" position="replace">
-            <div class="o_database_logo text-center mb-4">
-                <img src="/quelyos_debrand/static/img/quelyos_logo.svg"
-                     alt="Quelyos Suite"
-                     style="max-height: 60px;"/>
-            </div>
-        </xpath>
-    </template>
-
-    <!-- Override error pages -->
-    <template id="error_page_500" inherit_id="http_routing.http_error" priority="100">
-        <xpath expr="//h1[contains(text(), 'Odoo')]" position="replace">
-            <h1>Erreur Serveur</h1>
-        </xpath>
-    </template>
+    <record id="layout_title_override" model="ir.ui.view">
+        <field name="name">quelyos.layout.title</field>
+        <field name="inherit_id" ref="web.layout"/>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <xpath expr="//title" position="replace">
+                <title><t t-if="title"><t t-esc="title"/> - </t>Quelyos Suite</title>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

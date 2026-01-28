@@ -145,7 +145,7 @@ export default function HomePageContent() {
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link
-                  href="#modules"
+                  href="/modules"
                   className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 px-8 py-4 text-lg font-medium text-white transition-all hover:from-indigo-600 hover:to-indigo-700"
                 >
                   <Layers className="h-5 w-5" />

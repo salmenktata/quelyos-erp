@@ -12,6 +12,20 @@
     display: none !important;
 }
 
+// Login page - Hide powered by Odoo footer and replace logo
+.o_database_list {
+    // Hide the footer with "Powered by Odoo"
+    .card-body > .text-center.small.border-top {
+        display: none !important;
+    }
+
+    // Replace company logo with Quelyos logo via CSS background
+    .card-body > .text-center.pb-3.border-bottom img {
+        content: url('/quelyos_debrand/static/img/quelyos_logo.svg') !important;
+        max-height: 80px !important;
+    }
+}
+
 // Login page customization
 .o_login_background {
     background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #6366F1 100%) !important;

@@ -11,11 +11,8 @@ import {
   BarChart3,
   FileText,
   Megaphone,
-  Sparkles,
   LogIn,
   Briefcase,
-  ShoppingCart,
-  Users,
   Zap,
   DollarSign,
   MessageCircle,
@@ -23,9 +20,6 @@ import {
   TrendingUp,
   Building2,
   GraduationCap,
-  Mail,
-  Shield,
-  Info,
   Wallet,
   Store,
   UserCircle,
@@ -33,6 +27,7 @@ import {
   UsersRound,
   Monitor,
   Layers,
+  Users,
 } from "lucide-react";
 import config from "../lib/config";
 import Container from "./Container";
@@ -166,87 +161,6 @@ export default function Header() {
     },
   ];
 
-  // Menu Marketing - organisé par catégories
-  const marketingPages = [
-    // PRODUIT
-    {
-      category: "Produit",
-      items: [
-        {
-          href: "/marketing",
-          label: "Présentation",
-          icon: Megaphone,
-          desc: "Vue d'ensemble",
-        },
-        {
-          href: "/marketing/features",
-          label: "Fonctionnalités",
-          icon: Sparkles,
-          desc: "Automatisation IA",
-        },
-      ],
-    },
-    // TARIFS & CLIENTS
-    {
-      category: "Tarifs & Clients",
-      items: [
-        {
-          href: "/marketing/tarifs",
-          label: "Tarifs",
-          icon: DollarSign,
-          desc: "Plans et pricing",
-        },
-        {
-          href: "/marketing/contact",
-          label: "Contact",
-          icon: Mail,
-          desc: "Nous contacter",
-        },
-      ],
-    },
-    // DÉVELOPPEMENT
-    {
-      category: "Développement",
-      items: [
-        {
-          href: "/marketing/roadmap",
-          label: "Roadmap 2026",
-          icon: TrendingUp,
-          desc: "Vision & expansion",
-        },
-        {
-          href: "/marketing/backlog",
-          label: "Backlog Produit",
-          icon: FileText,
-          desc: "Features à venir",
-        },
-      ],
-    },
-    // LÉGAL
-    {
-      category: "Légal",
-      items: [
-        {
-          href: "/marketing/cgu",
-          label: "CGU",
-          icon: FileText,
-          desc: "Conditions générales",
-        },
-        {
-          href: "/marketing/confidentialite",
-          label: "Confidentialité",
-          icon: Shield,
-          desc: "Politique RGPD",
-        },
-        {
-          href: "/marketing/mentions-legales",
-          label: "Mentions légales",
-          icon: Info,
-          desc: "Informations légales",
-        },
-      ],
-    },
-  ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-900/80 backdrop-blur-xl">
@@ -350,7 +264,7 @@ export default function Header() {
                       </Link>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      {financePages.map((section, sectionIdx) => (
+                      {financePages.map((section) => (
                         <div key={section.category}>
                           <div className="mb-2 px-3">
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
