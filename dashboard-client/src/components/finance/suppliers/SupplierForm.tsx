@@ -1,4 +1,19 @@
+/**
+ * Formulaire Création/Édition Fournisseur
+ *
+ * Fonctionnalités :
+ * - Création et modification de fournisseurs
+ * - Informations de base (nom, email, téléphone, site web)
+ * - Informations bancaires (IBAN, BIC)
+ * - Catégorisation et importance
+ * - Conditions de paiement (délais, pénalités, remises)
+ * - Notes internes et tags
+ */
+
 import { useState } from "react";
+import { Layout } from "@/components/Layout";
+import { Breadcrumbs, PageNotice } from "@/components/common";
+import { financeNotices } from "@/lib/notices";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,30 +122,42 @@ export default function SupplierForm({ initialData, supplierId, mode }: Supplier
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">
-            {mode === "create" ? "Nouveau fournisseur" : "Modifier le fournisseur"}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {mode === "create"
-              ? "Ajoutez un nouveau fournisseur à votre base"
-              : "Modifiez les informations du fournisseur"}
-          </p>
-        </div>
-      </div>
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Tableau de bord', href: '/dashboard' },
+            { label: 'Finance', href: '/finance' },
+            { label: 'Fournisseurs', href: '/finance/suppliers' },
+            { label: mode === 'create' ? 'Nouveau' : 'Modifier' },
+          ]}
+        />
 
-      {/* Erreur */}
-      {error && (
-        <Card className="p-4 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
-          <p className="text-red-600 dark:text-red-400">{error}</p>
-        </Card>
-      )}
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              {mode === "create" ? "Nouveau fournisseur" : "Modifier le fournisseur"}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              {mode === "create"
+                ? "Ajoutez un nouveau fournisseur à votre base"
+                : "Modifiez les informations du fournisseur"}
+            </p>
+          </div>
+        </div>
+
+        <PageNotice config={financeNotices.suppliers} className="mb-6" />
+
+        {/* Erreur */}
+        {error && (
+          <Card className="p-4 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800" role="alert">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
+          </Card>
+        )}
 
       {/* Formulaire */}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -332,6 +359,7 @@ export default function SupplierForm({ initialData, supplierId, mode }: Supplier
           </Button>
         </div>
       </form>
-    </div>
+      </div>
+    </Layout>
   );
 }

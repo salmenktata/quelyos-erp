@@ -100,6 +100,30 @@ import FinanceSettingsIntegrations from './pages/finance/settings/integrations/p
 import FinanceSettingsSecurity from './pages/finance/settings/security/page'
 import StockValuation from './pages/stock/valuation/page'
 import StockTurnover from './pages/stock/turnover/page'
+// Store Settings
+import StoreSettingsLayoutWrapper from './pages/store/settings/SettingsLayoutWrapper'
+import StoreSettings from './pages/store/settings/page'
+import StoreSettingsBrand from './pages/store/settings/brand/page'
+import StoreSettingsContact from './pages/store/settings/contact/page'
+import StoreSettingsShipping from './pages/store/settings/shipping/page'
+import StoreSettingsFeatures from './pages/store/settings/features/page'
+import StoreSettingsReturns from './pages/store/settings/returns/page'
+import StoreSettingsSocial from './pages/store/settings/social/page'
+import StoreSettingsSeo from './pages/store/settings/seo/page'
+// Stock Settings
+import StockSettingsLayoutWrapper from './pages/stock/settings/SettingsLayoutWrapper'
+import StockSettings from './pages/stock/settings/page'
+import StockSettingsValuation from './pages/stock/settings/valuation/page'
+import StockSettingsReordering from './pages/stock/settings/reordering/page'
+import StockSettingsUnits from './pages/stock/settings/units/page'
+import StockSettingsAlerts from './pages/stock/settings/alerts/page'
+// CRM Settings
+import CrmSettingsLayoutWrapper from './pages/crm/settings/SettingsLayoutWrapper'
+import CrmSettings from './pages/crm/settings/page'
+import CrmSettingsStages from './pages/crm/settings/stages/page'
+import CrmSettingsPricelists from './pages/crm/settings/pricelists/page'
+import CrmSettingsCategories from './pages/crm/settings/categories/page'
+import CrmSettingsScoring from './pages/crm/settings/scoring/page'
 import NoticeAnalytics from './pages/NoticeAnalytics'
 import GlobalSettings from './pages/settings/page'
 import { CurrencyProvider } from './lib/finance/CurrencyContext'
@@ -307,6 +331,21 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* Stock Settings */}
+              <Route
+                path="/stock/settings"
+                element={
+                  <ProtectedRoute>
+                    <StockSettingsLayoutWrapper />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<StockSettings />} />
+                <Route path="valuation" element={<StockSettingsValuation />} />
+                <Route path="reordering" element={<StockSettingsReordering />} />
+                <Route path="units" element={<StockSettingsUnits />} />
+                <Route path="alerts" element={<StockSettingsAlerts />} />
+              </Route>
               <Route
                 path="/store/delivery"
                 element={
@@ -315,14 +354,26 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* Redirection ancienne page site-config vers settings */}
+              <Route path="/store/site-config" element={<Navigate to="/store/settings" replace />} />
+              {/* Store Settings */}
               <Route
-                path="/store/site-config"
+                path="/store/settings"
                 element={
                   <ProtectedRoute>
-                    <SiteConfig />
+                    <StoreSettingsLayoutWrapper />
                   </ProtectedRoute>
                 }
-              />
+              >
+                <Route index element={<StoreSettings />} />
+                <Route path="brand" element={<StoreSettingsBrand />} />
+                <Route path="contact" element={<StoreSettingsContact />} />
+                <Route path="shipping" element={<StoreSettingsShipping />} />
+                <Route path="features" element={<StoreSettingsFeatures />} />
+                <Route path="returns" element={<StoreSettingsReturns />} />
+                <Route path="social" element={<StoreSettingsSocial />} />
+                <Route path="seo" element={<StoreSettingsSeo />} />
+              </Route>
               <Route
                 path="/payments"
                 element={
@@ -411,6 +462,21 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* CRM Settings */}
+              <Route
+                path="/crm/settings"
+                element={
+                  <ProtectedRoute>
+                    <CrmSettingsLayoutWrapper />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<CrmSettings />} />
+                <Route path="stages" element={<CrmSettingsStages />} />
+                <Route path="pricelists" element={<CrmSettingsPricelists />} />
+                <Route path="categories" element={<CrmSettingsCategories />} />
+                <Route path="scoring" element={<CrmSettingsScoring />} />
+              </Route>
               <Route
                 path="/warehouses"
                 element={

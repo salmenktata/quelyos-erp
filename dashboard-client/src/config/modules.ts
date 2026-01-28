@@ -208,7 +208,7 @@ export const MODULES: Module[] = [
         title: 'Configuration',
         items: [
           { name: 'Livraison', path: '/store/delivery', icon: Truck },
-          { name: 'Configuration Site', path: '/store/site-config', icon: Settings },
+          { name: 'Paramètres', path: '/store/settings', icon: Settings },
           { name: 'Pages Statiques', path: '/store/static-pages', icon: FileText },
           { name: 'Menus Navigation', path: '/store/menus', icon: List },
           { name: 'Messages Promo', path: '/store/promo-messages', icon: MessageSquare },
@@ -248,6 +248,12 @@ export const MODULES: Module[] = [
           { name: 'Rotation', path: '/stock/turnover', icon: Shuffle },
         ],
       },
+      {
+        title: 'Configuration',
+        items: [
+          { name: 'Paramètres', path: '/stock/settings', icon: Settings },
+        ],
+      },
     ],
   },
   {
@@ -280,6 +286,12 @@ export const MODULES: Module[] = [
         items: [
           { name: 'Factures', path: '/invoices', icon: Receipt },
           { name: 'Paiements', path: '/payments', icon: BadgePercent },
+        ],
+      },
+      {
+        title: 'Configuration',
+        items: [
+          { name: 'Paramètres', path: '/crm/settings', icon: Settings },
         ],
       },
     ],

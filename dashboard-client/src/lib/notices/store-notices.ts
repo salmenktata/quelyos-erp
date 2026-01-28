@@ -172,6 +172,33 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
       }
     ]
   },
+  settings: {
+    pageId: 'store-settings',
+    title: 'Paramètres Boutique',
+    purpose: 'Configurez votre boutique en ligne : identité, contact, livraison, fonctionnalités et SEO.',
+    icon: Settings,
+    moduleColor: 'indigo',
+    sections: [
+      {
+        title: 'Configuration disponible',
+        icon: Store,
+        items: [
+          'Identité : Nom, logo et couleurs de marque',
+          'Contact : Email, téléphone et WhatsApp',
+          'Livraison : Délais et seuil de gratuité',
+          'Fonctionnalités : Wishlist, avis, comparateur',
+        ]
+      },
+      {
+        title: 'Actions recommandées',
+        items: [
+          'Personnaliser l\'identité : Configurez le branding de votre boutique',
+          'Configurer le contact : Renseignez vos coordonnées client',
+          'Optimiser le SEO : Améliorez votre référencement',
+        ]
+      }
+    ]
+  },
   siteConfig: {
     pageId: 'store-site-config',
     title: 'Configuration Site',
