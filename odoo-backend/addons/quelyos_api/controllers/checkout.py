@@ -6,11 +6,12 @@ import logging
 import json
 from odoo import http
 from odoo.http import request
+from .base import BaseController
 
 _logger = logging.getLogger(__name__)
 
 
-class QuelyosCheckout(http.Controller):
+class QuelyosCheckout(BaseController):
     """API Checkout et Paiement pour frontend e-commerce"""
 
     def _get_params(self):
@@ -121,7 +122,7 @@ class QuelyosCheckout(http.Controller):
                 'error': 'Une erreur est survenue'
             }
 
-    @http.route('/api/admin/shipping/zones', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/admin/shipping/zones', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_shipping_zones(self, **kwargs):
         """
         Récupérer les zones de livraison et leurs tarifs (Admin)
@@ -140,6 +141,11 @@ class QuelyosCheckout(http.Controller):
                 'free_threshold': float
             }
         """
+        # Authentification via Bearer token
+        auth_error = self._authenticate_from_header()
+        if auth_error:
+            return auth_error
+
         try:
             IrConfig = request.env['ir.config_parameter'].sudo()
             State = request.env['res.country.state'].sudo()
@@ -182,7 +188,7 @@ class QuelyosCheckout(http.Controller):
                 'error': 'Une erreur est survenue'
             }
 
-    @http.route('/api/admin/shipping/zones/update', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/admin/shipping/zones/update', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def update_shipping_zones(self, **kwargs):
         """
         Mettre à jour les tarifs des zones de livraison (Admin)
@@ -194,6 +200,11 @@ class QuelyosCheckout(http.Controller):
         Returns:
             dict: {'success': bool}
         """
+        # Authentification via Bearer token
+        auth_error = self._authenticate_from_header()
+        if auth_error:
+            return auth_error
+
         try:
             params = self._get_params()
             zones = params.get('zones', {})
