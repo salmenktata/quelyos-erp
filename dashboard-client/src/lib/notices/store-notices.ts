@@ -717,4 +717,31 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
       }
     ]
   },
+  tickets: {
+    pageId: 'store-tickets',
+    title: 'Support / SAV',
+    purpose: 'Gérez les demandes et réclamations de vos clients efficacement.',
+    icon: Shield,
+    moduleColor: 'indigo',
+    sections: [
+      {
+        title: 'Fonctionnalités',
+        icon: Settings,
+        items: [
+          'Gestion des tickets par statut et priorité',
+          'Conversation en temps réel',
+          'Statistiques de temps de réponse',
+          'Attribution et suivi',
+        ]
+      },
+      {
+        title: 'Actions recommandées',
+        items: [
+          'Répondre rapidement : Maintenir un bon temps de réponse',
+          'Catégoriser : Organiser les tickets par type',
+          'Résoudre : Clôturer les tickets traités',
+        ]
+      }
+    ]
+  },
 };
