@@ -12,6 +12,7 @@ import {
   Navigation,
   Shield,
   Search,
+  Quote,
   type LucideIcon,
 } from 'lucide-react';
 import type { PageNoticeConfig } from './types';
@@ -602,6 +603,33 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
           'Modérer : Approuvez les avis conformes',
           'Répondre : Engagez avec vos clients',
           'Analyser : Suivez la satisfaction',
+        ]
+      }
+    ]
+  },
+  testimonials: {
+    pageId: 'store-testimonials',
+    title: 'Témoignages Clients',
+    purpose: 'Mettez en avant les témoignages de vos clients satisfaits sur votre site.',
+    icon: Quote,
+    moduleColor: 'indigo',
+    sections: [
+      {
+        title: 'Fonctionnalités',
+        icon: Settings,
+        items: [
+          'Gestion des témoignages clients',
+          'Notation par étoiles',
+          'Mise en avant sélective',
+          'Affichage configurable (homepage, produit, checkout)',
+        ]
+      },
+      {
+        title: 'Actions recommandées',
+        items: [
+          'Ajouter : Créez des témoignages clients',
+          'Publier : Activez les meilleurs témoignages',
+          'Mettre en avant : Sélectionnez les plus impactants',
         ]
       }
     ]
