@@ -14,6 +14,7 @@ import {
   Search,
   Quote,
   Award,
+  HelpCircle,
   type LucideIcon,
 } from 'lucide-react';
 import type { PageNoticeConfig } from './types';
@@ -658,6 +659,33 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
           'Configurer : Définir les règles de points',
           'Créer niveaux : Bronze, Argent, Or, Platine',
           'Analyser : Suivre l\'engagement des membres',
+        ]
+      }
+    ]
+  },
+  faq: {
+    pageId: 'store-faq',
+    title: 'FAQ',
+    purpose: 'Gérez les questions fréquemment posées pour aider vos clients.',
+    icon: HelpCircle,
+    moduleColor: 'indigo',
+    sections: [
+      {
+        title: 'Fonctionnalités',
+        icon: Settings,
+        items: [
+          'Organisation par catégories',
+          'Accordéon pour les réponses',
+          'Mise en avant de FAQ importantes',
+          'Publication/brouillon',
+        ]
+      },
+      {
+        title: 'Actions recommandées',
+        items: [
+          'Organiser : Créer des catégories thématiques',
+          'Rédiger : Ajouter les questions fréquentes',
+          'Mettre en avant : Sélectionner les plus utiles',
         ]
       }
     ]
