@@ -18,11 +18,11 @@ const isTest = process.env.NODE_ENV === 'test';
  * Interface Logger pour maintenir compatibilité avec console
  */
 interface Logger {
-  error(...args: any[]): void;
-  warn(...args: any[]): void;
-  info(...args: any[]): void;
-  log(...args: any[]): void;
-  debug(...args: any[]): void;
+  error(...args: unknown[]): void;
+  warn(...args: unknown[]): void;
+  info(...args: unknown[]): void;
+  log(...args: unknown[]): void;
+  debug(...args: unknown[]): void;
 }
 
 /**
@@ -35,7 +35,7 @@ export const logger: Logger = {
    * En production, considérer l'envoi à un service de monitoring
    * comme Sentry, Datadog, ou LogRocket.
    */
-  error(...args: any[]): void {
+  error(...args: unknown[]): void {
     if (isDevelopment || isTest) {
       console.error('[ERROR]', ...args);
     } else {
@@ -47,7 +47,7 @@ export const logger: Logger = {
   /**
    * Warnings (affichés en dev, masqués en production)
    */
-  warn(...args: any[]): void {
+  warn(...args: unknown[]): void {
     if (isDevelopment || isTest) {
       console.warn('[WARN]', ...args);
     } else {
@@ -58,7 +58,7 @@ export const logger: Logger = {
   /**
    * Informations (affichées en dev uniquement)
    */
-  info(...args: any[]): void {
+  info(...args: unknown[]): void {
     if (isDevelopment) {
       console.info('[INFO]', ...args);
     }
@@ -67,7 +67,7 @@ export const logger: Logger = {
   /**
    * Logs généraux (affichés en dev uniquement)
    */
-  log(...args: any[]): void {
+  log(...args: unknown[]): void {
     if (isDevelopment) {
       console.log('[LOG]', ...args);
     }
@@ -76,7 +76,7 @@ export const logger: Logger = {
   /**
    * Debug (affichés en dev uniquement)
    */
-  debug(...args: any[]): void {
+  debug(...args: unknown[]): void {
     if (isDevelopment) {
       console.debug('[DEBUG]', ...args);
     }
@@ -92,19 +92,19 @@ export const logger: Logger = {
  */
 export function createComponentLogger(componentName: string): Logger {
   return {
-    error(...args: any[]): void {
+    error(...args: unknown[]): void {
       logger.error(`[${componentName}]`, ...args);
     },
-    warn(...args: any[]): void {
+    warn(...args: unknown[]): void {
       logger.warn(`[${componentName}]`, ...args);
     },
-    info(...args: any[]): void {
+    info(...args: unknown[]): void {
       logger.info(`[${componentName}]`, ...args);
     },
-    log(...args: any[]): void {
+    log(...args: unknown[]): void {
       logger.log(`[${componentName}]`, ...args);
     },
-    debug(...args: any[]): void {
+    debug(...args: unknown[]): void {
       logger.debug(`[${componentName}]`, ...args);
     },
   };
@@ -119,19 +119,19 @@ export function createComponentLogger(componentName: string): Logger {
  */
 export function createApiLogger(endpoint: string): Logger {
   return {
-    error(...args: any[]): void {
+    error(...args: unknown[]): void {
       logger.error(`[API:${endpoint}]`, ...args);
     },
-    warn(...args: any[]): void {
+    warn(...args: unknown[]): void {
       logger.warn(`[API:${endpoint}]`, ...args);
     },
-    info(...args: any[]): void {
+    info(...args: unknown[]): void {
       logger.info(`[API:${endpoint}]`, ...args);
     },
-    log(...args: any[]): void {
+    log(...args: unknown[]): void {
       logger.log(`[API:${endpoint}]`, ...args);
     },
-    debug(...args: any[]): void {
+    debug(...args: unknown[]): void {
       logger.debug(`[API:${endpoint}]`, ...args);
     },
   };

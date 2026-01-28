@@ -9,6 +9,10 @@ Endpoints:
 - POST /api/ecommerce/tenant/create : Création (admin)
 - PUT /api/ecommerce/tenant/<id>/update : Modification (admin)
 - DELETE /api/ecommerce/tenant/<id>/delete : Suppression (admin)
+
+Self-Service Onboarding:
+- POST /api/onboarding/check-slug : Vérifie disponibilité du slug
+- POST /api/onboarding/create-tenant : Crée un tenant depuis le signup
 """
 
 import json

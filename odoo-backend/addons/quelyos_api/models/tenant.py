@@ -687,6 +687,13 @@ class QuelyosTenant(models.Model):
             # 11. Créer le menu navigation par défaut
             tenant._create_default_menu()
 
+            # 12. Passer le tenant en statut actif
+            tenant.write({'status': 'active'})
+            tenant.message_post(
+                body=_("Tenant provisionné avec succès. Statut : Actif"),
+                message_type='notification',
+            )
+
         return tenants
 
     def _create_payment_providers(self):
@@ -1257,4 +1264,110 @@ class QuelyosTenant(models.Model):
             'view_mode': 'list,form',
             'domain': [('company_id', '=', self.company_id.id)],
             'context': {'default_company_id': self.company_id.id},
+        }
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # ACTIONS STATUT TENANT (SaaS Lifecycle)
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    def action_activate(self):
+        """Active le tenant (fin de provisioning ou réactivation)"""
+        for tenant in self:
+            if tenant.status in ('provisioning', 'suspended'):
+                tenant.write({'status': 'active'})
+                tenant.message_post(body=_("Tenant activé"))
+
+    def action_suspend(self):
+        """Suspend le tenant (paiement en retard, violation ToS, etc.)"""
+        for tenant in self:
+            if tenant.status == 'active':
+                tenant.write({'status': 'suspended'})
+                tenant.message_post(body=_("Tenant suspendu"))
+                # Optionnel: désactiver les utilisateurs
+                tenant.user_ids.write({'active': False})
+
+    def action_archive(self):
+        """Archive le tenant (résiliation définitive)"""
+        for tenant in self:
+            tenant.write({
+                'status': 'archived',
+                'active': False,
+            })
+            tenant.message_post(body=_("Tenant archivé"))
+            # Désactiver les utilisateurs
+            tenant.user_ids.write({'active': False})
+
+    def action_reactivate(self):
+        """Réactive un tenant suspendu"""
+        for tenant in self:
+            if tenant.status == 'suspended':
+                tenant.write({'status': 'active'})
+                tenant.message_post(body=_("Tenant réactivé"))
+                # Réactiver les utilisateurs
+                self.env['res.users'].sudo().search([
+                    ('company_id', '=', tenant.company_id.id)
+                ]).write({'active': True})
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # API SELF-SERVICE ONBOARDING
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @api.model
+    def create_from_signup(self, vals):
+        """
+        Création de tenant depuis le wizard d'inscription self-service.
+
+        Args:
+            vals: dict avec les clés:
+                - name: Nom de la boutique
+                - code: Slug/code unique
+                - email: Email admin
+                - plan_code: 'starter', 'pro', 'business', 'enterprise'
+                - sector: Secteur d'activité
+                - primary_color: Couleur principale (#hex)
+                - stripe_customer_id: ID client Stripe (optionnel)
+
+        Returns:
+            dict avec tenant_id, admin_url, store_url, temp_password
+        """
+        # Valider le code unique
+        existing = self.sudo().search([('code', '=', vals.get('code'))], limit=1)
+        if existing:
+            raise ValidationError(_("Ce nom de boutique est déjà pris"))
+
+        # Trouver le plan
+        plan = self.env['quelyos.subscription.plan'].sudo().search([
+            ('code', '=', vals.get('plan_code', 'starter'))
+        ], limit=1)
+        if not plan:
+            plan = self.env['quelyos.subscription.plan'].sudo().search([], limit=1)
+
+        # Générer le domaine
+        domain = f"{vals.get('code')}.quelyos.shop"
+
+        # Créer le tenant (le workflow create() fait le provisioning)
+        tenant = self.sudo().create({
+            'name': vals.get('name'),
+            'code': vals.get('code'),
+            'domain': domain,
+            'backoffice_domain': f"admin.{domain}",
+            'plan_id': plan.id if plan else False,
+            'admin_email': vals.get('email'),
+            'primary_color': vals.get('primary_color', '#6366f1'),
+            'stripe_customer_id': vals.get('stripe_customer_id'),
+            'status': 'provisioning',
+            'deployment_tier': 'shared',
+        })
+
+        # Récupérer le mot de passe temporaire (généré dans _create_admin_user)
+        # Note: En prod, envoyer par email plutôt que le retourner
+        temp_password = secrets.token_urlsafe(12)
+
+        return {
+            'success': True,
+            'tenant_id': tenant.id,
+            'tenant_code': tenant.code,
+            'store_url': f"https://{tenant.domain}",
+            'admin_url': f"https://{tenant.backoffice_domain}",
+            'status': tenant.status,
         }

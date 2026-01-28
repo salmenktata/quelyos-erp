@@ -1,36 +1,56 @@
-/**
- * Playwright E2E testing configuration - Backoffice
- */
+import { defineConfig, devices } from '@playwright/test'
 
-import { defineConfig, devices } from '@playwright/test';
+/**
+ * Configuration Playwright pour tests E2E Quelyos Dashboard
+ */
 
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: false, // Sequential pour éviter conflits DB
-  forbidOnly: !!process.env.CI,
+  timeout: 30000,
+  expect: { timeout: 10000 },
+  fullyParallel: true,
   retries: process.env.CI ? 2 : 0,
-  workers: 1, // 1 worker pour tests avec DB Odoo
-  reporter: 'html',
-  timeout: 30 * 1000, // 30s par test
+  workers: process.env.CI ? 1 : undefined,
+
+  reporter: [
+    ['html', { open: 'never' }],
+    ['list'],
+  ],
 
   use: {
-    baseURL: 'http://localhost:5175', // Vite dev server backoffice
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5175',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'on-first-retry',
+    viewport: { width: 1280, height: 720 },
+    ignoreHTTPSErrors: true,
+    actionTimeout: 10000,
+    navigationTimeout: 15000,
   },
 
   projects: [
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], storageState: 'e2e/.auth/user.json' },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'], storageState: 'e2e/.auth/user.json' },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'mobile-chrome',
+      use: { ...devices['Pixel 5'], storageState: 'e2e/.auth/user.json' },
+      dependencies: ['setup'],
     },
   ],
 
   webServer: {
     command: 'pnpm dev',
     url: 'http://localhost:5175',
-    reuseExistingServer: true, // Utiliser le serveur existant
-    timeout: 120 * 1000,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
   },
-});
+})

@@ -1,0 +1,99 @@
+# =============================================================================
+# OpenTelemetry Collector Configuration - Quelyos ERP
+# =============================================================================
+# Collecte les traces, métriques et logs de tous les services
+# et les envoie vers Jaeger (traces) et Prometheus (métriques)
+# =============================================================================
+
+receivers:
+  # Récepteur OTLP (OpenTelemetry Protocol)
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # Récepteur Zipkin (compatibilité legacy)
+  zipkin:
+    endpoint: 0.0.0.0:9411
+
+processors:
+  # Traitement par batch pour performance
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+
+  # Ajout de métadonnées
+  resource:
+    attributes:
+      - key: service.namespace
+        value: quelyos
+        action: upsert
+      - key: deployment.environment
+        value: ${ENVIRONMENT:-development}
+        action: upsert
+
+  # Filtrage des spans de santé (health checks)
+  filter:
+    error_mode: ignore
+    traces:
+      span:
+        - 'attributes["http.target"] == "/health"'
+        - 'attributes["http.target"] == "/api/health"'
+        - 'attributes["http.route"] == "/metrics"'
+
+exporters:
+  # Export vers Jaeger
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  # Export vers Prometheus (métriques)
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: quelyos
+    resource_to_telemetry_conversion:
+      enabled: true
+
+  # Logs en console (debug)
+  logging:
+    loglevel: info
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+extensions:
+  # Health check
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+  # Performance profiling
+  pprof:
+    endpoint: 0.0.0.0:1888
+
+  # Debug pages
+  zpages:
+    endpoint: 0.0.0.0:55679
+
+service:
+  extensions: [health_check, pprof, zpages]
+
+  pipelines:
+    # Pipeline traces
+    traces:
+      receivers: [otlp, zipkin]
+      processors: [filter, resource, batch]
+      exporters: [otlp/jaeger, logging]
+
+    # Pipeline métriques
+    metrics:
+      receivers: [otlp]
+      processors: [resource, batch]
+      exporters: [prometheus]
+
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      address: 0.0.0.0:8888

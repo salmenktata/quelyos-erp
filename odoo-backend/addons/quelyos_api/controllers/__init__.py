@@ -2,6 +2,7 @@
 from . import auth
 from . import base
 from . import main
+from . import health
 from . import cms
 from . import checkout
 from . import wishlist

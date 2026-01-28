@@ -1,0 +1,526 @@
+openapi: 3.0.3
+info:
+  title: Quelyos ERP API
+  description: |
+    API REST pour Quelyos ERP - Solution e-commerce et gestion d'entreprise.
+
+    ## Authentification
+
+    L'API utilise des sessions. Pour s'authentifier:
+    1. Appeler `POST /api/ecommerce/auth/login`
+    2. Récupérer le `session_id` de la réponse
+    3. Inclure le header `Authorization: Bearer {session_id}` dans les requêtes suivantes
+
+    ## Format des requêtes
+
+    Les endpoints utilisent le format JSON-RPC 2.0:
+    ```json
+    {
+      "jsonrpc": "2.0",
+      "method": "call",
+      "params": { ... },
+      "id": 1
+    }
+    ```
+
+    ## Rate Limiting
+
+    - Endpoints publics: 100 req/min
+    - Endpoints authentifiés: 200 req/min
+    - Login: 5 tentatives/min
+
+  version: 1.0.0
+  contact:
+    name: Quelyos Support
+    email: support@quelyos.com
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:8069/api
+    description: Développement local
+  - url: https://api.quelyos.com/api
+    description: Production
+
+tags:
+  - name: Auth
+    description: Authentification et sessions
+  - name: Products
+    description: Catalogue produits
+  - name: Orders
+    description: Commandes et checkout
+  - name: Customers
+    description: Gestion clients
+  - name: Stock
+    description: Gestion des stocks
+  - name: Health
+    description: Health checks et monitoring
+
+paths:
+  # ===========================================================================
+  # HEALTH
+  # ===========================================================================
+  /health:
+    get:
+      tags: [Health]
+      summary: Liveness probe
+      description: Vérifie si le service est vivant
+      operationId: healthLiveness
+      responses:
+        '200':
+          description: Service opérationnel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /health/ready:
+    get:
+      tags: [Health]
+      summary: Readiness probe
+      description: Vérifie si le service est prêt (toutes dépendances OK)
+      operationId: healthReadiness
+      responses:
+        '200':
+          description: Service prêt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadinessResponse'
+        '503':
+          description: Service non prêt
+
+  # ===========================================================================
+  # AUTH
+  # ===========================================================================
+  /ecommerce/auth/login:
+    post:
+      tags: [Auth]
+      summary: Connexion utilisateur
+      description: Authentifie un utilisateur et retourne un session_id
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '429':
+          description: Trop de tentatives
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /auth/user-info:
+    post:
+      tags: [Auth]
+      summary: Informations utilisateur
+      description: Retourne les informations de l'utilisateur connecté
+      operationId: getUserInfo
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Informations utilisateur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+        '401':
+          description: Non authentifié
+
+  # ===========================================================================
+  # PRODUCTS
+  # ===========================================================================
+  /ecommerce/products:
+    get:
+      tags: [Products]
+      summary: Liste des produits
+      description: Retourne la liste des produits avec pagination et filtres
+      operationId: listProducts
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: category_id
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des produits
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+
+  /ecommerce/products/{id}:
+    get:
+      tags: [Products]
+      summary: Détail produit
+      description: Retourne les détails d'un produit
+      operationId: getProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détail du produit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetailResponse'
+        '404':
+          description: Produit non trouvé
+
+  # ===========================================================================
+  # ORDERS
+  # ===========================================================================
+  /backoffice/orders:
+    post:
+      tags: [Orders]
+      summary: Liste des commandes
+      description: Retourne la liste des commandes (authentification requise)
+      operationId: listOrders
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonRpcRequest'
+      responses:
+        '200':
+          description: Liste des commandes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderListResponse'
+        '401':
+          description: Non authentifié
+
+  /backoffice/orders/{id}:
+    post:
+      tags: [Orders]
+      summary: Détail commande
+      description: Retourne les détails d'une commande
+      operationId: getOrder
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détail de la commande
+        '404':
+          description: Commande non trouvée
+
+  # ===========================================================================
+  # CUSTOMERS
+  # ===========================================================================
+  /backoffice/customers:
+    post:
+      tags: [Customers]
+      summary: Liste des clients
+      description: Retourne la liste des clients (authentification requise)
+      operationId: listCustomers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des clients
+        '401':
+          description: Non authentifié
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: session_id
+
+  schemas:
+    # Common
+    JsonRpcRequest:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          example: "2.0"
+        method:
+          type: string
+          example: "call"
+        params:
+          type: object
+        id:
+          type: integer
+          example: 1
+
+    ApiError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+        error_code:
+          type: string
+
+    RateLimitError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Too many requests"
+        error_code:
+          type: string
+          example: "RATE_LIMIT_EXCEEDED"
+        retry_after:
+          type: integer
+          description: Secondes avant retry
+
+    # Health
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        timestamp:
+          type: string
+          format: date-time
+
+    ReadinessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        timestamp:
+          type: string
+          format: date-time
+        checks:
+          type: object
+          properties:
+            database:
+              $ref: '#/components/schemas/CheckResult'
+            redis:
+              $ref: '#/components/schemas/CheckResult'
+
+    CheckResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, error, disabled]
+        latency_ms:
+          type: number
+        error:
+          type: string
+
+    # Auth
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        jsonrpc:
+          type: string
+          example: "2.0"
+        method:
+          type: string
+          example: "call"
+        params:
+          type: object
+          properties:
+            email:
+              type: string
+              example: "admin"
+            password:
+              type: string
+              example: "admin"
+        id:
+          type: integer
+
+    LoginResponse:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            success:
+              type: boolean
+            session_id:
+              type: string
+            uid:
+              type: integer
+
+    UserInfoResponse:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            success:
+              type: boolean
+            user:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+                email:
+                  type: string
+                login:
+                  type: string
+                groups:
+                  type: array
+                  items:
+                    type: string
+
+    # Products
+    ProductListResponse:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            success:
+              type: boolean
+            products:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductSummary'
+            total:
+              type: integer
+            limit:
+              type: integer
+            offset:
+              type: integer
+
+    ProductSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+        image_url:
+          type: string
+        category_id:
+          type: integer
+        stock_status:
+          type: string
+          enum: [in_stock, low_stock, out_of_stock]
+
+    ProductDetailResponse:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            success:
+              type: boolean
+            product:
+              $ref: '#/components/schemas/Product'
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        sku:
+          type: string
+        stock_quantity:
+          type: number
+        stock_status:
+          type: string
+        category_id:
+          type: integer
+        images:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              url:
+                type: string
+        attributes:
+          type: array
+          items:
+            type: object
+
+    # Orders
+    OrderListResponse:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            success:
+              type: boolean
+            orders:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderSummary'
+
+    OrderSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        date_order:
+          type: string
+          format: date-time
+        partner_id:
+          type: integer
+        partner_name:
+          type: string
+        amount_total:
+          type: number
+        state:
+          type: string
+          enum: [draft, sale, done, cancel]

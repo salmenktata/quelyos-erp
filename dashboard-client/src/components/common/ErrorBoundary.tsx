@@ -39,10 +39,37 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo
     })
 
-    // Logger vers service monitoring (Sentry, etc.) si configuré
+    // Envoyer à Sentry si disponible
+    if (typeof window !== 'undefined' && (window as unknown as { Sentry?: { captureException: (e: Error, opts?: unknown) => void } }).Sentry) {
+      (window as unknown as { Sentry: { captureException: (e: Error, opts?: unknown) => void } }).Sentry.captureException(error, {
+        extra: { componentStack: errorInfo.componentStack }
+      })
+    }
+
+    // Reporter au backend en production
     if (window.location.hostname !== 'localhost') {
-      // Production error logging
-      // Exemple : Sentry.captureException(error, { contexts: { react: errorInfo } })
+      this.reportErrorToBackend(error, errorInfo)
+    }
+  }
+
+  private reportErrorToBackend(error: Error, errorInfo: ErrorInfo) {
+    try {
+      const errorData = {
+        message: error.message,
+        stack: error.stack,
+        componentStack: errorInfo.componentStack,
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+      }
+
+      fetch('/api/backoffice/client-errors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(errorData),
+      }).catch(() => { /* Ignorer */ })
+    } catch {
+      // Ignorer les erreurs d'envoi
     }
   }
 

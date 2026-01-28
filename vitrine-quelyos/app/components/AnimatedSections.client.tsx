@@ -1,15 +1,11 @@
 "use client";
 
-import { LazyMotion, domAnimation, m } from "framer-motion";
-import { useEffect, useState } from "react";
+import { LazyMotion, domAnimation } from "framer-motion";
+import { useState } from "react";
 
 // Client Component pour animations progressives (lazy loaded)
 export default function AnimatedSections() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [mounted, setMounted] = useState(() => typeof window !== 'undefined');
 
   if (!mounted) return null;
 
