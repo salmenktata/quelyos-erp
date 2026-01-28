@@ -1,7 +1,19 @@
+/**
+ * Types de congés - Configuration des types de congés
+ *
+ * Fonctionnalités :
+ * - Liste des types avec couleur et paramètres
+ * - Création et modification de types
+ * - Règles de validation par type
+ * - État actif/inactif
+ */
 import { useState } from 'react'
+import { Layout } from '@/components/Layout'
+import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeaveTypes, type LeaveType } from '@/hooks/hr'
-import { Tag, Plus, Edit, Check, X, Clock, Calendar } from 'lucide-react'
+import { hrNotices } from '@/lib/notices'
+import { Tag, Plus, Edit } from 'lucide-react'
 
 export default function LeaveTypesPage() {
   const { tenant } = useMyTenant()
@@ -11,74 +23,89 @@ export default function LeaveTypesPage() {
   const { data: leaveTypes, isLoading } = useLeaveTypes(tenant?.id || null)
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Types de congés
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Configurez les différents types de congés disponibles
-          </p>
-        </div>
-        <button
-          onClick={() => {
-            setEditingType(null)
-            setShowModal(true)
-          }}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg"
-        >
-          <Plus className="w-4 h-4" />
-          Nouveau type
-        </button>
-      </div>
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Accueil', href: '/' },
+            { label: 'RH', href: '/hr' },
+            { label: 'Congés', href: '/hr/leaves' },
+            { label: 'Types' },
+          ]}
+        />
 
-      {/* Loading */}
-      {isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-40" />
-          ))}
-        </div>
-      )}
-
-      {/* Liste des types */}
-      {!isLoading && leaveTypes && leaveTypes.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {leaveTypes.map(type => (
-            <LeaveTypeCard
-              key={type.id}
-              leaveType={type}
-              onEdit={() => {
-                setEditingType(type)
-                setShowModal(true)
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Empty */}
-      {!isLoading && (!leaveTypes || leaveTypes.length === 0) && (
-        <div className="text-center py-12">
-          <Tag className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            Aucun type de congé
-          </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">
-            Créez vos premiers types de congés
-          </p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg"
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Types de congés
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">
+              Configurez les différents types de congés disponibles
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => {
+              setEditingType(null)
+              setShowModal(true)
+            }}
           >
-            <Plus className="w-4 h-4" />
-            Créer un type
-          </button>
+            Nouveau type
+          </Button>
         </div>
-      )}
-    </div>
+
+        {/* PageNotice */}
+        <PageNotice config={hrNotices.leavesTypes} className="mb-2" />
+
+        {/* Loading */}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-40" />
+            ))}
+          </div>
+        )}
+
+        {/* Liste des types */}
+        {!isLoading && leaveTypes && leaveTypes.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {leaveTypes.map(type => (
+              <LeaveTypeCard
+                key={type.id}
+                leaveType={type}
+                onEdit={() => {
+                  setEditingType(type)
+                  setShowModal(true)
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Empty */}
+        {!isLoading && (!leaveTypes || leaveTypes.length === 0) && (
+          <div className="text-center py-12">
+            <Tag className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Aucun type de congé
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
+              Créez vos premiers types de congés
+            </p>
+            <Button
+              variant="primary"
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => setShowModal(true)}
+            >
+              Créer un type
+            </Button>
+          </div>
+        )}
+      </div>
+    </Layout>
   )
 }
 

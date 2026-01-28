@@ -1,20 +1,20 @@
+/**
+ * Évaluations - Gestion des entretiens annuels
+ *
+ * Fonctionnalités :
+ * - Liste des évaluations avec filtres
+ * - Statistiques par statut
+ * - Création d'évaluations
+ * - Actions rapides (démarrer, voir)
+ */
 import { useState } from 'react'
+import { Layout } from '@/components/Layout'
+import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
-import { useAppraisals, useCreateAppraisal, useAppraisalAction, useEmployees, type AppraisalSummary } from '@/hooks/hr'
+import { useAppraisals, useCreateAppraisal, useAppraisalAction, useEmployees } from '@/hooks/hr'
+import { hrNotices } from '@/lib/notices'
 import { Link } from 'react-router-dom'
-import {
-  ClipboardCheck,
-  Plus,
-  Calendar,
-  User,
-  Star,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Eye,
-  Play,
-  Filter,
-} from 'lucide-react'
+import { ClipboardCheck, Plus, Star, Eye, Play, X } from 'lucide-react'
 
 export default function AppraisalsPage() {
   const { tenant } = useMyTenant()
@@ -64,217 +64,224 @@ export default function AppraisalsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Évaluations
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Entretiens annuels et bilans de performance
-          </p>
-        </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg"
-        >
-          <Plus className="w-4 h-4" />
-          Nouvelle évaluation
-        </button>
-      </div>
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Accueil', href: '/' },
+            { label: 'RH', href: '/hr' },
+            { label: 'Évaluations' },
+          ]}
+        />
 
-      {/* Stats rapides */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Planifiées', count: appraisals.filter(a => a.state === 'scheduled').length, color: 'blue' },
-          { label: 'En cours', count: appraisals.filter(a => ['in_progress', 'employee_done', 'manager_done'].includes(a.state)).length, color: 'amber' },
-          { label: 'Terminées', count: appraisals.filter(a => a.state === 'done').length, color: 'emerald' },
-          { label: 'Total', count: data?.total || 0, color: 'gray' },
-        ].map(stat => (
-          <div
-            key={stat.label}
-            className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700"
-          >
-            <p className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
-            <p className={`text-2xl font-bold text-${stat.color}-600 dark:text-${stat.color}-400`}>
-              {stat.count}
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Évaluations
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">
+              Entretiens annuels et bilans de performance
             </p>
           </div>
-        ))}
-      </div>
-
-      {/* Filtres */}
-      <div className="flex flex-wrap gap-4">
-        <select
-          value={yearFilter}
-          onChange={(e) => setYearFilter(Number(e.target.value))}
-          className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-        >
-          {[yearFilter - 1, yearFilter, yearFilter + 1].map(y => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
-        <select
-          value={stateFilter}
-          onChange={(e) => setStateFilter(e.target.value)}
-          className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-        >
-          <option value="">Tous les statuts</option>
-          <option value="draft">Brouillon</option>
-          <option value="scheduled">Planifié</option>
-          <option value="in_progress">En cours</option>
-          <option value="done">Terminé</option>
-          <option value="cancelled">Annulé</option>
-        </select>
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-        >
-          <option value="">Tous les types</option>
-          <option value="annual">Entretien annuel</option>
-          <option value="probation">Fin période d'essai</option>
-          <option value="mid_year">Bilan semestriel</option>
-          <option value="project">Fin de projet</option>
-        </select>
-      </div>
-
-      {/* Loading */}
-      {isLoading && (
-        <div className="space-y-4">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-20" />
-          ))}
+          <Button
+            variant="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => setShowModal(true)}
+          >
+            Nouvelle évaluation
+          </Button>
         </div>
-      )}
 
-      {/* Liste */}
-      {!isLoading && appraisals.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50 dark:bg-gray-900/50 text-left text-sm text-gray-500 dark:text-gray-400">
-                <th className="px-4 py-3 font-medium">Référence</th>
-                <th className="px-4 py-3 font-medium">Employé</th>
-                <th className="px-4 py-3 font-medium">Type</th>
-                <th className="px-4 py-3 font-medium">Date prévue</th>
-                <th className="px-4 py-3 font-medium">Statut</th>
-                <th className="px-4 py-3 font-medium">Note</th>
-                <th className="px-4 py-3 font-medium">Objectifs</th>
-                <th className="px-4 py-3 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {appraisals.map(appraisal => (
-                <tr key={appraisal.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                  <td className="px-4 py-3">
-                    <Link
-                      to={`/hr/appraisals/${appraisal.id}`}
-                      className="font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
-                    >
-                      {appraisal.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 text-sm font-semibold">
-                        {appraisal.employee_name?.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white text-sm">
-                          {appraisal.employee_name}
-                        </p>
-                        {appraisal.department_name && (
-                          <p className="text-xs text-gray-500">{appraisal.department_name}</p>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
-                    {appraisal.appraisal_type_label}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
-                    {appraisal.date_scheduled
-                      ? new Date(appraisal.date_scheduled).toLocaleDateString('fr-FR')
-                      : '-'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 text-xs rounded-full ${getStateColor(appraisal.state)}`}>
-                      {appraisal.state_label}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {getScoreStars(appraisal.final_score)}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    {appraisal.goals_total > 0 ? (
-                      <span className="text-gray-600 dark:text-gray-300">
-                        {appraisal.goals_achieved}/{appraisal.goals_total}
-                      </span>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
+        {/* PageNotice */}
+        <PageNotice config={hrNotices.appraisals} className="mb-2" />
+
+        {/* Stats rapides */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard label="Planifiées" count={appraisals.filter(a => a.state === 'scheduled').length} color="blue" />
+          <StatCard label="En cours" count={appraisals.filter(a => ['in_progress', 'employee_done', 'manager_done'].includes(a.state)).length} color="amber" />
+          <StatCard label="Terminées" count={appraisals.filter(a => a.state === 'done').length} color="emerald" />
+          <StatCard label="Total" count={data?.total || 0} color="gray" />
+        </div>
+
+        {/* Filtres */}
+        <div className="flex flex-wrap gap-4">
+          <select
+            value={yearFilter}
+            onChange={(e) => setYearFilter(Number(e.target.value))}
+            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+          >
+            {[yearFilter - 1, yearFilter, yearFilter + 1].map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+          <select
+            value={stateFilter}
+            onChange={(e) => setStateFilter(e.target.value)}
+            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+          >
+            <option value="">Tous les statuts</option>
+            <option value="draft">Brouillon</option>
+            <option value="scheduled">Planifié</option>
+            <option value="in_progress">En cours</option>
+            <option value="done">Terminé</option>
+            <option value="cancelled">Annulé</option>
+          </select>
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+          >
+            <option value="">Tous les types</option>
+            <option value="annual">Entretien annuel</option>
+            <option value="probation">Fin période d'essai</option>
+            <option value="mid_year">Bilan semestriel</option>
+            <option value="project">Fin de projet</option>
+          </select>
+        </div>
+
+        {/* Loading */}
+        {isLoading && (
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-xl h-20" />
+            ))}
+          </div>
+        )}
+
+        {/* Liste */}
+        {!isLoading && appraisals.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50 dark:bg-gray-900/50 text-left text-sm text-gray-500 dark:text-gray-400">
+                  <th className="px-4 py-3 font-medium">Référence</th>
+                  <th className="px-4 py-3 font-medium">Employé</th>
+                  <th className="px-4 py-3 font-medium">Type</th>
+                  <th className="px-4 py-3 font-medium">Date prévue</th>
+                  <th className="px-4 py-3 font-medium">Statut</th>
+                  <th className="px-4 py-3 font-medium">Note</th>
+                  <th className="px-4 py-3 font-medium">Objectifs</th>
+                  <th className="px-4 py-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {appraisals.map(appraisal => (
+                  <tr key={appraisal.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
+                    <td className="px-4 py-3">
                       <Link
                         to={`/hr/appraisals/${appraisal.id}`}
-                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                        title="Voir"
+                        className="font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
                       >
-                        <Eye className="w-4 h-4" />
+                        {appraisal.name}
                       </Link>
-                      {appraisal.state === 'scheduled' && (
-                        <button
-                          onClick={() => doAction({ id: appraisal.id, action: 'start' })}
-                          className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded"
-                          title="Démarrer"
-                        >
-                          <Play className="w-4 h-4" />
-                        </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 text-sm font-semibold">
+                          {appraisal.employee_name?.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white text-sm">{appraisal.employee_name}</p>
+                          {appraisal.department_name && (
+                            <p className="text-xs text-gray-500">{appraisal.department_name}</p>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{appraisal.appraisal_type_label}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+                      {appraisal.date_scheduled ? new Date(appraisal.date_scheduled).toLocaleDateString('fr-FR') : '-'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 text-xs rounded-full ${getStateColor(appraisal.state)}`}>
+                        {appraisal.state_label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">{getScoreStars(appraisal.final_score)}</td>
+                    <td className="px-4 py-3 text-sm">
+                      {appraisal.goals_total > 0 ? (
+                        <span className="text-gray-600 dark:text-gray-300">{appraisal.goals_achieved}/{appraisal.goals_total}</span>
+                      ) : (
+                        <span className="text-gray-400">-</span>
                       )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to={`/hr/appraisals/${appraisal.id}`}
+                          className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          title="Voir"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Link>
+                        {appraisal.state === 'scheduled' && (
+                          <button
+                            onClick={() => doAction({ id: appraisal.id, action: 'start' })}
+                            className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded"
+                            title="Démarrer"
+                          >
+                            <Play className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-      {/* Empty */}
-      {!isLoading && appraisals.length === 0 && (
-        <div className="text-center py-12">
-          <ClipboardCheck className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            Aucune évaluation
-          </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">
-            Planifiez les entretiens annuels de vos employés
-          </p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg"
-          >
-            <Plus className="w-4 h-4" />
-            Nouvelle évaluation
-          </button>
-        </div>
-      )}
+        {/* Empty */}
+        {!isLoading && appraisals.length === 0 && (
+          <div className="text-center py-12">
+            <ClipboardCheck className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Aucune évaluation
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
+              Planifiez les entretiens annuels de vos employés
+            </p>
+            <Button
+              variant="primary"
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => setShowModal(true)}
+            >
+              Nouvelle évaluation
+            </Button>
+          </div>
+        )}
 
-      {/* Modal création */}
-      {showModal && (
-        <CreateAppraisalModal
-          tenantId={tenant?.id || 0}
-          onClose={() => setShowModal(false)}
-          onCreate={(data) => {
-            createAppraisal(data)
-            setShowModal(false)
-          }}
-          isLoading={isCreating}
-        />
-      )}
+        {/* Modal création */}
+        {showModal && (
+          <CreateAppraisalModal
+            tenantId={tenant?.id || 0}
+            onClose={() => setShowModal(false)}
+            onCreate={(modalData) => {
+              createAppraisal(modalData)
+              setShowModal(false)
+            }}
+            isLoading={isCreating}
+          />
+        )}
+      </div>
+    </Layout>
+  )
+}
+
+function StatCard({ label, count, color }: { label: string; count: number; color: 'blue' | 'amber' | 'emerald' | 'gray' }) {
+  const colorClasses = {
+    blue: 'text-blue-600 dark:text-blue-400',
+    amber: 'text-amber-600 dark:text-amber-400',
+    emerald: 'text-emerald-600 dark:text-emerald-400',
+    gray: 'text-gray-600 dark:text-gray-400',
+  }
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+      <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
+      <p className={`text-2xl font-bold ${colorClasses[color]}`}>{count}</p>
     </div>
   )
 }
@@ -287,7 +294,7 @@ function CreateAppraisalModal({
 }: {
   tenantId: number
   onClose: () => void
-  onCreate: (data: any) => void
+  onCreate: (data: Record<string, unknown>) => void
   isLoading: boolean
 }) {
   const { data: employeesData } = useEmployees({ tenant_id: tenantId, limit: 200 })
@@ -322,9 +329,14 @@ function CreateAppraisalModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Nouvelle évaluation
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Nouvelle évaluation
+          </h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -363,9 +375,7 @@ function CreateAppraisalModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Début période
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Début période</label>
               <input
                 type="date"
                 value={formData.period_start}
@@ -374,9 +384,7 @@ function CreateAppraisalModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Fin période
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fin période</label>
               <input
                 type="date"
                 value={formData.period_end}
@@ -388,9 +396,7 @@ function CreateAppraisalModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Date entretien
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date entretien</label>
               <input
                 type="datetime-local"
                 value={formData.date_scheduled}
@@ -399,9 +405,7 @@ function CreateAppraisalModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Durée (heures)
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Durée (heures)</label>
               <input
                 type="number"
                 min="0.5"
@@ -414,9 +418,7 @@ function CreateAppraisalModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Lieu
-            </label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lieu</label>
             <input
               type="text"
               value={formData.location}
@@ -427,20 +429,12 @@ function CreateAppraisalModal({
           </div>
 
           <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg"
-            >
+            <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
               Annuler
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading || !formData.employee_id}
-              className="flex-1 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg"
-            >
+            </Button>
+            <Button type="submit" variant="primary" className="flex-1" disabled={isLoading || !formData.employee_id}>
               {isLoading ? 'Création...' : 'Créer'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

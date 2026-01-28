@@ -1,5 +1,16 @@
+/**
+ * Fiche employé - Détail et modification d'un employé
+ *
+ * Fonctionnalités :
+ * - Informations complètes (professionnel, contact, personnel)
+ * - Onglets : Informations, Contrats, Présences, Congés
+ * - Mode édition inline
+ * - Solde congés et contact d'urgence
+ */
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import { Layout } from '@/components/Layout'
+import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import {
   useEmployee,
@@ -10,8 +21,8 @@ import {
   useDepartments,
   useJobs,
 } from '@/hooks/hr'
+import { hrNotices } from '@/lib/notices'
 import {
-  ArrowLeft,
   Edit,
   Save,
   X,
@@ -22,7 +33,6 @@ import {
   Calendar,
   Mail,
   Phone,
-  MapPin,
   Building2,
   UserCheck,
   UserX,
@@ -55,7 +65,7 @@ export default function EmployeeDetailPage() {
   const departments = departmentsData?.departments || []
   const jobs = jobsData?.jobs || []
 
-  const [editForm, setEditForm] = useState<any>(null)
+  const [editForm, setEditForm] = useState<Record<string, string | number> | null>(null)
 
   const startEditing = () => {
     setEditForm({
@@ -82,7 +92,7 @@ export default function EmployeeDetailPage() {
   }
 
   const saveChanges = () => {
-    if (!employee?.id) return
+    if (!employee?.id || !editForm) return
     updateEmployee({
       id: employee.id,
       data: {
@@ -107,40 +117,48 @@ export default function EmployeeDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
-          <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+      <Layout>
+        <div className="p-4 md:p-8 space-y-6">
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
+            <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+          </div>
         </div>
-      </div>
+      </Layout>
     )
   }
 
   if (!employee) {
     return (
-      <div className="p-6 text-center">
-        <AlertTriangle className="w-12 h-12 mx-auto text-amber-500 mb-4" />
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-          Employé non trouvé
-        </h2>
-        <Link to="/hr/employees" className="text-cyan-600 hover:underline">
-          Retour à la liste
-        </Link>
-      </div>
+      <Layout>
+        <div className="p-4 md:p-8 text-center">
+          <AlertTriangle className="w-12 h-12 mx-auto text-amber-500 mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            Employé non trouvé
+          </h2>
+          <Link to="/hr/employees" className="text-cyan-600 hover:underline">
+            Retour à la liste
+          </Link>
+        </div>
+      </Layout>
     )
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate('/hr/employees')}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          </button>
+    <Layout>
+      <div className="p-4 md:p-8 space-y-6">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Accueil', href: '/' },
+            { label: 'RH', href: '/hr' },
+            { label: 'Employés', href: '/hr/employees' },
+            { label: employee.name || 'Détail' },
+          ]}
+        />
+
+        {/* Header */}
+        <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 text-2xl font-semibold">
               {employee.first_name?.[0]}{employee.last_name?.[0]}
@@ -160,411 +178,355 @@ export default function EmployeeDetailPage() {
               </div>
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <AttendanceStatus state={employee.attendance_state} />
-          <EmployeeStatus status={employee.state} />
-          {!isEditing && (
-            <button
-              onClick={startEditing}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg"
-            >
-              <Edit className="w-4 h-4" />
-              Modifier
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-gray-200 dark:border-gray-700 pb-4">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-              activeTab === tab.id
-                ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-            }`}
-          >
-            <tab.icon className="w-4 h-4" />
-            {tab.label}
-            {tab.count !== undefined && tab.count > 0 && (
-              <span className="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 rounded-full">
-                {tab.count}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Content */}
-      {activeTab === 'info' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Infos principales */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Professionnel */}
-            <InfoCard title="Informations professionnelles">
-              {isEditing ? (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Département</label>
-                    <select
-                      value={editForm.department_id}
-                      onChange={(e) => setEditForm({ ...editForm, department_id: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    >
-                      <option value="">Aucun</option>
-                      {departments.map(d => (
-                        <option key={d.id} value={d.id}>{d.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Poste</label>
-                    <select
-                      value={editForm.job_id}
-                      onChange={(e) => setEditForm({ ...editForm, job_id: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    >
-                      <option value="">Aucun</option>
-                      {jobs.map(j => (
-                        <option key={j.id} value={j.id}>{j.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <InfoRow icon={Building2} label="Département" value={employee.department_name} />
-                  <InfoRow icon={Briefcase} label="Poste" value={employee.job_title} />
-                  <InfoRow icon={User} label="Manager" value={employee.parent_name} />
-                  <InfoRow icon={Calendar} label="Ancienneté" value={employee.seniority ? `${employee.seniority} ans` : '-'} />
-                </div>
-              )}
-            </InfoCard>
-
-            {/* Contact */}
-            <InfoCard title="Contact">
-              {isEditing ? (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Email pro</label>
-                    <input
-                      type="email"
-                      value={editForm.work_email}
-                      onChange={(e) => setEditForm({ ...editForm, work_email: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Tél pro</label>
-                    <input
-                      type="tel"
-                      value={editForm.work_phone}
-                      onChange={(e) => setEditForm({ ...editForm, work_phone: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Mobile</label>
-                    <input
-                      type="tel"
-                      value={editForm.mobile_phone}
-                      onChange={(e) => setEditForm({ ...editForm, mobile_phone: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <InfoRow icon={Mail} label="Email pro" value={employee.work_email} link={`mailto:${employee.work_email}`} />
-                  <InfoRow icon={Phone} label="Tél pro" value={employee.work_phone} link={`tel:${employee.work_phone}`} />
-                  <InfoRow icon={Phone} label="Mobile" value={employee.mobile_phone} link={`tel:${employee.mobile_phone}`} />
-                </div>
-              )}
-            </InfoCard>
-
-            {/* Personnel */}
-            <InfoCard title="Informations personnelles">
-              {isEditing ? (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Prénom</label>
-                    <input
-                      type="text"
-                      value={editForm.first_name}
-                      onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Nom</label>
-                    <input
-                      type="text"
-                      value={editForm.last_name}
-                      onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Genre</label>
-                    <select
-                      value={editForm.gender}
-                      onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    >
-                      <option value="">Non spécifié</option>
-                      <option value="male">Homme</option>
-                      <option value="female">Femme</option>
-                      <option value="other">Autre</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Date de naissance</label>
-                    <input
-                      type="date"
-                      value={editForm.birthday}
-                      onChange={(e) => setEditForm({ ...editForm, birthday: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <InfoRow label="Genre" value={getGenderLabel(employee.gender)} />
-                  <InfoRow label="Date de naissance" value={employee.birthday ? new Date(employee.birthday).toLocaleDateString('fr-FR') : '-'} />
-                  <InfoRow label="Situation" value={getMaritalLabel(employee.marital)} />
-                  <InfoRow label="Enfants" value={employee.children?.toString() || '0'} />
-                </div>
-              )}
-            </InfoCard>
-
-            {/* Actions édition */}
-            {isEditing && (
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={cancelEditing}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg"
-                >
-                  <X className="w-4 h-4" />
-                  Annuler
-                </button>
-                <button
-                  onClick={saveChanges}
-                  disabled={isUpdating}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg"
-                >
-                  <Save className="w-4 h-4" />
-                  {isUpdating ? 'Enregistrement...' : 'Enregistrer'}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Solde congés */}
-            <InfoCard title="Solde congés">
-              <div className="text-center">
-                <p className="text-4xl font-bold text-cyan-600 dark:text-cyan-400">
-                  {employee.remaining_leaves?.toFixed(1) || '0'}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">jours restants</p>
-              </div>
-            </InfoCard>
-
-            {/* Contact urgence */}
-            <InfoCard title="Contact d'urgence">
-              {isEditing ? (
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Nom</label>
-                    <input
-                      type="text"
-                      value={editForm.emergency_contact}
-                      onChange={(e) => setEditForm({ ...editForm, emergency_contact: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Téléphone</label>
-                    <input
-                      type="tel"
-                      value={editForm.emergency_phone}
-                      onChange={(e) => setEditForm({ ...editForm, emergency_phone: e.target.value })}
-                      className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {employee.emergency_contact || '-'}
-                  </p>
-                  {employee.emergency_phone && (
-                    <a
-                      href={`tel:${employee.emergency_phone}`}
-                      className="text-cyan-600 hover:underline"
-                    >
-                      {employee.emergency_phone}
-                    </a>
-                  )}
-                </div>
-              )}
-            </InfoCard>
-          </div>
-        </div>
-      )}
-
-      {/* Contrats */}
-      {activeTab === 'contracts' && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          {contracts.length > 0 ? (
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-gray-900/50 text-left text-sm text-gray-500 dark:text-gray-400">
-                  <th className="px-4 py-3 font-medium">Référence</th>
-                  <th className="px-4 py-3 font-medium">Type</th>
-                  <th className="px-4 py-3 font-medium">Début</th>
-                  <th className="px-4 py-3 font-medium">Fin</th>
-                  <th className="px-4 py-3 font-medium">Statut</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {contracts.map(contract => (
-                  <tr key={contract.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
-                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                      {contract.name}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
-                      {contract.contract_type_label}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
-                      {new Date(contract.date_start).toLocaleDateString('fr-FR')}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
-                      {contract.date_end ? new Date(contract.date_end).toLocaleDateString('fr-FR') : '-'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <ContractStatus state={contract.state} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="p-8 text-center">
-              <FileText className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">Aucun contrat</p>
-              <Link
-                to="/hr/contracts/new"
-                className="inline-block mt-4 text-cyan-600 hover:underline"
+          <div className="flex items-center gap-2">
+            <AttendanceStatus state={employee.attendance_state} />
+            <EmployeeStatus status={employee.state} />
+            {!isEditing && (
+              <Button
+                variant="primary"
+                icon={<Edit className="w-4 h-4" />}
+                onClick={startEditing}
               >
-                Créer un contrat
-              </Link>
-            </div>
-          )}
+                Modifier
+              </Button>
+            )}
+          </div>
         </div>
-      )}
 
-      {/* Présences */}
-      {activeTab === 'attendance' && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          {attendances.length > 0 ? (
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-gray-900/50 text-left text-sm text-gray-500 dark:text-gray-400">
-                  <th className="px-4 py-3 font-medium">Date</th>
-                  <th className="px-4 py-3 font-medium">Entrée</th>
-                  <th className="px-4 py-3 font-medium">Sortie</th>
-                  <th className="px-4 py-3 font-medium">Durée</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {attendances.map(att => (
-                  <tr key={att.id}>
-                    <td className="px-4 py-3 text-gray-900 dark:text-white">
-                      {new Date(att.check_in).toLocaleDateString('fr-FR')}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
-                      {new Date(att.check_in).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
-                      {att.check_out
-                        ? new Date(att.check_out).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-                        : '-'}
-                    </td>
-                    <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">
-                      {att.worked_hours ? `${att.worked_hours.toFixed(1)}h` : '-'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="p-8 text-center">
-              <Clock className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">Aucun pointage enregistré</p>
-            </div>
-          )}
+        {/* PageNotice */}
+        <PageNotice config={hrNotices.employeeDetail} className="mb-2" />
+
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-2 border-b border-gray-200 dark:border-gray-700 pb-4">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+              {tab.count !== undefined && tab.count > 0 && (
+                <span className="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 rounded-full">
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
-      )}
 
-      {/* Congés */}
-      {activeTab === 'leaves' && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          {leaves.length > 0 ? (
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-gray-900/50 text-left text-sm text-gray-500 dark:text-gray-400">
-                  <th className="px-4 py-3 font-medium">Type</th>
-                  <th className="px-4 py-3 font-medium">Période</th>
-                  <th className="px-4 py-3 font-medium">Durée</th>
-                  <th className="px-4 py-3 font-medium">Statut</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {leaves.map(leave => (
-                  <tr key={leave.id}>
-                    <td className="px-4 py-3">
-                      <span
-                        className="px-2 py-1 text-xs rounded-full"
-                        style={{
-                          backgroundColor: `${leave.leave_type_color || '#6b7280'}20`,
-                          color: leave.leave_type_color || '#6b7280',
-                        }}
+        {/* Content */}
+        {activeTab === 'info' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <InfoCard title="Informations professionnelles">
+                {isEditing && editForm ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Département</label>
+                      <select
+                        value={editForm.department_id}
+                        onChange={(e) => setEditForm({ ...editForm, department_id: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
                       >
-                        {leave.leave_type_name}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
-                      {new Date(leave.date_from).toLocaleDateString('fr-FR')} - {new Date(leave.date_to).toLocaleDateString('fr-FR')}
-                    </td>
-                    <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">
-                      {leave.number_of_days} jour{leave.number_of_days > 1 ? 's' : ''}
-                    </td>
-                    <td className="px-4 py-3">
-                      <LeaveStatus state={leave.state} label={leave.state_label} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="p-8 text-center">
-              <Calendar className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">Aucune demande de congé</p>
+                        <option value="">Aucun</option>
+                        {departments.map(d => (
+                          <option key={d.id} value={d.id}>{d.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Poste</label>
+                      <select
+                        value={editForm.job_id}
+                        onChange={(e) => setEditForm({ ...editForm, job_id: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      >
+                        <option value="">Aucun</option>
+                        {jobs.map(j => (
+                          <option key={j.id} value={j.id}>{j.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <InfoRow icon={Building2} label="Département" value={employee.department_name} />
+                    <InfoRow icon={Briefcase} label="Poste" value={employee.job_title} />
+                    <InfoRow icon={User} label="Manager" value={employee.parent_name} />
+                    <InfoRow icon={Calendar} label="Ancienneté" value={employee.seniority ? `${employee.seniority} ans` : '-'} />
+                  </div>
+                )}
+              </InfoCard>
+
+              <InfoCard title="Contact">
+                {isEditing && editForm ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Email pro</label>
+                      <input
+                        type="email"
+                        value={editForm.work_email}
+                        onChange={(e) => setEditForm({ ...editForm, work_email: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Tél pro</label>
+                      <input
+                        type="tel"
+                        value={editForm.work_phone}
+                        onChange={(e) => setEditForm({ ...editForm, work_phone: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Mobile</label>
+                      <input
+                        type="tel"
+                        value={editForm.mobile_phone}
+                        onChange={(e) => setEditForm({ ...editForm, mobile_phone: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <InfoRow icon={Mail} label="Email pro" value={employee.work_email} link={`mailto:${employee.work_email}`} />
+                    <InfoRow icon={Phone} label="Tél pro" value={employee.work_phone} link={`tel:${employee.work_phone}`} />
+                    <InfoRow icon={Phone} label="Mobile" value={employee.mobile_phone} link={`tel:${employee.mobile_phone}`} />
+                  </div>
+                )}
+              </InfoCard>
+
+              <InfoCard title="Informations personnelles">
+                {isEditing && editForm ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Prénom</label>
+                      <input
+                        type="text"
+                        value={editForm.first_name}
+                        onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Nom</label>
+                      <input
+                        type="text"
+                        value={editForm.last_name}
+                        onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Genre</label>
+                      <select
+                        value={editForm.gender}
+                        onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      >
+                        <option value="">Non spécifié</option>
+                        <option value="male">Homme</option>
+                        <option value="female">Femme</option>
+                        <option value="other">Autre</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Date de naissance</label>
+                      <input
+                        type="date"
+                        value={editForm.birthday as string}
+                        onChange={(e) => setEditForm({ ...editForm, birthday: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <InfoRow label="Genre" value={getGenderLabel(employee.gender)} />
+                    <InfoRow label="Date de naissance" value={employee.birthday ? new Date(employee.birthday).toLocaleDateString('fr-FR') : '-'} />
+                    <InfoRow label="Situation" value={getMaritalLabel(employee.marital)} />
+                    <InfoRow label="Enfants" value={employee.children?.toString() || '0'} />
+                  </div>
+                )}
+              </InfoCard>
+
+              {isEditing && (
+                <div className="flex justify-end gap-3">
+                  <Button variant="secondary" icon={<X className="w-4 h-4" />} onClick={cancelEditing}>
+                    Annuler
+                  </Button>
+                  <Button variant="primary" icon={<Save className="w-4 h-4" />} onClick={saveChanges} disabled={isUpdating}>
+                    {isUpdating ? 'Enregistrement...' : 'Enregistrer'}
+                  </Button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
-    </div>
+
+            <div className="space-y-6">
+              <InfoCard title="Solde congés">
+                <div className="text-center">
+                  <p className="text-4xl font-bold text-cyan-600 dark:text-cyan-400">
+                    {employee.remaining_leaves?.toFixed(1) || '0'}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">jours restants</p>
+                </div>
+              </InfoCard>
+
+              <InfoCard title="Contact d'urgence">
+                {isEditing && editForm ? (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Nom</label>
+                      <input
+                        type="text"
+                        value={editForm.emergency_contact}
+                        onChange={(e) => setEditForm({ ...editForm, emergency_contact: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Téléphone</label>
+                      <input
+                        type="tel"
+                        value={editForm.emergency_phone}
+                        onChange={(e) => setEditForm({ ...editForm, emergency_phone: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {employee.emergency_contact || '-'}
+                    </p>
+                    {employee.emergency_phone && (
+                      <a href={`tel:${employee.emergency_phone}`} className="text-cyan-600 hover:underline">
+                        {employee.emergency_phone}
+                      </a>
+                    )}
+                  </div>
+                )}
+              </InfoCard>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'contracts' && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            {contracts.length > 0 ? (
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 dark:bg-gray-900/50 text-left text-sm text-gray-500 dark:text-gray-400">
+                    <th className="px-4 py-3 font-medium">Référence</th>
+                    <th className="px-4 py-3 font-medium">Type</th>
+                    <th className="px-4 py-3 font-medium">Début</th>
+                    <th className="px-4 py-3 font-medium">Fin</th>
+                    <th className="px-4 py-3 font-medium">Statut</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {contracts.map(contract => (
+                    <tr key={contract.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/30">
+                      <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{contract.name}</td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{contract.contract_type_label}</td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{new Date(contract.date_start).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{contract.date_end ? new Date(contract.date_end).toLocaleDateString('fr-FR') : '-'}</td>
+                      <td className="px-4 py-3"><ContractStatus state={contract.state} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="p-8 text-center">
+                <FileText className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">Aucun contrat</p>
+                <Link to="/hr/contracts/new" className="inline-block mt-4 text-cyan-600 hover:underline">
+                  Créer un contrat
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'attendance' && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            {attendances.length > 0 ? (
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 dark:bg-gray-900/50 text-left text-sm text-gray-500 dark:text-gray-400">
+                    <th className="px-4 py-3 font-medium">Date</th>
+                    <th className="px-4 py-3 font-medium">Entrée</th>
+                    <th className="px-4 py-3 font-medium">Sortie</th>
+                    <th className="px-4 py-3 font-medium">Durée</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {attendances.map(att => (
+                    <tr key={att.id}>
+                      <td className="px-4 py-3 text-gray-900 dark:text-white">{new Date(att.check_in).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{new Date(att.check_in).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{att.check_out ? new Date(att.check_out).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '-'}</td>
+                      <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">{att.worked_hours ? `${att.worked_hours.toFixed(1)}h` : '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="p-8 text-center">
+                <Clock className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">Aucun pointage enregistré</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'leaves' && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            {leaves.length > 0 ? (
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 dark:bg-gray-900/50 text-left text-sm text-gray-500 dark:text-gray-400">
+                    <th className="px-4 py-3 font-medium">Type</th>
+                    <th className="px-4 py-3 font-medium">Période</th>
+                    <th className="px-4 py-3 font-medium">Durée</th>
+                    <th className="px-4 py-3 font-medium">Statut</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {leaves.map(leave => (
+                    <tr key={leave.id}>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-1 text-xs rounded-full" style={{ backgroundColor: `${leave.leave_type_color || '#6b7280'}20`, color: leave.leave_type_color || '#6b7280' }}>
+                          {leave.leave_type_name}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{new Date(leave.date_from).toLocaleDateString('fr-FR')} - {new Date(leave.date_to).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">{leave.number_of_days} jour{leave.number_of_days > 1 ? 's' : ''}</td>
+                      <td className="px-4 py-3"><LeaveStatus state={leave.state} label={leave.state_label} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="p-8 text-center">
+                <Calendar className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">Aucune demande de congé</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </Layout>
   )
 }
 
-// Composants utilitaires
 function InfoCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -574,12 +536,7 @@ function InfoCard({ title, children }: { title: string; children: React.ReactNod
   )
 }
 
-function InfoRow({ icon: Icon, label, value, link }: {
-  icon?: React.ComponentType<{ className?: string }>
-  label: string
-  value?: string | null
-  link?: string
-}) {
+function InfoRow({ icon: Icon, label, value, link }: { icon?: React.ComponentType<{ className?: string }>; label: string; value?: string | null; link?: string }) {
   const content = (
     <div className="flex items-start gap-3">
       {Icon && <Icon className="w-4 h-4 text-gray-400 mt-0.5" />}
@@ -589,10 +546,7 @@ function InfoRow({ icon: Icon, label, value, link }: {
       </div>
     </div>
   )
-
-  if (link && value) {
-    return <a href={link} className="hover:text-cyan-600">{content}</a>
-  }
+  if (link && value) return <a href={link} className="hover:text-cyan-600">{content}</a>
   return content
 }
 
@@ -600,15 +554,13 @@ function AttendanceStatus({ state }: { state: string }) {
   if (state === 'checked_in') {
     return (
       <span className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full">
-        <UserCheck className="w-4 h-4" />
-        Présent
+        <UserCheck className="w-4 h-4" />Présent
       </span>
     )
   }
   return (
     <span className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded-full">
-      <UserX className="w-4 h-4" />
-      Absent
+      <UserX className="w-4 h-4" />Absent
     </span>
   )
 }
@@ -619,16 +571,8 @@ function EmployeeStatus({ status }: { status: string }) {
     suspended: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
     departed: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
   }
-  const labels: Record<string, string> = {
-    active: 'Actif',
-    suspended: 'Suspendu',
-    departed: 'Parti',
-  }
-  return (
-    <span className={`px-3 py-1 text-sm rounded-full ${styles[status] || styles.active}`}>
-      {labels[status] || status}
-    </span>
-  )
+  const labels: Record<string, string> = { active: 'Actif', suspended: 'Suspendu', departed: 'Parti' }
+  return <span className={`px-3 py-1 text-sm rounded-full ${styles[status] || styles.active}`}>{labels[status] || status}</span>
 }
 
 function ContractStatus({ state }: { state: string }) {
@@ -638,17 +582,8 @@ function ContractStatus({ state }: { state: string }) {
     close: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
     cancel: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
   }
-  const labels: Record<string, string> = {
-    draft: 'Brouillon',
-    open: 'En cours',
-    close: 'Terminé',
-    cancel: 'Annulé',
-  }
-  return (
-    <span className={`px-2 py-1 text-xs rounded-full ${styles[state] || styles.draft}`}>
-      {labels[state] || state}
-    </span>
-  )
+  const labels: Record<string, string> = { draft: 'Brouillon', open: 'En cours', close: 'Terminé', cancel: 'Annulé' }
+  return <span className={`px-2 py-1 text-xs rounded-full ${styles[state] || styles.draft}`}>{labels[state] || state}</span>
 }
 
 function LeaveStatus({ state, label }: { state: string; label: string }) {
@@ -660,29 +595,15 @@ function LeaveStatus({ state, label }: { state: string; label: string }) {
     refuse: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
     cancel: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
   }
-  return (
-    <span className={`px-2 py-1 text-xs rounded-full ${styles[state] || styles.draft}`}>
-      {label}
-    </span>
-  )
+  return <span className={`px-2 py-1 text-xs rounded-full ${styles[state] || styles.draft}`}>{label}</span>
 }
 
 function getGenderLabel(gender?: string): string {
-  const labels: Record<string, string> = {
-    male: 'Homme',
-    female: 'Femme',
-    other: 'Autre',
-  }
+  const labels: Record<string, string> = { male: 'Homme', female: 'Femme', other: 'Autre' }
   return gender ? labels[gender] || gender : '-'
 }
 
 function getMaritalLabel(marital?: string): string {
-  const labels: Record<string, string> = {
-    single: 'Célibataire',
-    married: 'Marié(e)',
-    cohabitant: 'Concubin(e)',
-    widower: 'Veuf/Veuve',
-    divorced: 'Divorcé(e)',
-  }
+  const labels: Record<string, string> = { single: 'Célibataire', married: 'Marié(e)', cohabitant: 'Concubin(e)', widower: 'Veuf/Veuve', divorced: 'Divorcé(e)' }
   return marital ? labels[marital] || marital : '-'
 }
