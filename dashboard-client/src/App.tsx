@@ -26,7 +26,6 @@ import StockMoves from './pages/StockMoves'
 import StockTransfers from './pages/StockTransfers'
 import StockLocations from './pages/StockLocations'
 import ReorderingRules from './pages/stock/ReorderingRules'
-import DeliveryMethods from './pages/store/DeliveryMethods'
 import Payments from './pages/Payments'
 import Featured from './pages/store/Featured'
 import Analytics from './pages/Analytics'
@@ -353,14 +352,8 @@ export default function App() {
                 <Route path="units" element={<StockSettingsUnits />} />
                 <Route path="alerts" element={<StockSettingsAlerts />} />
               </Route>
-              <Route
-                path="/store/delivery"
-                element={
-                  <ProtectedRoute>
-                    <DeliveryMethods />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Redirection ancienne page delivery vers settings/shipping */}
+              <Route path="/store/delivery" element={<Navigate to="/store/settings/shipping" replace />} />
               {/* Redirection ancienne page site-config vers settings */}
               <Route path="/store/site-config" element={<Navigate to="/store/settings" replace />} />
               {/* Store Settings */}

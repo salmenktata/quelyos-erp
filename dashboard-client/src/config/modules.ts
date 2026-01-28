@@ -227,7 +227,6 @@ export const MODULES: Module[] = [
       {
         title: 'Configuration',
         items: [
-          { name: 'Livraison', path: '/store/delivery', icon: Truck },
           { name: 'Paramètres', path: '/store/settings', icon: Settings },
         ],
       },
