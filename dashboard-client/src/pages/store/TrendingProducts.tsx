@@ -30,7 +30,7 @@ import {
   type TrendingProduct,
 } from '@/hooks/useTrendingProducts';
 import { useToast } from '@/hooks/useToast';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice } from '@/lib/utils/formatters';
 
 export default function TrendingProducts() {
   const toast = useToast();

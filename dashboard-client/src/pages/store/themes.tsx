@@ -151,7 +151,7 @@ export default function ThemesPage() {
         </div>
       </div>
 
-      <PageNotice notices={storeNotices} page="themes" />
+      <PageNotice config={storeNotices.themes} className="mb-6" />
 
       {/* Filtres catégories */}
       <div className="mb-6 flex flex-wrap gap-2">

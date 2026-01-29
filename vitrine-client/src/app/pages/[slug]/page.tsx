@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useStaticPage } from '@/hooks/useStaticPage'
 import Header from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
@@ -47,12 +48,12 @@ export default function StaticPageView() {
               <p className="text-gray-600 dark:text-gray-400 mb-8">
                 {error || 'La page que vous recherchez n\'existe pas.'}
               </p>
-              <a
+              <Link
                 href="/"
                 className="inline-block px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
               >
                 Retour à l'accueil
-              </a>
+              </Link>
             </div>
           </div>
         </main>

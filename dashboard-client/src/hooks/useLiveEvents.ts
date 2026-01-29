@@ -52,11 +52,11 @@ export function useLiveEvents(params?: { state?: string; active?: boolean }) {
   return useQuery({
     queryKey: ['live-events', params],
     queryFn: async () => {
-      const response = await api.post('/api/admin/live-events', params || {})
-      if (!response.success) {
-        throw new Error(response.error || 'Erreur lors du chargement')
+      const response = await api.post<{ success: boolean; error?: string; liveEvents?: LiveEvent[] }>('/api/admin/live-events', params || {})
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Erreur lors du chargement')
       }
-      return response.liveEvents as LiveEvent[]
+      return response.data.liveEvents as LiveEvent[]
     },
   })
 }
@@ -67,11 +67,11 @@ export function useCreateLiveEvent() {
 
   return useMutation({
     mutationFn: async (data: LiveEventFormData) => {
-      const response = await api.post('/api/admin/live-events/save', data)
-      if (!response.success) {
-        throw new Error(response.error || 'Erreur lors de la création')
+      const response = await api.post<{ success: boolean; error?: string; liveEvent?: LiveEvent }>('/api/admin/live-events/save', data)
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Erreur lors de la création')
       }
-      return response.liveEvent as LiveEvent
+      return response.data.liveEvent as LiveEvent
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['live-events'] })
@@ -85,11 +85,11 @@ export function useUpdateLiveEvent() {
 
   return useMutation({
     mutationFn: async (data: LiveEventFormData & { id: number }) => {
-      const response = await api.post('/api/admin/live-events/save', data)
-      if (!response.success) {
-        throw new Error(response.error || 'Erreur lors de la modification')
+      const response = await api.post<{ success: boolean; error?: string; liveEvent?: LiveEvent }>('/api/admin/live-events/save', data)
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Erreur lors de la modification')
       }
-      return response.liveEvent as LiveEvent
+      return response.data.liveEvent as LiveEvent
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['live-events'] })
@@ -103,9 +103,9 @@ export function useDeleteLiveEvent() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await api.post(`/api/admin/live-events/${id}/delete`, {})
-      if (!response.success) {
-        throw new Error(response.error || 'Erreur lors de la suppression')
+      const response = await api.post<{ success: boolean; error?: string }>(`/api/admin/live-events/${id}/delete`, {})
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Erreur lors de la suppression')
       }
       return true
     },
@@ -121,11 +121,11 @@ export function useGoLive() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await api.post(`/api/admin/live-events/${id}/go-live`, {})
-      if (!response.success) {
-        throw new Error(response.error || 'Erreur')
+      const response = await api.post<{ success: boolean; error?: string; liveEvent?: LiveEvent }>(`/api/admin/live-events/${id}/go-live`, {})
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Erreur')
       }
-      return response.liveEvent as LiveEvent
+      return response.data.liveEvent as LiveEvent
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['live-events'] })
@@ -139,11 +139,11 @@ export function useEndLive() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await api.post(`/api/admin/live-events/${id}/end`, {})
-      if (!response.success) {
-        throw new Error(response.error || 'Erreur')
+      const response = await api.post<{ success: boolean; error?: string; liveEvent?: LiveEvent }>(`/api/admin/live-events/${id}/end`, {})
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Erreur')
       }
-      return response.liveEvent as LiveEvent
+      return response.data.liveEvent as LiveEvent
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['live-events'] })
@@ -157,11 +157,11 @@ export function useScheduleLiveEvent() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await api.post(`/api/admin/live-events/${id}/schedule`, {})
-      if (!response.success) {
-        throw new Error(response.error || 'Erreur')
+      const response = await api.post<{ success: boolean; error?: string; liveEvent?: LiveEvent }>(`/api/admin/live-events/${id}/schedule`, {})
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Erreur')
       }
-      return response.liveEvent as LiveEvent
+      return response.data.liveEvent as LiveEvent
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['live-events'] })

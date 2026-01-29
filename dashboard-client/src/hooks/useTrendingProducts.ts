@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { backendApi } from '@/lib/backend';
+import { api } from '@/lib/api';
 
 export interface TrendingProduct {
   id: number;
@@ -31,14 +31,14 @@ export function useTrendingProducts(params: TrendingProductsParams = {}) {
   return useQuery({
     queryKey: ['trending-products', params],
     queryFn: async () => {
-      const response = await backendApi.post<TrendingProductsResponse>(
+      const response = await api.post<TrendingProductsResponse>(
         '/api/admin/trending-products',
         params
       );
-      if (!response.success) {
-        throw new Error(response.error || 'Erreur lors de la récupération');
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Erreur lors de la récupération');
       }
-      return response;
+      return response.data;
     },
   });
 }
@@ -48,14 +48,14 @@ export function useToggleTrending() {
 
   return useMutation({
     mutationFn: async (productId: number) => {
-      const response = await backendApi.post<{ success: boolean; is_trending: boolean; error?: string }>(
+      const response = await api.post<{ success: boolean; is_trending: boolean; error?: string }>(
         `/api/admin/trending-products/${productId}/toggle`,
         {}
       );
-      if (!response.success) {
-        throw new Error(response.error || 'Erreur lors de la mise à jour');
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Erreur lors de la mise à jour');
       }
-      return response;
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trending-products'] });
@@ -78,14 +78,14 @@ export function useUpdateTrendingData() {
         social_mentions?: number;
       };
     }) => {
-      const response = await backendApi.post<{ success: boolean; product: TrendingProduct; error?: string }>(
+      const response = await api.post<{ success: boolean; product: TrendingProduct; error?: string }>(
         `/api/admin/trending-products/${productId}/update`,
         data
       );
-      if (!response.success) {
-        throw new Error(response.error || 'Erreur lors de la mise à jour');
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Erreur lors de la mise à jour');
       }
-      return response;
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trending-products'] });
