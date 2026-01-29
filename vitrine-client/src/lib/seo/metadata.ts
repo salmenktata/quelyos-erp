@@ -21,7 +21,7 @@ export interface SeoData {
   twitter_title: string;
   twitter_description: string;
   twitter_image: string;
-  structured_data: any;
+  structured_data: unknown;
 }
 
 /**
@@ -60,12 +60,12 @@ export async function getProductSeoMetadata(productId: number): Promise<Metadata
             alt: seo.og_title,
           },
         ],
-        type: seo.og_type as any,
+        type: (seo.og_type || 'website') as 'website' | 'article' | 'book' | 'profile' | 'music.song' | 'music.album' | 'music.playlist' | 'music.radio_station' | 'video.movie' | 'video.episode' | 'video.tv_show' | 'video.other',
         url: `${baseUrl}${seo.canonical_url}`,
         siteName: 'Quelyos',
       },
       twitter: {
-        card: seo.twitter_card as any,
+        card: (seo.twitter_card || 'summary_large_image') as 'summary' | 'summary_large_image' | 'app' | 'player',
         title: seo.twitter_title,
         description: seo.twitter_description,
         images: [
@@ -76,7 +76,7 @@ export async function getProductSeoMetadata(productId: number): Promise<Metadata
       },
     };
   } catch (_error) {
-    logger.error('Erreur lors de la récupération des métadonnées SEO:', error);
+    logger.error('Erreur lors de la récupération des métadonnées SEO:', _error);
     return getDefaultMetadata();
   }
 }
@@ -94,7 +94,7 @@ export async function getProductStructuredData(productId: number): Promise<strin
 
     return JSON.stringify(response.data.structured_data);
   } catch (_error) {
-    logger.error('Erreur lors de la récupération des données structurées:', error);
+    logger.error('Erreur lors de la récupération des données structurées:', _error);
     return null;
   }
 }
@@ -112,7 +112,7 @@ export async function getBreadcrumbStructuredData(productId: number): Promise<st
 
     return JSON.stringify(response.data.structured_data);
   } catch (_error) {
-    logger.error('Erreur lors de la récupération du fil d\'Ariane:', error);
+    logger.error('Erreur lors de la récupération du fil d\'Ariane:', _error);
     return null;
   }
 }
@@ -130,7 +130,7 @@ export async function getOrganizationStructuredData(): Promise<string | null> {
 
     return JSON.stringify(response.data.structured_data);
   } catch (_error) {
-    logger.error('Erreur lors de la récupération des données de l\'organisation:', error);
+    logger.error('Erreur lors de la récupération des données de l\'organisation:', _error);
     return null;
   }
 }

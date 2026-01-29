@@ -10,7 +10,7 @@ import type { Product } from '@quelyos/types';
 interface UseCachedProductsOptions {
   limit?: number;
   offset?: number;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   sort?: 'name' | 'price_asc' | 'price_desc' | 'newest' | 'popularity';
   useCache?: boolean; // Enable/disable cache
 }
@@ -64,7 +64,8 @@ export function useCachedProducts(
       } else {
         setError('Failed to fetch products');
       }
-    } catch (_err: any) {
+    } catch (_err) {
+      const err = _err as Error;
       setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
@@ -117,7 +118,8 @@ export function useCachedProduct(
       } else {
         setError('Product not found');
       }
-    } catch (_err: any) {
+    } catch (_err) {
+      const err = _err as Error;
       setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);

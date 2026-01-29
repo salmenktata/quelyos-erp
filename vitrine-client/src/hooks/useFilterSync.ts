@@ -51,7 +51,7 @@ export const useFilterSync = ({
     if (categoryId) urlFilters.category_id = Number(categoryId);
     if (minPrice) urlFilters.min_price = Number(minPrice);
     if (maxPrice) urlFilters.max_price = Number(maxPrice);
-    if (sort) urlFilters.sort = sort as any;
+    if (sort) urlFilters.sort = sort as ProductFilters['sort'];
     if (search) urlFilters.search = search;
 
     // Appliquer les filtres si différents

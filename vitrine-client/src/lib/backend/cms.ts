@@ -28,9 +28,9 @@ const getApiBase = () => {
 /**
  * Appel JSON-RPC vers l'API CMS
  */
-async function jsonrpc<T = any>(
+async function jsonrpc<T = unknown>(
   endpoint: string,
-  params: Record<string, any> = {},
+  params: Record<string, unknown> = {},
   options: { throwOn404?: boolean } = {}
 ): Promise<T> {
   const apiBase = getApiBase();
@@ -42,6 +42,7 @@ async function jsonrpc<T = any>(
     });
     return response.data;
   } catch (_error: unknown) {
+    const error = _error as { response?: { status?: number; data?: { error?: string; message?: string } }; message?: string };
     // Gestion gracieuse des 404 pour les endpoints CMS non implémentés
     if (error.response?.status === 404 && !throwOn404) {
       logger.warn(`Endpoint CMS non implémenté: ${endpoint}`);
@@ -49,12 +50,11 @@ async function jsonrpc<T = any>(
       return { success: false, error: 'Not implemented' } as T;
     }
 
-    logger.error(`Erreur API CMS [${endpoint}]:`, error);
+    logger.error(`Erreur API CMS [${endpoint}]:`, _error);
     const errorMessage =
       error.response?.data?.error ||
       error.response?.data?.message ||
-      error instanceof Error ? error.message :
-      'Unknown error';
+      (error instanceof Error ? error.message : 'Unknown error');
     throw new Error(errorMessage);
   }
 }

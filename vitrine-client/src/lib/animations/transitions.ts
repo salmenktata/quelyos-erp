@@ -123,7 +123,7 @@ export const staggerConfig = {
  */
 export const pageTransition: Transition = {
   duration: 0.4,
-  ease: easeInOutCubic as any,
+  ease: easeInOutCubic as [number, number, number, number],
 };
 
 /**
