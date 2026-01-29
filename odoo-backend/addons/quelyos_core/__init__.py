@@ -18,7 +18,7 @@ QUELYOS_MODULES = [
 ]
 
 
-def post_init_hook(cr, registry):
+def post_init_hook(env):
     """
     Hook exécuté après l'installation de quelyos_core.
     Installe automatiquement les modules Quelyos selon la configuration par défaut.
@@ -33,8 +33,10 @@ def post_init_hook(cr, registry):
     - quelyos.install_stock_advanced
     - quelyos.install_finance
     - quelyos.install_sms_tn
+
+    Args:
+        env: Environment Odoo 19 (nouvelle signature post_init_hook)
     """
-    env = api.Environment(cr, SUPERUSER_ID, {})
     _logger.info("="*80)
     _logger.info("QUELYOS SUITE ORCHESTRATOR - Starting automatic installation")
     _logger.info("="*80)
