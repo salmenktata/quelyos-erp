@@ -311,22 +311,5 @@
 }]]></field>
         </record>
 
-        <!-- ═══════════════════════════════════════════════════════════════════════════
-             THÈME PAR DÉFAUT : Alias vers Fashion Luxury
-        ═══════════════════════════════════════════════════════════════════════════ -->
-
-        <record id="theme_default" model="quelyos.theme">
-            <field name="code">default</field>
-            <field name="name">Thème par Défaut</field>
-            <field name="description">Thème par défaut appliqué automatiquement aux nouveaux tenants</field>
-            <field name="category">general</field>
-            <field name="version">1.0.0</field>
-            <field name="sequence">1</field>
-            <field name="is_public" eval="True"/>
-            <field name="is_premium" eval="False"/>
-            <field name="price">0.0</field>
-            <field name="config_json" ref="theme_fashion_luxury"/>
-        </record>
-
     </data>
 </odoo>

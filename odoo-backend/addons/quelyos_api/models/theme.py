@@ -17,6 +17,7 @@ _logger = logging.getLogger(__name__)
 class QuelyosTheme(models.Model):
     _name = 'quelyos.theme'
     _description = 'Theme Configuration (Theme Engine)'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'sequence, name'
 
     # ═══════════════════════════════════════════════════════════════════════════

@@ -9,7 +9,7 @@
         <field name="name">quelyos.theme.tree</field>
         <field name="model">quelyos.theme</field>
         <field name="arch" type="xml">
-            <tree string="Thèmes">
+            <list string="Thèmes">
                 <field name="sequence" widget="handle"/>
                 <field name="thumbnail" widget="image" class="oe_avatar"/>
                 <field name="name"/>
@@ -18,12 +18,11 @@
                 <field name="version"/>
                 <field name="is_public" widget="boolean_toggle"/>
                 <field name="is_premium" widget="boolean_toggle"/>
-                <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="price"/>
                 <field name="rating" widget="priority"/>
                 <field name="downloads"/>
                 <field name="active" widget="boolean_toggle"/>
-                <field name="currency_id" invisible="1"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -98,9 +97,6 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(quelyos_api.action_quelyos_theme_review)d" type="action" class="oe_stat_button" icon="fa-star">
-                            <field name="review_count" widget="statinfo" string="Avis"/>
-                        </button>
                         <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-download">
                             <field name="downloads" widget="statinfo" string="Téléchargements"/>
                         </button>
@@ -124,7 +120,7 @@
                             <field name="version"/>
                             <field name="sequence"/>
                         </group>
-                        <group string="Visibilité & Monétisation">
+                        <group string="Visibilité &amp; Monétisation">
                             <field name="is_public"/>
                             <field name="tenant_ids" widget="many2many_tags" attrs="{'invisible': [('is_public', '=', True)]}"/>
                             <field name="is_premium"/>
@@ -136,11 +132,11 @@
                     <group string="Médias">
                         <field name="preview_url" widget="url"/>
                         <field name="screenshot_ids" widget="one2many">
-                            <tree editable="bottom">
+                            <list editable="bottom">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
                                 <field name="image" widget="image"/>
-                            </tree>
+                            </list>
                         </field>
                     </group>
 
@@ -150,14 +146,14 @@
                         </page>
                         <page string="Avis" name="reviews">
                             <field name="review_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="create_date"/>
                                     <field name="user_id"/>
                                     <field name="tenant_id"/>
                                     <field name="rating" widget="priority"/>
                                     <field name="title"/>
                                     <field name="comment"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -275,9 +271,9 @@
         <field name="model">quelyos.theme</field>
         <field name="inherit_id" ref="view_quelyos_theme_tree"/>
         <field name="arch" type="xml">
-            <tree position="inside">
+            <list position="inside">
                 <!-- Hack: on ajoute un champ related pour avoir currency_id -->
-            </tree>
+            </list>
         </field>
     </record>
 

@@ -31,7 +31,7 @@ export default function FullscreenAutoplay({ config, className = '', colors }: F
     },
     {
       image: '/images/hero/slide-2.jpg',
-      title: 'Jusqu'à -50% sur les Bestsellers',
+      title: 'Jusqu&#39;à -50% sur les Bestsellers',
       subtitle: 'Profitez de nos offres exceptionnelles',
       cta: { text: 'Voir les offres', url: '/promotions' },
     },

@@ -1589,37 +1589,34 @@
 
         <!-- =================================================================== -->
         <!-- SECTION 11: PRODUITS LIES (Cross-sell / Upsell) -->
+        <!-- COMMENTÉ - Nécessite correction références product.product -->
         <!-- =================================================================== -->
 
-        <!-- Cross-sell: T-shirt -> Ceinture, Casquette -->
+        <!-- TODO: Corriger les références pour utiliser product.product au lieu de product.template
         <record id="product_tshirt_basic" model="product.template">
             <field name="accessory_product_ids" eval="[(6, 0, [ref('product_ceinture_cuir'), ref('product_casquette')])]"/>
         </record>
 
-        <!-- Cross-sell: Robe -> Sac, Sandales -->
         <record id="product_robe_ete" model="product.template">
             <field name="accessory_product_ids" eval="[(6, 0, [ref('product_sac_main'), ref('product_sandales_talon')])]"/>
         </record>
 
-        <!-- Cross-sell: Sneakers -> Chaussettes, Spray -->
         <record id="product_sneakers_urban" model="product.template">
             <field name="accessory_product_ids" eval="[(6, 0, [ref('product_chaussettes_sport'), ref('product_spray_chaussures')])]"/>
         </record>
 
-        <!-- Upsell: T-shirt Basic -> Polo Premium -->
         <record id="product_tshirt_basic" model="product.template">
             <field name="alternative_product_ids" eval="[(6, 0, [ref('product_polo_premium')])]"/>
         </record>
 
-        <!-- Upsell: Sneakers Urban -> Running Shoes Pro -->
         <record id="product_sneakers_urban" model="product.template">
             <field name="alternative_product_ids" eval="[(6, 0, [ref('product_running_pro')])]"/>
         </record>
 
-        <!-- Upsell: Blouse -> Robe -->
         <record id="product_blouse_fluide" model="product.template">
             <field name="alternative_product_ids" eval="[(6, 0, [ref('product_robe_ete')])]"/>
         </record>
+        -->
 
         <!-- =================================================================== -->
         <!-- SECTION 12: ASSOCIATION COLLECTIONS <-> PRODUITS -->

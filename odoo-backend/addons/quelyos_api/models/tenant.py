@@ -710,10 +710,9 @@ class QuelyosTenant(models.Model):
             # 11. Créer le menu navigation par défaut
             tenant._create_default_menu()
 
-            # 12. Passer le tenant en statut actif
-            tenant.write({'status': 'active'})
+            # 12. Notifier provisionnement réussi
             tenant.message_post(
-                body=_("Tenant provisionné avec succès. Statut : Actif"),
+                body=_("Tenant provisionné avec succès"),
                 message_type='notification',
             )
 
