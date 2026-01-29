@@ -12,7 +12,7 @@ interface FilterDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   filters: ProductFilters;
-  onFilterChange: (key: keyof ProductFilters, value: any) => void;
+  onFilterChange: (key: keyof ProductFilters, value: ProductFilters[keyof ProductFilters]) => void;
   categories: Category[];
   priceRange: { min: number; max: number };
   onPriceRangeChange: (range: { min: number; max: number }) => void;

@@ -9,10 +9,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { ComponentType } from 'react';
-
-// Type pour les props motion génériques
-type MotionProps = any;
 
 // Lazy load motion.div
 export const MotionDiv = dynamic(

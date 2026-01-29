@@ -84,7 +84,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
   });
 
   // Gestion du swipe
-  const handleDragEnd = (e: any, { offset, velocity }: PanInfo) => {
+  const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, { offset, velocity }: PanInfo) => {
     const swipe = swipePower(offset.x, velocity.x);
 
     if (swipe < -swipeConfidenceThreshold) {

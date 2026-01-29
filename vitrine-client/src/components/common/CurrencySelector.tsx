@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useCurrencies } from '@/hooks/useCurrencies';
+import { useCurrencies, type Currency } from '@/hooks/useCurrencies';
 import { useCurrencyStore } from '@/store/currencyStore';
 
 export function CurrencySelector() {
@@ -53,7 +53,7 @@ export function CurrencySelector() {
                 Sélectionner la devise
               </p>
               <div className="space-y-1">
-                {currencies.map((currency: any) => (
+                {currencies.map((currency: Currency) => (
                   <button
                     key={currency.id}
                     onClick={() =>

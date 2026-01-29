@@ -175,7 +175,7 @@ export function OnePageCheckout() {
       } else {
         setError(response.message || 'Échec de la commande');
       }
-    } catch (_err: any) {
+    } catch (_err) {
       logger.error('Error completing checkout:', err);
       setError(err.message || 'Une erreur est survenue');
     } finally {

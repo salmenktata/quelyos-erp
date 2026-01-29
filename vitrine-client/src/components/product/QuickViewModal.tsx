@@ -69,7 +69,7 @@ export function QuickViewModal({ productId, isOpen, onClose }: QuickViewModalPro
       const response = await backendClient.getProduct(productId);
 
       if (response.success && response.product) {
-        setProduct(response.product as any);
+        setProduct(response.product);
 
         // Set default variant if available
         if (response.product.variants && response.product.variants.length > 0) {

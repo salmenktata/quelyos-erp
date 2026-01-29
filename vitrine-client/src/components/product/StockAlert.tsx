@@ -76,7 +76,7 @@ export function StockAlert({ productId, productName }: StockAlertProps) {
       } else {
         setError(response.message || 'Échec de l\'inscription');
       }
-    } catch (_err: any) {
+    } catch (_err) {
       logger.error('Error subscribing to stock alert:', err);
       setError(err.message || 'Une erreur est survenue');
     } finally {
@@ -104,7 +104,7 @@ export function StockAlert({ productId, productName }: StockAlertProps) {
       } else {
         setError(response.message || 'Échec de la désinscription');
       }
-    } catch (_err: any) {
+    } catch (_err) {
       logger.error('Error unsubscribing from stock alert:', err);
       setError(err.message || 'Une erreur est survenue');
     } finally {

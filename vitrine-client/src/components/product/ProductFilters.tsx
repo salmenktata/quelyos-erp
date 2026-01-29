@@ -29,9 +29,15 @@ interface Facets {
   total_products: number;
 }
 
+interface AppliedFilters {
+  priceRanges: string[];
+  attributes: Record<string, string[]>;
+  brands: string[];
+}
+
 interface ProductFiltersProps {
   categoryId?: number;
-  onFiltersChange?: (filters: any) => void;
+  onFiltersChange?: (filters: AppliedFilters) => void;
 }
 
 /**

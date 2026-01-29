@@ -13,10 +13,28 @@ interface CompareDrawerProps {
   onClose: () => void;
 }
 
+interface CompareProduct {
+  id: number;
+  name: string;
+  slug?: string;
+  price?: number;
+  compare_at_price?: number;
+  in_stock: boolean;
+  is_new?: boolean;
+  is_bestseller?: boolean;
+  is_featured?: boolean;
+  category?: { name: string };
+  sku?: string;
+  description?: string;
+  images?: Array<{ url: string }>;
+  image_url?: string;
+  currency?: { symbol: string };
+}
+
 /**
  * Calcule un score pour chaque produit basé sur plusieurs critères
  */
-function calculateProductScores(products: any[]) {
+function calculateProductScores(products: CompareProduct[]) {
   if (products.length === 0) return [];
 
   const scores: { id: number; score: number; breakdown: Record<string, number> }[] = [];

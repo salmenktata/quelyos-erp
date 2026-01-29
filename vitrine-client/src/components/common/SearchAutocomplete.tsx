@@ -93,16 +93,19 @@ export function SearchAutocomplete({
   useEffect(() => {
     const fetchPopular = async () => {
       try {
-        const response = await backendClient.getPopularSearches(5) as any;
+        const response = await backendClient.getPopularSearches(5);
         // Backend returns popular_searches at root level or in data
         const popularSearches = response.popular_searches || response.data?.popular_searches;
-        if (response.success && popularSearches) {
+        if (response.success && popularSearches && Array.isArray(popularSearches)) {
           // Map backend response to frontend type
-          const searches: PopularSearch[] = popularSearches.map((s: any) => ({
-            query: s.query,
-            type: (s.type === 'category' ? 'category' : 'keyword') as 'category' | 'keyword',
-            count: s.count,
-          }));
+          const searches: PopularSearch[] = popularSearches.map((s: unknown) => {
+            const search = s as Record<string, unknown>;
+            return {
+              query: String(search.query || ''),
+              type: (search.type === 'category' ? 'category' : 'keyword') as 'category' | 'keyword',
+              count: Number(search.count || 0),
+            };
+          });
           setPopularSearches(searches);
         }
       } catch (_error) {
@@ -128,7 +131,7 @@ export function SearchAutocomplete({
 
     try {
       // Standard autocomplete first
-      const response = await backendClient.searchAutocomplete(searchQuery, 8, true) as any;
+      const response = await backendClient.searchAutocomplete(searchQuery, 8, true);
 
       if (response.success) {
         const products = response.products || response.data?.products || [];
