@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos Core Orchestrator',
-    'version': '19.0.2.0.0',
+    'version': '19.0.2.0.1',
     'category': 'Quelyos/Foundation',
     'summary': 'Orchestrateur principal Quelyos Suite - Installation automatique complète',
     'description': """
@@ -21,12 +21,11 @@
         - Produits et catalogue (product)
         - Email marketing (mass_mailing)
 
-        Modules OCA installés :
-        -----------------------
-        - **Stock** (v19) : stock_available_unreserved, stock_change_qty_reason,
-          stock_demand_estimate, stock_inventory, stock_location_lockdown
-        - **Marketing** (v16) : mass_mailing_partner, mass_mailing_list_dynamic,
-          mass_mailing_resend
+        Modules OCA installés (si disponibles) :
+        ----------------------------------------
+        - **Stock** (v19) : stock_change_qty_reason, stock_demand_estimate,
+          stock_inventory, stock_location_lockdown
+        - **Marketing** (v16) : Optionnels, à installer manuellement si nécessaires
 
         Modules Quelyos installés automatiquement :
         -------------------------------------------
@@ -70,16 +69,17 @@
         'contacts',
         # Odoo Standard Marketing
         'mass_mailing',
-        # OCA Stock (v19) - Fonctionnalités avancées inventaire
-        'stock_available_unreserved',
+        # OCA Stock (v19) - Fonctionnalités avancées inventaire (optionnels)
+        # Note: Les modules OCA sont installés séparément si disponibles
+        # 'stock_available_unreserved',  # Optionnel - pas toujours disponible
         'stock_change_qty_reason',
         'stock_demand_estimate',
         'stock_inventory',
         'stock_location_lockdown',
-        # OCA Marketing (v16) - Fonctionnalités avancées emailing
-        'mass_mailing_partner',
-        'mass_mailing_list_dynamic',
-        'mass_mailing_resend',
+        # OCA Marketing (v16) - Optionnels, installer manuellement si nécessaire
+        # 'mass_mailing_partner',
+        # 'mass_mailing_list_dynamic',
+        # 'mass_mailing_resend',
     ],
     'data': [
         'data/module_category_data.xml',

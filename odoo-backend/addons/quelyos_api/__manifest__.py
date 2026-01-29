@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos API',
-    'version': '19.0.1.0.123',
+    'version': '19.0.1.0.125',
     'category': 'Quelyos/API',
     'summary': 'API REST pour frontend e-commerce et backoffice',
     'author': 'Quelyos',
@@ -43,6 +43,7 @@
         'data/res_country_state_tn.xml',
         'data/email_templates_data.xml',
         'data/sms_templates.xml',
+        # 'data/email_builder_templates.xml',  # TEMPORAIREMENT DÉSACTIVÉ (erreur XML schema)
         # 'data/hr_sequence.xml',  # TEMPORAIREMENT DÉSACTIVÉ
         'data/ticket_sequence.xml',
         'data/pos_demo_data.xml',
