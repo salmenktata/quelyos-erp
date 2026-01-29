@@ -17,6 +17,8 @@ import { NewsletterForm } from '@/components/home/NewsletterForm';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { FlashSalesSection } from '@/components/home/FlashSalesSection';
 import { ContinueShoppingSection } from '@/components/home/ContinueShoppingSection';
+import { SocialTrendingProducts } from '@/components/home/SocialTrendingProducts';
+import { LivestreamShopping } from '@/components/live/LivestreamShopping';
 import { logger } from '@/lib/logger';
 
 // Server-side data fetching
@@ -131,6 +133,9 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* SOCIAL TRENDING - Produits tendance réseaux sociaux */}
+      <SocialTrendingProducts />
+
       {/* PROMO BANNERS */}
       <PromoBanners banners={promoBanners} />
 
@@ -142,6 +147,9 @@ export default async function Home() {
 
       {/* TESTIMONIALS - Affiche uniquement si témoignages disponibles */}
       <TestimonialsSection />
+
+      {/* LIVESTREAM SHOPPING - Événements live à venir */}
+      <LivestreamShopping />
 
       {/* NEWSLETTER */}
       <section className="container mx-auto px-4 max-w-7xl py-12">

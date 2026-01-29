@@ -31,6 +31,7 @@ import { ProductReviews } from '@/components/product/ProductReviews';
 import { StockAlert } from '@/components/product/StockAlert';
 import { VolumePricing } from '@/components/product/VolumePricing';
 import { EcoScore } from '@/components/product/EcoScore';
+import { SocialShare } from '@/components/product/SocialShare';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -452,6 +453,16 @@ export default function ProductDetailPage() {
                   </svg>
                 </button>
               )}
+
+              {/* Social Share */}
+              <SocialShare
+                productId={product.id}
+                productName={product.name}
+                productUrl={`/products/${product.slug}`}
+                productImage={product.images?.[0]?.url}
+                price={displayPrice}
+                currency={product.currency?.symbol}
+              />
             </div>
 
             {/* Contact WhatsApp */}

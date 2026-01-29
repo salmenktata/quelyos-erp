@@ -16,7 +16,10 @@ Relance le serveur de développement Next.js pour le site vitrine Quelyos (port 
 2. Tuer le processus proprement (SIGTERM puis SIGKILL si nécessaire)
 3. Vérifier que le port est libéré
 
-### Étape 2 : Relancer le serveur
+### Étape 2 : Nettoyer le cache Next.js
+1. Supprimer le dossier `.next` pour éviter les erreurs de cache corrompu
+
+### Étape 3 : Relancer le serveur
 1. Se placer dans le dossier `vitrine-quelyos/`
 2. Exécuter `pnpm dev` en arrière-plan
 3. Attendre que le serveur soit prêt (message "Local: http://localhost:3000")
@@ -28,7 +31,10 @@ Relance le serveur de développement Next.js pour le site vitrine Quelyos (port 
 # 1. Trouver et arrêter le processus sur le port 3000
 lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 
-# 2. Relancer le serveur
+# 2. Nettoyer le cache Next.js (évite les erreurs de routes-manifest.json corrompu)
+rm -rf vitrine-quelyos/.next
+
+# 3. Relancer le serveur
 cd vitrine-quelyos && pnpm dev
 ```
 

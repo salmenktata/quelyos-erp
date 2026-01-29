@@ -33,14 +33,16 @@ Relance l'intégralité des services du projet Quelyos ERP : Backend Odoo (8069)
 4. Confirmer que le backoffice est accessible sur http://localhost:5175/
 
 ### Étape 4 : Relancer Site Vitrine
-1. Se placer dans `vitrine-quelyos/`
-2. Démarrer le serveur Next.js en arrière-plan
+1. Nettoyer le cache `.next` (évite les erreurs de cache corrompu)
+2. Se placer dans `vitrine-quelyos/`
+3. Démarrer le serveur Next.js en arrière-plan
 3. Attendre que Next.js soit prêt (~5-10s)
 4. Confirmer que le site vitrine est accessible sur http://localhost:3000/
 
 ### Étape 5 : Relancer E-commerce
-1. Se placer dans `vitrine-client/`
-2. Démarrer le serveur Next.js en arrière-plan
+1. Nettoyer le cache `.next` (évite les erreurs de cache corrompu)
+2. Se placer dans `vitrine-client/`
+3. Démarrer le serveur Next.js en arrière-plan
 3. Attendre que Next.js soit prêt (~5-10s)
 4. Confirmer que l'e-commerce est accessible sur http://localhost:3001/
 
@@ -64,10 +66,12 @@ cd odoo-backend && docker-compose up -d
 # 3. Relancer Backoffice
 cd dashboard-client && npm run dev &
 
-# 4. Relancer Site Vitrine
+# 4. Nettoyer cache + Relancer Site Vitrine
+rm -rf vitrine-quelyos/.next
 cd vitrine-quelyos && npm run dev &
 
-# 5. Relancer E-commerce
+# 5. Nettoyer cache + Relancer E-commerce
+rm -rf vitrine-client/.next
 cd vitrine-client && npm run dev &
 ```
 
