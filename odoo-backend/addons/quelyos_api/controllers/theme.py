@@ -10,8 +10,9 @@ Endpoints disponibles :
 - POST /api/themes/<id>/review              : Ajouter un avis sur un thème
 """
 
+import json
 import logging
-from odoo import http
+from odoo import http, fields
 from odoo.http import request
 
 _logger = logging.getLogger(__name__)
@@ -754,4 +755,145 @@ IMPORTANT : Réponds UNIQUEMENT avec le JSON, sans texte explicatif ni markdown.
             return {
                 'success': False,
                 'error': 'Internal server error'
+            }
+
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # ENDPOINTS ADMIN - Import thèmes
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @http.route('/api/themes/import-json', auth='user', type='jsonrpc', methods=['POST'], csrf=False)
+    def import_theme_from_json(self, theme_json, is_public=True):
+        """
+        Importer un thème depuis une configuration JSON
+        (ADMIN UNIQUEMENT)
+
+        Args:
+            theme_json (dict): Configuration JSON du thème
+            is_public (bool): Thème public ou privé
+
+        Returns:
+            dict: { success: bool, theme_id: int }
+        """
+        try:
+            # Vérifier droits admin
+            if not request.env.user.has_group('base.group_system'):
+                _logger.warning(f"Non-admin user {request.env.user.login} attempted to import theme")
+                return {
+                    'success': False,
+                    'error': 'Admin rights required'
+                }
+
+            # Valider champs requis
+            required_fields = ['id', 'name', 'category', 'colors', 'typography', 'layouts']
+            for field in required_fields:
+                if field not in theme_json:
+                    return {
+                        'success': False,
+                        'error': f'Missing required field: {field}'
+                    }
+
+            # Vérifier si thème existe déjà
+            existing_theme = request.env['quelyos.theme'].sudo().search([
+                ('code', '=', theme_json['id'])
+            ], limit=1)
+
+            if existing_theme:
+                _logger.info(f"Theme {theme_json['id']} already exists, updating...")
+                # Mettre à jour configuration
+                existing_theme.write({
+                    'config_json': json.dumps(theme_json),
+                    'name': theme_json.get('name', existing_theme.name),
+                    'description': theme_json.get('description', existing_theme.description),
+                })
+                return {
+                    'success': True,
+                    'theme_id': existing_theme.id,
+                    'updated': True
+                }
+
+            # Créer nouveau thème
+            theme = request.env['quelyos.theme'].sudo().create({
+                'code': theme_json['id'],
+                'name': theme_json['name'],
+                'description': theme_json.get('description', ''),
+                'category': theme_json['category'],
+                'version': theme_json.get('version', '1.0.0'),
+                'config_json': json.dumps(theme_json),
+                'is_public': is_public,
+                'is_premium': False,  # Les thèmes importés sont gratuits par défaut
+                'price': 0.0,
+                'is_marketplace': False,  # Thèmes officiels Quelyos
+                'active': True,
+            })
+
+            _logger.info(f"Theme imported successfully: {theme.name} (ID: {theme.id})")
+
+            return {
+                'success': True,
+                'theme_id': theme.id,
+                'updated': False
+            }
+
+        except Exception as e:
+            _logger.error(f"Error importing theme from JSON: {str(e)}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+
+    @http.route('/api/themes/import-batch', auth='user', type='jsonrpc', methods=['POST'], csrf=False)
+    def import_themes_batch(self, themes, is_public=True):
+        """
+        Importer plusieurs thèmes en batch depuis configurations JSON
+        (ADMIN UNIQUEMENT)
+
+        Args:
+            themes (list): Liste de configurations JSON
+            is_public (bool): Thèmes publics ou privés
+
+        Returns:
+            dict: { success: bool, imported: int, updated: int, errors: list }
+        """
+        try:
+            # Vérifier droits admin
+            if not request.env.user.has_group('base.group_system'):
+                return {
+                    'success': False,
+                    'error': 'Admin rights required'
+                }
+
+            imported_count = 0
+            updated_count = 0
+            errors = []
+
+            for theme_json in themes:
+                result = self.import_theme_from_json(theme_json, is_public)
+
+                if result.get('success'):
+                    if result.get('updated'):
+                        updated_count += 1
+                    else:
+                        imported_count += 1
+                else:
+                    errors.append({
+                        'theme': theme_json.get('id', 'unknown'),
+                        'error': result.get('error')
+                    })
+
+            _logger.info(f"Batch import completed: {imported_count} imported, {updated_count} updated, {len(errors)} errors")
+
+            return {
+                'success': True,
+                'imported': imported_count,
+                'updated': updated_count,
+                'errors': errors
+            }
+
+        except Exception as e:
+            _logger.error(f"Error in batch import: {str(e)}")
+            return {
+                'success': False,
+                'error': str(e)
             }

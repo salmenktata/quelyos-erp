@@ -1,0 +1,132 @@
+{
+  "id": "fashion-luxury",
+  "name": "Fashion Luxury",
+  "category": "fashion",
+  "description": "Thème élégant et raffiné pour boutiques de mode haut de gamme",
+  "version": "1.0.0",
+  "colors": {
+    "primary": "#2c2c2c",
+    "secondary": "#d4af37",
+    "accent": "#ff6b6b",
+    "background": "#ffffff",
+    "text": "#2c2c2c",
+    "muted": "#6b7280"
+  },
+  "typography": {
+    "headings": "Playfair Display",
+    "body": "Lato",
+    "mono": "Courier New"
+  },
+  "layouts": {
+    "homepage": {
+      "sections": [
+        {
+          "type": "hero-slider",
+          "variant": "fullscreen-autoplay",
+          "config": {
+            "height": "90vh",
+            "animation": "fade",
+            "interval": 5000,
+            "slides": [
+              {
+                "image": "/images/hero/fashion-slide-1.jpg",
+                "title": "Nouvelle Collection Été 2026",
+                "subtitle": "Découvrez nos pièces exclusives",
+                "cta": {
+                  "text": "Découvrir",
+                  "url": "/shop"
+                }
+              },
+              {
+                "image": "/images/hero/fashion-slide-2.jpg",
+                "title": "Élégance Intemporelle",
+                "subtitle": "Des créations qui traversent les saisons",
+                "cta": {
+                  "text": "Explorer",
+                  "url": "/collections/intemporel"
+                }
+              },
+              {
+                "image": "/images/hero/fashion-slide-3.jpg",
+                "title": "Livraison Offerte",
+                "subtitle": "Dès 150 TND d'achat",
+                "cta": {
+                  "text": "Profiter",
+                  "url": "/shipping"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "featured-products",
+          "variant": "grid-4cols",
+          "config": {
+            "title": "Nos Coups de Cœur",
+            "limit": 8,
+            "sortBy": "bestsellers"
+          }
+        },
+        {
+          "type": "newsletter",
+          "variant": "with-background",
+          "config": {
+            "title": "Rejoignez le Club Fashion Luxury",
+            "subtitle": "Offres privées et avant-premières exclusives",
+            "backgroundImage": "/images/newsletter-fashion-bg.jpg"
+          }
+        },
+        {
+          "type": "testimonials",
+          "variant": "carousel",
+          "config": {
+            "title": "Ils Nous Font Confiance"
+          }
+        }
+      ]
+    },
+    "productPage": {
+      "layout": "sidebar-right",
+      "gallery": {
+        "type": "zoom-vertical",
+        "thumbnailPosition": "left"
+      },
+      "sections": [
+        {
+          "type": "product-info",
+          "variant": "detailed"
+        },
+        {
+          "type": "product-tabs",
+          "config": {
+            "tabs": ["description", "reviews", "shipping", "size-guide"]
+          }
+        },
+        {
+          "type": "related-products",
+          "config": {
+            "limit": 4,
+            "title": "Vous Aimerez Aussi"
+          }
+        }
+      ]
+    },
+    "categoryPage": {
+      "layout": "sidebar-left",
+      "grid": "3cols",
+      "filters": ["price", "color", "size", "brand", "material", "occasion"]
+    }
+  },
+  "components": {
+    "productCard": "style-overlay",
+    "header": "transparent-sticky",
+    "footer": "columns-4",
+    "buttons": "rounded-shadow"
+  },
+  "spacing": {
+    "sectionPadding": "large",
+    "containerWidth": "1400px",
+    "gutter": "1.5rem"
+  },
+  "customCSS": ".fashion-luxury-theme { letter-spacing: 0.02em; } .fashion-luxury-theme h1, .fashion-luxury-theme h2, .fashion-luxury-theme h3 { letter-spacing: 0.05em; text-transform: uppercase; }"
+}
