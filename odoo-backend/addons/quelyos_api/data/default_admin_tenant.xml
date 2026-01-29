@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Tenant Admin par défaut - Plan Enterprise -->
+        <record id="tenant_admin" model="quelyos.tenant">
+            <field name="name">Admin Quelyos</field>
+            <field name="code">admin</field>
+            <field name="domain">localhost</field>
+            <field name="backoffice_domain">localhost:5175</field>
+            <field name="slogan">Boutique Administrateur</field>
+            <field name="description">Tenant administrateur par défaut avec accès complet</field>
+
+            <!-- Plan tarifaire : Enterprise (illimité) -->
+            <field name="plan_id" ref="plan_enterprise"/>
+
+            <!-- Branding par défaut -->
+            <field name="font_family">inter</field>
+
+            <!-- Couleurs Thème Indigo (couleur admin Quelyos) -->
+            <field name="primary_color">#4f46e5</field>
+            <field name="primary_dark">#4338ca</field>
+            <field name="primary_light">#6366f1</field>
+            <field name="secondary_color">#0ea5e9</field>
+            <field name="secondary_dark">#0284c7</field>
+            <field name="secondary_light">#38bdf8</field>
+            <field name="accent_color">#f59e0b</field>
+            <field name="background_color">#ffffff</field>
+            <field name="foreground_color">#0f172a</field>
+            <field name="muted_color">#f1f5f9</field>
+            <field name="muted_foreground">#64748b</field>
+            <field name="border_color">#e2e8f0</field>
+            <field name="ring_color">#4f46e5</field>
+
+            <!-- Contact admin par défaut -->
+            <field name="email">admin@quelyos.tn</field>
+            <field name="phone">+216 XX XXX XXX</field>
+
+            <!-- SEO -->
+            <field name="meta_title">Quelyos Admin - Gestion E-commerce Complète</field>
+            <field name="meta_description">Plateforme d'administration e-commerce avec accès complet aux fonctionnalités</field>
+
+            <!-- Toutes les options activées pour admin -->
+            <field name="enable_dark_mode" eval="True"/>
+            <field name="default_dark" eval="False"/>
+            <field name="feature_wishlist" eval="True"/>
+            <field name="feature_comparison" eval="True"/>
+            <field name="feature_reviews" eval="True"/>
+            <field name="feature_newsletter" eval="True"/>
+            <field name="feature_guest_checkout" eval="True"/>
+            <field name="feature_live_chat" eval="True"/>
+            <field name="feature_blog" eval="True"/>
+            <field name="feature_loyalty" eval="True"/>
+            <field name="feature_gift_cards" eval="True"/>
+            <field name="feature_subscriptions" eval="True"/>
+
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

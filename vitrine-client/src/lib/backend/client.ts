@@ -211,7 +211,7 @@ export class BackendClient {
       }
 
       return result;
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       const error = _error as Error;
       return { success: false, error: error.message };
     }
