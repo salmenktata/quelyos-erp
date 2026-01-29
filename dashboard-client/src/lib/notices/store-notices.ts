@@ -854,4 +854,32 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
       }
     ]
   },
+  themes: {
+    pageId: 'store-themes',
+    title: 'Thèmes',
+    purpose: 'Choisissez et activez un thème pour personnaliser l\'apparence de votre boutique en ligne.',
+    icon: Palette,
+    moduleColor: 'indigo',
+    sections: [
+      {
+        title: 'Fonctionnalités',
+        icon: Settings,
+        items: [
+          'Galerie de thèmes prédéfinis',
+          'Filtres par catégorie (mode, tech, food...)',
+          'Activation en un clic',
+          'Preview du thème avant activation',
+          'Thèmes gratuits et premium',
+        ]
+      },
+      {
+        title: 'Actions recommandées',
+        items: [
+          'Activer un thème : Cliquez sur "Activer" pour appliquer un thème',
+          'Explorer les catégories : Trouvez un thème adapté à votre secteur',
+          'Preview : Prévisualisez le rendu avant d\'activer',
+        ]
+      }
+    ]
+  },
 };

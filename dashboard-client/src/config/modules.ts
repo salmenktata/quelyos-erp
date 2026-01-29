@@ -71,6 +71,7 @@ import {
   AlertTriangle,
   Sliders,
   Download,
+  Palette,
 } from 'lucide-react'
 
 // ============================================================================
@@ -285,6 +286,7 @@ export const MODULES: Module[] = [
       {
         title: 'Configuration',
         items: [
+          { name: 'Thèmes', path: '/store/themes', icon: Palette },
           { name: 'Paramètres', path: '/store/settings', icon: Settings },
         ],
       },

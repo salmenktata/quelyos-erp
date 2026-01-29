@@ -10,6 +10,7 @@ import { generateOrganizationSchema } from "@/lib/utils/seo";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import { PushNotificationPrompt } from "@/components/pwa/PushNotificationPrompt";
 import { FAQChatbot } from "@/components/chat/FAQChatbot";
+import { ThemeProvider } from "@/theme-engine/ThemeProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -68,17 +69,19 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
         <AppProviders>
-          <ServiceWorkerRegistration />
-          <div className="flex flex-col min-h-screen">
-            <HeaderWrapper />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </div>
-          <ToastContainer />
-          <FAQChatbot />
-          <PushNotificationPrompt />
+          <ThemeProvider tenantId={1}>
+            <ServiceWorkerRegistration />
+            <div className="flex flex-col min-h-screen">
+              <HeaderWrapper />
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </div>
+            <ToastContainer />
+            <FAQChatbot />
+            <PushNotificationPrompt />
+          </ThemeProvider>
         </AppProviders>
       </body>
     </html>

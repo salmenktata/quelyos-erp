@@ -799,6 +799,29 @@ export class BackendClient {
   }> {
     return this.jsonrpc('/trending-products', params || {});
   }
+
+  // =========================================================================
+  // THEME ENGINE
+  // =========================================================================
+
+  async getActiveTheme(tenantId: number): Promise<{
+    success: boolean;
+    theme?: {
+      id: string;
+      name: string;
+      description: string;
+      category: ThemeCategory;
+      version: string;
+      is_premium: boolean;
+      price: number;
+      rating: number;
+      downloads: number;
+      config: ThemeConfig;
+    };
+    error?: string;
+  }> {
+    return this.jsonrpc(`/tenants/${tenantId}/theme`, {});
+  }
 }
 
 export interface TrendingProduct {
@@ -889,6 +912,67 @@ export interface LiveEvent {
   isLive: boolean;
   viewersCount: number;
   viewers: number;
+}
+
+export type ThemeCategory = 'fashion' | 'tech' | 'food' | 'beauty' | 'sports' | 'home' | 'general';
+
+export interface SectionConfig {
+  type: string;
+  variant: string;
+  config?: Record<string, unknown>;
+  id?: string;
+  className?: string;
+}
+
+export interface ThemeConfig {
+  id: string;
+  name: string;
+  category: ThemeCategory;
+  description?: string;
+  version?: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent?: string;
+    background?: string;
+    text?: string;
+    muted?: string;
+  };
+  typography: {
+    headings: string;
+    body: string;
+    mono?: string;
+  };
+  layouts: {
+    homepage: {
+      sections: SectionConfig[];
+    };
+    productPage: {
+      layout: string;
+      gallery: {
+        type: string;
+        thumbnailPosition?: string;
+      };
+      sections: SectionConfig[];
+    };
+    categoryPage: {
+      layout: string;
+      grid: string;
+      filters: string[];
+    };
+  };
+  components: {
+    productCard: string;
+    header: string;
+    footer: string;
+    buttons: string;
+  };
+  spacing: {
+    sectionPadding: string;
+    containerWidth: string;
+    gutter?: string;
+  };
+  customCSS?: string;
 }
 
 // Instance singleton
