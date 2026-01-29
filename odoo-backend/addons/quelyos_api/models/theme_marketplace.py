@@ -258,6 +258,7 @@ class QuelyosThemePurchase(models.Model):
         ('free', 'Gratuit'),
     ], string='Méthode Paiement', default='stripe')
     transaction_id = fields.Char(string='Transaction ID')
+    stripe_payment_intent_id = fields.Char(string='Stripe Payment Intent ID', index=True)
 
     # Statut
     status = fields.Selection([

@@ -31,3 +31,5 @@ from . import store_extended
 from . import pos
 # Stripe Billing
 from . import stripe_billing
+# Stripe Payments Marketplace
+from . import payment_stripe

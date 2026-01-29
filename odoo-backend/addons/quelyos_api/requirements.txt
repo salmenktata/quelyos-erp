@@ -6,3 +6,6 @@ passlib>=1.7.4
 
 # Anthropic Claude API pour génération thèmes IA
 anthropic>=0.39.0
+
+# Stripe pour paiements marketplace thèmes premium
+stripe>=7.0.0,<8.0.0
