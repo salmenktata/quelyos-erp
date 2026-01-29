@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { 
-  Check, 
-  X, 
+import {
+  Check,
+  X,
   Minus,
-  ArrowRight, 
+  ArrowRight,
   Sparkles,
   Building2,
   Users,
@@ -15,7 +15,6 @@ import {
   Target,
   BarChart3,
   Wallet,
-  TrendingUp,
   Clock,
   Euro,
   Globe,

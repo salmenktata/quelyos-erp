@@ -110,7 +110,8 @@ function RegisterLoading() {
 }
 
 function RegisterForm() {
-  const searchParams = useSearchParams();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _searchParams = useSearchParams();
 
   const [form, setForm] = useState({ email: '', password: '', companyName: '' });
   const [showPassword, setShowPassword] = useState(false);

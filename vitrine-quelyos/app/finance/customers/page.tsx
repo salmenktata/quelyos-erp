@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Header from "@/app/components/Header";
 import Container from "@/app/components/Container";
-import { ArrowRight, Star, Quote, Building2 } from "lucide-react";
+import { ArrowRight, Star, Quote } from "lucide-react";
 
 import config from "@/app/lib/config";
 const testimonials = [

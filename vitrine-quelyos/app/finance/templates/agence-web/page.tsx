@@ -7,7 +7,6 @@ import Container from "@/app/components/Container";
 import {
   ArrowRight,
   Globe,
-  Palette,
   Users,
   CreditCard,
   Calendar,

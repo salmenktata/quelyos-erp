@@ -11,7 +11,6 @@ import {
   RefreshCw,
   Users,
   CreditCard,
-  BarChart3,
   CheckCircle2,
 } from "lucide-react";
 

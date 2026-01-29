@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState, useEffect, useMemo, Suspense } from 'react';
+import { FormEvent, useState, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { config } from '@/app/lib/config';

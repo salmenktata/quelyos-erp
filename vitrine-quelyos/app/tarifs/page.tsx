@@ -231,23 +231,36 @@ const trustMetrics = [
 
 const faqs = [
   {
+    category: "Offre de lancement",
+    questions: [
+      {
+        q: "Pourquoi ces prix sont-ils si bas ?",
+        a: "Offre de lancement : nous voulons conquérir le marché français. Profitez de -50% maintenant, ce tarif sera verrouillé à vie pour vous.",
+      },
+      {
+        q: "Le Freemium est-il vraiment gratuit à vie ?",
+        a: "Oui, à vie. 5 comptes bancaires, 500 transactions/mois, prévisions IA 3 mois incluses. Pas de watermark, pas de limitation cachée.",
+      },
+      {
+        q: "Comment fonctionne l'essai 30 jours ?",
+        a: "30 jours d'accès complet au plan choisi. Aucune carte bancaire requise. Satisfait ou remboursé. À la fin, continuez ou passez au Freemium.",
+      },
+    ],
+  },
+  {
     category: "Tarifs & Facturation",
     questions: [
       {
         q: "Puis-je changer de formule à tout moment ?",
-        a: "Oui, vous pouvez upgrader ou downgrader votre abonnement à tout moment. Le changement prend effet immédiatement et est proratisé.",
+        a: "Oui, upgrade ou downgrade instantané. Le changement est proratisé au jour près.",
       },
       {
         q: "Y a-t-il un engagement ?",
-        a: "Non, tous nos abonnements sont sans engagement. Annulation en 1 clic, vous continuez jusqu'à la fin de la période payée.",
+        a: "Aucun engagement. Annulation en 1 clic. Satisfait ou remboursé 30 jours.",
       },
       {
         q: "Les tarifs sont-ils HT ou TTC ?",
         a: "Tous les tarifs affichés sont HT. La TVA applicable sera ajoutée lors de la facturation.",
-      },
-      {
-        q: "Comment fonctionne l'essai gratuit ?",
-        a: "14 jours d'accès complet au plan choisi. Aucune carte bancaire requise. À la fin, vous choisissez de continuer ou de passer au Freemium.",
       },
     ],
   },
@@ -256,24 +269,11 @@ const faqs = [
     questions: [
       {
         q: "Où sont hébergées mes données ?",
-        a: "Toutes vos données sont hébergées en France, dans des datacenters certifiés ISO 27001. Conformité RGPD garantie.",
+        a: "France uniquement, datacenters certifiés ISO 27001. Conformité RGPD garantie.",
       },
       {
         q: "L'export FEC est-il compatible ?",
-        a: "Notre export FEC respecte le format officiel DGFiP. Compatible avec tous les logiciels comptables (Sage, Ciel, EBP, Pennylane...).",
-      },
-    ],
-  },
-  {
-    category: "Suite vs Module",
-    questions: [
-      {
-        q: "Quelle différence entre Suite et module individuel ?",
-        a: "Les modules individuels sont parfaits pour tester. La Suite débloque l'IA avancée, l'API complète, les intégrations et le multi-utilisateurs.",
-      },
-      {
-        q: "Puis-je commencer par un module et migrer vers la Suite ?",
-        a: "Absolument. Vos données sont conservées lors de la migration. L'upgrade se fait en quelques clics depuis votre compte.",
+        a: "Format officiel DGFiP. Compatible Sage, Ciel, EBP, Pennylane et tous les autres.",
       },
     ],
   },
@@ -1097,25 +1097,27 @@ export default function TarifsPage() {
           >
             <Zap className="mx-auto mb-4 h-12 w-12 text-indigo-400" />
             <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              Prêt à simplifier votre gestion ?
+              Prêt à économiser 70% de votre temps ?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-slate-300">
-              Essayez gratuitement pendant 14 jours. Sans carte bancaire, sans
-              engagement.
+              30 jours d&apos;essai gratuit. Sans carte bancaire. Sans engagement.
+            </p>
+            <p className="mt-2 text-emerald-400 font-semibold">
+              🚀 Offre -50% • Tarif verrouillé à vie
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                href="/finance/register"
-                className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-medium text-slate-900 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                href="/finance/register?plan=business"
+                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-lg font-bold text-white transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/25"
               >
-                Démarrer l&apos;essai gratuit
+                Essayer Business à 49€/mois
                 <ArrowRight className="h-5 w-5" />
               </Link>
               <Link
-                href="/contact"
+                href={config.finance.app}
                 className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-6 py-3 font-medium text-white transition-all hover:bg-white/10"
               >
-                Demander une démo
+                Ou commencer gratuitement
               </Link>
             </div>
           </motion.div>

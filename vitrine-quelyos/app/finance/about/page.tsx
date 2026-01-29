@@ -2,9 +2,8 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { 
+import {
   ArrowRight,
-  Sparkles,
   Target,
   Heart,
   Shield,
@@ -23,8 +22,6 @@ import {
   Star,
   Rocket
 } from "lucide-react";
-
-import config from "@/app/lib/config";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Container from "@/app/components/Container";

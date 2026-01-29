@@ -2,9 +2,8 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { 
-  ArrowLeft, 
-  FileText,
+import {
+  ArrowLeft,
   Sparkles,
   Shield,
   Eye,

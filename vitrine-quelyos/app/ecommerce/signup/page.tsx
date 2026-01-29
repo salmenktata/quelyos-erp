@@ -396,7 +396,8 @@ function Step3Store({
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
-    setFormData({ ...formData, storeSlug: slug });
+    setFormData((prev) => ({ ...prev, storeSlug: slug }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeName]);
 
   return (

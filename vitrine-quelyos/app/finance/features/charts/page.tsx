@@ -9,7 +9,9 @@ import config from "@/app/lib/config";
 import { BarChart3, LineChart, PieChart, TrendingUp } from "lucide-react";
 import Container from "@/app/components/Container";
 
-const SAMPLE_DATA_MONTHLY = [
+// Sample data pour futurs graphiques interactifs
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _SAMPLE_DATA_MONTHLY = [
   { name: "Jan", revenus: 15000, dépenses: 12000, net: 3000 },
   { name: "Fév", revenus: 16500, dépenses: 13200, net: 3300 },
   { name: "Mar", revenus: 14800, dépenses: 11800, net: 3000 },
@@ -18,14 +20,16 @@ const SAMPLE_DATA_MONTHLY = [
   { name: "Juin", revenus: 16800, dépenses: 12900, net: 3900 },
 ];
 
-const SAMPLE_DATA_CATEGORIES = [
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _SAMPLE_DATA_CATEGORIES = [
   { name: "Salaires", value: 45000 },
   { name: "Freelance", value: 18000 },
   { name: "Investissements", value: 8500 },
   { name: "Autres", value: 3200 },
 ];
 
-const SAMPLE_DATA_WEEKLY = [
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _SAMPLE_DATA_WEEKLY = [
   { name: "Sem 1", solde: 25000 },
   { name: "Sem 2", solde: 27500 },
   { name: "Sem 3", solde: 26800 },

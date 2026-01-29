@@ -10,7 +10,6 @@ import {
   Users,
   Clock,
   FileText,
-  TrendingUp,
   Calculator,
   CheckCircle2,
 } from "lucide-react";

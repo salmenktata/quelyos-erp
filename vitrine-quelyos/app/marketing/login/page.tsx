@@ -2,7 +2,6 @@
 
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { config } from '@/app/lib/config';
 
 // Icônes inline
 const Shield = ({ className }: { className?: string }) => (
