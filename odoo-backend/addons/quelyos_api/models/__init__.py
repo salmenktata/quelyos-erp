@@ -29,6 +29,8 @@ from . import payment_transaction
 from . import email_config
 from . import contact_list
 from . import marketing_campaign
+from . import sms_template
+from . import email_builder
 # Store Extended Models
 from . import product_review
 from . import faq

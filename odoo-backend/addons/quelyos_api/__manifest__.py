@@ -43,7 +43,7 @@
         'data/res_country_state_tn.xml',
         'data/email_templates_data.xml',
         'data/sms_templates.xml',
-        # 'data/email_builder_templates.xml',  # TEMPORAIREMENT DÉSACTIVÉ (erreur XML schema)
+        'data/email_builder_templates.xml',
         # 'data/hr_sequence.xml',  # TEMPORAIREMENT DÉSACTIVÉ
         'data/ticket_sequence.xml',
         'data/pos_demo_data.xml',

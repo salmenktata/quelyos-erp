@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Template Email Builder : Bienvenue -->
+        <record id="email_builder_welcome" model="quelyos.email.builder">
+            <field name="name">Email Bienvenue</field>
+            <field name="category">welcome</field>
+            <field name="subject">Bienvenue chez notre boutique</field>
+            <field name="preview_text">Merci de rejoindre notre communauté</field>
+            <field name="primary_color">#4F46E5</field>
+            <field name="secondary_color">#10B981</field>
+            <field name="is_template" eval="True"/>
+            <field name="blocks_json"><![CDATA[[{"type":"header","title":"Bienvenue","subtitle":"Merci de nous rejoindre","bg_color":"#4F46E5"},{"type":"text","content":"<p>Bonjour,</p><p>Nous sommes ravis de vous compter parmi nos clients.</p>","align":"left"},{"type":"button","text":"Découvrir nos produits","url":"https://example.com/shop","bg_color":"#4F46E5","align":"center"},{"type":"footer","content":"<p>Merci de votre confiance</p>","bg_color":"#f9fafb","text_color":"#6b7280"}]]></field>
+        </record>
+
+        <!-- Template Email Builder : Newsletter -->
+        <record id="email_builder_newsletter" model="quelyos.email.builder">
+            <field name="name">Newsletter Mensuelle</field>
+            <field name="category">newsletter</field>
+            <field name="subject">Newsletter - Nouveautés du mois</field>
+            <field name="preview_text">Découvrez nos nouveautés</field>
+            <field name="primary_color">#10B981</field>
+            <field name="secondary_color">#F59E0B</field>
+            <field name="is_template" eval="True"/>
+            <field name="blocks_json"><![CDATA[[{"type":"header","title":"Newsletter","subtitle":"Les actualités du mois","bg_color":"#10B981"},{"type":"text","content":"<h2>Bonjour,</h2><p>Voici les nouveautés du mois.</p>","align":"left"},{"type":"button","text":"Voir la collection","url":"https://example.com/collection","bg_color":"#10B981","align":"center"},{"type":"footer","content":"<p>Newsletter mensuelle</p>","bg_color":"#f9fafb"}]]></field>
+        </record>
+
+        <!-- Template Email Builder : Promotion Flash -->
+        <record id="email_builder_flash_sale" model="quelyos.email.builder">
+            <field name="name">Vente Flash</field>
+            <field name="category">promo</field>
+            <field name="subject">FLASH SALE : -50% pendant 24h</field>
+            <field name="preview_text">Profitez de -50% pendant 24h</field>
+            <field name="primary_color">#EF4444</field>
+            <field name="secondary_color">#F59E0B</field>
+            <field name="is_template" eval="True"/>
+            <field name="blocks_json"><![CDATA[[{"type":"header","title":"VENTE FLASH","subtitle":"-50% pendant 24h","bg_color":"#EF4444"},{"type":"text","content":"<p>Profitez de <strong>-50%</strong> sur une sélection de produits.</p>","align":"center"},{"type":"button","text":"Profiter de l'offre","url":"https://example.com/sale","bg_color":"#EF4444","align":"center"},{"type":"footer","content":"<p>Offres exclusives</p>","bg_color":"#fef2f2"}]]></field>
+        </record>
+
+        <!-- Template Email Builder : Relance Panier -->
+        <record id="email_builder_cart_reminder" model="quelyos.email.builder">
+            <field name="name">Relance Panier Abandonné</field>
+            <field name="category">cart_reminder</field>
+            <field name="subject">Vous avez oublié quelque chose</field>
+            <field name="preview_text">Votre panier vous attend</field>
+            <field name="primary_color">#8B5CF6</field>
+            <field name="secondary_color">#EC4899</field>
+            <field name="is_template" eval="True"/>
+            <field name="blocks_json"><![CDATA[[{"type":"header","title":"Votre panier vous attend","subtitle":"Finalisez votre commande","bg_color":"#8B5CF6"},{"type":"text","content":"<p>Vous avez des articles dans votre panier.</p>","align":"left"},{"type":"button","text":"Finaliser ma commande","url":"https://example.com/cart","bg_color":"#8B5CF6","align":"center"},{"type":"footer","content":"<p>Votre panier sera conservé 7 jours</p>","bg_color":"#f9fafb"}]]></field>
+        </record>
+
+    </data>
+</odoo>

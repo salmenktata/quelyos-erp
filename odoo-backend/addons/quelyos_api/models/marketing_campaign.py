@@ -32,6 +32,28 @@ class MarketingCampaign(models.Model):
 
     # Contenu SMS
     sms_message = fields.Text(string='Message SMS')
+    sms_template_id = fields.Many2one(
+        'quelyos.sms.template',
+        string='Template SMS',
+        help='Template SMS réutilisable (Premium)'
+    )
+
+    # Statistiques SMS détaillées (Premium)
+    sms_stats_delivered = fields.Integer(
+        string='SMS Délivrés',
+        default=0,
+        help='Nombre de SMS effectivement délivrés'
+    )
+    sms_stats_failed = fields.Integer(
+        string='SMS Échoués',
+        default=0,
+        help='Nombre de SMS en échec (numéro invalide, opérateur rejeté, etc.)'
+    )
+    sms_stats_cost = fields.Float(
+        string='Coût SMS Total',
+        default=0.0,
+        help='Coût total de la campagne SMS en euros'
+    )
 
     # Destinataires
     contact_list_id = fields.Many2one(
@@ -139,29 +161,96 @@ class MarketingCampaign(models.Model):
         })
 
     def _send_sms_campaign(self):
-        """Envoi de campagne SMS via quelyos_sms_tn"""
+        """
+        Envoi de campagne SMS via quelyos_sms_tn (VERSION PREMIUM)
+
+        Fonctionnalités Premium :
+        - Support templates SMS avec variables dynamiques
+        - Validation format numéros internationaux
+        - Tracking détaillé (delivered, failed, cost)
+        - Gestion erreurs par contact
+        """
         if not self.contact_list_id:
             return
 
         contacts = self.contact_list_id.get_contacts()
-        sent_count = 0
+
+        # Statistiques détaillées
+        delivered_count = 0
+        failed_count = 0
+        total_cost = 0.0
+
+        # Coût moyen SMS (peut être configuré par opérateur)
+        SMS_COST_PER_UNIT = 0.05  # 5 centimes par SMS
 
         # Utilise le module quelyos_sms_tn si disponible
         sms_service = self.env.get('quelyos.sms.service')
 
         for contact in contacts:
-            if contact.mobile:
-                if sms_service:
-                    try:
-                        sms_service.send_sms(contact.mobile, self.sms_message)
-                        sent_count += 1
-                    except Exception:
-                        pass
-                else:
-                    sent_count += 1  # Simulation en dev
+            # Vérifier que le contact a un numéro mobile
+            if not contact.mobile:
+                failed_count += 1
+                continue
 
+            # Valider format numéro (doit commencer par +)
+            mobile = contact.mobile.strip()
+            if not mobile.startswith('+'):
+                failed_count += 1
+                continue
+
+            # Préparer message : template ou message direct
+            if self.sms_template_id:
+                # Utiliser template avec variables dynamiques
+                message = self.sms_template_id.render_message(
+                    partner=contact,
+                    custom_vars={
+                        'company.name': self.env.company.name,
+                    }
+                )
+                # Incrémenter usage du template
+                self.sms_template_id.increment_usage()
+            else:
+                # Message direct
+                message = self.sms_message
+
+            if not message:
+                failed_count += 1
+                continue
+
+            # Calculer nombre de SMS pour ce message
+            char_count = len(message)
+            if char_count <= 160:
+                sms_count = 1
+            else:
+                sms_count = 1 + ((char_count - 160 + 152) // 153)
+
+            # Envoyer SMS
+            if sms_service:
+                try:
+                    # Envoyer via service SMS
+                    result = sms_service.send_sms(mobile, message)
+
+                    # Vérifier résultat (dépend de l'implémentation du service)
+                    if result and result.get('success'):
+                        delivered_count += 1
+                        total_cost += SMS_COST_PER_UNIT * sms_count
+                    else:
+                        failed_count += 1
+
+                except Exception as e:
+                    # Échec envoi
+                    failed_count += 1
+            else:
+                # Mode simulation (dev) : considérer comme délivré
+                delivered_count += 1
+                total_cost += SMS_COST_PER_UNIT * sms_count
+
+        # Mettre à jour statistiques campagne
         self.write({
-            'stats_sent': sent_count,
+            'stats_sent': delivered_count + failed_count,
+            'sms_stats_delivered': delivered_count,
+            'sms_stats_failed': failed_count,
+            'sms_stats_cost': total_cost,
             'sent_date': datetime.now(),
             'status': 'sent',
         })
@@ -183,6 +272,102 @@ class MarketingCampaign(models.Model):
             'stats_clicked': 0,
             'sent_date': False,
         })
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # INTÉGRATION OCA: mass_mailing_resend
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    def action_resend_non_openers(self):
+        """
+        Renvoie la campagne uniquement aux contacts qui ne l'ont pas ouverte.
+
+        Inspiré du module OCA mass_mailing_resend.
+
+        Crée une nouvelle campagne ciblant uniquement les destinataires
+        qui ont reçu la campagne originale mais ne l'ont PAS ouverte.
+
+        Cas d'usage : Relancer les contacts inactifs après une première campagne.
+        """
+        self.ensure_one()
+
+        if self.status != 'sent':
+            raise ValueError("Cette campagne doit être envoyée pour être renvoyée")
+
+        if self.channel != 'email':
+            raise ValueError("Le renvoi n'est supporté que pour les campagnes email")
+
+        # Récupérer les contacts qui ont reçu mais n'ont PAS ouvert
+        # Via mailing.trace si disponible, sinon via logique custom
+        non_openers = self._get_non_opener_contacts()
+
+        if not non_openers:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Aucun destinataire',
+                    'message': 'Tous les contacts ont ouvert la campagne',
+                    'type': 'info',
+                }
+            }
+
+        # Créer nouvelle liste statique avec les non-openers
+        new_list = self.env['quelyos.contact.list'].create({
+            'name': f"{self.name} - Non-ouvreurs ({len(non_openers)})",
+            'list_type': 'static',
+            'contact_ids': [(6, 0, non_openers.ids)],
+        })
+
+        # Créer campagne de relance
+        new_campaign = self.copy({
+            'name': f"{self.name} (Relance non-ouvreurs)",
+            'contact_list_id': new_list.id,
+            'status': 'draft',
+            'stats_sent': 0,
+            'stats_delivered': 0,
+            'stats_opened': 0,
+            'stats_clicked': 0,
+            'sent_date': False,
+        })
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Campagne de Relance',
+            'res_model': 'quelyos.marketing.campaign',
+            'res_id': new_campaign.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def _get_non_opener_contacts(self):
+        """
+        Retourne les contacts qui ont reçu mais n'ont pas ouvert la campagne.
+
+        Logique :
+        1. Récupère tous les contacts de la liste originale
+        2. Exclut ceux qui ont ouvert (via mailing.trace ou stats custom)
+        """
+        self.ensure_one()
+
+        if not self.contact_list_id:
+            return self.env['res.partner']
+
+        # Tous les destinataires
+        all_contacts = self.contact_list_id.get_contacts()
+
+        # Récupérer les ouvreurs via mailing.trace
+        traces = self.env['mailing.trace'].search([
+            ('partner_id', 'in', all_contacts.ids),
+            ('mass_mailing_id.id', '=', self.id),  # Si lié à mailing.mailing
+            ('opened', '>', datetime(1970, 1, 1)),  # A ouvert
+        ])
+
+        opener_ids = traces.mapped('partner_id').ids
+
+        # Retourner les non-ouvreurs
+        non_openers = all_contacts.filtered(lambda c: c.id not in opener_ids)
+
+        return non_openers
 
     def to_dict(self):
         """Sérialisation pour API"""

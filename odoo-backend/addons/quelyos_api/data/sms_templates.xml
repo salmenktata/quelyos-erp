@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Template SMS : Confirmation Commande -->
+        <record id="sms_template_order_confirmation" model="quelyos.sms.template">
+            <field name="name">Confirmation Commande</field>
+            <field name="category">transactional</field>
+            <field name="message">Bonjour {{partner.name}}, votre commande {{order.name}} d'un montant de {{order.total}} a été confirmée. Merci de votre confiance ! - {{company.name}}</field>
+        </record>
+
+        <!-- Template SMS : Expédition -->
+        <record id="sms_template_shipping" model="quelyos.sms.template">
+            <field name="name">Expédition Commande</field>
+            <field name="category">notification</field>
+            <field name="message">{{partner.name}}, votre commande {{order.name}} a été expédiée ! Vous la recevrez sous 2-3 jours. Suivez votre colis sur notre site. {{company.name}}</field>
+        </record>
+
+        <!-- Template SMS : Relance Panier Abandonné -->
+        <record id="sms_template_cart_reminder" model="quelyos.sms.template">
+            <field name="name">Relance Panier Abandonné</field>
+            <field name="category">reminder</field>
+            <field name="message">Bonjour {{partner.name}}, vous avez oublié des articles dans votre panier ({{order.total}}). Finalisez votre commande maintenant : -10% avec le code RETOUR10 ! {{company.name}}</field>
+        </record>
+
+        <!-- Template SMS : Promotion Flash -->
+        <record id="sms_template_flash_sale" model="quelyos.sms.template">
+            <field name="name">Vente Flash</field>
+            <field name="category">marketing</field>
+            <field name="message">🔥 FLASH SALE ! {{partner.name}}, profitez de -30% sur {{product.name}} pendant 24h seulement ! Prix : {{product.price}}. Ne ratez pas cette offre ! {{company.name}}</field>
+        </record>
+
+        <!-- Template SMS : Code Promo Personnalisé -->
+        <record id="sms_template_promo_code" model="quelyos.sms.template">
+            <field name="name">Code Promo VIP</field>
+            <field name="category">marketing</field>
+            <field name="message">{{partner.name}}, vous êtes VIP ! Utilisez le code VIPEXCLUSIF pour -20% sur tout le site. Valable 7 jours. Merci de votre fidélité ! {{company.name}}</field>
+        </record>
+
+        <!-- Template SMS : Rappel Rendez-vous -->
+        <record id="sms_template_appointment_reminder" model="quelyos.sms.template">
+            <field name="name">Rappel Rendez-vous</field>
+            <field name="category">reminder</field>
+            <field name="message">Bonjour {{partner.name}}, rappel : vous avez rendez-vous demain à 14h avec {{company.name}}. Pour toute modification, appelez-nous au {{company.phone}}.</field>
+        </record>
+
+        <!-- Template SMS : Livraison Programmée -->
+        <record id="sms_template_delivery_scheduled" model="quelyos.sms.template">
+            <field name="name">Livraison Programmée</field>
+            <field name="category">notification</field>
+            <field name="message">{{partner.name}}, votre commande {{order.name}} sera livrée demain entre 9h-12h. Assurez-vous d'être présent ! {{company.name}}</field>
+        </record>
+
+        <!-- Template SMS : Demande Avis Client -->
+        <record id="sms_template_review_request" model="quelyos.sms.template">
+            <field name="name">Demande Avis</field>
+            <field name="category">custom</field>
+            <field name="message">Bonjour {{partner.name}}, merci pour votre commande ! Partagez votre expérience en 2 min sur notre site et recevez 5€ de réduction sur votre prochain achat. {{company.name}}</field>
+        </record>
+
+    </data>
+</odoo>
