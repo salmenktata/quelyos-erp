@@ -14,9 +14,10 @@ import { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button, PageNotice } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
-import { Save, Eye, Download, Upload, Palette, Type, Maximize } from 'lucide-react';
+import { Save, Eye, Download, Upload, Palette, Type, Maximize, Sparkles } from 'lucide-react';
 import type { ThemeConfig, ThemeCategory, SectionConfig } from '@/types/theme';
 import { PreviewFrame } from '@/components/theme-builder/PreviewFrame';
+import { AIGeneratorModal } from '@/components/theme-builder/AIGeneratorModal';
 
 // Catégories disponibles
 const THEME_CATEGORIES: { value: ThemeCategory; label: string }[] = [
@@ -88,6 +89,7 @@ export default function ThemeBuilderPage() {
   const [theme, setTheme] = useState<ThemeConfig>({ id: 'new', ...DEFAULT_THEME });
   const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'sections' | 'spacing'>('colors');
   const [showPreview, setShowPreview] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // Gestion des couleurs
@@ -243,6 +245,10 @@ export default function ThemeBuilderPage() {
                 onChange={handleImport}
               />
             </label>
+            <Button variant="outline" onClick={() => setShowAIModal(true)}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              AI Generate
+            </Button>
             <Button variant="primary" onClick={handleSave} disabled={isSaving}>
               <Save className="h-4 w-4 mr-2" />
               {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
@@ -518,6 +524,16 @@ export default function ThemeBuilderPage() {
           </div>
         )}
       </div>
+
+      {/* Modal AI Generator */}
+      <AIGeneratorModal
+        isOpen={showAIModal}
+        onClose={() => setShowAIModal(false)}
+        onGenerate={(generatedTheme) => {
+          setTheme({ ...theme, ...generatedTheme });
+          setShowAIModal(false);
+        }}
+      />
     </Layout>
   );
 }

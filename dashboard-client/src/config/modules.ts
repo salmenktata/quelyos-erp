@@ -289,6 +289,9 @@ export const MODULES: Module[] = [
         items: [
           { name: 'Thèmes', path: '/store/themes', icon: Palette },
           { name: 'Theme Builder', path: '/store/themes/builder', icon: Paintbrush },
+          { name: 'Marketplace Thèmes', path: '/store/themes/marketplace', icon: Store },
+          { name: 'Soumettre un Thème', path: '/store/themes/submit', icon: Upload },
+          { name: 'Mes Soumissions', path: '/store/themes/my-submissions', icon: FileEdit },
           { name: 'Paramètres', path: '/store/settings', icon: Settings },
         ],
       },

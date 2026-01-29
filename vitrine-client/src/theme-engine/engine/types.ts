@@ -136,3 +136,14 @@ export interface ThemeContextValue {
   components: ThemeComponents;
   spacing: ThemeSpacing;
 }
+
+// ============================================================================
+// SECTION COMPONENT PROPS
+// ============================================================================
+
+export interface SectionProps {
+  variant?: string;
+  config?: Record<string, unknown>;
+  className?: string;
+  theme: ThemeContextValue;
+}

@@ -326,3 +326,432 @@ class ThemeController(http.Controller):
                 'success': False,
                 'error': 'Internal server error'
             }
+
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # AI THEME GENERATION
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @http.route('/api/themes/generate', auth='user', type='jsonrpc', methods=['POST'], csrf=False)
+    def generate_theme_ai(self, prompt):
+        """
+        Génère un thème complet via Claude API basé sur un prompt utilisateur.
+
+        Args:
+            prompt (str): Description du thème souhaité par l'utilisateur
+
+        Returns:
+            dict: {
+                success: bool,
+                theme: ThemeConfig complète,
+                error: str (si échec)
+            }
+        """
+        try:
+            import json
+            import anthropic
+
+            if not prompt or not prompt.strip():
+                return {
+                    'success': False,
+                    'error': 'Le prompt ne peut pas être vide'
+                }
+
+            # Récupérer clé API Claude depuis paramètres système
+            api_key = request.env['ir.config_parameter'].sudo().get_param('quelyos.claude_api_key')
+
+            if not api_key:
+                return {
+                    'success': False,
+                    'error': 'Clé API Claude non configurée. Veuillez configurer la clé dans Paramètres > Technique > Paramètres Système (quelyos.claude_api_key).'
+                }
+
+            # System prompt pour guider Claude
+            system_prompt = """Tu es un expert en design web et e-commerce spécialisé dans la création de thèmes visuels.
+
+Ton rôle : générer une configuration de thème complète au format JSON basée sur la description utilisateur.
+
+Structure JSON attendue :
+{
+  "name": "Nom du thème",
+  "category": "fashion|tech|food|beauty|sports|home|general",
+  "description": "Description courte du thème",
+  "version": "1.0",
+  "colors": {
+    "primary": "#hexcode",
+    "secondary": "#hexcode",
+    "accent": "#hexcode",
+    "background": "#ffffff",
+    "text": "#1e293b",
+    "muted": "#94a3b8"
+  },
+  "typography": {
+    "headings": "Police Google Fonts (ex: Playfair Display)",
+    "body": "Police Google Fonts (ex: Inter)"
+  },
+  "layouts": {
+    "homepage": {
+      "sections": [
+        {
+          "type": "hero-slider|featured-products|newsletter|testimonials|faq|trust-badges",
+          "variant": "voir variantes ci-dessous",
+          "config": { "limit": 8 }
+        }
+      ]
+    },
+    "productPage": {
+      "layout": "standard|sidebar-left|sidebar-right",
+      "gallery": { "type": "standard|zoom|carousel" },
+      "sections": []
+    },
+    "categoryPage": {
+      "layout": "sidebar-left|sidebar-right|fullwidth",
+      "grid": "2cols|3cols|4cols",
+      "filters": ["price", "category", "color", "size"]
+    }
+  },
+  "components": {
+    "productCard": "standard|minimal|detailed",
+    "header": "standard|transparent|sticky",
+    "footer": "standard|minimal|columns",
+    "buttons": "standard|rounded|square"
+  },
+  "spacing": {
+    "sectionPadding": "small|medium|large",
+    "containerWidth": "1280px|1440px|1600px"
+  }
+}
+
+Sections disponibles et leurs variantes :
+- hero-slider : fullscreen-autoplay, split-screen, minimal
+- featured-products : grid-4cols, carousel, masonry
+- newsletter : centered, minimal
+- testimonials : carousel, grid
+- faq : accordion, tabs
+- trust-badges : icons, logos
+
+Choisis des couleurs harmonieuses adaptées à la catégorie du thème.
+Choisis des polices Google Fonts appropriées (headings différent de body pour contraste).
+Compose 3-5 sections pour la homepage selon le type de boutique.
+
+IMPORTANT : Réponds UNIQUEMENT avec le JSON, sans texte explicatif ni markdown."""
+
+            # Appel Claude API
+            client = anthropic.Anthropic(api_key=api_key)
+
+            message = client.messages.create(
+                model="claude-sonnet-4-5-20250929",
+                max_tokens=2048,
+                system=system_prompt,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"Génère un thème e-commerce complet pour : {prompt}"
+                    }
+                ]
+            )
+
+            # Extraire texte de la réponse
+            response_text = message.content[0].text.strip()
+
+            # Nettoyer markdown code blocks si présents
+            if response_text.startswith('```'):
+                lines = response_text.split('\n')
+                # Supprimer première ligne (```json ou ```)
+                lines = lines[1:]
+                # Supprimer dernière ligne (```)
+                if lines and lines[-1].strip() == '```':
+                    lines = lines[:-1]
+                response_text = '\n'.join(lines).strip()
+
+            # Parser JSON
+            theme_config = json.loads(response_text)
+
+            # Ajouter ID temporaire
+            theme_config['id'] = 'ai-generated'
+
+            _logger.info(f"AI theme generated successfully: {theme_config.get('name')}")
+
+            return {
+                'success': True,
+                'theme': theme_config
+            }
+
+        except Exception as e:
+            error_msg = str(e)
+            _logger.error(f"Error generating AI theme: {error_msg}")
+
+            # Messages d'erreur plus explicites
+            if 'anthropic' in error_msg.lower():
+                error_msg = "Erreur d'appel à l'API Claude. Vérifiez la clé API."
+            elif 'json' in error_msg.lower():
+                error_msg = "L'IA a retourné un format invalide. Réessayez avec un prompt plus clair."
+
+            return {
+                'success': False,
+                'error': error_msg
+            }
+
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # MARKETPLACE ENDPOINTS
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @http.route('/api/themes/marketplace', auth='public', type='jsonrpc', methods=['POST'], csrf=False)
+    def get_marketplace_themes(self, category=None, is_premium=None, sort='popular'):
+        """
+        Liste thèmes marketplace disponibles
+
+        Args:
+            category (str, optional): Filtrer par catégorie
+            is_premium (bool, optional): Filtrer premium/gratuit
+            sort (str): Tri (popular, recent, rating)
+
+        Returns:
+            dict: { success: bool, themes: list }
+        """
+        try:
+            domain = [
+                ('active', '=', True),
+                ('is_public', '=', True),
+                ('is_marketplace', '=', True),
+            ]
+
+            if category:
+                domain.append(('category', '=', category))
+
+            if is_premium is not None:
+                domain.append(('is_premium', '=', is_premium))
+
+            # Order
+            order_map = {
+                'popular': 'downloads desc',
+                'recent': 'create_date desc',
+                'rating': 'rating desc',
+            }
+            order = order_map.get(sort, 'downloads desc')
+
+            themes = request.env['quelyos.theme'].sudo().search(domain, order=order)
+
+            themes_data = []
+            for theme in themes:
+                themes_data.append({
+                    'id': theme.code,
+                    'name': theme.name,
+                    'description': theme.description,
+                    'category': theme.category,
+                    'thumbnail': theme.thumbnail,
+                    'designer': {
+                        'id': theme.designer_id.id if theme.designer_id else None,
+                        'name': theme.designer_id.display_name if theme.designer_id else 'Quelyos',
+                        'avatar': theme.designer_id.avatar if theme.designer_id else None,
+                    },
+                    'is_premium': theme.is_premium,
+                    'price': theme.price,
+                    'rating': theme.rating,
+                    'downloads': theme.downloads,
+                    'reviews_count': theme.review_count,
+                })
+
+            return {
+                'success': True,
+                'themes': themes_data
+            }
+
+        except Exception as e:
+            _logger.error(f"Error fetching marketplace themes: {str(e)}")
+            return {
+                'success': False,
+                'error': 'Internal server error'
+            }
+
+
+    @http.route('/api/themes/submissions', auth='user', type='jsonrpc', methods=['POST'], csrf=False)
+    def create_submission(self, name, description, category, config_json, is_premium=False, price=0.0):
+        """
+        Soumettre un thème pour review
+
+        Args:
+            name (str): Nom du thème
+            description (str): Description
+            category (str): Catégorie
+            config_json (str): Configuration JSON
+            is_premium (bool): Premium ou gratuit
+            price (float): Prix si premium
+
+        Returns:
+            dict: { success: bool, submission_id: int }
+        """
+        try:
+            # Vérifier si user a profil designer
+            designer = request.env['quelyos.theme.designer'].sudo().search([
+                ('user_id', '=', request.env.user.id)
+            ], limit=1)
+
+            if not designer:
+                # Créer profil designer automatiquement
+                designer = request.env['quelyos.theme.designer'].sudo().create({
+                    'user_id': request.env.user.id,
+                    'display_name': request.env.user.name,
+                    'email': request.env.user.email,
+                    'status': 'pending',
+                })
+
+            # Créer soumission
+            submission = request.env['quelyos.theme.submission'].sudo().create({
+                'designer_id': designer.id,
+                'name': name,
+                'description': description,
+                'category': category,
+                'config_json': config_json,
+                'is_premium': is_premium,
+                'price': price if is_premium else 0.0,
+                'status': 'submitted',
+                'submit_date': fields.Datetime.now(),
+            })
+
+            _logger.info(f"Theme submission created: {name} by {designer.display_name}")
+
+            return {
+                'success': True,
+                'submission_id': submission.id
+            }
+
+        except Exception as e:
+            _logger.error(f"Error creating theme submission: {str(e)}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+
+
+    @http.route('/api/themes/submissions/my', auth='user', type='jsonrpc', methods=['POST'], csrf=False)
+    def get_my_submissions(self):
+        """
+        Liste soumissions de l'utilisateur courant
+
+        Returns:
+            dict: { success: bool, submissions: list }
+        """
+        try:
+            designer = request.env['quelyos.theme.designer'].sudo().search([
+                ('user_id', '=', request.env.user.id)
+            ], limit=1)
+
+            if not designer:
+                return {
+                    'success': True,
+                    'submissions': []
+                }
+
+            submissions = designer.submission_ids
+
+            submissions_data = []
+            for submission in submissions:
+                submissions_data.append({
+                    'id': submission.id,
+                    'name': submission.name,
+                    'description': submission.description,
+                    'category': submission.category,
+                    'status': submission.status,
+                    'is_premium': submission.is_premium,
+                    'price': submission.price,
+                    'sales_count': submission.sales_count,
+                    'total_revenue': submission.total_revenue,
+                    'designer_revenue': submission.designer_revenue,
+                    'average_rating': submission.average_rating,
+                    'submit_date': submission.submit_date.isoformat() if submission.submit_date else None,
+                    'approval_date': submission.approval_date.isoformat() if submission.approval_date else None,
+                    'rejection_reason': submission.rejection_reason,
+                })
+
+            return {
+                'success': True,
+                'submissions': submissions_data
+            }
+
+        except Exception as e:
+            _logger.error(f"Error fetching user submissions: {str(e)}")
+            return {
+                'success': False,
+                'error': 'Internal server error'
+            }
+
+
+    @http.route('/api/themes/<int:theme_id>/purchase', auth='user', type='jsonrpc', methods=['POST'], csrf=False)
+    def purchase_theme(self, theme_id, tenant_id, payment_method='stripe'):
+        """
+        Acheter un thème pour un tenant
+
+        Args:
+            theme_id (int): ID du thème
+            tenant_id (int): ID du tenant
+            payment_method (str): Méthode paiement (stripe, paypal, free)
+
+        Returns:
+            dict: { success: bool, purchase_id: int, payment_url: str }
+        """
+        try:
+            theme = request.env['quelyos.theme'].sudo().browse(theme_id)
+
+            if not theme.exists():
+                return {
+                    'success': False,
+                    'error': 'Theme not found'
+                }
+
+            # Vérifier si déjà acheté
+            existing_purchase = request.env['quelyos.theme.purchase'].sudo().search([
+                ('theme_id', '=', theme_id),
+                ('tenant_id', '=', tenant_id),
+                ('status', '=', 'completed'),
+            ], limit=1)
+
+            if existing_purchase:
+                return {
+                    'success': False,
+                    'error': 'Theme already purchased'
+                }
+
+            # Si gratuit, acheter directement
+            if not theme.is_premium or theme.price == 0:
+                purchase = request.env['quelyos.theme.purchase'].sudo().create({
+                    'submission_id': theme.designer_id.submission_ids.filtered(lambda s: s.theme_id == theme).id if theme.designer_id else False,
+                    'tenant_id': tenant_id,
+                    'user_id': request.env.user.id,
+                    'amount': 0.0,
+                    'payment_method': 'free',
+                    'status': 'completed',
+                    'completion_date': fields.Datetime.now(),
+                })
+
+                return {
+                    'success': True,
+                    'purchase_id': purchase.id,
+                    'payment_url': None
+                }
+
+            # Si payant, créer purchase en attente
+            purchase = request.env['quelyos.theme.purchase'].sudo().create({
+                'submission_id': theme.designer_id.submission_ids.filtered(lambda s: s.theme_id == theme).id if theme.designer_id else False,
+                'tenant_id': tenant_id,
+                'user_id': request.env.user.id,
+                'amount': theme.price,
+                'payment_method': payment_method,
+                'status': 'pending',
+            })
+
+            # TODO: Intégrer Stripe/PayPal pour payment_url
+
+            return {
+                'success': True,
+                'purchase_id': purchase.id,
+                'payment_url': '/payment/stripe/checkout'  # TODO
+            }
+
+        except Exception as e:
+            _logger.error(f"Error purchasing theme: {str(e)}")
+            return {
+                'success': False,
+                'error': 'Internal server error'
+            }

@@ -102,6 +102,19 @@ class QuelyosTheme(models.Model):
         default=0.0,
         help="Prix du thème (0 = gratuit)"
     )
+
+    # Marketplace
+    is_marketplace = fields.Boolean(
+        string='Thème Marketplace',
+        default=False,
+        help="Thème soumis par un designer via marketplace"
+    )
+    designer_id = fields.Many2one(
+        comodel_name='quelyos.theme.designer',
+        string='Designer',
+        help="Designer créateur du thème (si marketplace)"
+    )
+
     tenant_ids = fields.Many2many(
         comodel_name='quelyos.tenant',
         relation='quelyos_theme_tenant_access_rel',

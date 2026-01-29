@@ -3,3 +3,6 @@ redis>=5.0.0,<6.0.0
 
 # Passlib pour cryptage des mots de passe (déjà utilisé)
 passlib>=1.7.4
+
+# Anthropic Claude API pour génération thèmes IA
+anthropic>=0.39.0

@@ -145,7 +145,7 @@ export class BackendClient {
 
       // The proxy returns the result directly
       return response.data;
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       const error = _error as { response?: { status?: number; data?: { error?: string; message?: string } }; message?: string };
       // Gestion gracieuse des 404 pour les endpoints non implémentés
       if (error.response?.status === 404 && !throwOn404) {

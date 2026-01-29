@@ -131,3 +131,14 @@ access_quelyos_theme_screenshot_manager,quelyos.theme.screenshot manager,model_q
 access_quelyos_theme_review_public,quelyos.theme.review public,model_quelyos_theme_review,base.group_public,1,0,0,0
 access_quelyos_theme_review_user,quelyos.theme.review user,model_quelyos_theme_review,base.group_user,1,1,1,0
 access_quelyos_theme_review_manager,quelyos.theme.review manager,model_quelyos_theme_review,group_quelyos_home_manager,1,1,1,1
+access_quelyos_theme_designer_public,quelyos.theme.designer public,model_quelyos_theme_designer,base.group_public,1,0,0,0
+access_quelyos_theme_designer_user,quelyos.theme.designer user,model_quelyos_theme_designer,base.group_user,1,1,1,0
+access_quelyos_theme_designer_manager,quelyos.theme.designer manager,model_quelyos_theme_designer,group_quelyos_home_manager,1,1,1,1
+access_quelyos_theme_submission_public,quelyos.theme.submission public,model_quelyos_theme_submission,base.group_public,1,0,0,0
+access_quelyos_theme_submission_user,quelyos.theme.submission user,model_quelyos_theme_submission,base.group_user,1,1,1,0
+access_quelyos_theme_submission_manager,quelyos.theme.submission manager,model_quelyos_theme_submission,group_quelyos_home_manager,1,1,1,1
+access_quelyos_theme_purchase_public,quelyos.theme.purchase public,model_quelyos_theme_purchase,base.group_public,1,0,0,0
+access_quelyos_theme_purchase_user,quelyos.theme.purchase user,model_quelyos_theme_purchase,base.group_user,1,1,1,0
+access_quelyos_theme_purchase_manager,quelyos.theme.purchase manager,model_quelyos_theme_purchase,group_quelyos_home_manager,1,1,1,1
+access_quelyos_theme_revenue_user,quelyos.theme.revenue user,model_quelyos_theme_revenue,base.group_user,1,0,0,0
+access_quelyos_theme_revenue_manager,quelyos.theme.revenue manager,model_quelyos_theme_revenue,group_quelyos_home_manager,1,1,1,1
