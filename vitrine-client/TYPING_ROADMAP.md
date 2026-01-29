@@ -235,15 +235,15 @@ const handleError = (error: StripeError): void => { ... }
 ```
 
 **Checklist Étape 2** :
-- [ ] Typer ShippingForm avec interface dédiée
-- [ ] Installer `@types/paypal__paypal-js` si manquant
-- [ ] Typer PayPalButton avec types officiels
-- [ ] Typer StripePaymentForm avec types officiels
-- [ ] Typer WalletPaymentButton (2 any)
-- [ ] Tests : Simuler paiements en dev
-- [ ] Commit : `refactor: typage formulaires paiement (14 any → 0)`
+- [x] Typer ShippingForm avec interface dédiée
+- [x] Installer `@types/paypal__paypal-js` si manquant
+- [x] Typer PayPalButton avec types officiels
+- [x] Typer StripePaymentForm avec types officiels
+- [x] Typer WalletPaymentButton (2 any)
+- [x] Tests : Simuler paiements en dev
+- [x] Commit : `refactor: typage formulaires paiement (14 any → 0)`
 
-**Gain attendu** : -14 any (14% du total)
+**Gain réel** : -14 any (14% du total) ✅ TERMINÉ (2026-01-29)
 
 ---
 
@@ -502,7 +502,7 @@ git commit -m "refactor: typage BackendClient - Phase 1 (39 any → 0)"
 ## ✅ Checklist Globale
 
 - [x] Phase 1 : API Client (39 any) ✅ TERMINÉ
-- [ ] Phase 2 : Paiements (14 any)
+- [x] Phase 2 : Paiements (14 any) ✅ TERMINÉ
 - [ ] Phase 3 : Hooks/Utils (18 any)
 - [ ] Phase 4 : UI Components (27 any)
 - [ ] Activer `strict: true` dans tsconfig
