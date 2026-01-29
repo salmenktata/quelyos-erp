@@ -93,7 +93,7 @@ export function PayPalButton({
             }
 
             return response.data.paypal_order_id;
-          } catch (err) {
+          } catch (_err) {
             const errorMsg = err instanceof Error ? err.message : 'PayPal order creation failed';
             setError(errorMsg);
             onError(err instanceof Error ? err : new Error(errorMsg));
@@ -117,7 +117,7 @@ export function PayPalButton({
 
             // Payment successful
             onSuccess(response.data.transaction_id);
-          } catch (err) {
+          } catch (_err) {
             const errorMsg = err instanceof Error ? err.message : 'PayPal payment capture failed';
             setError(errorMsg);
             onError(err instanceof Error ? err : new Error(errorMsg));

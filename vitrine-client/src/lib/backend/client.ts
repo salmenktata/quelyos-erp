@@ -3,7 +3,7 @@
  * Gère les appels JSON-RPC vers le système backend E-commerce
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import type {
   Product,
   ProductListResponse,
@@ -29,7 +29,7 @@ const getApiBase = () => {
   return '/api/backend';
 };
 
-const DB = process.env.BACKEND_DATABASE || 'quelyos';
+const _DB = process.env.BACKEND_DATABASE || 'quelyos';
 
 export class BackendClient {
   private api: AxiosInstance;
@@ -84,7 +84,7 @@ export class BackendClient {
 
       // The proxy returns the result directly
       return response.data;
-    } catch (error: any) {
+    } catch (_error: unknown) {
       // Gestion gracieuse des 404 pour les endpoints non implémentés
       if (error.response?.status === 404 && !throwOn404) {
         logger.warn(`Endpoint non implémenté: ${endpoint}`);
@@ -98,7 +98,7 @@ export class BackendClient {
       const errorMessage =
         error.response?.data?.error ||
         error.response?.data?.message ||
-        error.message ||
+        error instanceof Error ? error.message :
         'Unknown error';
 
       throw new Error(errorMessage);
@@ -150,7 +150,7 @@ export class BackendClient {
       }
 
       return result;
-    } catch (error: any) {
+    } catch (_error: unknown) {
       return { success: false, error: error.message };
     }
   }
@@ -160,7 +160,7 @@ export class BackendClient {
       await this.jsonrpc('/auth/logout');
       this.clearSession();
       return { success: true };
-    } catch (error) {
+    } catch (_error) {
       this.clearSession();
       return { success: false };
     }
@@ -178,7 +178,7 @@ export class BackendClient {
   async getSession(): Promise<{ authenticated: boolean; user?: User }> {
     try {
       return await this.jsonrpc('/auth/session');
-    } catch (error) {
+    } catch (_error) {
       return { authenticated: false };
     }
   }

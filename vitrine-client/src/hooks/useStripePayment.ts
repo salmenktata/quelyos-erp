@@ -68,7 +68,7 @@ export function useStripePayment({
       } else {
         throw new Error(response.error || 'Erreur création Payment Intent');
       }
-    } catch (err: any) {
+    } catch (_err: any) {
       const errorMessage = getUserFriendlyErrorMessage(err);
       logger.error('Erreur création Payment Intent:', err);
       setError(errorMessage);
@@ -140,7 +140,7 @@ export function useStripePayment({
         } else {
           throw new Error(confirmResponse.error || 'Erreur confirmation commande');
         }
-      } catch (err: any) {
+      } catch (_err: any) {
         const errorMessage = getUserFriendlyErrorMessage(err);
         logger.error('Erreur confirmation paiement:', err);
         setError(errorMessage);

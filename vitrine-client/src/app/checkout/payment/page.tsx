@@ -110,9 +110,9 @@ export default function CheckoutPaymentPage() {
       } else {
         throw new Error(result.error || 'Erreur confirmation commande');
       }
-    } catch (error: any) {
+    } catch (_error: unknown) {
       logger.error('Erreur confirmation commande:', error);
-      alert(error.message || 'Une erreur est survenue. Veuillez réessayer.');
+      alert(error instanceof Error ? error.message : 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setIsSubmitting(false);
     }

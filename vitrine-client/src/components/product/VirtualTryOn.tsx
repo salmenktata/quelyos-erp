@@ -47,7 +47,7 @@ export function VirtualTryOn({
         setCameraActive(true);
         setCameraError(null);
       }
-    } catch (err) {
+    } catch (_err) {
       console.error('Camera error:', err);
       setCameraError('Impossible d\'acceder a la camera. Verifiez les permissions.');
     }

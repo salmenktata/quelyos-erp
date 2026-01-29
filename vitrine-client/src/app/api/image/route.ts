@@ -28,7 +28,7 @@ function isBase64(str: string): boolean {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Get the image URL from query params (may be base64-encoded)
     const rawUrl = request.nextUrl.searchParams.get('url');
@@ -94,10 +94,10 @@ export async function GET(request: NextRequest) {
         'Access-Control-Allow-Origin': '*',
       },
     });
-  } catch (error: any) {
+  } catch (_error: unknown) {
     logger.error('Image proxy error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to proxy image' },
+      { error: error instanceof Error ? error.message : 'Failed to proxy image' },
       { status: 500 }
     );
   }

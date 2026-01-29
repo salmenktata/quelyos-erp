@@ -27,7 +27,7 @@ const MAX_AGE_DAYS = 7;
 
 export const useRecentlyViewedStore = create<RecentlyViewedState>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       products: [],
 
       addProduct: (product) => {

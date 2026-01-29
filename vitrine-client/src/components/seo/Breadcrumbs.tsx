@@ -47,7 +47,7 @@ export function Breadcrumbs({ productId, customItems }: BreadcrumbsProps) {
         setBreadcrumbs(response.data.breadcrumbs || []);
         setStructuredData(response.data.structured_data);
       }
-    } catch (error) {
+    } catch (_error) {
       logger.error('Error loading breadcrumbs:', error);
     } finally {
       setLoading(false);

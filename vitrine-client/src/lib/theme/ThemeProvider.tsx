@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { Theme, ThemeName, ThemeColors } from './types';
 import { themes, defaultTheme } from './themes';
 import { FONT_FAMILIES } from '@/types/tenant';
-import type { TenantTheme, TenantColors, TenantTypography } from '@/types/tenant';
+import type { TenantTheme, TenantTypography } from '@/types/tenant';
 
 interface ThemeContextType {
   theme: Theme;

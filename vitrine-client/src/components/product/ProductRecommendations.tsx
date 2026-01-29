@@ -92,7 +92,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
           }
           break;
       }
-    } catch (error) {
+    } catch (_error) {
       logger.error('Error loading recommendations:', error);
     } finally {
       setIsLoading(false);

@@ -41,7 +41,7 @@ async function jsonrpc<T = any>(
       headers: { 'Content-Type': 'application/json' },
     });
     return response.data;
-  } catch (error: any) {
+  } catch (_error: unknown) {
     // Gestion gracieuse des 404 pour les endpoints CMS non implémentés
     if (error.response?.status === 404 && !throwOn404) {
       logger.warn(`Endpoint CMS non implémenté: ${endpoint}`);
@@ -53,7 +53,7 @@ async function jsonrpc<T = any>(
     const errorMessage =
       error.response?.data?.error ||
       error.response?.data?.message ||
-      error.message ||
+      error instanceof Error ? error.message :
       'Unknown error';
     throw new Error(errorMessage);
   }

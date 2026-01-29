@@ -64,7 +64,7 @@ export function useCachedProducts(
       } else {
         setError('Failed to fetch products');
       }
-    } catch (err: any) {
+    } catch (_err: any) {
       setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
@@ -117,7 +117,7 @@ export function useCachedProduct(
       } else {
         setError('Product not found');
       }
-    } catch (err: any) {
+    } catch (_err: any) {
       setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);

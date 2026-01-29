@@ -80,7 +80,7 @@ export function MegaMenu() {
         );
         setCategories(topLevelCategories);
       }
-    } catch (error) {
+    } catch (_error) {
       logger.error('Error loading categories:', error);
     } finally {
       setLoading(false);

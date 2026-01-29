@@ -105,7 +105,7 @@ export function SearchAutocomplete({
           }));
           setPopularSearches(searches);
         }
-      } catch (error) {
+      } catch (_error) {
         // Silently fail - popular searches are optional
         logger.debug('Popular searches not available');
       }
@@ -171,7 +171,7 @@ export function SearchAutocomplete({
         setResults({ products, categories });
         setIsOpen(true);
       }
-    } catch (error) {
+    } catch (_error) {
       logger.error('Search autocomplete error:', error);
     } finally {
       setIsLoading(false);

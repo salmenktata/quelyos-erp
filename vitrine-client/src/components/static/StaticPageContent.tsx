@@ -34,7 +34,7 @@ export function StaticPageContent({ slug, fallback, title, subtitle }: StaticPag
         } else {
           setUseFallback(true);
         }
-      } catch (error) {
+      } catch (_error) {
         logger.error(`Error fetching static page ${slug}:`, error);
         setUseFallback(true);
       } finally {
