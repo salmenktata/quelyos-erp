@@ -949,17 +949,17 @@ def export_data(self):
 Tous les services tournent dans une session tmux en arrière-plan. Vous pouvez fermer le terminal sans arrêter les services.
 
 ```bash
-# Démarrer TOUS les services (Backend + Frontend + Backoffice)
-./dev.sh
+# Démarrer TOUS les services (Backend + Frontends + Backoffice)
+./scripts/dev.sh
 
 # Voir le statut de tous les services
-./status.sh
+./scripts/status.sh
 
 # Se connecter à la session tmux (voir les logs en temps réel)
-./attach.sh
+./scripts/attach.sh
 
 # Arrêter tous les services proprement
-./stop.sh
+./scripts/stop.sh
 ```
 
 **Raccourcis tmux utiles (après `./attach.sh`)** :
@@ -971,16 +971,22 @@ Tous les services tournent dans une session tmux en arrière-plan. Vous pouvez f
 
 ```bash
 # Reset Odoo (installation vierge)
-cd backend && ./reset.sh
+cd odoo-backend && ./reset.sh
 
 # Démarrer Odoo
-cd backend && docker-compose up -d
+cd odoo-backend && docker-compose up -d
 
-# Démarrer Frontend
-cd frontend && npm install && npm run dev
+# Démarrer Vitrine (marketing)
+cd vitrine-quelyos && pnpm dev
+
+# Démarrer Boutique (e-commerce)
+cd vitrine-client && pnpm dev
 
 # Démarrer Backoffice
-cd backoffice && npm install && npm run dev
+cd dashboard-client && pnpm dev
+
+# Démarrer Super-admin
+cd super-admin-client && pnpm dev
 ```
 
 ---
@@ -996,6 +1002,10 @@ cd backoffice && npm install && npm run dev
 
 ### Étapes de déploiement
 
+> ⚠️ **Note** : `docker-compose.prod.yml` utilise des contextes legacy `./frontend` et `./backoffice`.
+> Dans ce repo, les apps réelles sont `vitrine-quelyos/` et `dashboard-client/`.
+> Avant un déploiement Docker prod, mettez à jour ces contextes (ou utilisez les Dockerfiles dans ces dossiers).
+
 ```bash
 # 1. Cloner le projet
 git clone https://github.com/salmenktata/quelyosSuite.git
@@ -1006,10 +1016,10 @@ cp .env.production.example .env.production
 nano .env.production  # Remplir les valeurs
 
 # 3. Déployer l'application
-./deploy.sh
+./scripts/deploy.sh
 
 # 4. Configurer SSL (Let's Encrypt)
-./ssl-init.sh
+./scripts/ssl-init.sh
 
 # 5. Vérifier que tout fonctionne
 docker-compose -f docker-compose.prod.yml ps
@@ -1021,20 +1031,20 @@ docker-compose -f docker-compose.prod.yml logs -f
 | Script | Description |
 |--------|-------------|
 | **Développement** | |
-| `./dev.sh` | Démarre tous les services en développement (tmux) |
-| `./stop.sh` | Arrête tous les services de développement |
-| `./status.sh` | Affiche le statut de tous les services |
-| `./attach.sh` | Se connecte à la session tmux |
+| `./scripts/dev.sh` | Démarre tous les services en développement (tmux) |
+| `./scripts/stop.sh` | Arrête tous les services de développement |
+| `./scripts/status.sh` | Affiche le statut de tous les services |
+| `./scripts/attach.sh` | Se connecte à la session tmux |
 | **Sécurité** | |
-| `backend/test-security.sh` | Teste les endpoints sécurisés (sans auth = refus) |
-| `backend/monitor-security.sh` | Affiche statistiques tentatives non autorisées |
-| `backend/monitor-security.sh --live` | Monitoring temps réel événements sécurité |
-| `backend/monitor-security.sh --today` | Filtrer événements du jour |
+| `odoo-backend/test-security.sh` | Teste les endpoints sécurisés (sans auth = refus) |
+| `odoo-backend/monitor-security.sh` | Affiche statistiques tentatives non autorisées |
+| `odoo-backend/monitor-security.sh --live` | Monitoring temps réel événements sécurité |
+| `odoo-backend/monitor-security.sh --today` | Filtrer événements du jour |
 | **Production** | |
-| `./deploy.sh` | Déploie l'application (build + start) |
-| `./ssl-init.sh` | Configure les certificats SSL |
-| `./backup.sh` | Sauvegarde la base de données |
-| `./healthcheck.sh` | Vérifie la santé de l'application |
+| `./scripts/deploy.sh` | Déploie l'application (build + start) |
+| `./scripts/ssl-init.sh` | Configure les certificats SSL |
+| `./scripts/backup.sh` | Sauvegarde la base de données |
+| `./scripts/healthcheck.sh` | Vérifie la santé de l'application |
 
 ### Commandes utiles
 
@@ -1053,7 +1063,7 @@ docker-compose -f docker-compose.prod.yml build
 docker-compose -f docker-compose.prod.yml up -d
 
 # Backup manuel
-./backup.sh
+./scripts/backup.sh
 
 # Restaurer un backup
 gunzip < backups/quelyos_backup_YYYYMMDD_HHMMSS.sql.gz | \

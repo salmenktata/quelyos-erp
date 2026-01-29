@@ -182,8 +182,8 @@ export function validateApiResponse<T>(schema: z.ZodSchema<T>, data: unknown): T
     return schema.parse(data)
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('Validation API failed:', error.errors)
-      throw new Error(`Invalid API response: ${error.errors.map((e) => e.message).join(', ')}`)
+      console.error('Validation API failed:', error.issues)
+      throw new Error(`Invalid API response: ${error.issues.map((e) => e.message).join(', ')}`)
     }
     throw error
   }
@@ -195,7 +195,7 @@ export function validateApiResponse<T>(schema: z.ZodSchema<T>, data: unknown): T
 export function safeValidateApiResponse<T>(schema: z.ZodSchema<T>, data: unknown): T | null {
   const result = schema.safeParse(data)
   if (!result.success) {
-    console.error('Validation API failed (safe):', result.error.errors)
+    console.error('Validation API failed (safe):', result.error.issues)
     return null
   }
   return result.data

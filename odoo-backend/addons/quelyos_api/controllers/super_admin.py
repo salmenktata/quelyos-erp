@@ -10,7 +10,6 @@ from odoo.http import request
 from odoo.exceptions import AccessDenied
 from datetime import datetime, timedelta
 import logging
-import redis
 
 _logger = logging.getLogger(__name__)
 
@@ -36,6 +35,50 @@ class SuperAdminController(http.Controller):
             f"[AUDIT] Super admin access granted - User: {user.login} (ID: {user.id}) | "
             f"IP: {ip_address} | Endpoint: {endpoint}"
         )
+
+        # Rate limiting automatique
+        self._check_rate_limit()
+
+    def _check_rate_limit(self, max_requests=100, window_seconds=60):
+        """
+        Vérifie le rate limiting via table PostgreSQL
+        Par défaut: 100 requêtes par minute par utilisateur
+        """
+        user = request.env.user
+        endpoint = request.httprequest.path
+        now = datetime.now()
+        window_start = now - timedelta(seconds=window_seconds)
+
+        # Nettoyer anciennes entrées (> window)
+        request.env.cr.execute("""
+            DELETE FROM ir_logging
+            WHERE name = 'rate_limit.superadmin'
+            AND create_date < %s
+        """, (window_start,))
+
+        # Compter requêtes dans la fenêtre
+        request.env.cr.execute("""
+            SELECT COUNT(*)
+            FROM ir_logging
+            WHERE name = 'rate_limit.superadmin'
+            AND message LIKE %s
+            AND create_date >= %s
+        """, (f"{user.id}:{endpoint}%", window_start))
+
+        count = request.env.cr.fetchone()[0]
+
+        if count >= max_requests:
+            _logger.warning(
+                f"[RATE LIMIT] User {user.login} (ID: {user.id}) exceeded rate limit "
+                f"on {endpoint}: {count}/{max_requests} requests"
+            )
+            raise AccessDenied(f"Rate limit exceeded. Max {max_requests} requests per {window_seconds}s.")
+
+        # Enregistrer cette requête
+        request.env.cr.execute("""
+            INSERT INTO ir_logging (create_date, create_uid, name, type, dbname, level, message, path, line, func)
+            VALUES (NOW(), %s, 'rate_limit.superadmin', 'server', current_database(), 'INFO', %s, '', '', '')
+        """, (user.id, f"{user.id}:{endpoint}"))
 
     # =========================================================================
     # DASHBOARD METRICS
@@ -327,9 +370,29 @@ class SuperAdminController(http.Controller):
             postgres_status = 'down'
             postgres_connections = 0
 
-        # Redis (simulé - TODO: implémenter vrai check)
-        redis_status = 'up'
-        redis_memory_mb = 128
+        # Redis (check via socket TCP)
+        import socket
+        try:
+            redis_host = request.env['ir.config_parameter'].sudo().get_param('redis.host', 'redis')
+            redis_port = int(request.env['ir.config_parameter'].sudo().get_param('redis.port', '6379'))
+
+            # Test connexion TCP
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(2)
+            result = sock.connect_ex((redis_host, redis_port))
+            sock.close()
+
+            if result == 0:
+                redis_status = 'up'
+                # Estimation mémoire (pas de vraie valeur sans client Redis)
+                redis_memory_mb = 128
+            else:
+                redis_status = 'down'
+                redis_memory_mb = 0
+        except Exception as e:
+            _logger.warning(f"Redis health check failed: {str(e)}")
+            redis_status = 'down'
+            redis_memory_mb = 0
 
         # Stripe (vérifier dernière webhook)
         stripe_status = 'up'
