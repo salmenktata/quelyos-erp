@@ -63,30 +63,54 @@ class AuthController(http.Controller):
             response.status_code = 400
             return response
 
-    @http.route('/api/auth/sso-login', type='json', auth='none', methods=['POST', 'OPTIONS'], csrf=False, cors='*')
+    @http.route('/api/auth/sso-login', type='http', auth='none', methods=['POST', 'OPTIONS'], csrf=False)
     def sso_login(self, **kwargs):
         """
         Authentification SSO avec cookies HttpOnly - valide les credentials et crée une session Odoo.
 
         Returns:
-            dict: {success: bool, user: {...}} ou {success: false, error: str}
+            JSON: {success: bool, user: {...}} ou {success: false, error: str}
 
         Note: Les tokens sont définis dans des cookies HttpOnly (non accessibles par JavaScript)
         """
+        # Gérer CORS manuellement pour credentials: include
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        # Handle preflight OPTIONS
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
         # Rate limiting - protection brute force
         rate_error = check_rate_limit(request, RateLimitConfig.LOGIN, 'login')
         if rate_error:
             _logger.warning(f"Rate limit exceeded for login attempt from {request.httprequest.remote_addr}")
-            return rate_error
+            response = request.make_json_response(rate_error, headers=cors_headers)
+            response.status_code = 429
+            return response
 
         try:
-            params = request.params if hasattr(request, 'params') and request.params else {}
+            # Parser le body JSON (peut être JSON-RPC ou JSON simple)
+            try:
+                body = request.get_json_data()
+                # Si JSON-RPC, extraire params
+                if isinstance(body, dict) and 'jsonrpc' in body:
+                    params = body.get('params', {})
+                else:
+                    params = body or {}
+            except:
+                params = {}
             login = params.get('login', '').strip()
             password = params.get('password', '')
             db = params.get('db') or request.db
 
             if not login or not password:
-                return {'success': False, 'error': 'Login et mot de passe requis'}
+                response_data = {'success': False, 'error': 'Login et mot de passe requis'}
+                response = request.make_json_response(response_data, headers=cors_headers)
+                response.status_code = 400
+                return response
 
             # Authenticate user (Odoo 19: authenticate prend env et credentials dict)
             uid = request.session.authenticate(request.env, {'db': db, 'login': login, 'password': password})
@@ -96,7 +120,10 @@ class AuthController(http.Controller):
                 fail_key = rate_limit_key(request, 'login_failed')
                 limiter = get_rate_limiter()
                 limiter.is_allowed(fail_key, *RateLimitConfig.LOGIN_FAILED)
-                return {'success': False, 'error': 'Identifiants invalides'}
+                response_data = {'success': False, 'error': 'Identifiants invalides'}
+                response = request.make_json_response(response_data, headers=cors_headers)
+                response.status_code = 401
+                return response
 
             # Générer refresh token
             ip_address = request.httprequest.remote_addr
@@ -125,8 +152,8 @@ class AuthController(http.Controller):
                 }
             }
 
-            # Créer la réponse HTTP pour définir les cookies
-            response = request.make_json_response(response_data)
+            # Créer la réponse HTTP pour définir les cookies (avec headers CORS)
+            response = request.make_json_response(response_data, headers=cors_headers)
 
             # Définir cookie session (30 min)
             response.set_cookie(
@@ -154,7 +181,10 @@ class AuthController(http.Controller):
 
         except Exception as e:
             _logger.error(f"SSO login error: {e}")
-            return {'success': False, 'error': 'Erreur de connexion'}
+            response_data = {'success': False, 'error': 'Erreur de connexion'}
+            response = request.make_json_response(response_data, headers=cors_headers)
+            response.status_code = 500
+            return response
 
     @http.route('/api/auth/login', type='json', auth='none', methods=['POST'], csrf=False, cors='*')
     def login(self, **kwargs):
