@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Configuration par défaut de l'installation automatique des modules Quelyos -->
+
+        <!-- Module quelyos_stock_advanced : Inventaire avancé (ACTIVÉ par défaut) -->
+        <function model="ir.config_parameter" name="set_param">
+            <value>quelyos.install_stock_advanced</value>
+            <value>True</value>
+        </function>
+
+        <!-- Module quelyos_finance : Gestion trésorerie et budgets (ACTIVÉ par défaut) -->
+        <function model="ir.config_parameter" name="set_param">
+            <value>quelyos.install_finance</value>
+            <value>True</value>
+        </function>
+
+        <!-- Module quelyos_sms_tn : Notifications SMS Tunisie (ACTIVÉ par défaut) -->
+        <function model="ir.config_parameter" name="set_param">
+            <value>quelyos.install_sms_tn</value>
+            <value>True</value>
+        </function>
+
+        <!--
+            Pour désactiver un module optionnel, modifier la valeur à False :
+
+            Paramètres > Technique > Paramètres > Paramètres système
+            - quelyos.install_stock_advanced = False
+            - quelyos.install_finance = False
+            - quelyos.install_sms_tn = False
+
+            Note : quelyos_api est TOUJOURS installé (module critique)
+        -->
+
+    </data>
+</odoo>

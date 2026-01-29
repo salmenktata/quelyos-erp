@@ -15,5 +15,17 @@
             <value>True</value>
         </function>
 
+        <!-- Paramètres de stock par défaut -->
+        <function model="ir.config_parameter" name="set_param">
+            <value>stock.propagate_cancel</value>
+            <value>True</value>
+        </function>
+
+        <!-- Paramètres website par défaut -->
+        <function model="ir.config_parameter" name="set_param">
+            <value>website.auto_advance_payment</value>
+            <value>True</value>
+        </function>
+
     </data>
 </odoo>

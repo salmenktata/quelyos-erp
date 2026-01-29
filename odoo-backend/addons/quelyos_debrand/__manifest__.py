@@ -1,7 +1,7 @@
 {
     'name': 'Quelyos Debrand',
-    'version': '19.0.1.0.0',
-    'category': 'Hidden/Tools',
+    'version': '19.0.1.0.1',
+    'category': 'Quelyos/Branding',
     'summary': 'Anonymisation complète Odoo - Branding Quelyos',
     'description': '''
         Module de debranding pour remplacer toutes les références Odoo par Quelyos.

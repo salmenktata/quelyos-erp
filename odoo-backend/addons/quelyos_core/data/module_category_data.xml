@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Catégorie principale Quelyos pour regrouper tous les modules de la suite -->
+        <record id="module_category_quelyos" model="ir.module.category">
+            <field name="name">Quelyos</field>
+            <field name="description">Modules de la suite Quelyos ERP - Infrastructure multi-tenant e-commerce</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <!-- Sous-catégorie Foundation -->
+        <record id="module_category_quelyos_foundation" model="ir.module.category">
+            <field name="name">Foundation</field>
+            <field name="description">Modules fondamentaux de la suite Quelyos</field>
+            <field name="parent_id" ref="module_category_quelyos"/>
+            <field name="sequence">1</field>
+        </record>
+
+        <!-- Sous-catégorie API -->
+        <record id="module_category_quelyos_api" model="ir.module.category">
+            <field name="name">API</field>
+            <field name="description">Infrastructure multi-tenant et API REST</field>
+            <field name="parent_id" ref="module_category_quelyos"/>
+            <field name="sequence">2</field>
+        </record>
+
+        <!-- Sous-catégorie Branding -->
+        <record id="module_category_quelyos_branding" model="ir.module.category">
+            <field name="name">Branding</field>
+            <field name="description">Personnalisation et anonymisation interface</field>
+            <field name="parent_id" ref="module_category_quelyos"/>
+            <field name="sequence">3</field>
+        </record>
+
+        <!-- Sous-catégorie Finance -->
+        <record id="module_category_quelyos_finance" model="ir.module.category">
+            <field name="name">Finance</field>
+            <field name="description">Gestion trésorerie, budgets et portefeuilles</field>
+            <field name="parent_id" ref="module_category_quelyos"/>
+            <field name="sequence">4</field>
+        </record>
+
+        <!-- Sous-catégorie Inventory -->
+        <record id="module_category_quelyos_inventory" model="ir.module.category">
+            <field name="name">Inventory</field>
+            <field name="description">Fonctionnalités avancées de gestion de stock</field>
+            <field name="parent_id" ref="module_category_quelyos"/>
+            <field name="sequence">5</field>
+        </record>
+
+        <!-- Sous-catégorie Communication -->
+        <record id="module_category_quelyos_communication" model="ir.module.category">
+            <field name="name">Communication</field>
+            <field name="description">Notifications SMS et messaging</field>
+            <field name="parent_id" ref="module_category_quelyos"/>
+            <field name="sequence">6</field>
+        </record>
+
+    </data>
+</odoo>

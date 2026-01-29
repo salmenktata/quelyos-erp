@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos SMS Tunisie',
-    'version': '19.0.1.0.1',
-    'category': 'Marketing',
+    'version': '19.0.1.0.2',
+    'category': 'Quelyos/Communication',
     'summary': 'Envoi de SMS via API Tunisie SMS pour notifications e-commerce',
     'description': """
         Module SMS pour Quelyos Suite
