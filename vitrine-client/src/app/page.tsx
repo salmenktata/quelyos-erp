@@ -20,6 +20,7 @@ import { ContinueShoppingSection } from '@/components/home/ContinueShoppingSecti
 import { SocialTrendingProducts } from '@/components/home/SocialTrendingProducts';
 import { LivestreamShopping } from '@/components/live/LivestreamShopping';
 import { logger } from '@/lib/logger';
+import { ThemeSections } from '@/components/theme/ThemeSections';
 
 // Server-side data fetching
 async function getHomeData(): Promise<{ products: Product[]; categories: Category[]; heroSlides: HeroSlide[]; promoBanners: PromoBanner[]; benefits: Benefit[] }> {
@@ -98,6 +99,10 @@ export default async function Home() {
 
   return (
     <div className="bg-gray-50">
+      {/* THEME SECTIONS - Rendu dynamique selon le thème actif */}
+      <ThemeSections />
+
+      {/* FALLBACK - Structure par défaut si pas de sections dans le thème */}
       {/* HERO SLIDER */}
       <HeroSlider slides={heroSlides} />
 
