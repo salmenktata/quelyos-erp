@@ -3,7 +3,7 @@
     <data noupdate="1">
 
         <!-- =================================================================== -->
-        <!-- FAQ Categories -->
+        <!-- SECTION 1: FAQ Categories -->
         <!-- =================================================================== -->
         <record id="faq_category_orders" model="quelyos.faq.category">
             <field name="name">Commandes</field>
@@ -41,7 +41,7 @@
         </record>
 
         <!-- =================================================================== -->
-        <!-- FAQs -->
+        <!-- SECTION 2: FAQs -->
         <!-- =================================================================== -->
         <record id="faq_order_1" model="quelyos.faq">
             <field name="question">Comment passer une commande ?</field>
@@ -135,7 +135,7 @@
         </record>
 
         <!-- =================================================================== -->
-        <!-- Loyalty Program -->
+        <!-- SECTION 3: Loyalty Program -->
         <!-- =================================================================== -->
         <record id="loyalty_program_default" model="quelyos.loyalty.program">
             <field name="name">Programme Fidelite Quelyos</field>
@@ -146,7 +146,6 @@
             <field name="min_points_redeem">100</field>
         </record>
 
-        <!-- Loyalty Levels -->
         <record id="loyalty_level_bronze" model="quelyos.loyalty.level">
             <field name="name">Bronze</field>
             <field name="program_id" ref="loyalty_program_default"/>
@@ -192,7 +191,7 @@
         </record>
 
         <!-- =================================================================== -->
-        <!-- Testimonials -->
+        <!-- SECTION 4: Testimonials -->
         <!-- =================================================================== -->
         <record id="testimonial_1" model="quelyos.testimonial">
             <field name="customer_name">Ahmed Ben Ali</field>
@@ -230,7 +229,7 @@
         </record>
 
         <!-- =================================================================== -->
-        <!-- Collections -->
+        <!-- SECTION 5: Collections -->
         <!-- =================================================================== -->
         <record id="collection_bestsellers" model="quelyos.collection">
             <field name="name">Meilleures Ventes</field>
@@ -268,7 +267,7 @@
         </record>
 
         <!-- =================================================================== -->
-        <!-- Trust Badges (Benefits Homepage) -->
+        <!-- SECTION 6: Trust Badges (Benefits Homepage) -->
         <!-- =================================================================== -->
         <record id="trust_badge_delivery" model="quelyos.trust.badge">
             <field name="name">Livraison Rapide</field>
@@ -304,6 +303,1323 @@
             <field name="icon">creditcard</field>
             <field name="sequence">4</field>
             <field name="active">True</field>
+        </record>
+
+        <!-- =================================================================== -->
+        <!-- SECTION 7: CATEGORIES PRODUITS (Hiérarchie Mode) -->
+        <!-- =================================================================== -->
+
+        <!-- Catégories principales (racine) -->
+        <record id="categ_homme" model="product.category">
+            <field name="name">Homme</field>
+        </record>
+
+        <record id="categ_femme" model="product.category">
+            <field name="name">Femme</field>
+        </record>
+
+        <record id="categ_enfant" model="product.category">
+            <field name="name">Enfant</field>
+        </record>
+
+        <record id="categ_sport" model="product.category">
+            <field name="name">Sport &amp; Fitness</field>
+        </record>
+
+        <record id="categ_promo" model="product.category">
+            <field name="name">Promotions</field>
+        </record>
+
+        <!-- Sous-catégories Homme -->
+        <record id="categ_homme_tshirts" model="product.category">
+            <field name="name">T-shirts &amp; Polos</field>
+            <field name="parent_id" ref="categ_homme"/>
+        </record>
+
+        <record id="categ_homme_chemises" model="product.category">
+            <field name="name">Chemises</field>
+            <field name="parent_id" ref="categ_homme"/>
+        </record>
+
+        <record id="categ_homme_pantalons" model="product.category">
+            <field name="name">Pantalons &amp; Jeans</field>
+            <field name="parent_id" ref="categ_homme"/>
+        </record>
+
+        <record id="categ_homme_vestes" model="product.category">
+            <field name="name">Vestes &amp; Manteaux</field>
+            <field name="parent_id" ref="categ_homme"/>
+        </record>
+
+        <record id="categ_homme_chaussures" model="product.category">
+            <field name="name">Chaussures Homme</field>
+            <field name="parent_id" ref="categ_homme"/>
+        </record>
+
+        <record id="categ_homme_accessoires" model="product.category">
+            <field name="name">Accessoires Homme</field>
+            <field name="parent_id" ref="categ_homme"/>
+        </record>
+
+        <!-- Sous-catégories Femme -->
+        <record id="categ_femme_tops" model="product.category">
+            <field name="name">Tops &amp; Blouses</field>
+            <field name="parent_id" ref="categ_femme"/>
+        </record>
+
+        <record id="categ_femme_robes" model="product.category">
+            <field name="name">Robes</field>
+            <field name="parent_id" ref="categ_femme"/>
+        </record>
+
+        <record id="categ_femme_jupes" model="product.category">
+            <field name="name">Jupes &amp; Shorts</field>
+            <field name="parent_id" ref="categ_femme"/>
+        </record>
+
+        <record id="categ_femme_pantalons" model="product.category">
+            <field name="name">Pantalons Femme</field>
+            <field name="parent_id" ref="categ_femme"/>
+        </record>
+
+        <record id="categ_femme_chaussures" model="product.category">
+            <field name="name">Chaussures Femme</field>
+            <field name="parent_id" ref="categ_femme"/>
+        </record>
+
+        <record id="categ_femme_accessoires" model="product.category">
+            <field name="name">Accessoires Femme</field>
+            <field name="parent_id" ref="categ_femme"/>
+        </record>
+
+        <!-- Sous-catégories Enfant -->
+        <record id="categ_enfant_garcon" model="product.category">
+            <field name="name">Garcon</field>
+            <field name="parent_id" ref="categ_enfant"/>
+        </record>
+
+        <record id="categ_enfant_fille" model="product.category">
+            <field name="name">Fille</field>
+            <field name="parent_id" ref="categ_enfant"/>
+        </record>
+
+        <!-- Sous-catégories Sport -->
+        <record id="categ_sport_vetements" model="product.category">
+            <field name="name">Vetements Sport</field>
+            <field name="parent_id" ref="categ_sport"/>
+        </record>
+
+        <record id="categ_sport_chaussures" model="product.category">
+            <field name="name">Chaussures Sport</field>
+            <field name="parent_id" ref="categ_sport"/>
+        </record>
+
+        <!-- =================================================================== -->
+        <!-- SECTION 8: ATTRIBUTS PRODUITS -->
+        <!-- =================================================================== -->
+
+        <!-- Attribut Couleur -->
+        <record id="attr_couleur" model="product.attribute">
+            <field name="name">Couleur</field>
+            <field name="display_type">color</field>
+            <field name="create_variant">always</field>
+        </record>
+
+        <record id="attr_val_noir" model="product.attribute.value">
+            <field name="name">Noir</field>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="html_color">#000000</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="attr_val_blanc" model="product.attribute.value">
+            <field name="name">Blanc</field>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="html_color">#FFFFFF</field>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="attr_val_bleu_marine" model="product.attribute.value">
+            <field name="name">Bleu Marine</field>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="html_color">#1E3A5F</field>
+            <field name="sequence">3</field>
+        </record>
+
+        <record id="attr_val_gris" model="product.attribute.value">
+            <field name="name">Gris</field>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="html_color">#808080</field>
+            <field name="sequence">4</field>
+        </record>
+
+        <record id="attr_val_rouge" model="product.attribute.value">
+            <field name="name">Rouge</field>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="html_color">#DC2626</field>
+            <field name="sequence">5</field>
+        </record>
+
+        <record id="attr_val_vert" model="product.attribute.value">
+            <field name="name">Vert</field>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="html_color">#16A34A</field>
+            <field name="sequence">6</field>
+        </record>
+
+        <record id="attr_val_beige" model="product.attribute.value">
+            <field name="name">Beige</field>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="html_color">#D4C4A8</field>
+            <field name="sequence">7</field>
+        </record>
+
+        <record id="attr_val_rose" model="product.attribute.value">
+            <field name="name">Rose</field>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="html_color">#F472B6</field>
+            <field name="sequence">8</field>
+        </record>
+
+        <record id="attr_val_bordeaux" model="product.attribute.value">
+            <field name="name">Bordeaux</field>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="html_color">#7B2D3A</field>
+            <field name="sequence">9</field>
+        </record>
+
+        <record id="attr_val_camel" model="product.attribute.value">
+            <field name="name">Camel</field>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="html_color">#C19A6B</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Attribut Taille Vêtements -->
+        <record id="attr_taille" model="product.attribute">
+            <field name="name">Taille</field>
+            <field name="display_type">radio</field>
+            <field name="create_variant">always</field>
+        </record>
+
+        <record id="attr_val_xs" model="product.attribute.value">
+            <field name="name">XS</field>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="attr_val_s" model="product.attribute.value">
+            <field name="name">S</field>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="attr_val_m" model="product.attribute.value">
+            <field name="name">M</field>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="sequence">3</field>
+        </record>
+
+        <record id="attr_val_l" model="product.attribute.value">
+            <field name="name">L</field>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="sequence">4</field>
+        </record>
+
+        <record id="attr_val_xl" model="product.attribute.value">
+            <field name="name">XL</field>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="sequence">5</field>
+        </record>
+
+        <record id="attr_val_xxl" model="product.attribute.value">
+            <field name="name">XXL</field>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="sequence">6</field>
+        </record>
+
+        <!-- Attribut Taille Chaussures -->
+        <record id="attr_pointure" model="product.attribute">
+            <field name="name">Pointure</field>
+            <field name="display_type">radio</field>
+            <field name="create_variant">always</field>
+        </record>
+
+        <record id="attr_val_p36" model="product.attribute.value">
+            <field name="name">36</field>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="attr_val_p37" model="product.attribute.value">
+            <field name="name">37</field>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="attr_val_p38" model="product.attribute.value">
+            <field name="name">38</field>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="sequence">3</field>
+        </record>
+
+        <record id="attr_val_p39" model="product.attribute.value">
+            <field name="name">39</field>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="sequence">4</field>
+        </record>
+
+        <record id="attr_val_p40" model="product.attribute.value">
+            <field name="name">40</field>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="sequence">5</field>
+        </record>
+
+        <record id="attr_val_p41" model="product.attribute.value">
+            <field name="name">41</field>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="sequence">6</field>
+        </record>
+
+        <record id="attr_val_p42" model="product.attribute.value">
+            <field name="name">42</field>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="sequence">7</field>
+        </record>
+
+        <record id="attr_val_p43" model="product.attribute.value">
+            <field name="name">43</field>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="sequence">8</field>
+        </record>
+
+        <record id="attr_val_p44" model="product.attribute.value">
+            <field name="name">44</field>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="sequence">9</field>
+        </record>
+
+        <record id="attr_val_p45" model="product.attribute.value">
+            <field name="name">45</field>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Attribut Matière -->
+        <record id="attr_matiere" model="product.attribute">
+            <field name="name">Matiere</field>
+            <field name="display_type">radio</field>
+            <field name="create_variant">no_variant</field>
+        </record>
+
+        <record id="attr_val_coton" model="product.attribute.value">
+            <field name="name">Coton</field>
+            <field name="attribute_id" ref="attr_matiere"/>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="attr_val_lin" model="product.attribute.value">
+            <field name="name">Lin</field>
+            <field name="attribute_id" ref="attr_matiere"/>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="attr_val_polyester" model="product.attribute.value">
+            <field name="name">Polyester</field>
+            <field name="attribute_id" ref="attr_matiere"/>
+            <field name="sequence">3</field>
+        </record>
+
+        <record id="attr_val_cuir" model="product.attribute.value">
+            <field name="name">Cuir</field>
+            <field name="attribute_id" ref="attr_matiere"/>
+            <field name="sequence">4</field>
+        </record>
+
+        <record id="attr_val_denim" model="product.attribute.value">
+            <field name="name">Denim</field>
+            <field name="attribute_id" ref="attr_matiere"/>
+            <field name="sequence">5</field>
+        </record>
+
+        <record id="attr_val_laine" model="product.attribute.value">
+            <field name="name">Laine</field>
+            <field name="attribute_id" ref="attr_matiere"/>
+            <field name="sequence">6</field>
+        </record>
+
+        <!-- Tailles enfant -->
+        <record id="attr_taille_enfant" model="product.attribute">
+            <field name="name">Taille Enfant</field>
+            <field name="display_type">radio</field>
+            <field name="create_variant">always</field>
+        </record>
+
+        <record id="attr_val_4ans" model="product.attribute.value">
+            <field name="name">4 ans</field>
+            <field name="attribute_id" ref="attr_taille_enfant"/>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="attr_val_6ans" model="product.attribute.value">
+            <field name="name">6 ans</field>
+            <field name="attribute_id" ref="attr_taille_enfant"/>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="attr_val_8ans" model="product.attribute.value">
+            <field name="name">8 ans</field>
+            <field name="attribute_id" ref="attr_taille_enfant"/>
+            <field name="sequence">3</field>
+        </record>
+
+        <record id="attr_val_10ans" model="product.attribute.value">
+            <field name="name">10 ans</field>
+            <field name="attribute_id" ref="attr_taille_enfant"/>
+            <field name="sequence">4</field>
+        </record>
+
+        <!-- =================================================================== -->
+        <!-- SECTION 9: PRODUITS -->
+        <!-- =================================================================== -->
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 1: T-shirt Basic Coton (Homme) -->
+        <!-- ============================================ -->
+        <record id="product_tshirt_basic" model="product.template">
+            <field name="name">T-shirt Basic Coton</field>
+            <field name="default_code">TSH-BAS-001</field>
+            <field name="categ_id" ref="categ_homme_tshirts"/>
+            <field name="list_price">39.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_bestseller">True</field>
+            <field name="x_is_featured">True</field>
+            <field name="description_sale">T-shirt classique en coton 100% bio. Coupe droite confortable, col rond renforce. Parfait pour un style decontracte au quotidien.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 100% Coton biologique&lt;/li&gt;
+                &lt;li&gt;Grammage: 180g/m2&lt;/li&gt;
+                &lt;li&gt;Coupe: Regular fit&lt;/li&gt;
+                &lt;li&gt;Col: Rond renforce bord-cote&lt;/li&gt;
+                &lt;li&gt;Entretien: Lavable 40C&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <!-- Attributs T-shirt Basic: Couleurs -->
+        <record id="product_tshirt_basic_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_tshirt_basic"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_blanc'), ref('attr_val_bleu_marine'), ref('attr_val_gris'), ref('attr_val_rouge'), ref('attr_val_vert')])]"/>
+        </record>
+
+        <!-- Attributs T-shirt Basic: Tailles -->
+        <record id="product_tshirt_basic_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_tshirt_basic"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_xs'), ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl'), ref('attr_val_xxl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 2: Polo Premium (Homme) -->
+        <!-- ============================================ -->
+        <record id="product_polo_premium" model="product.template">
+            <field name="name">Polo Premium</field>
+            <field name="default_code">POL-PRE-001</field>
+            <field name="categ_id" ref="categ_homme_tshirts"/>
+            <field name="list_price">79.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_featured">True</field>
+            <field name="description_sale">Polo elegant en pique de coton premium. Col classique avec 3 boutons. Logo brode discret. Ideal pour le bureau ou les sorties decontractees.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 95% Coton, 5% Elasthanne&lt;/li&gt;
+                &lt;li&gt;Grammage: 220g/m2&lt;/li&gt;
+                &lt;li&gt;Coupe: Slim fit&lt;/li&gt;
+                &lt;li&gt;Col: Kent 3 boutons&lt;/li&gt;
+                &lt;li&gt;Finitions: Bords-cotes manches, logo brode&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_polo_premium_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_polo_premium"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_blanc'), ref('attr_val_bleu_marine'), ref('attr_val_bordeaux'), ref('attr_val_vert')])]"/>
+        </record>
+
+        <record id="product_polo_premium_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_polo_premium"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_xs'), ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl'), ref('attr_val_xxl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 3: Chemise Oxford (Homme) -->
+        <!-- ============================================ -->
+        <record id="product_chemise_oxford" model="product.template">
+            <field name="name">Chemise Oxford</field>
+            <field name="default_code">CHE-OXF-001</field>
+            <field name="categ_id" ref="categ_homme_chemises"/>
+            <field name="list_price">119.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_new">True</field>
+            <field name="description_sale">Chemise Oxford intemporelle en coton. Coupe regular avec col button-down. Tissu leger et respirant, parfaite pour toutes les saisons.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 100% Coton Oxford&lt;/li&gt;
+                &lt;li&gt;Grammage: 140g/m2&lt;/li&gt;
+                &lt;li&gt;Coupe: Regular fit&lt;/li&gt;
+                &lt;li&gt;Col: Button-down&lt;/li&gt;
+                &lt;li&gt;Poignets: Boutons&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_chemise_oxford_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_chemise_oxford"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_blanc'), ref('attr_val_bleu_marine'), ref('attr_val_rose')])]"/>
+        </record>
+
+        <record id="product_chemise_oxford_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_chemise_oxford"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl'), ref('attr_val_xxl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 4: Jean Slim Stretch (Homme) -->
+        <!-- ============================================ -->
+        <record id="product_jean_slim" model="product.template">
+            <field name="name">Jean Slim Stretch</field>
+            <field name="default_code">JEA-SLI-001</field>
+            <field name="categ_id" ref="categ_homme_pantalons"/>
+            <field name="list_price">149.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_bestseller">True</field>
+            <field name="x_is_trending">True</field>
+            <field name="x_trending_score">95</field>
+            <field name="description_sale">Jean slim en denim stretch pour un confort optimal. Coupe moderne ajustee avec elasticite. 5 poches classiques, finitions soignees.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 98% Coton, 2% Elasthanne&lt;/li&gt;
+                &lt;li&gt;Grammage: 340g/m2 Denim&lt;/li&gt;
+                &lt;li&gt;Coupe: Slim fit&lt;/li&gt;
+                &lt;li&gt;Fermeture: Bouton + zip&lt;/li&gt;
+                &lt;li&gt;Poches: 5 poches&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_jean_slim_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_jean_slim"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_bleu_marine'), ref('attr_val_gris')])]"/>
+        </record>
+
+        <record id="product_jean_slim_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_jean_slim"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_xs'), ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl'), ref('attr_val_xxl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 5: Veste en Jean (Homme) -->
+        <!-- ============================================ -->
+        <record id="product_veste_jean" model="product.template">
+            <field name="name">Veste en Jean</field>
+            <field name="default_code">VES-JEA-001</field>
+            <field name="categ_id" ref="categ_homme_vestes"/>
+            <field name="list_price">199.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Veste en jean classique indémodable. Coupe trucker avec boutons metalliques. Poches poitrine et laterales. Un essentiel du vestiaire masculin.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 100% Coton Denim&lt;/li&gt;
+                &lt;li&gt;Grammage: 380g/m2&lt;/li&gt;
+                &lt;li&gt;Coupe: Trucker fit&lt;/li&gt;
+                &lt;li&gt;Fermeture: Boutons pression metal&lt;/li&gt;
+                &lt;li&gt;Poches: 4 poches&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_veste_jean_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_veste_jean"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_bleu_marine'), ref('attr_val_noir')])]"/>
+        </record>
+
+        <record id="product_veste_jean_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_veste_jean"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl'), ref('attr_val_xxl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 6: Sneakers Urban (Homme) -->
+        <!-- ============================================ -->
+        <record id="product_sneakers_urban" model="product.template">
+            <field name="name">Sneakers Urban</field>
+            <field name="default_code">SNE-URB-001</field>
+            <field name="categ_id" ref="categ_homme_chaussures"/>
+            <field name="list_price">189.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_trending">True</field>
+            <field name="x_trending_score">88</field>
+            <field name="description_sale">Sneakers urbaines au design contemporain. Semelle EVA ultra-legere et confortable. Tige en cuir et textile respirant. Style polyvalent ville.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Tige: Cuir + Mesh respirant&lt;/li&gt;
+                &lt;li&gt;Semelle: EVA + Caoutchouc&lt;/li&gt;
+                &lt;li&gt;Fermeture: Lacets&lt;/li&gt;
+                &lt;li&gt;Semelle interieure: Mousse memoire&lt;/li&gt;
+                &lt;li&gt;Drop: 8mm&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_sneakers_urban_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_sneakers_urban"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_blanc'), ref('attr_val_noir'), ref('attr_val_gris')])]"/>
+        </record>
+
+        <record id="product_sneakers_urban_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_sneakers_urban"/>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_p40'), ref('attr_val_p41'), ref('attr_val_p42'), ref('attr_val_p43'), ref('attr_val_p44'), ref('attr_val_p45')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 7: Ceinture Cuir (Homme) -->
+        <!-- ============================================ -->
+        <record id="product_ceinture_cuir" model="product.template">
+            <field name="name">Ceinture Cuir</field>
+            <field name="default_code">CEI-CUI-001</field>
+            <field name="categ_id" ref="categ_homme_accessoires"/>
+            <field name="list_price">69.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Ceinture en cuir veritable de qualite premium. Boucle metal brossee elegante. Finitions soignees pour un look raffine.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: Cuir de vachette 100%&lt;/li&gt;
+                &lt;li&gt;Largeur: 35mm&lt;/li&gt;
+                &lt;li&gt;Boucle: Metal brosse&lt;/li&gt;
+                &lt;li&gt;Tailles: Ajustable&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_ceinture_cuir_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_ceinture_cuir"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_camel')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 8: Blouse Fluide (Femme) -->
+        <!-- ============================================ -->
+        <record id="product_blouse_fluide" model="product.template">
+            <field name="name">Blouse Fluide</field>
+            <field name="default_code">BLO-FLU-001</field>
+            <field name="categ_id" ref="categ_femme_tops"/>
+            <field name="list_price">89.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_new">True</field>
+            <field name="x_is_featured">True</field>
+            <field name="description_sale">Blouse fluide et elegante en viscose. Coupe ample et feminine avec manches 3/4. Col V flatteuse. Parfaite du bureau aux sorties.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 100% Viscose&lt;/li&gt;
+                &lt;li&gt;Grammage: 120g/m2&lt;/li&gt;
+                &lt;li&gt;Coupe: Loose fit&lt;/li&gt;
+                &lt;li&gt;Col: V profond&lt;/li&gt;
+                &lt;li&gt;Manches: 3/4&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_blouse_fluide_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_blouse_fluide"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_blanc'), ref('attr_val_rose'), ref('attr_val_bordeaux'), ref('attr_val_bleu_marine'), ref('attr_val_beige')])]"/>
+        </record>
+
+        <record id="product_blouse_fluide_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_blouse_fluide"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_xs'), ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 9: Robe d'Ete (Femme) -->
+        <!-- ============================================ -->
+        <record id="product_robe_ete" model="product.template">
+            <field name="name">Robe d'Ete</field>
+            <field name="default_code">ROB-ETE-001</field>
+            <field name="categ_id" ref="categ_femme_robes"/>
+            <field name="list_price">159.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_featured">True</field>
+            <field name="x_is_trending">True</field>
+            <field name="x_trending_score">92</field>
+            <field name="description_sale">Robe d'ete legere et feminime. Imprime floral exclusif, coupe evasee flatteuse. Bretelles ajustables, longueur midi. Incontournable de la saison.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 100% Viscose&lt;/li&gt;
+                &lt;li&gt;Grammage: 110g/m2&lt;/li&gt;
+                &lt;li&gt;Coupe: Evasee midi&lt;/li&gt;
+                &lt;li&gt;Bretelles: Ajustables&lt;/li&gt;
+                &lt;li&gt;Longueur: 110cm&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_robe_ete_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_robe_ete"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_rose'), ref('attr_val_bleu_marine'), ref('attr_val_beige'), ref('attr_val_blanc')])]"/>
+        </record>
+
+        <record id="product_robe_ete_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_robe_ete"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_xs'), ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 10: Jupe Plissee (Femme) -->
+        <!-- ============================================ -->
+        <record id="product_jupe_plissee" model="product.template">
+            <field name="name">Jupe Plissee</field>
+            <field name="default_code">JUP-PLI-001</field>
+            <field name="categ_id" ref="categ_femme_jupes"/>
+            <field name="list_price">99.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Jupe plissee elegante longueur midi. Taille elastique confortable. Mouvement fluide et feminin. Se porte facilement au quotidien.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 100% Polyester&lt;/li&gt;
+                &lt;li&gt;Grammage: 140g/m2&lt;/li&gt;
+                &lt;li&gt;Coupe: Evasee plissee&lt;/li&gt;
+                &lt;li&gt;Taille: Elastique&lt;/li&gt;
+                &lt;li&gt;Longueur: 70cm&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_jupe_plissee_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_jupe_plissee"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_beige'), ref('attr_val_bordeaux')])]"/>
+        </record>
+
+        <record id="product_jupe_plissee_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_jupe_plissee"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 11: Pantalon Palazzo (Femme) -->
+        <!-- ============================================ -->
+        <record id="product_pantalon_palazzo" model="product.template">
+            <field name="name">Pantalon Palazzo</field>
+            <field name="default_code">PAN-PAL-001</field>
+            <field name="categ_id" ref="categ_femme_pantalons"/>
+            <field name="list_price">129.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Pantalon palazzo taille haute avec jambes larges et fluides. Coupe flatteuse qui allonge la silhouette. Confort absolu toute la journee.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 95% Polyester, 5% Elasthanne&lt;/li&gt;
+                &lt;li&gt;Grammage: 180g/m2&lt;/li&gt;
+                &lt;li&gt;Coupe: Wide leg taille haute&lt;/li&gt;
+                &lt;li&gt;Fermeture: Zip lateral invisible&lt;/li&gt;
+                &lt;li&gt;Entrejambe: 78cm&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_pantalon_palazzo_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_pantalon_palazzo"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_beige'), ref('attr_val_bleu_marine')])]"/>
+        </record>
+
+        <record id="product_pantalon_palazzo_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_pantalon_palazzo"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_xs'), ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 12: Sandales a Talon (Femme) -->
+        <!-- ============================================ -->
+        <record id="product_sandales_talon" model="product.template">
+            <field name="name">Sandales a Talon</field>
+            <field name="default_code">SAN-TAL-001</field>
+            <field name="categ_id" ref="categ_femme_chaussures"/>
+            <field name="list_price">169.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Sandales a talon elegantes en cuir. Talon bloc stable de 7cm. Brides fines et rafinees. Parfaites pour les occasions speciales.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Tige: Cuir veritable&lt;/li&gt;
+                &lt;li&gt;Semelle: Cuir + Anti-derapant&lt;/li&gt;
+                &lt;li&gt;Hauteur talon: 7cm bloc&lt;/li&gt;
+                &lt;li&gt;Fermeture: Boucle cheville&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_sandales_talon_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_sandales_talon"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_camel'), ref('attr_val_rose')])]"/>
+        </record>
+
+        <record id="product_sandales_talon_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_sandales_talon"/>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_p36'), ref('attr_val_p37'), ref('attr_val_p38'), ref('attr_val_p39'), ref('attr_val_p40'), ref('attr_val_p41'), ref('attr_val_p42')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 13: Sac a Main Cuir (Femme) -->
+        <!-- ============================================ -->
+        <record id="product_sac_main" model="product.template">
+            <field name="name">Sac a Main Cuir</field>
+            <field name="default_code">SAC-MAI-001</field>
+            <field name="categ_id" ref="categ_femme_accessoires"/>
+            <field name="list_price">249.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_bestseller">True</field>
+            <field name="x_is_featured">True</field>
+            <field name="description_sale">Sac a main en cuir veritable de qualite superieure. Design intemporel avec compartiments pratiques. Bandouliere amovible incluse.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Materiau: Cuir de vachette pleine fleur&lt;/li&gt;
+                &lt;li&gt;Dimensions: 30x25x12cm&lt;/li&gt;
+                &lt;li&gt;Compartiments: 3 + poche zip interieure&lt;/li&gt;
+                &lt;li&gt;Fermeture: Magnetique&lt;/li&gt;
+                &lt;li&gt;Bandouliere: Amovible 120cm&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_sac_main_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_sac_main"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_camel'), ref('attr_val_bordeaux'), ref('attr_val_beige')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 14: Echarpe en Soie (Femme) -->
+        <!-- ============================================ -->
+        <record id="product_echarpe_soie" model="product.template">
+            <field name="name">Echarpe en Soie</field>
+            <field name="default_code">ECH-SOI-001</field>
+            <field name="categ_id" ref="categ_femme_accessoires"/>
+            <field name="list_price">79.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Echarpe luxueuse en soie veritable. Imprime exclusif aux couleurs vibrantes. Se porte de multiples facons : cou, cheveux, sac.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 100% Soie naturelle&lt;/li&gt;
+                &lt;li&gt;Dimensions: 90x90cm&lt;/li&gt;
+                &lt;li&gt;Finitions: Ourlets roules main&lt;/li&gt;
+                &lt;li&gt;Entretien: Nettoyage a sec&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_echarpe_soie_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_echarpe_soie"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_rose'), ref('attr_val_bleu_marine'), ref('attr_val_bordeaux'), ref('attr_val_beige'), ref('attr_val_vert')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 15: Sweat a Capuche Sport -->
+        <!-- ============================================ -->
+        <record id="product_sweat_sport" model="product.template">
+            <field name="name">Sweat a Capuche Sport</field>
+            <field name="default_code">SWE-SPO-001</field>
+            <field name="categ_id" ref="categ_sport_vetements"/>
+            <field name="list_price">109.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_trending">True</field>
+            <field name="x_trending_score">85</field>
+            <field name="description_sale">Sweat a capuche technique pour le sport. Tissu respirant qui evacue l'humidite. Coupe ajustee pour liberte de mouvement.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 88% Polyester, 12% Elasthanne&lt;/li&gt;
+                &lt;li&gt;Technologie: DryFit evacuation humidite&lt;/li&gt;
+                &lt;li&gt;Coupe: Athletic fit&lt;/li&gt;
+                &lt;li&gt;Capuche: Ajustable cordon&lt;/li&gt;
+                &lt;li&gt;Poches: Kangourou avant&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_sweat_sport_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_sweat_sport"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_gris'), ref('attr_val_bleu_marine'), ref('attr_val_rouge')])]"/>
+        </record>
+
+        <record id="product_sweat_sport_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_sweat_sport"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_xs'), ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl'), ref('attr_val_xxl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 16: Legging Fitness -->
+        <!-- ============================================ -->
+        <record id="product_legging_fitness" model="product.template">
+            <field name="name">Legging Fitness</field>
+            <field name="default_code">LEG-FIT-001</field>
+            <field name="categ_id" ref="categ_sport_vetements"/>
+            <field name="list_price">69.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Legging taille haute compression legere. Tissu technique anti-transpiration. Maintien optimal pour tous types d'entrainement.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 80% Nylon, 20% Elasthanne&lt;/li&gt;
+                &lt;li&gt;Technologie: Compression + Anti-odeur&lt;/li&gt;
+                &lt;li&gt;Coupe: Taille haute sculptante&lt;/li&gt;
+                &lt;li&gt;Poche: Laterale telephone&lt;/li&gt;
+                &lt;li&gt;Coutures: Plates anti-frottement&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_legging_fitness_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_legging_fitness"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_gris'), ref('attr_val_rose')])]"/>
+        </record>
+
+        <record id="product_legging_fitness_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_legging_fitness"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_xs'), ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 17: Running Shoes Pro -->
+        <!-- ============================================ -->
+        <record id="product_running_pro" model="product.template">
+            <field name="name">Running Shoes Pro</field>
+            <field name="default_code">RUN-PRO-001</field>
+            <field name="categ_id" ref="categ_sport_chaussures"/>
+            <field name="list_price">229.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_new">True</field>
+            <field name="x_is_featured">True</field>
+            <field name="x_is_trending">True</field>
+            <field name="x_trending_score">98</field>
+            <field name="description_sale">Chaussures running haute performance. Amorti reactif et retour d'energie optimal. Tige legere et respirante. Pour coureurs exigeants.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Tige: Mesh ingeniere ultra-respirant&lt;/li&gt;
+                &lt;li&gt;Semelle: Mousse reactive + Plaque carbone&lt;/li&gt;
+                &lt;li&gt;Drop: 6mm&lt;/li&gt;
+                &lt;li&gt;Poids: 250g (taille 42)&lt;/li&gt;
+                &lt;li&gt;Usage: Route + Piste&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_running_pro_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_running_pro"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_blanc'), ref('attr_val_rouge')])]"/>
+        </record>
+
+        <record id="product_running_pro_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_running_pro"/>
+            <field name="attribute_id" ref="attr_pointure"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_p38'), ref('attr_val_p39'), ref('attr_val_p40'), ref('attr_val_p41'), ref('attr_val_p42'), ref('attr_val_p43'), ref('attr_val_p44'), ref('attr_val_p45')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 18: T-shirt Enfant Fun (Garcon) -->
+        <!-- ============================================ -->
+        <record id="product_tshirt_enfant" model="product.template">
+            <field name="name">T-shirt Enfant Fun</field>
+            <field name="default_code">TSH-ENF-001</field>
+            <field name="categ_id" ref="categ_enfant_garcon"/>
+            <field name="list_price">29.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">T-shirt fun pour garcon avec imprime colore. Coton bio doux et confortable. Coupe droite facile a enfiler.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 100% Coton bio certifie GOTS&lt;/li&gt;
+                &lt;li&gt;Grammage: 160g/m2&lt;/li&gt;
+                &lt;li&gt;Coupe: Regular&lt;/li&gt;
+                &lt;li&gt;Col: Rond renforce&lt;/li&gt;
+                &lt;li&gt;Entretien: Lavable 40C&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_tshirt_enfant_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_tshirt_enfant"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_bleu_marine'), ref('attr_val_rouge'), ref('attr_val_vert'), ref('attr_val_gris')])]"/>
+        </record>
+
+        <record id="product_tshirt_enfant_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_tshirt_enfant"/>
+            <field name="attribute_id" ref="attr_taille_enfant"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_4ans'), ref('attr_val_6ans'), ref('attr_val_8ans'), ref('attr_val_10ans')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 19: Robe Fille Fleurie -->
+        <!-- ============================================ -->
+        <record id="product_robe_fille" model="product.template">
+            <field name="name">Robe Fille Fleurie</field>
+            <field name="default_code">ROB-FIL-001</field>
+            <field name="categ_id" ref="categ_enfant_fille"/>
+            <field name="list_price">59.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Adorable robe fleurie pour petite fille. Coton leger et confortable. Jupe ample qui virevolte. Parfaite pour les beaux jours.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 100% Coton&lt;/li&gt;
+                &lt;li&gt;Grammage: 130g/m2&lt;/li&gt;
+                &lt;li&gt;Coupe: Evasee&lt;/li&gt;
+                &lt;li&gt;Bretelles: Ajustables&lt;/li&gt;
+                &lt;li&gt;Entretien: Lavable 30C&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_robe_fille_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_robe_fille"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_rose'), ref('attr_val_blanc'), ref('attr_val_bleu_marine')])]"/>
+        </record>
+
+        <record id="product_robe_fille_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_robe_fille"/>
+            <field name="attribute_id" ref="attr_taille_enfant"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_4ans'), ref('attr_val_6ans'), ref('attr_val_8ans'), ref('attr_val_10ans')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 20: Manteau Hiver Laine (Homme - Promo) -->
+        <!-- ============================================ -->
+        <record id="product_manteau_hiver" model="product.template">
+            <field name="name">Manteau Hiver Laine</field>
+            <field name="default_code">MAN-HIV-001</field>
+            <field name="categ_id" ref="categ_homme_vestes"/>
+            <field name="list_price">349.00</field>
+            <field name="compare_list_price">436.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="x_is_featured">True</field>
+            <field name="x_offer_end_date" eval="(DateTime.today() + timedelta(days=30)).strftime('%Y-%m-%d 23:59:59')"/>
+            <field name="description_sale">Manteau elegant en laine melangee. Coupe droite classique avec col revers. Doublure satin pour confort optimal. Piece maitresse de l'hiver.</field>
+            <field name="x_technical_description">&lt;ul&gt;
+                &lt;li&gt;Composition: 70% Laine, 20% Polyester, 10% Autres&lt;/li&gt;
+                &lt;li&gt;Doublure: 100% Polyester satin&lt;/li&gt;
+                &lt;li&gt;Coupe: Straight fit&lt;/li&gt;
+                &lt;li&gt;Fermeture: Boutons cachets&lt;/li&gt;
+                &lt;li&gt;Longueur: Mi-cuisse&lt;/li&gt;
+            &lt;/ul&gt;</field>
+        </record>
+
+        <record id="product_manteau_hiver_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_manteau_hiver"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_gris'), ref('attr_val_camel')])]"/>
+        </record>
+
+        <record id="product_manteau_hiver_attr_size" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_manteau_hiver"/>
+            <field name="attribute_id" ref="attr_taille"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_s'), ref('attr_val_m'), ref('attr_val_l'), ref('attr_val_xl'), ref('attr_val_xxl')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 21: Casquette Classic (Accessoire Homme) -->
+        <!-- ============================================ -->
+        <record id="product_casquette" model="product.template">
+            <field name="name">Casquette Classic</field>
+            <field name="default_code">CAS-CLA-001</field>
+            <field name="categ_id" ref="categ_homme_accessoires"/>
+            <field name="list_price">39.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Casquette baseball classique en coton. Visiere pre-courbee. Fermeture ajustable a l'arriere. Style intemporel et decontracte.</field>
+        </record>
+
+        <record id="product_casquette_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_casquette"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_noir'), ref('attr_val_bleu_marine'), ref('attr_val_beige')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 22: Chaussettes Sport (Pack) -->
+        <!-- ============================================ -->
+        <record id="product_chaussettes_sport" model="product.template">
+            <field name="name">Chaussettes Sport (Pack 3)</field>
+            <field name="default_code">CHU-SPO-001</field>
+            <field name="categ_id" ref="categ_sport_vetements"/>
+            <field name="list_price">25.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Pack de 3 paires de chaussettes sport. Coton technique anti-transpiration. Renfort talon et pointe. Confort toute la journee.</field>
+        </record>
+
+        <record id="product_chaussettes_sport_attr_color" model="product.template.attribute.line">
+            <field name="product_tmpl_id" ref="product_chaussettes_sport"/>
+            <field name="attribute_id" ref="attr_couleur"/>
+            <field name="value_ids" eval="[(6, 0, [ref('attr_val_blanc'), ref('attr_val_noir'), ref('attr_val_gris')])]"/>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- PRODUIT 23: Spray Entretien Chaussures -->
+        <!-- ============================================ -->
+        <record id="product_spray_chaussures" model="product.template">
+            <field name="name">Spray Entretien Chaussures</field>
+            <field name="default_code">SPR-ENT-001</field>
+            <field name="categ_id" ref="categ_homme_accessoires"/>
+            <field name="list_price">19.00</field>
+            <field name="type">consu</field>
+            <field name="sale_ok">True</field>
+            <field name="purchase_ok">True</field>
+            <field name="is_published">True</field>
+            <field name="description_sale">Spray protecteur et nettoyant pour chaussures. Formule all-in-one qui nettoie, protege et ravive les couleurs. Compatible cuir et textile.</field>
+        </record>
+
+        <!-- =================================================================== -->
+        <!-- SECTION 10: BUNDLES / PACKS -->
+        <!-- =================================================================== -->
+
+        <!-- Pack Casual Homme -->
+        <record id="bundle_casual_homme" model="quelyos.bundle">
+            <field name="name">Pack Casual Homme</field>
+            <field name="slug">pack-casual-homme</field>
+            <field name="description">&lt;p&gt;Le look casual parfait pour la saison ! Ce pack comprend un t-shirt basic, un jean slim et des sneakers urbaines. Economisez 78 TND par rapport aux prix individuels.&lt;/p&gt;</field>
+            <field name="bundle_price">299.00</field>
+            <field name="is_published">True</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="bundle_casual_homme_line1" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_casual_homme"/>
+            <field name="product_id" ref="product_tshirt_basic"/>
+            <field name="quantity">1</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="bundle_casual_homme_line2" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_casual_homme"/>
+            <field name="product_id" ref="product_jean_slim"/>
+            <field name="quantity">1</field>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="bundle_casual_homme_line3" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_casual_homme"/>
+            <field name="product_id" ref="product_sneakers_urban"/>
+            <field name="quantity">1</field>
+            <field name="sequence">3</field>
+        </record>
+
+        <!-- Pack Bureau Femme -->
+        <record id="bundle_bureau_femme" model="quelyos.bundle">
+            <field name="name">Pack Bureau Femme</field>
+            <field name="slug">pack-bureau-femme</field>
+            <field name="description">&lt;p&gt;L'ensemble parfait pour un look professionnel et elegant. Blouse fluide, pantalon palazzo et sac a main cuir. Economisez 88 TND !&lt;/p&gt;</field>
+            <field name="bundle_price">379.00</field>
+            <field name="is_published">True</field>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="bundle_bureau_femme_line1" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_bureau_femme"/>
+            <field name="product_id" ref="product_blouse_fluide"/>
+            <field name="quantity">1</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="bundle_bureau_femme_line2" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_bureau_femme"/>
+            <field name="product_id" ref="product_pantalon_palazzo"/>
+            <field name="quantity">1</field>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="bundle_bureau_femme_line3" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_bureau_femme"/>
+            <field name="product_id" ref="product_sac_main"/>
+            <field name="quantity">1</field>
+            <field name="sequence">3</field>
+        </record>
+
+        <!-- Pack Sport Complet -->
+        <record id="bundle_sport_complet" model="quelyos.bundle">
+            <field name="name">Pack Sport Complet</field>
+            <field name="slug">pack-sport-complet</field>
+            <field name="description">&lt;p&gt;Tout pour vos seances d'entrainement ! Sweat a capuche, legging fitness et chaussures running pro. Economisez 78 TND sur ce pack performance.&lt;/p&gt;</field>
+            <field name="bundle_price">329.00</field>
+            <field name="is_published">True</field>
+            <field name="sequence">3</field>
+        </record>
+
+        <record id="bundle_sport_complet_line1" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_sport_complet"/>
+            <field name="product_id" ref="product_sweat_sport"/>
+            <field name="quantity">1</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="bundle_sport_complet_line2" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_sport_complet"/>
+            <field name="product_id" ref="product_legging_fitness"/>
+            <field name="quantity">1</field>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="bundle_sport_complet_line3" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_sport_complet"/>
+            <field name="product_id" ref="product_running_pro"/>
+            <field name="quantity">1</field>
+            <field name="sequence">3</field>
+        </record>
+
+        <!-- Pack Rentree Enfant -->
+        <record id="bundle_rentree_enfant" model="quelyos.bundle">
+            <field name="name">Pack Rentree Enfant</field>
+            <field name="slug">pack-rentree-enfant</field>
+            <field name="description">&lt;p&gt;Preparez la rentree avec style ! 2 t-shirts fun pour garcon. Qualite bio, couleurs vives. Economisez 28%.&lt;/p&gt;</field>
+            <field name="bundle_price">49.00</field>
+            <field name="is_published">True</field>
+            <field name="sequence">4</field>
+        </record>
+
+        <record id="bundle_rentree_enfant_line1" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_rentree_enfant"/>
+            <field name="product_id" ref="product_tshirt_enfant"/>
+            <field name="quantity">2</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <!-- Pack Accessoires Femme -->
+        <record id="bundle_accessoires_femme" model="quelyos.bundle">
+            <field name="name">Pack Accessoires Femme</field>
+            <field name="slug">pack-accessoires-femme</field>
+            <field name="description">&lt;p&gt;Sublimez vos tenues avec ce duo d'accessoires luxueux. Sac a main cuir et echarpe en soie. Economisez 49 TND sur ce pack elegant.&lt;/p&gt;</field>
+            <field name="bundle_price">279.00</field>
+            <field name="is_published">True</field>
+            <field name="sequence">5</field>
+        </record>
+
+        <record id="bundle_accessoires_femme_line1" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_accessoires_femme"/>
+            <field name="product_id" ref="product_sac_main"/>
+            <field name="quantity">1</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="bundle_accessoires_femme_line2" model="quelyos.bundle.line">
+            <field name="bundle_id" ref="bundle_accessoires_femme"/>
+            <field name="product_id" ref="product_echarpe_soie"/>
+            <field name="quantity">1</field>
+            <field name="sequence">2</field>
+        </record>
+
+        <!-- =================================================================== -->
+        <!-- SECTION 11: PRODUITS LIES (Cross-sell / Upsell) -->
+        <!-- =================================================================== -->
+
+        <!-- Cross-sell: T-shirt -> Ceinture, Casquette -->
+        <record id="product_tshirt_basic" model="product.template">
+            <field name="accessory_product_ids" eval="[(6, 0, [ref('product_ceinture_cuir'), ref('product_casquette')])]"/>
+        </record>
+
+        <!-- Cross-sell: Robe -> Sac, Sandales -->
+        <record id="product_robe_ete" model="product.template">
+            <field name="accessory_product_ids" eval="[(6, 0, [ref('product_sac_main'), ref('product_sandales_talon')])]"/>
+        </record>
+
+        <!-- Cross-sell: Sneakers -> Chaussettes, Spray -->
+        <record id="product_sneakers_urban" model="product.template">
+            <field name="accessory_product_ids" eval="[(6, 0, [ref('product_chaussettes_sport'), ref('product_spray_chaussures')])]"/>
+        </record>
+
+        <!-- Upsell: T-shirt Basic -> Polo Premium -->
+        <record id="product_tshirt_basic" model="product.template">
+            <field name="alternative_product_ids" eval="[(6, 0, [ref('product_polo_premium')])]"/>
+        </record>
+
+        <!-- Upsell: Sneakers Urban -> Running Shoes Pro -->
+        <record id="product_sneakers_urban" model="product.template">
+            <field name="alternative_product_ids" eval="[(6, 0, [ref('product_running_pro')])]"/>
+        </record>
+
+        <!-- Upsell: Blouse -> Robe -->
+        <record id="product_blouse_fluide" model="product.template">
+            <field name="alternative_product_ids" eval="[(6, 0, [ref('product_robe_ete')])]"/>
+        </record>
+
+        <!-- =================================================================== -->
+        <!-- SECTION 12: ASSOCIATION COLLECTIONS <-> PRODUITS -->
+        <!-- =================================================================== -->
+
+        <!-- Meilleures Ventes -->
+        <record id="collection_bestsellers" model="quelyos.collection">
+            <field name="product_ids" eval="[(6, 0, [ref('product_tshirt_basic'), ref('product_jean_slim'), ref('product_sac_main'), ref('product_sneakers_urban')])]"/>
+        </record>
+
+        <!-- Nouveautes -->
+        <record id="collection_new" model="quelyos.collection">
+            <field name="product_ids" eval="[(6, 0, [ref('product_chemise_oxford'), ref('product_blouse_fluide'), ref('product_running_pro')])]"/>
+        </record>
+
+        <!-- Promotions -->
+        <record id="collection_promo" model="quelyos.collection">
+            <field name="product_ids" eval="[(6, 0, [ref('product_manteau_hiver')])]"/>
+        </record>
+
+        <!-- Collection Ete -->
+        <record id="collection_summer" model="quelyos.collection">
+            <field name="product_ids" eval="[(6, 0, [ref('product_robe_ete'), ref('product_sandales_talon'), ref('product_blouse_fluide'), ref('product_jupe_plissee')])]"/>
         </record>
 
     </data>
