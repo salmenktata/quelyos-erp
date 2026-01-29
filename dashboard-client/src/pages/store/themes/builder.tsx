@@ -14,9 +14,20 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from '@dnd-kit/core';
+import { arrayMove } from '@dnd-kit/sortable';
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button, PageNotice } from '@/components/common';
-import { BuilderProvider, useBuilder } from '@/components/theme-builder/BuilderContext';
+import { BuilderProvider, useBuilder, type SectionConfig } from '@/components/theme-builder/BuilderContext';
 import { SectionsPalette } from '@/components/theme-builder/SectionsPalette';
 import { CanvasArea } from '@/components/theme-builder/CanvasArea';
 import { SectionConfigPanel } from '@/components/theme-builder/SectionConfigPanel';
@@ -266,40 +277,116 @@ function LeftSidebar() {
 }
 
 /**
- * Contenu principal du builder (avec provider)
+ * Contenu principal du builder (avec provider et DnD)
  */
 function BuilderContent() {
+  const { state, addSection, reorderSections } = useBuilder();
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  // Sensors pour le drag & drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px de mouvement requis avant activation
+      },
+    })
+  );
+
+  // Handler début de drag
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  // Handler fin de drag
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (!over) return;
+
+    // Cas 1 : Drag depuis palette → canvas (nouveau)
+    if (active.data.current?.source === 'palette' && over.id === 'canvas-droppable') {
+      const sectionData = active.data.current;
+      addSection({
+        type: sectionData.type,
+        variant: sectionData.variant,
+        config: {},
+      });
+      toast.success('Section ajoutée');
+      return;
+    }
+
+    // Cas 2 : Réorganisation dans canvas
+    if (active.data.current?.source === 'canvas' && active.id !== over.id) {
+      const oldIndex = state.sections.findIndex((s) => s.id === active.id);
+      const newIndex = state.sections.findIndex((s) => s.id === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        reorderSections(oldIndex, newIndex);
+      }
+    }
+  };
+
+  // Section en cours de drag pour DragOverlay
+  const activeSection = activeId
+    ? state.sections.find((s) => s.id === activeId) ||
+      (activeId.startsWith('palette-')
+        ? { id: activeId, type: activeId.replace('palette-', ''), variant: 'default' }
+        : null)
+    : null;
+
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Theme Builder
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Créez votre thème visuellement avec drag & drop
-          </p>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Theme Builder
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Créez votre thème visuellement avec drag & drop
+            </p>
+          </div>
+          <ActionsToolbar />
         </div>
-        <ActionsToolbar />
+
+        {/* Layout 3 colonnes */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Sidebar gauche : Palette + Couleurs + Typo */}
+          <LeftSidebar />
+
+          {/* Zone centrale : Canvas */}
+          <div className="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden">
+            <CanvasArea />
+          </div>
+
+          {/* Sidebar droite : Config */}
+          <div className="w-80 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
+            <SectionConfigPanel />
+          </div>
+        </div>
       </div>
 
-      {/* Layout 3 colonnes */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar gauche : Palette + Couleurs + Typo */}
-        <LeftSidebar />
-
-        {/* Zone centrale : Canvas */}
-        <div className="flex-1 bg-gray-50 dark:bg-gray-800 overflow-hidden">
-          <CanvasArea />
-        </div>
-
-        {/* Sidebar droite : Config */}
-        <div className="w-80 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
-          <SectionConfigPanel />
-        </div>
-      </div>
-    </div>
+      {/* DragOverlay pour visual feedback */}
+      <DragOverlay>
+        {activeSection ? (
+          <div className="p-4 rounded-lg border-2 border-indigo-500 dark:border-indigo-400 bg-white dark:bg-gray-800 shadow-2xl opacity-90">
+            <p className="font-medium text-gray-900 dark:text-white text-sm">
+              {activeSection.type}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {activeSection.variant}
+            </p>
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }
 

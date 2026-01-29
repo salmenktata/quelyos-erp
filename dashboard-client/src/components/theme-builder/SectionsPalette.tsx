@@ -1,5 +1,6 @@
-import { Plus } from 'lucide-react';
-import { useBuilder } from './BuilderContext';
+import { useDraggable } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from 'lucide-react';
 
 /**
  * Sections disponibles dans le catalogue
@@ -8,7 +9,7 @@ const availableSections = [
   {
     type: 'hero-slider',
     name: 'Hero Slider',
-    description: 'Carrousel d\'images avec CTA',
+    description: "Carrousel d'images avec CTA",
     icon: '🎬',
     defaultVariant: 'fullscreen',
   },
@@ -22,7 +23,7 @@ const availableSections = [
   {
     type: 'newsletter',
     name: 'Newsletter',
-    description: 'Formulaire d\'inscription',
+    description: "Formulaire d'inscription",
     icon: '📧',
     defaultVariant: 'centered',
   },
@@ -78,19 +79,51 @@ const availableSections = [
 ];
 
 /**
+ * Item de section draggable
+ */
+function DraggableSection({ section }: { section: typeof availableSections[0] }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: `palette-${section.type}`,
+    data: {
+      type: section.type,
+      variant: section.defaultVariant,
+      source: 'palette',
+    },
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-indigo-500 dark:hover:border-indigo-400 hover:shadow-md transition-all cursor-grab active:cursor-grabbing ${
+        isDragging ? 'ring-2 ring-indigo-500 dark:ring-indigo-400' : ''
+      }`}
+    >
+      <GripVertical className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+      <span className="text-2xl flex-shrink-0">{section.icon}</span>
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-gray-900 dark:text-white text-sm">
+          {section.name}
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          {section.description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Palette de sections disponibles (sidebar gauche)
  */
 export function SectionsPalette() {
-  const { addSection } = useBuilder();
-
-  const handleAddSection = (section: typeof availableSections[0]) => {
-    addSection({
-      type: section.type,
-      variant: section.defaultVariant,
-      config: {},
-    });
-  };
-
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
@@ -104,22 +137,7 @@ export function SectionsPalette() {
 
       <div className="p-4 space-y-2">
         {availableSections.map((section) => (
-          <button
-            key={section.type}
-            onClick={() => handleAddSection(section)}
-            className="w-full flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-indigo-500 dark:hover:border-indigo-400 hover:shadow-md transition-all text-left group"
-          >
-            <span className="text-2xl flex-shrink-0">{section.icon}</span>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-gray-900 dark:text-white text-sm">
-                {section.name}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                {section.description}
-              </p>
-            </div>
-            <Plus className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
+          <DraggableSection key={section.type} section={section} />
         ))}
       </div>
     </div>
