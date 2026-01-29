@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { ThemeContextValue } from '../../../../engine/types';
 import type { Product } from '@quelyos/types';
 import { backendClient } from '@/lib/backend/client';
+import { logger } from '@/lib/logger';
 
 interface Grid4ColsProps {
   config?: Record<string, unknown>;
@@ -31,7 +32,7 @@ export default function Grid4Cols({ config, className = '', theme }: Grid4ColsPr
           setProducts(response.products);
         }
       } catch (error) {
-        console.error('Error loading products:', error);
+        logger.error('Error loading products:', error);
       } finally {
         setLoading(false);
       }
@@ -118,7 +119,7 @@ export default function Grid4Cols({ config, className = '', theme }: Grid4ColsPr
                   onClick={(e) => {
                     e.preventDefault();
                     // TODO: Ajouter au panier
-                    console.log('Ajouter au panier:', product.id);
+                    logger.debug('Ajouter au panier:', product.id);
                   }}
                 >
                   Ajouter au panier

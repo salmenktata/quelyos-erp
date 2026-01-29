@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { ThemeContextValue } from '../../../../engine/types';
 import { backendClient } from '@/lib/backend/client';
+import { logger } from '@/lib/logger';
 
 interface Category {
   id: number;
@@ -33,7 +34,7 @@ export default function Featured({ config, className = '', theme }: FeaturedProp
           setCategories(response.categories);
         }
       } catch (error) {
-        console.error('Error loading categories:', error);
+        logger.error('Error loading categories:', error);
       } finally {
         setLoading(false);
       }

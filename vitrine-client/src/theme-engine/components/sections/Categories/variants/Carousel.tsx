@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ThemeContextValue } from '../../../../engine/types';
 import { backendClient } from '@/lib/backend/client';
+import { logger } from '@/lib/logger';
 
 interface Category {
   id: number;
@@ -35,7 +36,7 @@ export default function Carousel({ config, className = '', theme }: CarouselProp
           setCategories(response.categories);
         }
       } catch (error) {
-        console.error('Error loading categories:', error);
+        logger.error('Error loading categories:', error);
       } finally {
         setLoading(false);
       }

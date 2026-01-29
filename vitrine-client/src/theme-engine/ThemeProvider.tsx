@@ -14,6 +14,7 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { backendClient, type ThemeConfig } from '@/lib/backend/client';
+import { logger } from '@/lib/logger';
 
 interface ThemeContextValue {
   theme: ThemeConfig | null;
@@ -99,12 +100,12 @@ export function ThemeProvider({ children, tenantId = 1 }: ThemeProviderProps) {
           applyThemeStyles(response.theme.config);
         } else {
           // Fallback sur thème par défaut
-          console.warn('Impossible de charger le thème, utilisation du thème par défaut');
+          logger.warn('Impossible de charger le thème, utilisation du thème par défaut');
           setTheme(DEFAULT_THEME);
           applyThemeStyles(DEFAULT_THEME);
         }
       } catch (err) {
-        console.error('Erreur chargement thème:', err);
+        logger.error('Erreur chargement thème:', err);
         setError('Erreur de chargement du thème');
         setTheme(DEFAULT_THEME);
         applyThemeStyles(DEFAULT_THEME);

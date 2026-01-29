@@ -50,6 +50,7 @@ export default async function CollectionPage({ params }: PageProps) {
             src={getProxiedImageUrl(collection.imageUrl)}
             alt={collection.name}
             fill
+            sizes="100vw"
             className="object-cover opacity-50"
             priority
           />

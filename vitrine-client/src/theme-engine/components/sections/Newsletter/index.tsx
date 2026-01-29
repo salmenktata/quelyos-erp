@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from '../../../engine/ThemeContext';
+import { logger } from '@/lib/logger';
 import CenteredMinimal from './variants/CenteredMinimal';
 import WithBackground from './variants/WithBackground';
 
@@ -21,7 +22,7 @@ export default function Newsletter({ variant, config, className }: NewsletterPro
   const VariantComponent = variantComponents[variant as keyof typeof variantComponents];
 
   if (!VariantComponent) {
-    console.warn(`Newsletter variant "${variant}" not found, using centered-minimal`);
+    logger.warn(`Newsletter variant "${variant}" not found, using centered-minimal`);
     return <CenteredMinimal config={config} className={className} theme={theme} />;
   }
 

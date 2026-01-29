@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from '../../../engine/ThemeContext';
+import { logger } from '@/lib/logger';
 import VideoBackground from './variants/VideoBackground';
 import Parallax from './variants/Parallax';
 import Centered from './variants/Centered';
@@ -23,7 +24,7 @@ export default function Hero({ variant, config, className }: HeroProps) {
   const VariantComponent = variantComponents[variant as keyof typeof variantComponents];
 
   if (!VariantComponent) {
-    console.warn(`Hero variant "${variant}" not found, using centered`);
+    logger.warn(`Hero variant "${variant}" not found, using centered`);
     return <Centered config={config} className={className} colors={colors} />;
   }
 

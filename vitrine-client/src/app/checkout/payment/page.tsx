@@ -7,14 +7,26 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 import { CheckoutStepper } from '@/components/checkout/CheckoutStepper';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
-import { PaymentForm, PaymentMethod } from '@/components/checkout/PaymentForm';
+import type { PaymentMethod } from '@/components/checkout/PaymentForm';
 import { LoadingPage } from '@/components/common/Loading';
 import { backendClient } from '@/lib/backend/client';
 import { logger } from '@/lib/logger';
+
+// Lazy load du formulaire de paiement (contient Stripe/PayPal/etc.)
+const PaymentForm = dynamic(
+  () => import('@/components/checkout/PaymentForm').then(mod => ({ default: mod.PaymentForm })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg h-96" />
+    )
+  }
+);
 
 // Méthodes de paiement disponibles
 const paymentMethods: PaymentMethod[] = [

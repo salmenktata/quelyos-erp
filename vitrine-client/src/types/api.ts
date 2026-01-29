@@ -216,9 +216,9 @@ export interface CartResponse {
 export interface DeliveryMethod {
   id: number;
   name: string;
-  price: number;
+  description: string;
+  fixed_price: number | null;
   delivery_time?: string;
-  description?: string;
 }
 
 export interface DeliveryMethodsData {
@@ -233,17 +233,20 @@ export interface ShippingCostResponse {
 
 export interface CheckoutData {
   shipping_address_id?: number;
+  shipping_address?: Partial<Address>;
   billing_address_id?: number;
   delivery_method_id: number;
-  payment_method_id: number;
+  payment_method?: string;
+  payment_method_id?: number;
   notes?: string;
+  save_address?: boolean;
 }
 
-export interface OrderResponse {
-  success: boolean;
-  order?: Order;
-  error?: string;
+export interface OrderData {
+  order: Order;
 }
+
+export type OrderResponse = ApiResponse<OrderData>;
 
 // ========================================
 // PAIEMENT
@@ -271,6 +274,11 @@ export interface WalletPaymentData {
   payment_method_id: number;
   shipping_address: ShippingAddress;
   order_id?: number;
+}
+
+export interface WalletPaymentResponseData {
+  client_secret: string;
+  payment_intent_id: string;
 }
 
 export interface ShippingAddress {
@@ -375,10 +383,25 @@ export interface WishlistResponse {
   error?: string;
 }
 
-export interface PublicWishlistData {
+export interface PublicWishlistProduct {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  image_url: string | null;
+  stock_available: boolean;
+  added_date: string | null;
+}
+
+export interface PublicWishlist {
   owner_name: string;
-  items: WishlistItem[];
-  created_at: string;
+  items: PublicWishlistProduct[];
+  total_items: number;
+}
+
+export interface PublicWishlistData {
+  wishlist: PublicWishlist;
 }
 
 export interface WishlistShareResponse {
@@ -466,11 +489,14 @@ export interface CartSaveResponse {
   error?: string;
 }
 
-export interface CartRecoveryResponse {
-  success: boolean;
-  cart?: Cart;
-  error?: string;
+export interface CartRecoveryData {
+  products_restored: number;
+  coupon_applied: boolean;
+  coupon_code?: string;
+  message: string;
 }
+
+export type CartRecoveryResponse = ApiResponse<CartRecoveryData>;
 
 // ========================================
 // FACETTES PRODUIT

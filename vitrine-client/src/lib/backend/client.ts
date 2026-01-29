@@ -39,6 +39,7 @@ import type {
   PayPalOrderData,
   PayPalCaptureData,
   WalletPaymentData,
+  WalletPaymentResponseData,
   StripePaymentIntentData,
   StripeConfirmationData,
   PaymentProvidersResponse,
@@ -134,7 +135,7 @@ export class BackendClient {
    */
   private async jsonrpc<T = unknown>(
     endpoint: string,
-    params: Record<string, unknown> = {},
+    params: Record<string, unknown> | object = {},
     options: { throwOn404?: boolean } = {}
   ): Promise<T> {
     const { throwOn404 = false } = options;
@@ -415,8 +416,8 @@ export class BackendClient {
     });
   }
 
-  async createWalletPayment(data: WalletPaymentData): Promise<ApiResponse<unknown>> {
-    return this.jsonrpc<ApiResponse<unknown>>('/payment/wallet/create', data);
+  async createWalletPayment(data: WalletPaymentData): Promise<ApiResponse<WalletPaymentResponseData>> {
+    return this.jsonrpc<ApiResponse<WalletPaymentResponseData>>('/payment/wallet/create', data);
   }
 
   // ========================================

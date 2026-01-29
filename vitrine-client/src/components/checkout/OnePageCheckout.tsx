@@ -7,6 +7,7 @@ import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/common';
 import { logger } from '@/lib/logger';
+import type { DeliveryMethod } from '@/types/api';
 
 interface ShippingAddress {
   name: string;
@@ -18,13 +19,6 @@ interface ShippingAddress {
   state_id?: number;
   phone: string;
   email: string;
-}
-
-interface DeliveryMethod {
-  id: number;
-  name: string;
-  description: string;
-  fixed_price: number | null;
 }
 
 /**
@@ -151,7 +145,7 @@ export function OnePageCheckout() {
       // Submit complete checkout
       const response = await backendClient.completeCheckout({
         shipping_address: shippingAddress,
-        delivery_method_id: selectedDelivery,
+        delivery_method_id: selectedDelivery!, // Safe: validated in validateForm()
         payment_method: paymentMethod,
         notes: notes,
         save_address: saveAddress,
@@ -175,7 +169,8 @@ export function OnePageCheckout() {
       } else {
         setError(response.message || 'Échec de la commande');
       }
-    } catch (err) {
+    } catch (_error: unknown) {
+      const err = _error as Error;
       logger.error('Error completing checkout:', err);
       setError(err.message || 'Une erreur est survenue');
     } finally {

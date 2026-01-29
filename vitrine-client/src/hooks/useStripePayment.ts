@@ -61,10 +61,10 @@ export function useStripePayment({
     try {
       const response = await backendClient.createStripePaymentIntent(orderId);
 
-      if (response.success && response.client_secret && response.payment_intent_id) {
-        setClientSecret(response.client_secret);
-        setPaymentIntentId(response.payment_intent_id);
-        logger.info('Payment Intent créé:', response.payment_intent_id);
+      if (response.success && response.data) {
+        setClientSecret(response.data.client_secret);
+        setPaymentIntentId(response.data.payment_intent_id);
+        logger.info('Payment Intent créé:', response.data.payment_intent_id);
       } else {
         throw new Error(response.error || 'Erreur création Payment Intent');
       }
@@ -135,8 +135,8 @@ export function useStripePayment({
           orderId
         );
 
-        if (confirmResponse.success && confirmResponse.order) {
-          logger.info('Commande confirmée:', confirmResponse.order.name);
+        if (confirmResponse.success && confirmResponse.data) {
+          logger.info('Commande confirmée:', confirmResponse.data.order.name);
           onSuccess?.(orderId);
         } else {
           throw new Error(confirmResponse.error || 'Erreur confirmation commande');

@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from '../../../engine/ThemeContext';
+import { logger } from '@/lib/logger';
 import Banner from './variants/Banner';
 import Centered from './variants/Centered';
 import Split from './variants/Split';
@@ -23,7 +24,7 @@ export default function CallToAction({ variant, config, className }: CallToActio
   const VariantComponent = variantComponents[variant as keyof typeof variantComponents];
 
   if (!VariantComponent) {
-    console.warn(`CallToAction variant "${variant}" not found, using banner`);
+    logger.warn(`CallToAction variant "${variant}" not found, using banner`);
     return <Banner config={config} className={className} theme={theme} />;
   }
 

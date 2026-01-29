@@ -62,6 +62,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             src={getProxiedImageUrl(post.coverUrl)}
             alt={post.title}
             fill
+            sizes="100vw"
             className="object-cover opacity-60"
             priority
           />
@@ -186,6 +187,7 @@ function RelatedPostCard({ post }: { post: BlogPost }) {
             src={getProxiedImageUrl(post.coverUrl)}
             alt={post.title}
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (

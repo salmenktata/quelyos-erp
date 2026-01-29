@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { getProxiedImageUrl } from '@/lib/image-proxy';
+import { logger } from '@/lib/logger';
 
 interface VirtualTryOnProps {
   productName: string;
@@ -48,7 +49,7 @@ export function VirtualTryOn({
         setCameraError(null);
       }
     } catch (err) {
-      console.error('Camera error:', err);
+      logger.error('Camera error:', err);
       setCameraError('Impossible d\'acceder a la camera. Verifiez les permissions.');
     }
   };

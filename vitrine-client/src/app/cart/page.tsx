@@ -6,12 +6,18 @@ export const dynamic = 'force-dynamic';
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import nextDynamic from 'next/dynamic';
 import { Button, Input } from '@/components/common';
 import { LoadingSpinner } from '@/components/common/Loading';
 import { CartItem, CartSummary } from '@/components/cart';
-import { CartSaveModal } from '@/components/cart/CartSaveModal';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
+
+// Lazy load modal (utilisé conditionnellement)
+const CartSaveModal = nextDynamic(
+  () => import('@/components/cart/CartSaveModal').then(mod => ({ default: mod.CartSaveModal })),
+  { ssr: false }
+);
 
 export default function CartPage() {
   const router = useRouter();

@@ -111,6 +111,7 @@ function FlashSaleCard({ sale }: { sale: FlashSale }) {
                     src={getProxiedImageUrl(product.image_url)}
                     alt={product.name}
                     fill
+                    sizes="144px"
                     className="object-cover"
                   />
                 ) : (

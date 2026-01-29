@@ -3,6 +3,7 @@
 import { lazy, Suspense } from 'react';
 import type { SectionConfig } from './types';
 import { useTheme } from './ThemeContext';
+import { logger } from '@/lib/logger';
 
 // Lazy load des sections (optimisation performance)
 const HeroSlider = lazy(() => import('../components/sections/HeroSlider'));
@@ -109,7 +110,7 @@ export function SectionRenderer({ sections }: SectionRendererProps) {
             SectionComponent = BlogPosts;
             break;
           default:
-            console.warn(`Section type "${section.type}" not found`);
+            logger.warn(`Section type "${section.type}" not found`);
             return null;
         }
 

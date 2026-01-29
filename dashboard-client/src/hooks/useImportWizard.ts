@@ -33,9 +33,10 @@ export function useImportWizard() {
 
       const result: UploadAnalysisResponse = await response.json();
       dispatch({ type: "ANALYSIS_SUCCESS", payload: result });
-    } catch (error: any) {
+    } catch (error) {
       logger.error("Import analysis error:", error);
-      dispatch({ type: "ANALYSIS_ERROR", payload: error.message });
+      const message = error instanceof Error ? error.message : "Erreur d'analyse";
+      dispatch({ type: "ANALYSIS_ERROR", payload: message });
     }
   };
 
@@ -59,9 +60,10 @@ export function useImportWizard() {
 
       const result: PreviewResponse = await response.json();
       dispatch({ type: "PREVIEW_LOAD", payload: result });
-    } catch (error: any) {
+    } catch (error) {
       logger.error("Import preview error:", error);
-      dispatch({ type: "ANALYSIS_ERROR", payload: error.message });
+      const message = error instanceof Error ? error.message : "Erreur de prévisualisation";
+      dispatch({ type: "ANALYSIS_ERROR", payload: message });
     }
   };
 
@@ -91,9 +93,10 @@ export function useImportWizard() {
 
       const result: ConfirmImportResponse = await response.json();
       dispatch({ type: "IMPORT_SUCCESS", payload: result });
-    } catch (error: any) {
+    } catch (error) {
       logger.error("Import confirm error:", error);
-      dispatch({ type: "IMPORT_ERROR", payload: error.message });
+      const message = error instanceof Error ? error.message : "Erreur d'import";
+      dispatch({ type: "IMPORT_ERROR", payload: message });
     }
   };
 

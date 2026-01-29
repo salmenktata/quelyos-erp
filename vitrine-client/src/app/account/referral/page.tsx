@@ -5,6 +5,7 @@ import { backendClient } from '@/lib/backend/client';
 import { useAuthStore } from '@/store/authStore';
 import { useToast } from '@/store/toastStore';
 import { formatPrice } from '@/lib/utils/formatting';
+import { logger } from '@/lib/logger';
 import Link from 'next/link';
 
 interface ReferralData {
@@ -40,7 +41,7 @@ export default function ReferralPage() {
         setData(response.data);
       }
     } catch (error) {
-      console.error('Error fetching referral data:', error);
+      logger.error('Error fetching referral data:', error);
     } finally {
       setIsLoading(false);
     }

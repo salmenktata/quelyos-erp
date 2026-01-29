@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from '../../../engine/ThemeContext';
+import { logger } from '@/lib/logger';
 import Icons from './variants/Icons';
 import Stats from './variants/Stats';
 
@@ -21,7 +22,7 @@ export default function TrustBadges({ variant, config, className }: TrustBadgesP
   const VariantComponent = variantComponents[variant as keyof typeof variantComponents];
 
   if (!VariantComponent) {
-    console.warn(`TrustBadges variant "${variant}" not found, using icons`);
+    logger.warn(`TrustBadges variant "${variant}" not found, using icons`);
     return <Icons config={config} className={className} theme={theme} />;
   }
 

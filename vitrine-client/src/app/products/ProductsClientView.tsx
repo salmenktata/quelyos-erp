@@ -14,7 +14,6 @@ import { Pagination, PaginationInfo } from '@/components/common/Pagination';
 import { useFilterSync } from '@/hooks/useFilterSync';
 import { VariantSwatches } from '@/components/product/VariantSwatches';
 import StarRating from '@/components/product/reviews/StarRating';
-import { QuickViewModal } from '@/components/product/QuickViewModal';
 import { ViewersCount } from '@/components/product/ViewersCount';
 import { CountdownTimer } from '@/components/product/CountdownTimer';
 import { useCompareStore } from '@/store/compareStore';
@@ -23,9 +22,14 @@ import { useTranslations } from '@/hooks/useTranslations';
 import { logger } from '@/lib/logger';
 import { getProxiedImageUrl } from '@/lib/image-proxy';
 
-// Lazy load du carousel (non critique)
+// Lazy load des composants non critiques
 const RecentlyViewedCarousel = dynamic(
   () => import('@/components/product/RecentlyViewedCarousel'),
+  { ssr: false }
+);
+
+const QuickViewModal = dynamic(
+  () => import('@/components/product/QuickViewModal').then(mod => ({ default: mod.QuickViewModal })),
   { ssr: false }
 );
 

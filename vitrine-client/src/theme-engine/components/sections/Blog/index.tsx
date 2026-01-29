@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from '../../../engine/ThemeContext';
+import { logger } from '@/lib/logger';
 import Grid from './variants/Grid';
 import Featured from './variants/Featured';
 
@@ -21,7 +22,7 @@ export default function Blog({ variant, config, className }: BlogProps) {
   const VariantComponent = variantComponents[variant as keyof typeof variantComponents];
 
   if (!VariantComponent) {
-    console.warn(`Blog variant "${variant}" not found, using grid`);
+    logger.warn(`Blog variant "${variant}" not found, using grid`);
     return <Grid config={config} className={className} theme={theme} />;
   }
 

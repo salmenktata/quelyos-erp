@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from '../../../engine/ThemeContext';
+import { logger } from '@/lib/logger';
 import FullscreenAutoplay from './variants/FullscreenAutoplay';
 import SplitScreen from './variants/SplitScreen';
 import Minimal from './variants/Minimal';
@@ -23,7 +24,7 @@ export default function HeroSlider({ variant, config, className }: HeroSliderPro
   const VariantComponent = variantComponents[variant as keyof typeof variantComponents];
 
   if (!VariantComponent) {
-    console.warn(`HeroSlider variant "${variant}" not found, using fullscreen-autoplay`);
+    logger.warn(`HeroSlider variant "${variant}" not found, using fullscreen-autoplay`);
     return <FullscreenAutoplay config={config} className={className} colors={colors} />;
   }
 
