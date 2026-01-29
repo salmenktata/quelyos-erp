@@ -914,4 +914,33 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
       }
     ]
   },
+  'themes.payouts': {
+    pageId: 'store-themes-payouts',
+    title: 'Payouts Designer',
+    purpose: 'Consultez vos revenus de ventes de thèmes et gérez vos paiements Stripe Connect.',
+    icon: Palette,
+    moduleColor: 'indigo',
+    sections: [
+      {
+        title: 'Fonctionnalités',
+        icon: Settings,
+        items: [
+          'Suivi du solde en attente de paiement',
+          'Historique complet des revenus (pending/paid/failed)',
+          'Onboarding Stripe Connect pour recevoir les paiements',
+          'Dashboard Stripe Express intégré',
+          'Payouts automatiques mensuels (minimum 50 EUR)',
+        ]
+      },
+      {
+        title: 'Comment ça marche',
+        items: [
+          'Onboarding Stripe : Configurez votre compte Stripe Connect pour recevoir les paiements',
+          'Vente de thème : Vous recevez 70% du prix, la plateforme conserve 30%',
+          'Payout automatique : Chaque 1er du mois si votre solde ≥ 50 EUR',
+          'Délai de traitement : 2-5 jours ouvrés après déclenchement du payout',
+        ]
+      }
+    ]
+  },
 };

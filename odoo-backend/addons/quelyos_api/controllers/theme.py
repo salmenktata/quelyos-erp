@@ -897,3 +897,119 @@ IMPORTANT : Réponds UNIQUEMENT avec le JSON, sans texte explicatif ni markdown.
                 'success': False,
                 'error': str(e)
             }
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # ENDPOINTS DESIGNER - Profil et Revenus
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @http.route('/api/themes/designers/me', auth='user', type='jsonrpc', methods=['POST'], csrf=False)
+    def get_my_designer_profile(self):
+        """
+        Récupérer le profil designer de l'utilisateur connecté
+
+        Returns:
+            dict: {
+                success: bool,
+                designer: { id, display_name, pending_balance, ... }
+            }
+        """
+        try:
+            designer = request.env['quelyos.theme.designer'].sudo().search([
+                ('user_id', '=', request.env.user.id)
+            ], limit=1)
+
+            if not designer:
+                return {
+                    'success': False,
+                    'error': 'Designer profile not found'
+                }
+
+            return {
+                'success': True,
+                'designer': {
+                    'id': designer.id,
+                    'display_name': designer.display_name,
+                    'email': designer.email,
+                    'pending_balance': designer.pending_balance,
+                    'stripe_connect_account_id': designer.stripe_connect_account_id,
+                    'stripe_onboarding_completed': designer.stripe_onboarding_completed,
+                    'stripe_payouts_enabled': designer.stripe_payouts_enabled,
+                    'last_payout_date': designer.last_payout_date.isoformat() if designer.last_payout_date else False,
+                    'currency_id': [designer.currency_id.id, designer.currency_id.name] if designer.currency_id else False,
+                    'themes_count': designer.themes_count,
+                    'total_sales': designer.total_sales,
+                    'total_revenue': designer.total_revenue,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Error fetching designer profile: {str(e)}")
+            return {
+                'success': False,
+                'error': 'Internal error'
+            }
+
+    @http.route('/api/themes/designers/revenues', auth='user', type='jsonrpc', methods=['POST'], csrf=False)
+    def get_my_revenues(self, limit=100, offset=0):
+        """
+        Récupérer l'historique des revenus du designer connecté
+
+        Args:
+            limit (int): Nombre max de résultats
+            offset (int): Offset pagination
+
+        Returns:
+            dict: {
+                success: bool,
+                revenues: [{ id, amount, status, payout_date, ... }],
+                total: int
+            }
+        """
+        try:
+            designer = request.env['quelyos.theme.designer'].sudo().search([
+                ('user_id', '=', request.env.user.id)
+            ], limit=1)
+
+            if not designer:
+                return {
+                    'success': False,
+                    'error': 'Designer profile not found'
+                }
+
+            revenues = request.env['quelyos.theme.revenue'].sudo().search([
+                ('designer_id', '=', designer.id)
+            ], order='create_date desc', limit=limit, offset=offset)
+
+            total = request.env['quelyos.theme.revenue'].sudo().search_count([
+                ('designer_id', '=', designer.id)
+            ])
+
+            revenues_data = []
+            for revenue in revenues:
+                revenues_data.append({
+                    'id': revenue.id,
+                    'amount': revenue.amount,
+                    'currency_id': [revenue.currency_id.id, revenue.currency_id.name] if revenue.currency_id else False,
+                    'payout_status': revenue.payout_status,
+                    'payout_date': revenue.payout_date.isoformat() if revenue.payout_date else False,
+                    'payout_reference': revenue.payout_reference,
+                    'payout_error': revenue.payout_error,
+                    'stripe_transfer_id': revenue.stripe_transfer_id,
+                    'create_date': revenue.create_date.isoformat() if revenue.create_date else False,
+                    'submission_id': [revenue.submission_id.id, revenue.submission_id.name] if revenue.submission_id else False,
+                })
+
+            return {
+                'success': True,
+                'revenues': revenues_data,
+                'total': total,
+                'limit': limit,
+                'offset': offset
+            }
+
+        except Exception as e:
+            _logger.error(f"Error fetching revenues: {str(e)}")
+            return {
+                'success': False,
+                'error': 'Internal error'
+            }

@@ -134,17 +134,17 @@ export default function ThemesImportPage() {
           pageId: 'themes-import',
           title: 'Import Thèmes JSON',
           purpose:
-            'Cette page permet d'importer les thèmes JSON officiels Quelyos dans la base de données',
+            "Cette page permet d'importer les thèmes JSON officiels Quelyos dans la base de données",
           icon: Upload,
           moduleColor: 'indigo',
           sections: [
             {
               type: 'info',
               items: [
-                'Les thèmes JSON sont stockés dans vitrine-client/src/theme-engine/themes/',
-                'L'import crée les thèmes dans Odoo (quelyos.theme)',
-                'Si un thème existe déjà (même code), sa configuration JSON sera mise à jour',
-                'Les thèmes importés sont publics et gratuits par défaut',
+                "Les thèmes JSON sont stockés dans vitrine-client/src/theme-engine/themes/",
+                "L'import crée les thèmes dans Odoo (quelyos.theme)",
+                "Si un thème existe déjà (même code), sa configuration JSON sera mise à jour",
+                "Les thèmes importés sont publics et gratuits par défaut",
                 'Admin uniquement : droits "base.group_system" requis',
               ],
             },

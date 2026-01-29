@@ -54,9 +54,17 @@ class QuelyosThemeDesigner(models.Model):
     payment_method = fields.Selection([
         ('bank', 'Virement Bancaire'),
         ('paypal', 'PayPal'),
-        ('stripe', 'Stripe'),
-    ], string='Méthode de Paiement', default='bank')
+        ('stripe', 'Stripe Connect'),
+    ], string='Méthode de Paiement', default='stripe')
     revenue_share_rate = fields.Float(string='Taux Commission (%)', default=70.0, help='Pourcentage que reçoit le designer (70% = 0.70)')
+
+    # Stripe Connect
+    stripe_connect_account_id = fields.Char(string='Stripe Connect Account ID', index=True)
+    stripe_onboarding_completed = fields.Boolean(string='Onboarding Stripe Complété', default=False)
+    stripe_payouts_enabled = fields.Boolean(string='Payouts Activés', default=False)
+    stripe_charges_enabled = fields.Boolean(string='Charges Activées', default=False)
+    last_payout_date = fields.Datetime(string='Dernier Payout')
+    pending_balance = fields.Monetary(string='Solde En Attente', currency_field='currency_id', compute='_compute_pending_balance')
 
     # Relations
     submission_ids = fields.One2many('quelyos.theme.submission', 'designer_id', string='Soumissions')
@@ -85,6 +93,13 @@ class QuelyosThemeDesigner(models.Model):
                 designer.average_rating = sum(ratings) / len(ratings) if ratings else 0.0
             else:
                 designer.average_rating = 0.0
+
+    @api.depends('revenue_ids', 'revenue_ids.designer_share', 'revenue_ids.status')
+    def _compute_pending_balance(self):
+        """Calculer solde en attente (revenus non payés)"""
+        for designer in self:
+            pending_revenues = designer.revenue_ids.filtered(lambda r: r.status == 'pending')
+            designer.pending_balance = sum(pending_revenues.mapped('designer_share'))
 
 
 class QuelyosThemeSubmission(models.Model):
@@ -331,6 +346,10 @@ class QuelyosThemeRevenue(models.Model):
     ], string='Statut Paiement', default='pending', required=True)
     payout_date = fields.Date(string='Date Paiement')
     payout_reference = fields.Char(string='Référence Paiement')
+
+    # Stripe Transfer
+    stripe_transfer_id = fields.Char(string='Stripe Transfer ID', index=True)
+    payout_error = fields.Text(string='Erreur Paiement')
 
     # Dates
     create_date = fields.Datetime(string='Date', readonly=True)
