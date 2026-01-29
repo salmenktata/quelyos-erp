@@ -184,14 +184,22 @@ class AuthController(http.Controller):
                 return {'success': False, 'error': 'Login et mot de passe requis'}
 
             # Authenticate user
-            uid = request.session.authenticate(request.env, {'db': db, 'login': login, 'password': password})
+            auth_result = request.session.authenticate(request.env, {
+                'db': db,
+                'login': login,
+                'password': password,
+                'type': 'password',
+            })
 
-            if not uid:
+            if not auth_result:
                 # Track failed login attempts
                 fail_key = rate_limit_key(request, 'login_failed')
                 limiter = get_rate_limiter()
                 limiter.is_allowed(fail_key, *RateLimitConfig.LOGIN_FAILED)
                 return {'success': False, 'error': 'Identifiants invalides'}
+
+            # Extract uid from auth result (Odoo 19 returns dict with uid, auth_method, mfa)
+            uid = auth_result.get('uid') if isinstance(auth_result, dict) else auth_result
 
             # Get session ID
             session_id = request.session.sid

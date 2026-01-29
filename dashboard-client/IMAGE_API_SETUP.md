@@ -81,7 +81,7 @@ VITE_PEXELS_API_KEY=ton_api_key_pexels
 ### Redémarrer le serveur
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ---
@@ -146,7 +146,7 @@ L'upload direct est disponible via l'endpoint backend mais non intégré dans le
 
 ### Recherche ne fonctionne pas
 1. Vérifier que `.env` contient les clés
-2. Redémarrer `npm run dev`
+2. Redémarrer `pnpm dev`
 3. Vérifier console navigateur pour erreurs
 
 ### Images ne s'affichent pas

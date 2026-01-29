@@ -175,7 +175,7 @@ VITE_API_URL=
 
 ```bash
 cd dashboard-client
-npm run build
+pnpm build
 ```
 
 Le build sera dans `dist/`.
