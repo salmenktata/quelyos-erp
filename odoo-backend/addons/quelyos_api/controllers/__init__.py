@@ -34,3 +34,5 @@ from . import stripe_billing
 # Stripe Payments Marketplace
 from . import payment_stripe
 from . import payment_stripe_connect
+# Theme Analytics
+from . import theme_analytics

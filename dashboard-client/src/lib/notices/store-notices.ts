@@ -943,4 +943,36 @@ export const storeNotices: Record<string, PageNoticeConfig> = {
       }
     ]
   },
+  'themes.analytics': {
+    pageId: 'store-themes-analytics',
+    title: 'Analytics Marketplace',
+    purpose: 'Consultez les statistiques et performances complètes de votre marketplace de thèmes.',
+    icon: Palette,
+    moduleColor: 'indigo',
+    sections: [
+      {
+        title: 'Métriques disponibles',
+        icon: Settings,
+        items: [
+          'Revenus totaux marketplace (split 70/30 designer/platform)',
+          'Nombre de ventes et taux de conversion',
+          'Top 5 thèmes les plus vendus avec statistiques détaillées',
+          'Top 5 designers par revenus avec statut onboarding',
+          'Statistiques par catégorie (mode, tech, food, beauty...)',
+          'Évolution temporelle ventes et revenus (6 derniers mois)',
+        ]
+      },
+      {
+        title: 'Insights clés',
+        items: [
+          'Prix moyen thèmes : Identifier la fourchette de prix optimale',
+          'Taux conversion : Mesurer l\'efficacité de la marketplace',
+          'Payouts en attente : Suivre les paiements designers à déclencher',
+          'Soumissions en attente : Gérer la file de validation thèmes',
+          'Performance catégories : Identifier les niches les plus rentables',
+          'Tendances temporelles : Anticiper les variations saisonnières',
+        ]
+      }
+    ]
+  },
 };
