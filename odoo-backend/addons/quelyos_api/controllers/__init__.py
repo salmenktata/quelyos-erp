@@ -12,6 +12,7 @@ from . import marketing
 from . import subscription
 from . import tenant
 from . import theme_preset
+from . import theme
 from . import api_settings
 from . import finance
 from . import payment

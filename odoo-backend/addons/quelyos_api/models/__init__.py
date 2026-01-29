@@ -11,6 +11,7 @@ from . import subscription_plan
 from . import subscription
 from . import tenant
 from . import theme_preset
+from . import theme
 from . import hero_slide
 from . import promo_banner
 from . import promo_message

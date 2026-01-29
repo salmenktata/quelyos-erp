@@ -1,0 +1,102 @@
+{
+  "id": "food-organic",
+  "name": "Food Organic",
+  "category": "food",
+  "description": "Thème chaleureux et naturel pour épiceries bio et produits artisanaux",
+  "version": "1.0.0",
+  "colors": {
+    "primary": "#4a7c59",
+    "secondary": "#f4e4c1",
+    "accent": "#e27d60",
+    "background": "#fdfcf7",
+    "text": "#2d3436",
+    "muted": "#95a5a6"
+  },
+  "typography": {
+    "headings": "Merriweather",
+    "body": "Open Sans"
+  },
+  "layouts": {
+    "homepage": {
+      "sections": [
+        {
+          "type": "hero-slider",
+          "variant": "minimal",
+          "config": {
+            "title": "Savourez le Naturel",
+            "subtitle": "Produits bio et locaux livrés chez vous"
+          }
+        },
+        {
+          "type": "featured-products",
+          "variant": "grid-4cols",
+          "config": {
+            "title": "Nos Produits du Terroir",
+            "limit": 8,
+            "sortBy": "featured"
+          }
+        },
+        {
+          "type": "testimonials",
+          "variant": "grid",
+          "config": {
+            "title": "Témoignages de Nos Clients",
+            "limit": 3
+          }
+        },
+        {
+          "type": "newsletter",
+          "variant": "with-background",
+          "config": {
+            "title": "Rejoignez Notre Communauté Bio",
+            "subtitle": "Recettes, conseils et offres exclusives chaque semaine",
+            "backgroundImage": "/images/newsletter-organic-bg.jpg"
+          }
+        }
+      ]
+    },
+    "productPage": {
+      "layout": "sidebar-left",
+      "gallery": {
+        "type": "zoom-horizontal",
+        "thumbnailPosition": "bottom"
+      },
+      "sections": [
+        {
+          "type": "product-info",
+          "variant": "organic"
+        },
+        {
+          "type": "product-tabs",
+          "config": {
+            "tabs": ["origin", "nutrition", "recipes", "reviews"]
+          }
+        },
+        {
+          "type": "related-products",
+          "config": {
+            "limit": 4,
+            "title": "Vous Pourriez Aussi Aimer"
+          }
+        }
+      ]
+    },
+    "categoryPage": {
+      "layout": "sidebar-left",
+      "grid": "3cols",
+      "filters": ["price", "category", "origin", "certification", "allergens"]
+    }
+  },
+  "components": {
+    "productCard": "style-detailed",
+    "header": "classic",
+    "footer": "columns-3",
+    "buttons": "rounded-shadow"
+  },
+  "spacing": {
+    "sectionPadding": "large",
+    "containerWidth": "1300px",
+    "gutter": "1.25rem"
+  },
+  "customCSS": ".food-organic-theme { font-weight: 400; } .food-organic-theme .product-badge { border-radius: 50%; }"
+}

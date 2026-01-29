@@ -1,7 +1,7 @@
 /**
- * Middleware Next.js pour la détection du tenant par domaine.
+ * Proxy Next.js pour la détection du tenant par domaine.
  *
- * Ce middleware intercepte toutes les requêtes et:
+ * Ce proxy intercepte toutes les requêtes et:
  * 1. Détecte le domaine de la requête
  * 2. Recherche le tenant correspondant via l'API backend
  * 3. Injecte le code du tenant dans un cookie
@@ -56,9 +56,9 @@ async function lookupTenant(
       });
       return { code: data.tenant.code };
     }
-  } catch (_error) {
+  } catch (error) {
     // En cas d'erreur réseau, continuer sans tenant
-    logger.error('[Middleware] Tenant lookup error:', error);
+    logger.error('[Proxy] Tenant lookup error:', error);
   }
 
   return null;
@@ -95,7 +95,7 @@ function isDevDomain(hostname: string): boolean {
   return devPatterns.some((pattern) => hostname.includes(pattern));
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const hostname = request.headers.get('host') || 'localhost:3000';
   const domain = extractDomain(hostname);
 
@@ -170,7 +170,7 @@ export async function middleware(request: NextRequest) {
 }
 
 /**
- * Configuration du matcher pour le middleware.
+ * Configuration du matcher pour le proxy.
  * Exclut les routes statiques et API internes.
  */
 export const config = {

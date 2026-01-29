@@ -132,3 +132,12 @@ access_hr_goal_user,quelyos.hr.goal user,model_quelyos_hr_goal,group_quelyos_hr_
 access_hr_goal_manager,quelyos.hr.goal manager,model_quelyos_hr_goal,group_quelyos_hr_manager,1,1,1,1
 access_provisioning_job_public,quelyos.provisioning.job public,model_quelyos_provisioning_job,,1,0,0,0
 access_provisioning_job_manager,quelyos.provisioning.job manager,model_quelyos_provisioning_job,group_quelyos_finance_manager,1,1,1,1
+access_quelyos_theme_public,quelyos.theme public,model_quelyos_theme,base.group_public,1,0,0,0
+access_quelyos_theme_user,quelyos.theme user,model_quelyos_theme,group_quelyos_home_user,1,1,0,0
+access_quelyos_theme_manager,quelyos.theme manager,model_quelyos_theme,group_quelyos_home_manager,1,1,1,1
+access_quelyos_theme_screenshot_public,quelyos.theme.screenshot public,model_quelyos_theme_screenshot,base.group_public,1,0,0,0
+access_quelyos_theme_screenshot_user,quelyos.theme.screenshot user,model_quelyos_theme_screenshot,group_quelyos_home_user,1,1,1,0
+access_quelyos_theme_screenshot_manager,quelyos.theme.screenshot manager,model_quelyos_theme_screenshot,group_quelyos_home_manager,1,1,1,1
+access_quelyos_theme_review_public,quelyos.theme.review public,model_quelyos_theme_review,base.group_public,1,0,0,0
+access_quelyos_theme_review_user,quelyos.theme.review user,model_quelyos_theme_review,base.group_user,1,1,1,0
+access_quelyos_theme_review_manager,quelyos.theme.review manager,model_quelyos_theme_review,group_quelyos_home_manager,1,1,1,1

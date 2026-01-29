@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ═══════════════════════════════════════════════════════════════════════════
+             THÈME 1 : Fashion Luxury
+        ═══════════════════════════════════════════════════════════════════════════ -->
+
+        <record id="theme_fashion_luxury" model="quelyos.theme">
+            <field name="code">fashion-luxury</field>
+            <field name="name">Fashion Luxury</field>
+            <field name="description">Thème élégant et raffiné pour boutiques de mode haut de gamme</field>
+            <field name="category">fashion</field>
+            <field name="version">1.0.0</field>
+            <field name="sequence">10</field>
+            <field name="is_public" eval="True"/>
+            <field name="is_premium" eval="False"/>
+            <field name="price">0.0</field>
+            <field name="config_json"><![CDATA[{
+  "id": "fashion-luxury",
+  "name": "Fashion Luxury",
+  "category": "fashion",
+  "description": "Thème élégant et raffiné pour boutiques de mode haut de gamme",
+  "version": "1.0.0",
+  "colors": {
+    "primary": "#2c2c2c",
+    "secondary": "#d4af37",
+    "accent": "#ff6b6b",
+    "background": "#ffffff",
+    "text": "#2c2c2c",
+    "muted": "#6b7280"
+  },
+  "typography": {
+    "headings": "Playfair Display",
+    "body": "Lato",
+    "mono": "Courier New"
+  },
+  "layouts": {
+    "homepage": {
+      "sections": [
+        {
+          "type": "hero-slider",
+          "variant": "fullscreen-autoplay",
+          "config": {
+            "height": "90vh",
+            "animation": "fade",
+            "interval": 5000
+          }
+        },
+        {
+          "type": "featured-products",
+          "variant": "grid-4cols",
+          "config": {
+            "title": "Nos Coups de Cœur",
+            "limit": 8,
+            "sortBy": "bestsellers"
+          }
+        },
+        {
+          "type": "newsletter",
+          "variant": "with-background",
+          "config": {
+            "title": "Rejoignez le Club Fashion Luxury",
+            "subtitle": "Offres privées et avant-premières exclusives"
+          }
+        },
+        {
+          "type": "testimonials",
+          "variant": "carousel",
+          "config": {
+            "title": "Ils Nous Font Confiance"
+          }
+        }
+      ]
+    },
+    "productPage": {
+      "layout": "sidebar-right",
+      "gallery": {
+        "type": "zoom-vertical",
+        "thumbnailPosition": "left"
+      },
+      "sections": [
+        {
+          "type": "product-info",
+          "variant": "detailed"
+        }
+      ]
+    },
+    "categoryPage": {
+      "layout": "sidebar-left",
+      "grid": "3cols",
+      "filters": ["price", "color", "size", "brand"]
+    }
+  },
+  "components": {
+    "productCard": "style-overlay",
+    "header": "transparent-sticky",
+    "footer": "columns-4",
+    "buttons": "rounded-shadow"
+  },
+  "spacing": {
+    "sectionPadding": "large",
+    "containerWidth": "1400px",
+    "gutter": "1.5rem"
+  }
+}]]></field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════════
+             THÈME 2 : Tech Minimal
+        ═══════════════════════════════════════════════════════════════════════════ -->
+
+        <record id="theme_tech_minimal" model="quelyos.theme">
+            <field name="code">tech-minimal</field>
+            <field name="name">Tech Minimal</field>
+            <field name="description">Design épuré et moderne pour boutiques high-tech</field>
+            <field name="category">tech</field>
+            <field name="version">1.0.0</field>
+            <field name="sequence">20</field>
+            <field name="is_public" eval="True"/>
+            <field name="is_premium" eval="False"/>
+            <field name="price">0.0</field>
+            <field name="config_json"><![CDATA[{
+  "id": "tech-minimal",
+  "name": "Tech Minimal",
+  "category": "tech",
+  "description": "Design épuré et moderne pour boutiques high-tech",
+  "version": "1.0.0",
+  "colors": {
+    "primary": "#0066ff",
+    "secondary": "#00d4ff",
+    "accent": "#ff3366",
+    "background": "#f8f9fa",
+    "text": "#1a1a1a",
+    "muted": "#888888"
+  },
+  "typography": {
+    "headings": "Inter",
+    "body": "Inter"
+  },
+  "layouts": {
+    "homepage": {
+      "sections": [
+        {
+          "type": "hero",
+          "variant": "centered",
+          "config": {
+            "title": "Innovation au Quotidien",
+            "subtitle": "Les dernières technologies à portée de main",
+            "cta": {
+              "text": "Découvrir",
+              "url": "/shop"
+            }
+          }
+        },
+        {
+          "type": "featured-products",
+          "variant": "carousel",
+          "config": {
+            "title": "Nouveautés High-Tech",
+            "limit": 12,
+            "sortBy": "newest"
+          }
+        },
+        {
+          "type": "trust-badges",
+          "variant": "icons"
+        },
+        {
+          "type": "newsletter",
+          "variant": "centered-minimal",
+          "config": {
+            "title": "Restez à la Pointe",
+            "subtitle": "Recevez les dernières actualités tech"
+          }
+        }
+      ]
+    },
+    "productPage": {
+      "layout": "fullwidth",
+      "gallery": {
+        "type": "lightbox"
+      },
+      "sections": [
+        {
+          "type": "product-info",
+          "variant": "technical"
+        }
+      ]
+    },
+    "categoryPage": {
+      "layout": "fullwidth",
+      "grid": "4cols",
+      "filters": ["price", "brand", "processor", "ram"]
+    }
+  },
+  "components": {
+    "productCard": "style-minimal",
+    "header": "solid-sticky",
+    "footer": "minimal",
+    "buttons": "squared"
+  },
+  "spacing": {
+    "sectionPadding": "medium",
+    "containerWidth": "1200px",
+    "gutter": "1rem"
+  }
+}]]></field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════════
+             THÈME 3 : Food Organic
+        ═══════════════════════════════════════════════════════════════════════════ -->
+
+        <record id="theme_food_organic" model="quelyos.theme">
+            <field name="code">food-organic</field>
+            <field name="name">Food Organic</field>
+            <field name="description">Thème chaleureux et naturel pour épiceries bio et produits artisanaux</field>
+            <field name="category">food</field>
+            <field name="version">1.0.0</field>
+            <field name="sequence">30</field>
+            <field name="is_public" eval="True"/>
+            <field name="is_premium" eval="False"/>
+            <field name="price">0.0</field>
+            <field name="config_json"><![CDATA[{
+  "id": "food-organic",
+  "name": "Food Organic",
+  "category": "food",
+  "description": "Thème chaleureux et naturel pour épiceries bio",
+  "version": "1.0.0",
+  "colors": {
+    "primary": "#4a7c59",
+    "secondary": "#f4e4c1",
+    "accent": "#e27d60",
+    "background": "#fdfcf7",
+    "text": "#2d3436",
+    "muted": "#95a5a6"
+  },
+  "typography": {
+    "headings": "Merriweather",
+    "body": "Open Sans"
+  },
+  "layouts": {
+    "homepage": {
+      "sections": [
+        {
+          "type": "hero",
+          "variant": "parallax",
+          "config": {
+            "title": "Savourez le Naturel",
+            "subtitle": "Produits bio et locaux livrés chez vous"
+          }
+        },
+        {
+          "type": "featured-products",
+          "variant": "grid-4cols",
+          "config": {
+            "title": "Nos Produits du Terroir",
+            "limit": 8,
+            "sortBy": "featured"
+          }
+        },
+        {
+          "type": "testimonials",
+          "variant": "grid",
+          "config": {
+            "title": "Témoignages de Nos Clients",
+            "limit": 3
+          }
+        },
+        {
+          "type": "newsletter",
+          "variant": "with-background",
+          "config": {
+            "title": "Rejoignez Notre Communauté Bio",
+            "subtitle": "Recettes et offres exclusives"
+          }
+        }
+      ]
+    },
+    "productPage": {
+      "layout": "sidebar-left",
+      "gallery": {
+        "type": "zoom-horizontal",
+        "thumbnailPosition": "bottom"
+      },
+      "sections": [
+        {
+          "type": "product-info",
+          "variant": "organic"
+        }
+      ]
+    },
+    "categoryPage": {
+      "layout": "sidebar-left",
+      "grid": "3cols",
+      "filters": ["price", "category", "origin", "certification"]
+    }
+  },
+  "components": {
+    "productCard": "style-detailed",
+    "header": "classic",
+    "footer": "columns-3",
+    "buttons": "rounded-shadow"
+  },
+  "spacing": {
+    "sectionPadding": "large",
+    "containerWidth": "1300px",
+    "gutter": "1.25rem"
+  }
+}]]></field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════════
+             THÈME PAR DÉFAUT : Alias vers Fashion Luxury
+        ═══════════════════════════════════════════════════════════════════════════ -->
+
+        <record id="theme_default" model="quelyos.theme">
+            <field name="code">default</field>
+            <field name="name">Thème par Défaut</field>
+            <field name="description">Thème par défaut appliqué automatiquement aux nouveaux tenants</field>
+            <field name="category">general</field>
+            <field name="version">1.0.0</field>
+            <field name="sequence">1</field>
+            <field name="is_public" eval="True"/>
+            <field name="is_premium" eval="False"/>
+            <field name="price">0.0</field>
+            <field name="config_json" ref="theme_fashion_luxury"/>
+        </record>
+
+    </data>
+</odoo>

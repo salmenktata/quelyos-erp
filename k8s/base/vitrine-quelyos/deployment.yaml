@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vitrine-quelyos
+  namespace: quelyos
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: vitrine-quelyos
+  template:
+    metadata:
+      labels:
+        app: vitrine-quelyos
+        version: "1.0"
+    spec:
+      containers:
+      - name: vitrine-quelyos
+        image: quelyos/vitrine-quelyos:latest  # Remplacer par votre registry
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: quelyos-config
+              key: NODE_ENV
+        - name: BACKEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: quelyos-config
+              key: BACKEND_URL
+        - name: NEXT_TELEMETRY_DISABLED
+          valueFrom:
+            configMapKeyRef:
+              name: quelyos-config
+              key: NEXT_TELEMETRY_DISABLED
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3

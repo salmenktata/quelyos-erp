@@ -1,0 +1,107 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: quelyos
+
+bases:
+  - ../../base
+
+commonLabels:
+  environment: contabo-vps
+
+# Patch pour Contabo VPS (ressources adaptées)
+patchesStrategicMerge:
+  - storage-patch.yaml
+  - resource-patch.yaml
+
+configMapGenerator:
+  - name: quelyos-config
+    behavior: merge
+    literals:
+      - NODE_ENV=production
+
+# Réplicas optimisées pour VPS unique
+patchesJson6902:
+  # Backend: 1 replica (VPS unique)
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: backend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+
+  # Vitrine Quelyos: 2 replicas
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: vitrine-quelyos
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+
+  # Vitrine Client: 2 replicas
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: vitrine-client
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+
+  # Dashboard: 1 replica
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: dashboard-client
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+
+  # HPA: Limites réduites pour VPS
+  - target:
+      group: autoscaling
+      version: v2
+      kind: HorizontalPodAutoscaler
+      name: vitrine-quelyos-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 2
+      - op: replace
+        path: /spec/maxReplicas
+        value: 4
+
+  - target:
+      group: autoscaling
+      version: v2
+      kind: HorizontalPodAutoscaler
+      name: vitrine-client-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 2
+      - op: replace
+        path: /spec/maxReplicas
+        value: 5
+
+  - target:
+      group: autoscaling
+      version: v2
+      kind: HorizontalPodAutoscaler
+      name: dashboard-client-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 3

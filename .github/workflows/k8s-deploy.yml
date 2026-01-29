@@ -1,0 +1,164 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Build & Push Docker Images"]
+    types:
+      - completed
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+
+jobs:
+  deploy:
+    name: Deploy to K8s
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    environment:
+      name: ${{ inputs.environment || 'staging' }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Install kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+
+      # AWS EKS Authentication
+      - name: Configure AWS credentials (if EKS)
+        if: env.K8S_PROVIDER == 'eks'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS (if EKS)
+        if: env.K8S_PROVIDER == 'eks'
+        run: |
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+
+      # GCP GKE Authentication
+      - name: Authenticate to GCP (if GKE)
+        if: env.K8S_PROVIDER == 'gke'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Get GKE credentials (if GKE)
+        if: env.K8S_PROVIDER == 'gke'
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER_NAME }}
+          location: ${{ secrets.GKE_LOCATION }}
+
+      # Azure AKS Authentication
+      - name: Azure Login (if AKS)
+        if: env.K8S_PROVIDER == 'aks'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get AKS credentials (if AKS)
+        if: env.K8S_PROVIDER == 'aks'
+        run: |
+          az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}
+
+      # Generic kubeconfig (for other providers)
+      - name: Set kubeconfig (generic)
+        if: env.K8S_PROVIDER != 'eks' && env.K8S_PROVIDER != 'gke' && env.K8S_PROVIDER != 'aks'
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Verify cluster connection
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Create namespace if not exists
+        run: |
+          kubectl create namespace quelyos-${{ inputs.environment || 'staging' }} --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create secrets
+        run: |
+          kubectl create secret generic quelyos-secrets \
+            --from-literal=POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
+            --from-literal=JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            --from-literal=SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
+            --from-literal=SENTRY_DSN="${{ secrets.SENTRY_DSN }}" \
+            --namespace=quelyos-${{ inputs.environment || 'staging' }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy with Kustomize
+        run: |
+          ENV=${{ inputs.environment || 'staging' }}
+          kustomize build k8s/overlays/${ENV} | kubectl apply -f -
+
+      - name: Wait for deployment
+        run: |
+          ENV=${{ inputs.environment || 'staging' }}
+          NAMESPACE="quelyos"
+          if [ "$ENV" = "development" ]; then
+            NAMESPACE="quelyos-dev"
+          elif [ "$ENV" = "staging" ]; then
+            NAMESPACE="quelyos-staging"
+          fi
+
+          kubectl rollout status deployment/backend -n $NAMESPACE --timeout=5m
+          kubectl rollout status deployment/vitrine-quelyos -n $NAMESPACE --timeout=5m
+          kubectl rollout status deployment/vitrine-client -n $NAMESPACE --timeout=5m
+          kubectl rollout status deployment/dashboard-client -n $NAMESPACE --timeout=5m
+
+      - name: Verify deployment
+        run: |
+          ENV=${{ inputs.environment || 'staging' }}
+          NAMESPACE="quelyos"
+          if [ "$ENV" = "development" ]; then
+            NAMESPACE="quelyos-dev"
+          elif [ "$ENV" = "staging" ]; then
+            NAMESPACE="quelyos-staging"
+          fi
+
+          echo "=== Pods Status ==="
+          kubectl get pods -n $NAMESPACE
+
+          echo "=== Services ==="
+          kubectl get svc -n $NAMESPACE
+
+          echo "=== Ingress ==="
+          kubectl get ingress -n $NAMESPACE
+
+      - name: Smoke test
+        run: |
+          # Wait for ingress to be ready
+          sleep 30
+
+          # Test health endpoints (if accessible)
+          # kubectl run curl-test --image=curlimages/curl:latest --rm -it --restart=Never -- \
+          #   curl -f http://backend-service.quelyos.svc.cluster.local:8069/web/health
+
+    env:
+      # Set K8S_PROVIDER to: 'eks', 'gke', 'aks', or leave empty for generic
+      K8S_PROVIDER: ''  # Configure in repository settings

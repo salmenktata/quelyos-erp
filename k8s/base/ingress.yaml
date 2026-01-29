@@ -1,0 +1,90 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: quelyos-ingress
+  namespace: quelyos
+  annotations:
+    # Nginx Ingress Controller
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+
+    # Rate limiting
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+
+    # CORS (si nécessaire)
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+
+    # TLS/SSL
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # Si cert-manager installé
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - quelyos.com
+    - www.quelyos.com
+    - shop.quelyos.com
+    - dashboard.quelyos.com
+    - api.quelyos.com
+    secretName: quelyos-tls
+  rules:
+  # Site Vitrine (Marketing)
+  - host: quelyos.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vitrine-quelyos-service
+            port:
+              number: 3000
+  - host: www.quelyos.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vitrine-quelyos-service
+            port:
+              number: 3000
+
+  # E-commerce
+  - host: shop.quelyos.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vitrine-client-service
+            port:
+              number: 3000
+
+  # Dashboard Admin
+  - host: dashboard.quelyos.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dashboard-client-service
+            port:
+              number: 80
+
+  # API Backend
+  - host: api.quelyos.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8069

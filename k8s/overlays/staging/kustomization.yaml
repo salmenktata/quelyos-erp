@@ -1,0 +1,72 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: quelyos-staging
+
+bases:
+  - ../../base
+
+namePrefix: staging-
+
+commonLabels:
+  environment: staging
+
+configMapGenerator:
+  - name: quelyos-config
+    behavior: merge
+    literals:
+      - NODE_ENV=staging
+
+# Réplicas moyennes pour staging
+patchesJson6902:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: vitrine-quelyos
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: vitrine-client
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: dashboard-client
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+  - target:
+      group: autoscaling
+      version: v2
+      kind: HorizontalPodAutoscaler
+      name: vitrine-quelyos-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 2
+      - op: replace
+        path: /spec/maxReplicas
+        value: 5
+  - target:
+      group: autoscaling
+      version: v2
+      kind: HorizontalPodAutoscaler
+      name: vitrine-client-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 2
+      - op: replace
+        path: /spec/maxReplicas
+        value: 8

@@ -1,0 +1,104 @@
+{
+  "id": "tech-minimal",
+  "name": "Tech Minimal",
+  "category": "tech",
+  "description": "Design épuré et moderne pour boutiques high-tech",
+  "version": "1.0.0",
+  "colors": {
+    "primary": "#0066ff",
+    "secondary": "#00d4ff",
+    "accent": "#ff3366",
+    "background": "#f8f9fa",
+    "text": "#1a1a1a",
+    "muted": "#888888"
+  },
+  "typography": {
+    "headings": "Inter",
+    "body": "Inter"
+  },
+  "layouts": {
+    "homepage": {
+      "sections": [
+        {
+          "type": "hero",
+          "variant": "split-screen",
+          "config": {
+            "image": "/images/hero/tech-hero.jpg",
+            "title": "Innovation au Quotidien",
+            "subtitle": "Les dernières technologies à portée de main",
+            "cta": {
+              "text": "Découvrir",
+              "url": "/shop"
+            }
+          }
+        },
+        {
+          "type": "featured-products",
+          "variant": "carousel",
+          "config": {
+            "title": "Nouveautés High-Tech",
+            "limit": 12,
+            "sortBy": "newest"
+          }
+        },
+        {
+          "type": "newsletter",
+          "variant": "centered-minimal",
+          "config": {
+            "title": "Restez à la Pointe",
+            "subtitle": "Recevez les dernières actualités tech et nos offres exclusives"
+          }
+        },
+        {
+          "type": "testimonials",
+          "variant": "grid",
+          "config": {
+            "title": "Avis de Nos Clients",
+            "limit": 3
+          }
+        }
+      ]
+    },
+    "productPage": {
+      "layout": "fullwidth",
+      "gallery": {
+        "type": "lightbox"
+      },
+      "sections": [
+        {
+          "type": "product-info",
+          "variant": "technical"
+        },
+        {
+          "type": "product-tabs",
+          "config": {
+            "tabs": ["specs", "reviews", "warranty"]
+          }
+        },
+        {
+          "type": "related-products",
+          "config": {
+            "limit": 6,
+            "title": "Produits Similaires"
+          }
+        }
+      ]
+    },
+    "categoryPage": {
+      "layout": "fullwidth",
+      "grid": "4cols",
+      "filters": ["price", "brand", "processor", "ram", "storage"]
+    }
+  },
+  "components": {
+    "productCard": "style-minimal",
+    "header": "solid-sticky",
+    "footer": "minimal",
+    "buttons": "squared"
+  },
+  "spacing": {
+    "sectionPadding": "medium",
+    "containerWidth": "1200px",
+    "gutter": "1rem"
+  }
+}

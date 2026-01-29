@@ -1,0 +1,19 @@
+# IMPORTANT: Ne JAMAIS commit secrets.yaml avec vraies valeurs
+base/secrets/secrets.yaml
+
+# Fichiers secrets générés
+*.secret.yaml
+*-secrets.yaml
+
+# Kubeconfig (si copié localement)
+kubeconfig
+kubeconfig.*
+
+# Helm values secrets
+values-secrets.yaml
+values.*.secret.yaml
+
+# Environment files
+.env
+.env.local
+.env.production

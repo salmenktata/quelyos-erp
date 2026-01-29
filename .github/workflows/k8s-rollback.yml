@@ -1,0 +1,117 @@
+name: Rollback Kubernetes Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      service:
+        description: 'Service to rollback (or "all")'
+        required: true
+        type: choice
+        options:
+          - all
+          - backend
+          - vitrine-quelyos
+          - vitrine-client
+          - dashboard-client
+
+jobs:
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      # Same authentication steps as k8s-deploy.yml
+      - name: Set kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Verify cluster connection
+        run: |
+          kubectl cluster-info
+
+      - name: Rollback deployment
+        run: |
+          ENV=${{ inputs.environment }}
+          SERVICE=${{ inputs.service }}
+          NAMESPACE="quelyos"
+
+          if [ "$ENV" = "development" ]; then
+            NAMESPACE="quelyos-dev"
+          elif [ "$ENV" = "staging" ]; then
+            NAMESPACE="quelyos-staging"
+          fi
+
+          if [ "$SERVICE" = "all" ]; then
+            echo "Rolling back all services..."
+            kubectl rollout undo deployment/backend -n $NAMESPACE
+            kubectl rollout undo deployment/vitrine-quelyos -n $NAMESPACE
+            kubectl rollout undo deployment/vitrine-client -n $NAMESPACE
+            kubectl rollout undo deployment/dashboard-client -n $NAMESPACE
+          else
+            echo "Rolling back $SERVICE..."
+            kubectl rollout undo deployment/$SERVICE -n $NAMESPACE
+          fi
+
+      - name: Wait for rollback
+        run: |
+          ENV=${{ inputs.environment }}
+          SERVICE=${{ inputs.service }}
+          NAMESPACE="quelyos"
+
+          if [ "$ENV" = "development" ]; then
+            NAMESPACE="quelyos-dev"
+          elif [ "$ENV" = "staging" ]; then
+            NAMESPACE="quelyos-staging"
+          fi
+
+          if [ "$SERVICE" = "all" ]; then
+            kubectl rollout status deployment/backend -n $NAMESPACE --timeout=5m
+            kubectl rollout status deployment/vitrine-quelyos -n $NAMESPACE --timeout=5m
+            kubectl rollout status deployment/vitrine-client -n $NAMESPACE --timeout=5m
+            kubectl rollout status deployment/dashboard-client -n $NAMESPACE --timeout=5m
+          else
+            kubectl rollout status deployment/$SERVICE -n $NAMESPACE --timeout=5m
+          fi
+
+      - name: Verify rollback
+        run: |
+          ENV=${{ inputs.environment }}
+          NAMESPACE="quelyos"
+
+          if [ "$ENV" = "development" ]; then
+            NAMESPACE="quelyos-dev"
+          elif [ "$ENV" = "staging" ]; then
+            NAMESPACE="quelyos-staging"
+          fi
+
+          echo "=== Deployment Status ==="
+          kubectl get deployments -n $NAMESPACE
+
+          echo "=== Pods Status ==="
+          kubectl get pods -n $NAMESPACE
+
+          echo "=== Rollback History ==="
+          kubectl rollout history deployment/${{ inputs.service }} -n $NAMESPACE || true

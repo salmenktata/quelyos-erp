@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quelyos.tn/schemas/theme.json",
+  "title": "Quelyos Theme Configuration",
+  "description": "Configuration JSON pour un thème Quelyos e-commerce",
+  "type": "object",
+  "required": ["id", "name", "category", "colors", "typography", "layouts", "components", "spacing"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Identifiant unique du thème (kebab-case)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 50,
+      "description": "Nom d'affichage du thème"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["fashion", "tech", "food", "beauty", "sports", "home", "general"],
+      "description": "Catégorie du thème"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Description courte du thème"
+    },
+    "colors": {
+      "type": "object",
+      "required": ["primary", "secondary"],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Couleur primaire (hex)"
+        },
+        "secondary": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Couleur secondaire (hex)"
+        },
+        "accent": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "background": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "text": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "muted": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "required": ["headings", "body"],
+      "properties": {
+        "headings": {
+          "type": "string",
+          "description": "Font family pour les titres"
+        },
+        "body": {
+          "type": "string",
+          "description": "Font family pour le corps de texte"
+        },
+        "mono": {
+          "type": "string",
+          "description": "Font family monospace (optionnel)"
+        }
+      }
+    },
+    "layouts": {
+      "type": "object",
+      "required": ["homepage", "productPage", "categoryPage"],
+      "properties": {
+        "homepage": {
+          "type": "object",
+          "required": ["sections"],
+          "properties": {
+            "sections": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/section"
+              }
+            }
+          }
+        },
+        "productPage": {
+          "type": "object",
+          "required": ["layout", "gallery", "sections"],
+          "properties": {
+            "layout": {
+              "type": "string",
+              "enum": ["sidebar-left", "sidebar-right", "fullwidth", "centered"]
+            },
+            "gallery": {
+              "type": "object",
+              "required": ["type"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["zoom-vertical", "zoom-horizontal", "lightbox", "carousel"]
+                },
+                "thumbnailPosition": {
+                  "type": "string",
+                  "enum": ["left", "right", "bottom"]
+                }
+              }
+            },
+            "sections": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/section"
+              }
+            }
+          }
+        },
+        "categoryPage": {
+          "type": "object",
+          "required": ["layout", "grid", "filters"],
+          "properties": {
+            "layout": {
+              "type": "string",
+              "enum": ["sidebar-left", "sidebar-right", "fullwidth"]
+            },
+            "grid": {
+              "type": "string",
+              "enum": ["2cols", "3cols", "4cols", "5cols"]
+            },
+            "filters": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "type": "object",
+      "required": ["productCard", "header", "footer", "buttons"],
+      "properties": {
+        "productCard": {
+          "type": "string",
+          "enum": ["style-minimal", "style-detailed", "style-overlay", "style-compact"]
+        },
+        "header": {
+          "type": "string",
+          "enum": ["transparent-sticky", "solid-sticky", "classic"]
+        },
+        "footer": {
+          "type": "string",
+          "enum": ["columns-3", "columns-4", "minimal"]
+        },
+        "buttons": {
+          "type": "string",
+          "enum": ["rounded-shadow", "squared", "minimal", "outline"]
+        }
+      }
+    },
+    "spacing": {
+      "type": "object",
+      "required": ["sectionPadding", "containerWidth"],
+      "properties": {
+        "sectionPadding": {
+          "type": "string",
+          "enum": ["small", "medium", "large", "xlarge"]
+        },
+        "containerWidth": {
+          "type": "string",
+          "pattern": "^\\d+(px|rem|em|%)$"
+        },
+        "gutter": {
+          "type": "string",
+          "pattern": "^\\d+(px|rem|em)$"
+        }
+      }
+    },
+    "customCSS": {
+      "type": "string",
+      "description": "CSS personnalisé additionnel"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Version du thème (semver)"
+    }
+  },
+  "$defs": {
+    "section": {
+      "type": "object",
+      "required": ["type", "variant"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "hero-slider",
+            "hero",
+            "featured-products",
+            "newsletter",
+            "testimonials",
+            "faq",
+            "trust-badges",
+            "call-to-action",
+            "blog",
+            "contact"
+          ]
+        },
+        "variant": {
+          "type": "string",
+          "description": "Variante du composant section"
+        },
+        "config": {
+          "type": "object",
+          "description": "Configuration spécifique à la section"
+        },
+        "id": {
+          "type": "string",
+          "description": "ID unique pour la section"
+        },
+        "className": {
+          "type": "string",
+          "description": "Classes CSS additionnelles"
+        }
+      }
+    }
+  }
+}

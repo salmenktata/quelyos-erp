@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         VUE TREE - Liste des thèmes
+    ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <record id="view_quelyos_theme_tree" model="ir.ui.view">
+        <field name="name">quelyos.theme.tree</field>
+        <field name="model">quelyos.theme</field>
+        <field name="arch" type="xml">
+            <tree string="Thèmes">
+                <field name="sequence" widget="handle"/>
+                <field name="thumbnail" widget="image" class="oe_avatar"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category"/>
+                <field name="version"/>
+                <field name="is_public" widget="boolean_toggle"/>
+                <field name="is_premium" widget="boolean_toggle"/>
+                <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="rating" widget="priority"/>
+                <field name="downloads"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         VUE KANBAN - Galerie des thèmes
+    ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <record id="view_quelyos_theme_kanban" model="ir.ui.view">
+        <field name="name">quelyos.theme.kanban</field>
+        <field name="model">quelyos.theme</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category"/>
+                <field name="thumbnail"/>
+                <field name="is_premium"/>
+                <field name="price"/>
+                <field name="rating"/>
+                <field name="downloads"/>
+                <field name="preview_url"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('quelyos.theme', 'thumbnail', record.id.raw_value)" alt="Thumbnail"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <field name="code"/> · <field name="category"/>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <span t-if="record.is_premium.raw_value" class="badge badge-warning">Premium</span>
+                                    <span t-if="record.price.raw_value > 0"><field name="price"/> TND</span>
+                                    <span t-else="">Gratuit</span>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="rating" widget="priority"/>
+                                        (<field name="downloads"/> téléchargements)
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <button t-if="record.preview_url.raw_value" name="action_preview" type="object" class="btn btn-sm btn-link">
+                                            <i class="fa fa-eye"/> Preview
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         VUE FORM - Formulaire de création/édition
+    ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <record id="view_quelyos_theme_form" model="ir.ui.view">
+        <field name="name">quelyos.theme.form</field>
+        <field name="model">quelyos.theme</field>
+        <field name="arch" type="xml">
+            <form string="Thème">
+                <header>
+                    <button name="action_preview" string="Prévisualiser" type="object" class="btn-primary" attrs="{'invisible': [('preview_url', '=', False)]}"/>
+                    <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(quelyos_api.action_quelyos_theme_review)d" type="action" class="oe_stat_button" icon="fa-star">
+                            <field name="review_count" widget="statinfo" string="Avis"/>
+                        </button>
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-download">
+                            <field name="downloads" widget="statinfo" string="Téléchargements"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Premium" bg_color="bg-warning" attrs="{'invisible': [('is_premium', '=', False)]}"/>
+
+                    <field name="thumbnail" widget="image" class="oe_avatar" options="{'preview_image': 'thumbnail'}"/>
+
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Nom du thème"/></h1>
+                        <label for="code" class="oe_edit_only"/>
+                        <h2><field name="code" placeholder="code-unique-kebab-case"/></h2>
+                    </div>
+
+                    <group>
+                        <group string="Informations Générales">
+                            <field name="category"/>
+                            <field name="description"/>
+                            <field name="version"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group string="Visibilité & Monétisation">
+                            <field name="is_public"/>
+                            <field name="tenant_ids" widget="many2many_tags" attrs="{'invisible': [('is_public', '=', True)]}"/>
+                            <field name="is_premium"/>
+                            <field name="price" attrs="{'invisible': [('is_premium', '=', False)]}"/>
+                            <field name="rating" widget="priority"/>
+                        </group>
+                    </group>
+
+                    <group string="Médias">
+                        <field name="preview_url" widget="url"/>
+                        <field name="screenshot_ids" widget="one2many">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <field name="image" widget="image"/>
+                            </tree>
+                        </field>
+                    </group>
+
+                    <notebook>
+                        <page string="Configuration JSON" name="config">
+                            <field name="config_json" widget="ace" options="{'mode': 'json'}"/>
+                        </page>
+                        <page string="Avis" name="reviews">
+                            <field name="review_ids" readonly="1">
+                                <tree>
+                                    <field name="create_date"/>
+                                    <field name="user_id"/>
+                                    <field name="tenant_id"/>
+                                    <field name="rating" widget="priority"/>
+                                    <field name="title"/>
+                                    <field name="comment"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         VUE SEARCH - Filtres et regroupements
+    ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <record id="view_quelyos_theme_search" model="ir.ui.view">
+        <field name="name">quelyos.theme.search</field>
+        <field name="model">quelyos.theme</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher Thèmes">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category"/>
+                <filter string="Publics" name="filter_public" domain="[('is_public', '=', True)]"/>
+                <filter string="Privés" name="filter_private" domain="[('is_public', '=', False)]"/>
+                <separator/>
+                <filter string="Gratuits" name="filter_free" domain="[('is_premium', '=', False)]"/>
+                <filter string="Premium" name="filter_premium" domain="[('is_premium', '=', True)]"/>
+                <separator/>
+                <filter string="Actifs" name="filter_active" domain="[('active', '=', True)]"/>
+                <filter string="Archivés" name="filter_archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Catégorie" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="Premium/Gratuit" name="group_premium" context="{'group_by': 'is_premium'}"/>
+                    <filter string="Public/Privé" name="group_public" context="{'group_by': 'is_public'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         ACTIONS - Menu et actions
+    ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <record id="action_quelyos_theme" model="ir.actions.act_window">
+        <field name="name">Thèmes</field>
+        <field name="res_model">quelyos.theme</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre premier thème
+            </p>
+            <p>
+                Les thèmes permettent de personnaliser complètement l'apparence de la boutique e-commerce.
+                Créez des configurations JSON pour définir layouts, sections, couleurs et typographie.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_quelyos_theme_review" model="ir.actions.act_window">
+        <field name="name">Avis Thèmes</field>
+        <field name="res_model">quelyos.theme.review</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         MENU - Ajouter dans le menu principal
+    ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <menuitem id="menu_quelyos_themes"
+              name="Theme Engine"
+              parent="quelyos_api.menu_quelyos_root"
+              sequence="25"/>
+
+    <menuitem id="menu_quelyos_theme_list"
+              name="Thèmes"
+              parent="menu_quelyos_themes"
+              action="action_quelyos_theme"
+              sequence="10"/>
+
+    <menuitem id="menu_quelyos_theme_reviews"
+              name="Avis"
+              parent="menu_quelyos_themes"
+              action="action_quelyos_theme_review"
+              sequence="20"/>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         VUES TENANT - Ajouter champ active_theme_id dans le formulaire tenant
+    ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <record id="view_quelyos_tenant_form_theme" model="ir.ui.view">
+        <field name="name">quelyos.tenant.form.theme</field>
+        <field name="model">quelyos.tenant</field>
+        <field name="inherit_id" ref="quelyos_api.view_quelyos_tenant_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='branding']" position="after">
+                <group string="Theme Engine" name="theme_engine">
+                    <field name="active_theme_id" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="purchased_theme_ids" widget="many2many_tags"/>
+                    <field name="theme_overrides" widget="ace" options="{'mode': 'json'}" placeholder='{"colors": {"primary": "#custom"}}'/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         CHAMP currency_id virtuel (pour widget monetary)
+    ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <record id="view_quelyos_theme_add_currency" model="ir.ui.view">
+        <field name="name">quelyos.theme.currency</field>
+        <field name="model">quelyos.theme</field>
+        <field name="inherit_id" ref="view_quelyos_theme_tree"/>
+        <field name="arch" type="xml">
+            <tree position="inside">
+                <!-- Hack: on ajoute un champ related pour avoir currency_id -->
+            </tree>
+        </field>
+    </record>
+
+</odoo>

@@ -244,6 +244,29 @@ class QuelyosTenant(models.Model):
     )
 
     # ═══════════════════════════════════════════════════════════════════════════
+    # THEME ENGINE (Nouveau système de thèmes complets)
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    active_theme_id = fields.Many2one(
+        comodel_name='quelyos.theme',
+        string='Thème Actif',
+        ondelete='set null',
+        help="Thème actuellement utilisé par ce tenant (Theme Engine)"
+    )
+    purchased_theme_ids = fields.Many2many(
+        comodel_name='quelyos.theme',
+        relation='quelyos_tenant_theme_purchased_rel',
+        column1='tenant_id',
+        column2='theme_id',
+        string='Thèmes Achetés',
+        help="Thèmes premium achetés par ce tenant"
+    )
+    theme_overrides = fields.Text(
+        string='Overrides Thème (JSON)',
+        help="JSON partiel pour personnaliser des sections du thème actif"
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════════
     # CONTACT
     # ═══════════════════════════════════════════════════════════════════════════
 
@@ -1370,4 +1393,140 @@ class QuelyosTenant(models.Model):
             'store_url': f"https://{tenant.domain}",
             'admin_url': f"https://{tenant.backoffice_domain}",
             'status': tenant.status,
+        }
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # THEME ENGINE - Gestion du thème actif
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    def get_active_theme_config(self):
+        """
+        Retourne la configuration du thème actif pour ce tenant.
+        Applique les overrides si présents.
+
+        Returns:
+            dict: Configuration complète du thème
+        """
+        self.ensure_one()
+
+        # Si pas de thème actif, retourner thème par défaut
+        if not self.active_theme_id:
+            default_theme = self.env['quelyos.theme'].sudo().search([
+                ('code', '=', 'default'),
+                ('is_public', '=', True),
+                ('active', '=', True)
+            ], limit=1)
+
+            if not default_theme:
+                # Si aucun thème default, prendre le premier thème public
+                default_theme = self.env['quelyos.theme'].sudo().search([
+                    ('is_public', '=', True),
+                    ('active', '=', True)
+                ], limit=1, order='sequence')
+
+            if not default_theme:
+                return {
+                    'success': False,
+                    'error': 'No theme available'
+                }
+
+            # Activer ce thème par défaut pour le tenant
+            self.sudo().write({'active_theme_id': default_theme.id})
+
+        # Récupérer la config du thème
+        theme_data = self.active_theme_id.sudo().get_theme_config()
+
+        if not theme_data.get('success'):
+            return theme_data
+
+        # Appliquer les overrides si présents
+        if self.theme_overrides:
+            try:
+                overrides = json.loads(self.theme_overrides)
+                config = theme_data['theme']['config']
+
+                # Deep merge des overrides
+                merged_config = self._deep_merge_dict(config, overrides)
+                theme_data['theme']['config'] = merged_config
+
+            except json.JSONDecodeError:
+                _logger.warning(
+                    "Invalid theme_overrides JSON for tenant %s",
+                    self.code
+                )
+
+        return theme_data
+
+    def _deep_merge_dict(self, base, override):
+        """
+        Merge récursif de deux dictionnaires.
+        Les valeurs d'override écrasent celles de base.
+
+        Args:
+            base (dict): Dictionnaire de base
+            override (dict): Dictionnaire d'override
+
+        Returns:
+            dict: Dictionnaire mergé
+        """
+        result = base.copy()
+
+        for key, value in override.items():
+            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = self._deep_merge_dict(result[key], value)
+            else:
+                result[key] = value
+
+        return result
+
+    def action_set_theme(self, theme_code):
+        """
+        Active un thème pour ce tenant.
+        Vérifie que le thème est accessible (public ou acheté si premium).
+
+        Args:
+            theme_code (str): Code du thème à activer
+
+        Returns:
+            dict: Success status
+        """
+        self.ensure_one()
+
+        theme = self.env['quelyos.theme'].sudo().search([
+            ('code', '=', theme_code),
+            ('active', '=', True)
+        ], limit=1)
+
+        if not theme:
+            return {
+                'success': False,
+                'error': 'Theme not found'
+            }
+
+        # Vérifier accessibilité
+        if not theme.is_public and self not in theme.tenant_ids:
+            return {
+                'success': False,
+                'error': 'Theme not accessible'
+            }
+
+        # Vérifier si premium et pas acheté
+        if theme.is_premium and theme.price > 0:
+            if theme not in self.purchased_theme_ids:
+                return {
+                    'success': False,
+                    'error': 'Theme not purchased',
+                    'price': theme.price
+                }
+
+        # Activer le thème
+        self.sudo().write({'active_theme_id': theme.id})
+
+        # Incrémenter compteur downloads
+        theme.sudo().action_increment_downloads()
+
+        return {
+            'success': True,
+            'theme_code': theme.code,
+            'theme_name': theme.name
         }

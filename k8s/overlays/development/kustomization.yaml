@@ -1,0 +1,63 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: quelyos-dev
+
+bases:
+  - ../../base
+
+namePrefix: dev-
+
+commonLabels:
+  environment: development
+
+# Patchs pour développement
+patchesStrategicMerge:
+  - replica-patch.yaml
+  - resource-patch.yaml
+
+# ConfigMap overlay
+configMapGenerator:
+  - name: quelyos-config
+    behavior: merge
+    literals:
+      - NODE_ENV=development
+
+# Désactiver HPA en dev
+patchesJson6902:
+  - target:
+      group: autoscaling
+      version: v2
+      kind: HorizontalPodAutoscaler
+      name: vitrine-quelyos-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 2
+  - target:
+      group: autoscaling
+      version: v2
+      kind: HorizontalPodAutoscaler
+      name: vitrine-client-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 2
+  - target:
+      group: autoscaling
+      version: v2
+      kind: HorizontalPodAutoscaler
+      name: dashboard-client-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 2
