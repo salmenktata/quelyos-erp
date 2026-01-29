@@ -16,6 +16,7 @@ import { Breadcrumbs, Button, PageNotice } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { Save, Eye, Download, Upload, Palette, Type, Maximize } from 'lucide-react';
 import type { ThemeConfig, ThemeCategory, SectionConfig } from '@/types/theme';
+import { PreviewFrame } from '@/components/theme-builder/PreviewFrame';
 
 // Catégories disponibles
 const THEME_CATEGORIES: { value: ThemeCategory; label: string }[] = [
@@ -497,29 +498,22 @@ export default function ThemeBuilderPage() {
 
         {/* Colonne droite : Preview */}
         {showPreview && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Preview</h3>
-            <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-900">
-              <div className="aspect-video flex items-center justify-center text-gray-500 dark:text-gray-400">
-                <div className="text-center">
-                  <Eye className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Preview en temps réel</p>
-                  <p className="text-xs mt-1">(À implémenter avec iframe)</p>
-                </div>
-              </div>
-            </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col" style={{ height: '800px' }}>
+            <PreviewFrame theme={theme} className="flex-1" />
 
             {/* Aperçu couleurs */}
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              {Object.entries(theme.colors).slice(0, 6).map(([key, value]) => (
-                <div key={key} className="text-center">
-                  <div
-                    className="h-12 rounded border border-gray-300 dark:border-gray-600 mb-1"
-                    style={{ backgroundColor: value }}
-                  />
-                  <p className="text-xs text-gray-600 dark:text-gray-400 capitalize">{key}</p>
-                </div>
-              ))}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="grid grid-cols-3 gap-2">
+                {Object.entries(theme.colors).slice(0, 6).map(([key, value]) => (
+                  <div key={key} className="text-center">
+                    <div
+                      className="h-12 rounded border border-gray-300 dark:border-gray-600 mb-1"
+                      style={{ backgroundColor: value }}
+                    />
+                    <p className="text-xs text-gray-600 dark:text-gray-400 capitalize">{key}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
