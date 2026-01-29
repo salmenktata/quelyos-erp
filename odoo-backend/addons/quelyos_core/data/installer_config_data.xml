@@ -22,6 +22,19 @@
             <value>True</value>
         </function>
 
+        <!-- Désactiver le tour automatique du configurateur website d'Odoo -->
+        <!-- Quelyos utilise ses propres frontends (vitrine-client, dashboard-client) -->
+        <function model="ir.config_parameter" name="set_param">
+            <value>website_generator.done</value>
+            <value>True</value>
+        </function>
+
+        <!-- Désactiver tous les tours web automatiques -->
+        <function model="ir.config_parameter" name="set_param">
+            <value>web_tour.disable_tours</value>
+            <value>True</value>
+        </function>
+
         <!--
             Pour désactiver un module optionnel, modifier la valeur à False :
 

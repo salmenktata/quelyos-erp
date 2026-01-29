@@ -74,6 +74,35 @@ def _fix_menu_visibility(env):
         _logger.warning(f"Impossible d'appliquer les corrections UI : {str(e)}")
 
 
+def _disable_website_tours(env):
+    """
+    Désactivation des tours website d'Odoo.
+
+    Quelyos utilise ses propres frontends (vitrine-client, dashboard-client)
+    et n'a pas besoin du configurateur website intégré d'Odoo.
+
+    Cette fonction garantit que les paramètres système sont définis même si
+    le chargement XML échoue pour une raison quelconque (défense en profondeur).
+    """
+    try:
+        IrConfigParam = env['ir.config_parameter'].sudo()
+
+        # Marquer le website_generator comme terminé
+        IrConfigParam.set_param('website_generator.done', 'True')
+        _logger.info("✓ Paramètre 'website_generator.done' défini à True")
+
+        # Désactiver tous les tours automatiques
+        IrConfigParam.set_param('web_tour.disable_tours', 'True')
+        _logger.info("✓ Paramètre 'web_tour.disable_tours' défini à True")
+
+        env.cr.commit()
+        _logger.info("✓ Tours website désactivés avec succès")
+
+    except Exception as e:
+        # Ne pas bloquer l'installation si la désactivation échoue
+        _logger.warning(f"Impossible de désactiver les tours website : {str(e)}")
+
+
 def post_init_hook(env):
     """
     Hook exécuté après l'installation de quelyos_core.
@@ -196,5 +225,10 @@ def post_init_hook(env):
     _logger.info("-"*80)
     _logger.info("Application des corrections UI : menus Settings et Apps...")
     _fix_menu_visibility(env)
+
+    # 6. Désactiver les tours website automatiques
+    _logger.info("-"*80)
+    _logger.info("Désactivation des tours website d'Odoo...")
+    _disable_website_tours(env)
 
     _logger.info("="*80)
