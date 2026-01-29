@@ -5,6 +5,27 @@
 import DOMPurify from 'dompurify';
 
 /**
+ * Server-side HTML sanitizer (basic XSS protection)
+ * Removes script tags, event handlers, and dangerous protocols
+ */
+function sanitizeHtmlServer(html: string): string {
+  return html
+    // Remove script tags and their content
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    // Remove on* event handlers
+    .replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/\s+on\w+\s*=\s*[^\s>]+/gi, '')
+    // Remove javascript: and data: protocols in href/src
+    .replace(/href\s*=\s*["']?\s*javascript:[^"'\s>]*/gi, 'href="#"')
+    .replace(/src\s*=\s*["']?\s*javascript:[^"'\s>]*/gi, 'src=""')
+    .replace(/href\s*=\s*["']?\s*data:[^"'\s>]*/gi, 'href="#"')
+    // Remove style expressions (IE)
+    .replace(/style\s*=\s*["'][^"']*expression\s*\([^)]*\)[^"']*["']/gi, '')
+    // Remove iframe with srcdoc (XSS vector)
+    .replace(/srcdoc\s*=\s*["'][^"']*["']/gi, '');
+}
+
+/**
  * Sanitize HTML content to prevent XSS attacks
  * @param html - Raw HTML string to sanitize
  * @returns Sanitized HTML string safe for dangerouslySetInnerHTML
@@ -12,9 +33,9 @@ import DOMPurify from 'dompurify';
 export function sanitizeHtml(html: string | null | undefined): string {
   if (!html) return '';
 
-  // Server-side: return as-is (DOMPurify requires DOM)
+  // Server-side: use basic sanitizer (removes dangerous patterns)
   if (typeof window === 'undefined') {
-    return html;
+    return sanitizeHtmlServer(html);
   }
 
   return DOMPurify.sanitize(html, {
@@ -54,7 +75,10 @@ export function sanitizeSvg(svg: string | null | undefined): string {
   if (!svg) return '';
 
   if (typeof window === 'undefined') {
-    return svg;
+    // Server-side: remove script tags and event handlers from SVG
+    return svg
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '');
   }
 
   return DOMPurify.sanitize(svg, {
@@ -72,7 +96,9 @@ export function sanitizeHighlight(html: string | null | undefined): string {
   if (!html) return '';
 
   if (typeof window === 'undefined') {
-    return html;
+    // Server-side: only allow mark/b/strong/em/span, strip everything else
+    return html
+      .replace(/<(?!\/?(?:mark|b|strong|em|span)\b)[^>]+>/gi, '');
   }
 
   return DOMPurify.sanitize(html, {

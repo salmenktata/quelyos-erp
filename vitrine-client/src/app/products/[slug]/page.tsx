@@ -24,10 +24,13 @@ import { useProductVariants } from '@/hooks/useProductVariants';
 import { VariantSelector } from '@/components/product/VariantSelector';
 import { ViewersCount } from '@/components/product/ViewersCount';
 import { CountdownTimer } from '@/components/product/CountdownTimer';
-import { BundleSuggestions } from '@/components/product/BundleSuggestions';
+import { FrequentlyBoughtTogether } from '@/components/product/FrequentlyBoughtTogether';
 import { logger } from '@/lib/logger';
 import { sanitizeHtml } from '@/lib/utils/sanitize';
 import { ProductReviews } from '@/components/product/ProductReviews';
+import { StockAlert } from '@/components/product/StockAlert';
+import { VolumePricing } from '@/components/product/VolumePricing';
+import { EcoScore } from '@/components/product/EcoScore';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -341,9 +344,13 @@ export default function ProductDetailPage() {
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center text-red-700">
-                  <div className="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
-                  <span className="font-semibold text-lg">Rupture de stock</span>
+                <div className="space-y-4">
+                  <div className="flex items-center text-red-700">
+                    <div className="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+                    <span className="font-semibold text-lg">Rupture de stock</span>
+                  </div>
+                  {/* Alerte de réapprovisionnement */}
+                  <StockAlert productId={product.id} productName={product.name} />
                 </div>
               )}
             </div>
@@ -360,6 +367,23 @@ export default function ProductDetailPage() {
                 />
               </div>
             )}
+
+            {/* Prix dégressifs par volume */}
+            <VolumePricing
+              productId={product.id}
+              basePrice={displayPrice}
+              currency={product.currency?.symbol}
+              onQuantitySelect={(qty) => setQuantity(qty)}
+            />
+
+            {/* Eco-score */}
+            <EcoScore
+              details={{
+                origin: (product as { origin?: string }).origin || 'Non specifie',
+                packaging: (product as { packaging?: string }).packaging || 'Standard',
+                recyclable: true,
+              }}
+            />
 
             {/* Quantité */}
             <div className="mb-6">
@@ -748,8 +772,14 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Bundle Suggestions - Achetés ensemble */}
-        <BundleSuggestions currentProduct={product} className="mt-12" />
+        {/* Fréquemment achetés ensemble */}
+        <FrequentlyBoughtTogether
+          productId={product.id}
+          productName={product.name}
+          productPrice={displayPrice}
+          productImage={mainImage}
+          currency={product.currency?.symbol ?? 'TND'}
+        />
 
         {/* Produits similaires */}
         {relatedProducts.length > 0 && (

@@ -9,6 +9,7 @@ import { useStages } from '@/hooks/useStages'
 import { useUpdateLeadStage } from '@/hooks/useUpdateLeadStage'
 import { crmNotices } from '@/lib/notices/crm-notices'
 import { toast } from 'sonner'
+import { logger } from '@/lib/logger'
 
 /**
  * Page Pipeline CRM
@@ -29,7 +30,7 @@ export default function Pipeline() {
       toast.success('Opportunité déplacée avec succès')
     } catch (error) {
       toast.error('Erreur lors du déplacement de l\'opportunité')
-      console.error(error)
+      logger.error('Pipeline stage change error:', error)
     }
   }
 

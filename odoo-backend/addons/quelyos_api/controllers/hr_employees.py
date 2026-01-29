@@ -69,7 +69,7 @@ class HREmployeeController(http.Controller):
                 'offset': offset,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/employees/<int:employee_id>', type='jsonrpc', auth='user', methods=['POST'])
     def get_employee(self, employee_id, **kwargs):
@@ -84,7 +84,7 @@ class HREmployeeController(http.Controller):
                 'employee': employee.get_employee_data(detailed=True),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/employees/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_employee(self, **kwargs):
@@ -134,7 +134,7 @@ class HREmployeeController(http.Controller):
                 'employee': employee.get_employee_data(detailed=True),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/employees/<int:employee_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_employee(self, employee_id, **kwargs):
@@ -176,7 +176,7 @@ class HREmployeeController(http.Controller):
                 'employee': employee.get_employee_data(detailed=True),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/employees/<int:employee_id>/archive', type='jsonrpc', auth='user', methods=['POST'])
     def archive_employee(self, employee_id, **kwargs):
@@ -195,7 +195,7 @@ class HREmployeeController(http.Controller):
 
             return {'success': True, 'message': 'Employé archivé'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/employees/<int:employee_id>/subordinates', type='jsonrpc', auth='user', methods=['POST'])
     def get_subordinates(self, employee_id, **kwargs):
@@ -210,7 +210,7 @@ class HREmployeeController(http.Controller):
                 'subordinates': employee.get_subordinates_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/employees/<int:employee_id>/leaves', type='jsonrpc', auth='user', methods=['POST'])
     def get_employee_leaves(self, employee_id, **kwargs):
@@ -234,7 +234,7 @@ class HREmployeeController(http.Controller):
                 'leaves': [l.get_leave_data() for l in leaves],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/employees/<int:employee_id>/attendance', type='jsonrpc', auth='user', methods=['POST'])
     def get_employee_attendance(self, employee_id, **kwargs):
@@ -253,4 +253,4 @@ class HREmployeeController(http.Controller):
                 'attendance_state': employee.attendance_state,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}

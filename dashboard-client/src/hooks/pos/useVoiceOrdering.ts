@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { logger } from '@/lib/logger'
 
 // Types
 export interface VoiceCommand {
@@ -158,7 +159,7 @@ export function useVoiceOrdering(options: UseVoiceOrderingOptions = {}): UseVoic
     }
 
     recognition.onerror = (event) => {
-      console.error('[Voice] Error:', event.error)
+      logger.error('[Voice] Error:', event.error)
       setIsListening(false)
 
       const errorMessages: Record<string, string> = {
@@ -236,7 +237,7 @@ export function useVoiceOrdering(options: UseVoiceOrderingOptions = {}): UseVoic
       try {
         recognitionRef.current.start()
       } catch (e) {
-        console.error('[Voice] Start error:', e)
+        logger.error('[Voice] Start error:', e)
       }
     }
   }, [isListening])

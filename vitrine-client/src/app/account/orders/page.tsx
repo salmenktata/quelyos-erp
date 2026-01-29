@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
+import { useCartStore } from '@/store/cartStore';
+import { useToast } from '@/store/toastStore';
 import { LoadingPage } from '@/components/common/Loading';
 import { Button } from '@/components/common/Button';
 import { formatPrice } from '@/lib/utils/formatting';
@@ -26,8 +28,11 @@ const orderStates = {
 export default function AccountOrdersPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
+  const { fetchCart } = useCartStore();
+  const toast = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [reorderingId, setReorderingId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -53,6 +58,40 @@ export default function AccountOrdersPage() {
       fetchOrders();
     }
   }, [isAuthenticated]);
+
+  const handleReorder = async (orderId: number) => {
+    setReorderingId(orderId);
+    try {
+      const result = await backendClient.reorderOrder(orderId);
+
+      if (result.success) {
+        // Rafraîchir le panier
+        await fetchCart();
+
+        // Afficher le message de succès
+        const addedCount = result.added_products?.length || 0;
+        const unavailableCount = result.unavailable_products?.length || 0;
+
+        if (unavailableCount > 0) {
+          toast.warning(
+            `${addedCount} produit(s) ajouté(s). ${unavailableCount} produit(s) non disponible(s).`
+          );
+        } else {
+          toast.success(`${addedCount} produit(s) ajouté(s) au panier !`);
+        }
+
+        // Optionnel : rediriger vers le panier
+        router.push('/cart');
+      } else {
+        toast.error(result.error || 'Erreur lors de la recommande');
+      }
+    } catch (error) {
+      logger.error('Erreur reorder:', error);
+      toast.error('Une erreur est survenue');
+    } finally {
+      setReorderingId(null);
+    }
+  };
 
   if (!isAuthenticated) {
     return <LoadingPage />;
@@ -166,6 +205,29 @@ export default function AccountOrdersPage() {
 
                       {/* Actions */}
                       <div className="flex gap-3">
+                        <Button
+                          variant="primary"
+                          className="rounded-full"
+                          onClick={() => handleReorder(order.id)}
+                          disabled={reorderingId === order.id}
+                        >
+                          {reorderingId === order.id ? (
+                            <span className="flex items-center gap-2">
+                              <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Ajout...
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-2">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              Recommander
+                            </span>
+                          )}
+                        </Button>
                         <Link href={`/account/orders/${order.id}`}>
                           <Button variant="outline" className="rounded-full">
                             Voir détails

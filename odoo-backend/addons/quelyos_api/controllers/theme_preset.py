@@ -167,7 +167,7 @@ class ThemePresetController(BaseController):
             _logger.error(f"Error creating theme preset: {e}")
             return request.make_json_response({
                 'success': False,
-                'error': str(e) if request.env.user.has_group('base.group_system') else 'Erreur lors de la création',
+                'error': 'Erreur lors de la création',
                 'error_code': 'CREATE_ERROR'
             }, status=500)
 

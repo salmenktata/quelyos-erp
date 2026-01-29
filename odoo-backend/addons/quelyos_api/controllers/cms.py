@@ -1777,3 +1777,225 @@ class QuelyCMS(BaseController):
         except Exception as e:
             _logger.error(f"Delete static page error: {e}")
             return {'success': False, 'error': 'Une erreur est survenue'}
+
+    # ==================== BLOG PUBLIC ====================
+
+    @http.route('/api/ecommerce/blog/posts', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_public_blog_posts(self, **kwargs):
+        """Liste des articles blog publiés (public)"""
+        try:
+            company = self._get_company_from_tenant()
+            domain = [
+                ('company_id', '=', company.id),
+                ('state', '=', 'published'),
+            ]
+
+            # Filtres optionnels
+            if kwargs.get('category_slug'):
+                category = request.env['quelyos.blog.category'].sudo().search([
+                    ('slug', '=', kwargs['category_slug']),
+                    ('company_id', '=', company.id),
+                ], limit=1)
+                if category:
+                    domain.append(('category_id', '=', category.id))
+
+            if kwargs.get('tag_slug'):
+                tag = request.env['quelyos.blog.tag'].sudo().search([
+                    ('slug', '=', kwargs['tag_slug']),
+                    ('company_id', '=', company.id),
+                ], limit=1)
+                if tag:
+                    domain.append(('tag_ids', 'in', [tag.id]))
+
+            if kwargs.get('featured_only'):
+                domain.append(('is_featured', '=', True))
+
+            # Pagination
+            limit = min(kwargs.get('limit', 12), 50)
+            offset = kwargs.get('offset', 0)
+
+            posts = request.env['quelyos.blog.post'].sudo().search(
+                domain, limit=limit, offset=offset, order='published_date desc'
+            )
+            total = request.env['quelyos.blog.post'].sudo().search_count(domain)
+
+            return {
+                'success': True,
+                'posts': [p.to_dict(include_content=False) for p in posts],
+                'total': total,
+                'hasMore': offset + len(posts) < total,
+            }
+        except Exception as e:
+            _logger.error(f"Get public blog posts error: {e}")
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    @http.route('/api/ecommerce/blog/posts/<string:slug>', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_public_blog_post(self, slug, **kwargs):
+        """Détail d'un article par slug (public)"""
+        try:
+            company = self._get_company_from_tenant()
+            post = request.env['quelyos.blog.post'].sudo().search([
+                ('slug', '=', slug),
+                ('company_id', '=', company.id),
+                ('state', '=', 'published'),
+            ], limit=1)
+
+            if not post:
+                return {'success': False, 'error': 'Article non trouvé'}
+
+            # Incrémenter compteur de vues
+            post.sudo().write({'views_count': post.views_count + 1})
+
+            # Articles liés (même catégorie)
+            related = request.env['quelyos.blog.post'].sudo().search([
+                ('category_id', '=', post.category_id.id),
+                ('state', '=', 'published'),
+                ('id', '!=', post.id),
+            ], limit=3)
+
+            return {
+                'success': True,
+                'post': post.to_dict(include_content=True),
+                'relatedPosts': [r.to_dict(include_content=False) for r in related],
+            }
+        except Exception as e:
+            _logger.error(f"Get public blog post error: {e}")
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    @http.route('/api/ecommerce/blog/categories', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_public_blog_categories(self, **kwargs):
+        """Liste des catégories blog (public)"""
+        try:
+            company = self._get_company_from_tenant()
+            categories = request.env['quelyos.blog.category'].sudo().search([
+                ('company_id', '=', company.id),
+            ], order='sequence, name')
+
+            return {
+                'success': True,
+                'categories': [c.to_dict() for c in categories],
+            }
+        except Exception as e:
+            _logger.error(f"Get public blog categories error: {e}")
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    # ==================== TESTIMONIALS PUBLIC ====================
+
+    @http.route('/api/ecommerce/testimonials', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_public_testimonials(self, **kwargs):
+        """Liste des témoignages publiés (public)"""
+        try:
+            company = self._get_company_from_tenant()
+            domain = [
+                ('company_id', '=', company.id),
+                ('is_published', '=', True),
+            ]
+
+            if kwargs.get('featured_only'):
+                domain.append(('is_featured', '=', True))
+
+            limit = min(kwargs.get('limit', 10), 30)
+            testimonials = request.env['quelyos.testimonial'].sudo().search(
+                domain, limit=limit, order='is_featured desc, rating desc'
+            )
+
+            return {
+                'success': True,
+                'testimonials': [t.to_dict() for t in testimonials],
+            }
+        except Exception as e:
+            _logger.error(f"Get public testimonials error: {e}")
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    # ==================== COLLECTIONS PUBLIC ====================
+
+    @http.route('/api/ecommerce/collections', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_public_collections(self, **kwargs):
+        """Liste des collections publiées (public)"""
+        try:
+            company = self._get_company_from_tenant()
+            collections = request.env['quelyos.product.collection'].sudo().search([
+                ('company_id', '=', company.id),
+                ('is_published', '=', True),
+            ], order='sequence, name')
+
+            return {
+                'success': True,
+                'collections': [c.to_dict() for c in collections],
+            }
+        except Exception as e:
+            _logger.error(f"Get public collections error: {e}")
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    @http.route('/api/ecommerce/collections/<string:slug>', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_public_collection(self, slug, **kwargs):
+        """Détail d'une collection par slug (public)"""
+        try:
+            company = self._get_company_from_tenant()
+            collection = request.env['quelyos.product.collection'].sudo().search([
+                ('slug', '=', slug),
+                ('company_id', '=', company.id),
+                ('is_published', '=', True),
+            ], limit=1)
+
+            if not collection:
+                return {'success': False, 'error': 'Collection non trouvée'}
+
+            # Récupérer les produits de la collection
+            products = collection.product_ids.filtered(lambda p: p.is_published)
+
+            return {
+                'success': True,
+                'collection': collection.to_dict(),
+                'products': [self._format_product_for_list(p) for p in products[:50]],
+            }
+        except Exception as e:
+            _logger.error(f"Get public collection error: {e}")
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    # ==================== FLASH SALES PUBLIC ====================
+
+    @http.route('/api/ecommerce/flash-sales', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_public_flash_sales(self, **kwargs):
+        """Liste des ventes flash actives (public)"""
+        try:
+            company = self._get_company_from_tenant()
+            now = fields.Datetime.now()
+
+            flash_sales = request.env['quelyos.flash.sale'].sudo().search([
+                ('company_id', '=', company.id),
+                ('is_active', '=', True),
+                ('start_date', '<=', now),
+                ('end_date', '>=', now),
+            ], order='end_date asc')
+
+            return {
+                'success': True,
+                'flashSales': [self._format_flash_sale(fs) for fs in flash_sales],
+            }
+        except Exception as e:
+            _logger.error(f"Get public flash sales error: {e}")
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    def _format_flash_sale(self, fs):
+        """Formater une vente flash pour l'API publique"""
+        return {
+            'id': fs.id,
+            'name': fs.name,
+            'description': fs.description,
+            'bannerUrl': fs.get_banner_url() if hasattr(fs, 'get_banner_url') else None,
+            'startDate': fs.start_date.isoformat() if fs.start_date else None,
+            'endDate': fs.end_date.isoformat() if fs.end_date else None,
+            'products': [self._format_product_for_list(p) for p in fs.product_ids[:20]],
+        }
+
+    def _format_product_for_list(self, product):
+        """Formater un produit pour liste"""
+        return {
+            'id': product.id,
+            'name': product.name,
+            'slug': product.slug or f'product-{product.id}',
+            'price': product.list_price,
+            'comparePrice': product.compare_at_price if hasattr(product, 'compare_at_price') else None,
+            'imageUrl': product.get_image_url() if hasattr(product, 'get_image_url') else None,
+        }

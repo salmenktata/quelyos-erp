@@ -14,6 +14,9 @@ import { BenefitsSection, type Benefit } from '@/components/home/BenefitsSection
 import { ProductGrid } from '@/components/product/ProductGrid';
 import { ProductCardHome } from '@/components/home/ProductCardHome';
 import { NewsletterForm } from '@/components/home/NewsletterForm';
+import { TestimonialsSection } from '@/components/home/TestimonialsSection';
+import { FlashSalesSection } from '@/components/home/FlashSalesSection';
+import { ContinueShoppingSection } from '@/components/home/ContinueShoppingSection';
 import { logger } from '@/lib/logger';
 
 // Server-side data fetching
@@ -96,6 +99,9 @@ export default async function Home() {
       {/* HERO SLIDER */}
       <HeroSlider slides={heroSlides} />
 
+      {/* FLASH SALES - Affiche uniquement si vente flash active */}
+      <FlashSalesSection />
+
       {/* CATEGORIES */}
       <CategoriesSection categories={categories} isLoading={false} />
 
@@ -130,6 +136,12 @@ export default async function Home() {
 
       {/* BENEFITS SECTION - Dynamic from API */}
       <BenefitsSection benefits={benefits} />
+
+      {/* CONTINUE SHOPPING - Produits récemment consultés */}
+      <ContinueShoppingSection />
+
+      {/* TESTIMONIALS - Affiche uniquement si témoignages disponibles */}
+      <TestimonialsSection />
 
       {/* NEWSLETTER */}
       <section className="container mx-auto px-4 max-w-7xl py-12">

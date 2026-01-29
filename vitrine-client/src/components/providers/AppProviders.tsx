@@ -12,14 +12,34 @@
  * et doivent être dans un composant client.
  */
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { TenantProvider, useTenant } from '@/lib/tenant';
 import { SiteConfigProvider, useSiteConfig } from '@/lib/config/SiteConfigProvider';
 import { ThemeProvider } from '@/lib/theme';
 import { FaviconApplier } from './ThemeApplier';
+import { useAuthStore } from '@/store/authStore';
+import { usePurchasedStore } from '@/store/purchasedStore';
 
 interface AppProvidersProps {
   children: ReactNode;
+}
+
+/**
+ * Charge les produits déjà achetés quand l'utilisateur est connecté.
+ */
+function PurchasedProductsLoader() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { fetchPurchasedProducts, clear } = usePurchasedStore();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchPurchasedProducts();
+    } else {
+      clear();
+    }
+  }, [isAuthenticated, fetchPurchasedProducts, clear]);
+
+  return null;
 }
 
 /**
@@ -51,6 +71,7 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <TenantProvider>
       <FaviconApplier />
+      <PurchasedProductsLoader />
       <SiteConfigProvider>
         <ThemeWrapper>{children}</ThemeWrapper>
       </SiteConfigProvider>

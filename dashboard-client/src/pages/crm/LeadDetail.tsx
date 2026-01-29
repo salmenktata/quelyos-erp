@@ -5,6 +5,7 @@ import { Layout } from '@/components/Layout'
 import { useLead } from '@/hooks/useLead'
 import { useUpdateLead } from '@/hooks/useUpdateLead'
 import { toast } from 'sonner'
+import { logger } from '@/lib/logger'
 
 export default function LeadDetail() {
   const { id } = useParams<{ id: string }>()
@@ -65,7 +66,7 @@ export default function LeadDetail() {
       setIsEditing(false)
     } catch (error) {
       toast.error('Erreur lors de la mise à jour')
-      console.error(error)
+      logger.error('Lead update error:', error)
     }
   }
 

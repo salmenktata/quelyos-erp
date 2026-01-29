@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/common';
 import { GovernorateSelect } from './GovernorateSelect';
+import { AddressSelector } from './AddressSelector';
+import { backendClient } from '@/lib/backend/client';
+import { useAuthStore } from '@/store/authStore';
 import {
   GOVERNORATES,
   SHIPPING_ZONES,
@@ -42,6 +45,11 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
   freeThreshold = 150,
   zonePrices,
 }) => {
+  const { isAuthenticated } = useAuthStore();
+  const [addressMode, setAddressMode] = useState<'saved' | 'new'>('new');
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [selectedSavedAddress, setSelectedSavedAddress] = useState<any>(null);
+
   const [data, setData] = useState<ShippingFormData>({
     firstName: initialData.firstName || '',
     lastName: initialData.lastName || '',
@@ -56,6 +64,38 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof ShippingFormData, string>>>({});
+
+  // Charger les adresses sauvegardees
+  useEffect(() => {
+    if (isAuthenticated) {
+      backendClient.getAddresses().then((response) => {
+        if (response.success && response.addresses && response.addresses.length > 0) {
+          setSavedAddresses(response.addresses);
+          setAddressMode('saved');
+          // Pre-selectionner l'adresse par defaut
+          const defaultAddr = response.addresses.find((a: any) => a.is_default);
+          if (defaultAddr) {
+            handleSelectSavedAddress(defaultAddr);
+          }
+        }
+      });
+    }
+  }, [isAuthenticated]);
+
+  const handleSelectSavedAddress = (addr: any) => {
+    setSelectedSavedAddress(addr);
+    // Remplir le formulaire avec l'adresse selectionnee
+    const nameParts = (addr.name || '').split(' ');
+    setData(prev => ({
+      ...prev,
+      firstName: nameParts[0] || '',
+      lastName: nameParts.slice(1).join(' ') || '',
+      address: addr.street || '',
+      city: addr.city || '',
+      postalCode: addr.zip || '',
+      phone: addr.phone || prev.phone,
+    }));
+  };
 
   const selectedGovernorate = useMemo(
     () => GOVERNORATES.find((g) => g.code === data.governorate),
@@ -117,7 +157,80 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Personal Information */}
+      {/* Address Mode Tabs - Si des adresses sauvegardees existent */}
+      {isAuthenticated && savedAddresses.length > 0 && (
+        <div className="mb-6">
+          <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setAddressMode('saved')}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+                addressMode === 'saved'
+                  ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+              }`}
+            >
+              Mes adresses ({savedAddresses.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setAddressMode('new')}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+                addressMode === 'new'
+                  ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
+              }`}
+            >
+              Nouvelle adresse
+            </button>
+          </div>
+
+          {/* Liste des adresses sauvegardees */}
+          {addressMode === 'saved' && (
+            <div className="mt-4 space-y-3">
+              {savedAddresses.map((addr) => (
+                <div
+                  key={addr.id}
+                  onClick={() => handleSelectSavedAddress(addr)}
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                    selectedSavedAddress?.id === addr.id
+                      ? 'border-primary bg-primary/5'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white">{addr.name}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{addr.street}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{addr.zip} {addr.city}</p>
+                      {addr.phone && <p className="text-sm text-gray-500">{addr.phone}</p>}
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      selectedSavedAddress?.id === addr.id
+                        ? 'border-primary bg-primary'
+                        : 'border-gray-300'
+                    }`}>
+                      {selectedSavedAddress?.id === addr.id && (
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  {addr.is_default && (
+                    <span className="mt-2 inline-block text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                      Adresse par defaut
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Personal Information - Cache si adresse sauvegardee selectionnee */}
+      {(addressMode === 'new' || !selectedSavedAddress) && (
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Informations personnelles
@@ -163,8 +276,9 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
           />
         </div>
       </div>
+      )}
 
-      {/* Shipping Address */}
+      {/* Shipping Address - Toujours affiche pour permettre les modifications */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Adresse de livraison

@@ -47,7 +47,7 @@ class AuthController(http.Controller):
             import json
             _logger.error(f"Passkey start error: {e}")
             response = request.make_response(
-                json.dumps({'success': False, 'error': str(e)}),
+                json.dumps({'success': False, 'error': 'Erreur d\'authentification passkey'}),
                 headers=[('Content-Type', 'application/json')] + list(cors_headers.items())
             )
             response.status_code = 400

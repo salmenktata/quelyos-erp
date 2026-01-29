@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { logger } from '@/lib/logger'
 
 interface ServiceWorkerState {
   isSupported: boolean
@@ -37,7 +38,7 @@ export function useServiceWorker(): UseServiceWorkerReturn {
   // Enregistrer le Service Worker
   const register = useCallback(async () => {
     if (!state.isSupported) {
-      console.warn('[SW Hook] Service Worker not supported')
+      logger.warn('[SW Hook] Service Worker not supported')
       return
     }
 
@@ -46,7 +47,7 @@ export function useServiceWorker(): UseServiceWorkerReturn {
         scope: '/',
       })
 
-      console.log('[SW Hook] Service Worker registered:', registration.scope)
+      logger.debug('[SW Hook] Service Worker registered:', registration.scope)
 
       setState((prev) => ({
         ...prev,
@@ -71,7 +72,7 @@ export function useServiceWorker(): UseServiceWorkerReturn {
         setState((prev) => ({ ...prev, isReady: true }))
       }
     } catch (error) {
-      console.error('[SW Hook] Registration failed:', error)
+      logger.error('[SW Hook] Registration failed:', error)
     }
   }, [state.isSupported])
 
@@ -196,9 +197,9 @@ export function useBackgroundSync() {
       try {
         const registration = await navigator.serviceWorker.ready
         await (registration as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }).sync.register(tag)
-        console.log('[Background Sync] Registered:', tag)
+        logger.debug('[Background Sync] Registered:', tag)
       } catch (error) {
-        console.error('[Background Sync] Failed to register:', error)
+        logger.error('[Background Sync] Failed to register:', error)
       }
     }
   }, [])

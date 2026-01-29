@@ -45,7 +45,7 @@ class HRDepartmentController(http.Controller):
                 'total': len(departments),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/departments/tree', type='jsonrpc', auth='user', methods=['POST'])
     def get_departments_tree(self, **kwargs):
@@ -70,7 +70,7 @@ class HRDepartmentController(http.Controller):
                 'tree': [d.get_tree_data() for d in root_departments],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/departments/<int:department_id>', type='jsonrpc', auth='user', methods=['POST'])
     def get_department(self, department_id, **kwargs):
@@ -89,7 +89,7 @@ class HRDepartmentController(http.Controller):
                 'members': [m.get_employee_data() for m in members],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/departments/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_department(self, **kwargs):
@@ -127,7 +127,7 @@ class HRDepartmentController(http.Controller):
                 'department': department.get_department_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/departments/<int:department_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_department(self, department_id, **kwargs):
@@ -163,7 +163,7 @@ class HRDepartmentController(http.Controller):
                 'department': department.get_department_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/departments/<int:department_id>/delete', type='jsonrpc', auth='user', methods=['POST'])
     def delete_department(self, department_id, **kwargs):
@@ -180,7 +180,7 @@ class HRDepartmentController(http.Controller):
 
             return {'success': True, 'message': 'Département archivé'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # JOBS (POSTES)
@@ -208,7 +208,7 @@ class HRDepartmentController(http.Controller):
                 'total': len(jobs),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/jobs/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_job(self, **kwargs):
@@ -244,7 +244,7 @@ class HRDepartmentController(http.Controller):
                 'job': job.get_job_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/jobs/<int:job_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_job(self, job_id, **kwargs):
@@ -278,4 +278,4 @@ class HRDepartmentController(http.Controller):
                 'job': job.get_job_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}

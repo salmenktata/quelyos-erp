@@ -39,7 +39,7 @@ class PaymentController(BaseController):
 
         except Exception as e:
             _logger.error(f'Error fetching payment providers: {str(e)}', exc_info=True)
-            return self._error_response(str(e))
+            return self._error_response('Erreur lors de la récupération des providers')
 
     @http.route('/api/admin/payment/provider/update', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def update_payment_provider(self, provider_id, **kwargs):
@@ -84,7 +84,7 @@ class PaymentController(BaseController):
 
         except Exception as e:
             _logger.error(f'Error updating payment provider: {str(e)}', exc_info=True)
-            return self._error_response(str(e))
+            return self._error_response('Erreur lors de la mise à jour du provider')
 
     @http.route('/api/admin/payment/provider/test', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def test_payment_provider(self, provider_id):
@@ -118,7 +118,7 @@ class PaymentController(BaseController):
 
         except Exception as e:
             _logger.error(f'Error testing payment provider: {str(e)}', exc_info=True)
-            return self._error_response(str(e))
+            return self._error_response('Erreur lors du test de connexion')
 
     @http.route('/api/ecommerce/payment/providers', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_active_payment_providers(self):
@@ -152,7 +152,7 @@ class PaymentController(BaseController):
 
         except Exception as e:
             _logger.error(f'Error fetching active providers: {str(e)}', exc_info=True)
-            return self._error_response(str(e))
+            return self._error_response('Erreur lors de la récupération des moyens de paiement')
 
     @http.route('/api/ecommerce/payment/init', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def init_payment(self, provider_id, amount, currency_code, order_reference, customer_data, return_url):
@@ -251,7 +251,7 @@ class PaymentController(BaseController):
 
         except Exception as e:
             _logger.error(f'Error initializing payment: {str(e)}', exc_info=True)
-            return self._error_response(str(e))
+            return self._error_response('Erreur lors de l\'initialisation du paiement')
 
     @http.route('/api/payment/flouci/webhook', type='http', auth='public', methods=['POST'], csrf=False)
     def flouci_webhook(self):
@@ -291,7 +291,7 @@ class PaymentController(BaseController):
 
         except Exception as e:
             _logger.error(f'Error processing Flouci webhook: {str(e)}', exc_info=True)
-            return Response(json.dumps({'error': str(e)}), status=500, mimetype='application/json')
+            return Response(json.dumps({'error': 'Internal server error'}), status=500, mimetype='application/json')
 
     @http.route('/api/payment/konnect/webhook', type='http', auth='public', methods=['POST'], csrf=False)
     def konnect_webhook(self):
@@ -331,7 +331,7 @@ class PaymentController(BaseController):
 
         except Exception as e:
             _logger.error(f'Error processing Konnect webhook: {str(e)}', exc_info=True)
-            return Response(json.dumps({'error': str(e)}), status=500, mimetype='application/json')
+            return Response(json.dumps({'error': 'Internal server error'}), status=500, mimetype='application/json')
 
     def _check_admin_access(self):
         """Verify user has admin access"""

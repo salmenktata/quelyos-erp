@@ -23,7 +23,7 @@ class QuelyApiSettings(BaseController):
         except Exception as e:
             return request.make_json_response({
                 'success': False,
-                'error': str(e)
+                'error': 'Erreur serveur'
             })
 
     @http.route('/api/settings/images', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
@@ -62,7 +62,7 @@ class QuelyApiSettings(BaseController):
         except Exception as e:
             return {
                 'success': False,
-                'error': str(e)
+                'error': 'Erreur serveur'
             }
 
     @http.route('/api/settings/all', type='http', auth='user', methods=['GET'], csrf=False, cors='*')
@@ -95,5 +95,5 @@ class QuelyApiSettings(BaseController):
         except Exception as e:
             return request.make_json_response({
                 'success': False,
-                'error': str(e)
+                'error': 'Erreur serveur'
             })

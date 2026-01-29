@@ -4142,6 +4142,123 @@ class QuelyosAPI(BaseController):
                 'error': 'Une erreur est survenue'
             }
 
+    @http.route('/api/ecommerce/orders/<int:order_id>/reorder', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def reorder(self, order_id, **kwargs):
+        """
+        One-Click Reorder : Ajoute tous les produits d'une commande passée au panier actuel.
+        Vérifie la disponibilité du stock et retourne le nouveau panier.
+        """
+        try:
+            # Vérifier que l'utilisateur est connecté
+            if not request.session.uid:
+                return {
+                    'success': False,
+                    'error': 'Authentification requise',
+                    'error_code': 'AUTH_REQUIRED'
+                }
+
+            partner_id = request.env.user.partner_id.id
+
+            # Récupérer la commande originale
+            original_order = request.env['sale.order'].sudo().browse(order_id)
+
+            if not original_order.exists():
+                return {
+                    'success': False,
+                    'error': 'Commande non trouvée',
+                    'error_code': 'ORDER_NOT_FOUND'
+                }
+
+            # Vérifier que la commande appartient bien au client
+            if original_order.partner_id.id != partner_id:
+                return {
+                    'success': False,
+                    'error': 'Accès non autorisé',
+                    'error_code': 'UNAUTHORIZED'
+                }
+
+            # Récupérer ou créer le panier actuel
+            cart = self._get_or_create_cart(partner_id)
+
+            # Liste des produits ajoutés et des erreurs
+            added_products = []
+            unavailable_products = []
+
+            # Parcourir les lignes de la commande originale
+            for line in original_order.order_line:
+                # Ignorer les lignes sans produit (frais de port, remises, etc.)
+                if not line.product_id or line.is_delivery or line.is_downpayment:
+                    continue
+
+                product = line.product_id
+
+                # Vérifier que le produit est toujours vendable
+                if not product.active or not product.sale_ok:
+                    unavailable_products.append({
+                        'name': product.name,
+                        'reason': 'Produit non disponible à la vente'
+                    })
+                    continue
+
+                # Vérifier le stock disponible
+                available_qty = product.qty_available
+                requested_qty = line.product_uom_qty
+
+                if available_qty <= 0:
+                    unavailable_products.append({
+                        'name': product.name,
+                        'reason': 'Rupture de stock'
+                    })
+                    continue
+
+                # Ajuster la quantité si stock insuffisant
+                qty_to_add = min(requested_qty, available_qty)
+
+                # Vérifier si le produit est déjà dans le panier
+                existing_line = cart.order_line.filtered(
+                    lambda l: l.product_id.id == product.id
+                )
+
+                if existing_line:
+                    # Mettre à jour la quantité
+                    new_qty = existing_line.product_uom_qty + qty_to_add
+                    existing_line.write({'product_uom_qty': new_qty})
+                else:
+                    # Créer une nouvelle ligne
+                    request.env['sale.order.line'].sudo().create({
+                        'order_id': cart.id,
+                        'product_id': product.id,
+                        'product_uom_qty': qty_to_add,
+                        'price_unit': product.list_price,
+                    })
+
+                added_products.append({
+                    'name': product.name,
+                    'quantity': qty_to_add,
+                    'adjusted': qty_to_add < requested_qty
+                })
+
+            # Recalculer le panier
+            cart._compute_amount_all()
+
+            # Construire la réponse du panier
+            cart_data = self._serialize_cart(cart)
+
+            return {
+                'success': True,
+                'message': f'{len(added_products)} produit(s) ajouté(s) au panier',
+                'cart': cart_data,
+                'added_products': added_products,
+                'unavailable_products': unavailable_products,
+            }
+
+        except Exception as e:
+            _logger.error(f"Reorder error: {e}")
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue lors du réapprovisionnement'
+            }
+
     @http.route('/api/ecommerce/orders/<int:order_id>/delivery-slip/pdf', type='http', auth='public', methods=['GET'], csrf=False, cors='*')
     def get_delivery_slip_pdf(self, order_id, **kwargs):
         """Télécharger le bon de livraison PDF d'une commande (admin uniquement)"""
@@ -5902,7 +6019,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get product stock history error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -6156,7 +6273,7 @@ class QuelyosAPI(BaseController):
                 'id': request.jsonrequest.get('id') if hasattr(request, 'jsonrequest') and request.jsonrequest else None,
                 'result': {
                     'success': False,
-                    'error': str(e),
+                    'error': 'Erreur serveur',
                     'errorCode': 'SERVER_ERROR'
                 }
             }
@@ -7489,6 +7606,139 @@ class QuelyosAPI(BaseController):
                 'success': False,
                 'error': 'Une erreur est survenue'
             }
+
+    # ==================== REFERRAL PROGRAM ====================
+
+    @http.route('/api/ecommerce/referral/info', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_referral_info(self, **kwargs):
+        """
+        Récupérer les informations de parrainage de l'utilisateur connecté
+        """
+        try:
+            user = request.env.user
+            if not user or user._is_public():
+                return {'success': False, 'error': 'Authentification requise'}
+
+            partner = user.partner_id
+            if not partner:
+                return {'success': False, 'error': 'Profil utilisateur introuvable'}
+
+            # Générer ou récupérer le code de parrainage
+            referral_code = partner.ref or self._generate_referral_code(partner)
+
+            # Compter les filleuls (partenaires référés par cet utilisateur)
+            referred_count = request.env['res.partner'].sudo().search_count([
+                ('referred_by', '=', partner.id)
+            ])
+
+            # Calculer les récompenses gagnées
+            # Rechercher les commandes des filleuls
+            referred_partners = request.env['res.partner'].sudo().search([
+                ('referred_by', '=', partner.id)
+            ])
+            referred_orders = request.env['sale.order'].sudo().search([
+                ('partner_id', 'in', referred_partners.ids),
+                ('state', 'in', ['sale', 'done'])
+            ])
+            total_referred_amount = sum(referred_orders.mapped('amount_total'))
+            earned_rewards = round(total_referred_amount * 0.05, 2)  # 5% de récompense
+
+            return {
+                'success': True,
+                'data': {
+                    'referral_code': referral_code,
+                    'referral_link': f'{request.httprequest.host_url}?ref={referral_code}',
+                    'referred_count': referred_count,
+                    'successful_referrals': len(referred_orders),
+                    'pending_referrals': referred_count - len(set(referred_orders.mapped('partner_id').ids)),
+                    'earned_rewards': earned_rewards,
+                    'reward_rate': 5,  # 5%
+                    'rewards': {
+                        'referrer': '10% de réduction + 5% sur les achats du filleul',
+                        'referee': '15% de réduction sur la première commande',
+                    }
+                }
+            }
+        except Exception as e:
+            _logger.error(f"Get referral info error: {e}", exc_info=True)
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    def _generate_referral_code(self, partner):
+        """Génère un code de parrainage unique pour un partenaire"""
+        import hashlib
+        base = f"{partner.id}-{partner.create_date}"
+        code = hashlib.md5(base.encode()).hexdigest()[:8].upper()
+        partner.sudo().write({'ref': code})
+        return code
+
+    @http.route('/api/ecommerce/referral/apply', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def apply_referral_code(self, **kwargs):
+        """
+        Appliquer un code de parrainage lors de l'inscription
+        """
+        try:
+            params = self._get_params()
+            code = params.get('code', '').strip().upper()
+
+            if not code:
+                return {'success': False, 'error': 'Code de parrainage requis'}
+
+            # Trouver le parrain
+            referrer = request.env['res.partner'].sudo().search([
+                ('ref', '=', code)
+            ], limit=1)
+
+            if not referrer:
+                return {'success': False, 'error': 'Code de parrainage invalide'}
+
+            return {
+                'success': True,
+                'data': {
+                    'referrer_name': referrer.name.split()[0] if referrer.name else 'Un ami',
+                    'discount': '15%',
+                    'message': f'Code valide ! Vous bénéficierez de 15% de réduction sur votre première commande.'
+                }
+            }
+        except Exception as e:
+            _logger.error(f"Apply referral code error: {e}", exc_info=True)
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    @http.route('/api/ecommerce/referral/register-with-code', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def register_with_referral(self, **kwargs):
+        """
+        Enregistrer un lien de parrainage lors de l'inscription
+        """
+        try:
+            params = self._get_params()
+            code = params.get('referral_code', '').strip().upper()
+            new_partner_id = params.get('partner_id')
+
+            if not code or not new_partner_id:
+                return {'success': False, 'error': 'Paramètres manquants'}
+
+            # Trouver le parrain
+            referrer = request.env['res.partner'].sudo().search([
+                ('ref', '=', code)
+            ], limit=1)
+
+            if not referrer:
+                return {'success': True, 'data': {'linked': False}}
+
+            # Lier le filleul au parrain
+            new_partner = request.env['res.partner'].sudo().browse(int(new_partner_id))
+            if new_partner.exists() and not new_partner.referred_by:
+                new_partner.write({'referred_by': referrer.id})
+
+            return {
+                'success': True,
+                'data': {
+                    'linked': True,
+                    'referrer_name': referrer.name.split()[0] if referrer.name else 'Votre parrain'
+                }
+            }
+        except Exception as e:
+            _logger.error(f"Register with referral error: {e}", exc_info=True)
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ==================== ANALYTICS ====================
 
@@ -9330,7 +9580,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get stock turnover error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -9488,7 +9738,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"ABC Analysis error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -9695,7 +9945,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Stock forecast error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -9729,7 +9979,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"UoM list error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -9753,7 +10003,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"UoM categories error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -9811,7 +10061,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"UoM conversion error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -9856,7 +10106,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Product UoM config error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -9946,7 +10196,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Lot traceability error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -10059,7 +10309,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Advanced stock reports error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -10190,7 +10440,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Stock valuation by category error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -12073,6 +12323,90 @@ class QuelyosAPI(BaseController):
                 'error': 'Une erreur est survenue'
             }
 
+    @http.route('/api/ecommerce/products/<int:product_id>/volume-pricing', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_product_volume_pricing(self, product_id, **kwargs):
+        """
+        Récupérer les prix par quantité (dégressifs) pour un produit.
+        Utilise les règles de pricelist Odoo avec min_quantity.
+        """
+        try:
+            params = self._get_params()
+            pricelist_id = params.get('pricelist_id')
+
+            Product = request.env['product.template'].sudo()
+            product = Product.browse(product_id)
+
+            if not product.exists():
+                return {'success': False, 'error': 'Produit non trouvé'}
+
+            # Récupérer la pricelist (par défaut ou spécifiée)
+            Pricelist = request.env['product.pricelist'].sudo()
+            if pricelist_id:
+                pricelist = Pricelist.browse(int(pricelist_id))
+            else:
+                pricelist = Pricelist.search([('active', '=', True)], limit=1)
+
+            if not pricelist.exists():
+                return {'success': True, 'data': {'tiers': [], 'base_price': product.list_price}}
+
+            # Récupérer les items de la pricelist pour ce produit
+            PricelistItem = request.env['product.pricelist.item'].sudo()
+            items = PricelistItem.search([
+                ('pricelist_id', '=', pricelist.id),
+                '|', '|',
+                ('product_tmpl_id', '=', product.id),
+                ('product_id', 'in', product.product_variant_ids.ids),
+                '&', ('product_tmpl_id', '=', False), ('product_id', '=', False),
+            ], order='min_quantity ASC')
+
+            # Construire les paliers de prix
+            tiers = []
+            base_price = product.list_price
+            currency = pricelist.currency_id
+
+            for item in items:
+                if item.min_quantity <= 1:
+                    continue  # Ignorer le prix de base
+
+                # Calculer le prix selon le type de règle
+                if item.compute_price == 'fixed':
+                    price = item.fixed_price
+                elif item.compute_price == 'percentage':
+                    price = base_price * (1 - item.percent_price / 100)
+                elif item.compute_price == 'formula':
+                    price = base_price * (1 - (item.price_discount or 0) / 100)
+                else:
+                    continue
+
+                discount_percent = round((1 - price / base_price) * 100, 1) if base_price > 0 else 0
+
+                tiers.append({
+                    'min_quantity': int(item.min_quantity),
+                    'price': round(price, 2),
+                    'discount_percent': discount_percent,
+                    'savings_per_unit': round(base_price - price, 2),
+                })
+
+            # Dédupliquer et trier par quantité
+            seen_qtys = set()
+            unique_tiers = []
+            for tier in sorted(tiers, key=lambda x: x['min_quantity']):
+                if tier['min_quantity'] not in seen_qtys:
+                    seen_qtys.add(tier['min_quantity'])
+                    unique_tiers.append(tier)
+
+            return {
+                'success': True,
+                'data': {
+                    'base_price': round(base_price, 2),
+                    'currency': currency.symbol or 'TND',
+                    'tiers': unique_tiers,
+                }
+            }
+        except Exception as e:
+            _logger.error(f"Get volume pricing error: {e}", exc_info=True)
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
     @http.route('/api/ecommerce/pricelists/create', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def create_pricelist(self, **params):
         """
@@ -13620,7 +13954,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Validate stock transfer error: {e}")
             return {
                 'success': False,
-                'error': str(e) if 'pas assez de stock' in str(e).lower() else 'Une erreur est survenue'
+                'error': 'Erreur serveur' if 'pas assez de stock' in str(e).lower() else 'Une erreur est survenue'
             }
 
     @http.route('/api/ecommerce/stock/transfers/<int:picking_id>/cancel', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
@@ -13905,6 +14239,128 @@ class QuelyosAPI(BaseController):
                 'success': False,
                 'error': 'Une erreur est survenue'
             }
+
+    @http.route('/api/ecommerce/user/purchased-products', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
+    def get_user_purchased_products(self, **kwargs):
+        """
+        Récupérer la liste des IDs produits déjà achetés par l'utilisateur connecté
+        """
+        try:
+            user = request.env.user
+            if not user or user._is_public():
+                return {'success': True, 'data': {'product_ids': []}}
+
+            partner = user.partner_id
+            if not partner:
+                return {'success': True, 'data': {'product_ids': []}}
+
+            # Récupérer tous les produits des commandes confirmées
+            SaleOrder = request.env['sale.order'].sudo()
+            orders = SaleOrder.search([
+                ('partner_id', '=', partner.id),
+                ('state', 'in', ['sale', 'done'])
+            ])
+
+            product_ids = set()
+            for order in orders:
+                for line in order.order_line:
+                    if line.product_id and line.product_id.product_tmpl_id:
+                        product_ids.add(line.product_id.product_tmpl_id.id)
+
+            return {
+                'success': True,
+                'data': {
+                    'product_ids': list(product_ids)
+                }
+            }
+        except Exception as e:
+            _logger.error(f"Get user purchased products error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/ecommerce/products/<int:product_id>/frequently-bought-together', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_frequently_bought_together(self, product_id, **kwargs):
+        """
+        Récupérer les produits fréquemment achetés ensemble (basé sur l'analyse des commandes)
+        """
+        try:
+            params = self._get_params()
+            limit = int(params.get('limit', 4))
+
+            Product = request.env['product.template'].sudo()
+            product = Product.browse(product_id)
+
+            if not product.exists():
+                return {'success': False, 'error': 'Produit non trouvé'}
+
+            variant_ids = product.product_variant_ids.ids
+            if not variant_ids:
+                return {'success': True, 'data': {'products': [], 'bundle_discount': 0}}
+
+            # Requête SQL pour trouver les co-occurrences dans les commandes
+            request.env.cr.execute("""
+                WITH target_orders AS (
+                    SELECT DISTINCT sol.order_id
+                    FROM sale_order_line sol
+                    JOIN sale_order so ON so.id = sol.order_id
+                    WHERE sol.product_id IN %s AND so.state IN ('sale', 'done')
+                ),
+                cooccurrences AS (
+                    SELECT sol.product_id, COUNT(DISTINCT sol.order_id) as order_count
+                    FROM sale_order_line sol
+                    JOIN target_orders t ON t.order_id = sol.order_id
+                    WHERE sol.product_id NOT IN %s AND sol.product_uom_qty > 0
+                    GROUP BY sol.product_id ORDER BY order_count DESC LIMIT %s
+                )
+                SELECT pp.id, pt.id, c.order_count
+                FROM cooccurrences c
+                JOIN product_product pp ON pp.id = c.product_id
+                JOIN product_template pt ON pt.id = pp.product_tmpl_id
+                WHERE pt.active = true AND pt.sale_ok = true
+            """, (tuple(variant_ids), tuple(variant_ids), limit * 2))
+
+            results = request.env.cr.fetchall()
+            seen_templates = set()
+            frequently_bought = []
+
+            for variant_id, template_id, order_count in results:
+                if template_id in seen_templates or len(frequently_bought) >= limit:
+                    continue
+                seen_templates.add(template_id)
+                related = Product.browse(template_id)
+                if not related.exists():
+                    continue
+
+                image_url = f'/web/image/product.template/{related.id}/image_1920' if related.image_1920 else None
+                slug = related.name.lower().replace(' ', '-').replace('/', '-')
+
+                frequently_bought.append({
+                    'id': related.id,
+                    'name': related.name,
+                    'slug': slug,
+                    'price': related.list_price,
+                    'image_url': image_url,
+                    'in_stock': related.qty_available > 0 if related.type == 'product' else True,
+                    'co_purchase_count': order_count,
+                })
+
+            bundle_total = product.list_price + sum(p['price'] for p in frequently_bought)
+            bundle_discount = 5 if len(frequently_bought) >= 2 else 0
+
+            return {
+                'success': True,
+                'data': {
+                    'products': frequently_bought,
+                    'bundle_total': bundle_total,
+                    'bundle_discount': bundle_discount,
+                    'bundle_price': bundle_total * (1 - bundle_discount / 100) if bundle_discount else bundle_total
+                }
+            }
+        except Exception as e:
+            _logger.error(f"Get frequently bought together error: {e}", exc_info=True)
+            return {'success': False, 'error': 'Une erreur est survenue'}
 
     # ==================== ALERTES STOCK ====================
 
@@ -14281,7 +14737,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Create warehouse error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -14355,7 +14811,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Update warehouse error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -14435,7 +14891,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Archive warehouse error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -14508,7 +14964,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get stock routes error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -14599,7 +15055,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get stock route detail error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -14684,7 +15140,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get warehouse routes error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -14776,7 +15232,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Configure warehouse routes error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -14880,7 +15336,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get lots error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -14987,7 +15443,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get lot detail error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -15106,7 +15562,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get expiry alerts error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -15162,7 +15618,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get product expiry config error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -15283,7 +15739,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Update product expiry config error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -15403,7 +15859,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get locations tree error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -15521,7 +15977,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get location detail error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -15622,7 +16078,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Create location error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -15709,7 +16165,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Update location error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -15765,7 +16221,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Archive location error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -15830,7 +16286,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Move location error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -15913,7 +16369,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get reordering rules error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16044,7 +16500,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Create reordering rule error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16161,7 +16617,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Update reordering rule error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16196,7 +16652,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Delete reordering rule error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16320,7 +16776,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get stock change reasons error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'error_code': 'SERVER_ERROR'
             }
 
@@ -16359,7 +16815,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get stock inventories error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'error_code': 'SERVER_ERROR'
             }
 
@@ -16415,7 +16871,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Adjust stock with reason error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'error_code': 'SERVER_ERROR'
             }
 
@@ -16450,7 +16906,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get location locks error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'error_code': 'SERVER_ERROR'
             }
 
@@ -16496,7 +16952,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get CRM stages error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16568,7 +17024,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get CRM leads error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16625,7 +17081,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get CRM lead detail error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16713,7 +17169,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Create CRM lead error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16789,7 +17245,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Update CRM lead error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16867,7 +17323,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Update lead stage error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16943,7 +17399,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Create CRM stage error: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': str(e),
+                'error': 'Erreur serveur',
                 'errorCode': 'SERVER_ERROR'
             }
 
@@ -16973,7 +17429,7 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Get company settings error: {e}", exc_info=True)
             return request.make_json_response({
                 'success': False,
-                'error': str(e)
+                'error': 'Erreur serveur'
             }, status=500)
 
     @http.route('/api/ecommerce/admin/demo-mode', type='http', auth='public', methods=['POST'], csrf=False, cors='*')
@@ -17019,5 +17475,5 @@ class QuelyosAPI(BaseController):
             _logger.error(f"Toggle demo mode error: {e}", exc_info=True)
             return request.make_json_response({
                 'success': False,
-                'error': str(e)
+                'error': 'Erreur serveur'
             }, status=500)

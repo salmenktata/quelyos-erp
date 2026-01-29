@@ -77,6 +77,7 @@ export function SearchAutocomplete({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showHistory, setShowHistory] = useState(false);
+  const [queryExpansion, setQueryExpansion] = useState<string[]>([]);
 
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -110,26 +111,62 @@ export function SearchAutocomplete({
     fetchPopular();
   }, []);
 
-  // Fetch autocomplete results
+  // Fetch autocomplete results with semantic fallback
   const fetchResults = useCallback(async (searchQuery: string) => {
     if (searchQuery.length < 2) {
       setResults({ products: [], categories: [] });
+      setQueryExpansion([]);
       setIsOpen(false);
       return;
     }
 
     setIsLoading(true);
     setShowHistory(false);
+    setQueryExpansion([]);
 
     try {
+      // Standard autocomplete first
       const response = await backendClient.searchAutocomplete(searchQuery, 8, true) as any;
 
       if (response.success) {
-        // Backend returns products/categories at root level, not in data
-        setResults({
-          products: response.products || response.data?.products || [],
-          categories: response.categories || response.data?.categories || [],
-        });
+        const products = response.products || response.data?.products || [];
+        const categories = response.categories || response.data?.categories || [];
+
+        // If few results, try semantic search for more suggestions
+        if (products.length < 3 && searchQuery.length >= 3) {
+          try {
+            const semanticResponse = await backendClient.searchSemantic(searchQuery, { limit: 5 });
+            if (semanticResponse.success && semanticResponse.data) {
+              // Add semantic results that aren't already in products
+              const existingIds = new Set(products.map((p: Product) => p.id));
+              const semanticProducts = semanticResponse.data.products
+                .filter((sp: Product) => !existingIds.has(sp.id))
+                .slice(0, 5 - products.length)
+                .map((sp: Product) => ({
+                  id: sp.id,
+                  name: sp.name,
+                  highlight: sp.name,
+                  slug: sp.slug,
+                  image: (sp as { image_url?: string }).image_url || '',
+                  price: sp.price,
+                  currency: 'TND',
+                  category: sp.category,
+                  sku: null,
+                }));
+
+              products.push(...semanticProducts);
+
+              // Show query expansion if synonyms were used
+              if (semanticResponse.data.query_expansion.length > 0) {
+                setQueryExpansion(semanticResponse.data.query_expansion.slice(0, 3));
+              }
+            }
+          } catch {
+            // Semantic search is optional, fail silently
+          }
+        }
+
+        setResults({ products, categories });
         setIsOpen(true);
       }
     } catch (error) {
@@ -477,6 +514,26 @@ export function SearchAutocomplete({
                   <div className="h-4 w-16 rounded bg-gray-200" />
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Semantic Search Expansion Info */}
+          {!isLoading && queryExpansion.length > 0 && (
+            <div className="border-b border-gray-100 p-2">
+              <div className="flex items-center gap-2 px-2 py-1">
+                <svg className="h-4 w-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1z" />
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z" clipRule="evenodd" />
+                </svg>
+                <span className="text-xs text-purple-600 font-medium">Recherche intelligente</span>
+                <div className="flex gap-1 flex-wrap">
+                  {queryExpansion.map((term, i) => (
+                    <span key={i} className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+                      {term}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 

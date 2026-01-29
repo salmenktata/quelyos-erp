@@ -2,8 +2,11 @@
 """
 API Controller for HR Leaves management.
 """
+import logging
 from odoo import http
 from odoo.http import request
+
+_logger = logging.getLogger(__name__)
 
 
 class HRLeaveController(http.Controller):
@@ -44,7 +47,8 @@ class HRLeaveController(http.Controller):
                 'leave_types': [lt.get_leave_type_data() for lt in leave_types],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("Error fetching leave types: %s", e)
+            return {'success': False, 'error': 'Erreur lors de la récupération des types de congés'}
 
     @http.route('/api/hr/leave-types/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_leave_type(self, **kwargs):
@@ -82,7 +86,8 @@ class HRLeaveController(http.Controller):
                 'leave_type': leave_type.get_leave_type_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("Error creating leave type: %s", e)
+            return {'success': False, 'error': 'Erreur lors de la création du type de congé'}
 
     @http.route('/api/hr/leave-types/<int:leave_type_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_leave_type(self, leave_type_id, **kwargs):
@@ -112,7 +117,8 @@ class HRLeaveController(http.Controller):
                 'leave_type': leave_type.get_leave_type_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("Error updating leave type: %s", e)
+            return {'success': False, 'error': 'Erreur lors de la mise à jour du type de congé'}
 
     @http.route('/api/hr/leave-types/init-defaults', type='jsonrpc', auth='user', methods=['POST'])
     def init_default_leave_types(self, **kwargs):
@@ -126,7 +132,8 @@ class HRLeaveController(http.Controller):
 
             return {'success': True, 'message': 'Types de congés par défaut créés'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("Error initializing default leave types: %s", e)
+            return {'success': False, 'error': 'Erreur lors de l\'initialisation des types de congés'}
 
     # =========================================================================
     # LEAVES (Demandes)
@@ -174,7 +181,8 @@ class HRLeaveController(http.Controller):
                 'offset': offset,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leaves/<int:leave_id>', type='jsonrpc', auth='user', methods=['POST'])
     def get_leave(self, leave_id, **kwargs):
@@ -189,7 +197,8 @@ class HRLeaveController(http.Controller):
                 'leave': leave.get_leave_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leaves/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_leave(self, **kwargs):
@@ -224,7 +233,8 @@ class HRLeaveController(http.Controller):
                 'leave': leave.get_leave_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leaves/<int:leave_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_leave(self, leave_id, **kwargs):
@@ -257,7 +267,8 @@ class HRLeaveController(http.Controller):
                 'leave': leave.get_leave_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leaves/<int:leave_id>/confirm', type='jsonrpc', auth='user', methods=['POST'])
     def confirm_leave(self, leave_id, **kwargs):
@@ -274,7 +285,8 @@ class HRLeaveController(http.Controller):
                 'leave': leave.get_leave_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leaves/<int:leave_id>/approve', type='jsonrpc', auth='user', methods=['POST'])
     def approve_leave(self, leave_id, **kwargs):
@@ -291,7 +303,8 @@ class HRLeaveController(http.Controller):
                 'leave': leave.get_leave_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leaves/<int:leave_id>/validate', type='jsonrpc', auth='user', methods=['POST'])
     def validate_leave(self, leave_id, **kwargs):
@@ -308,7 +321,8 @@ class HRLeaveController(http.Controller):
                 'leave': leave.get_leave_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leaves/<int:leave_id>/refuse', type='jsonrpc', auth='user', methods=['POST'])
     def refuse_leave(self, leave_id, **kwargs):
@@ -326,7 +340,8 @@ class HRLeaveController(http.Controller):
                 'leave': leave.get_leave_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leaves/<int:leave_id>/cancel', type='jsonrpc', auth='user', methods=['POST'])
     def cancel_leave(self, leave_id, **kwargs):
@@ -343,7 +358,8 @@ class HRLeaveController(http.Controller):
                 'leave': leave.get_leave_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leaves/calendar', type='jsonrpc', auth='user', methods=['POST'])
     def get_leaves_calendar(self, **kwargs):
@@ -368,7 +384,8 @@ class HRLeaveController(http.Controller):
                 'events': calendar_data,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leaves/pending', type='jsonrpc', auth='user', methods=['POST'])
     def get_pending_leaves(self, **kwargs):
@@ -391,7 +408,8 @@ class HRLeaveController(http.Controller):
                 'total': len(pending),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # ALLOCATIONS
@@ -429,7 +447,8 @@ class HRLeaveController(http.Controller):
                 'offset': offset,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leave-allocations/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_allocation(self, **kwargs):
@@ -467,7 +486,8 @@ class HRLeaveController(http.Controller):
                 'allocation': allocation.get_allocation_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leave-allocations/<int:allocation_id>/validate', type='jsonrpc', auth='user', methods=['POST'])
     def validate_allocation(self, allocation_id, **kwargs):
@@ -484,7 +504,8 @@ class HRLeaveController(http.Controller):
                 'allocation': allocation.get_allocation_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leave-allocations/bulk-create', type='jsonrpc', auth='user', methods=['POST'])
     def bulk_create_allocations(self, **kwargs):
@@ -514,7 +535,8 @@ class HRLeaveController(http.Controller):
                 'message': f'{count} allocations créées',
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/leave-balances', type='jsonrpc', auth='user', methods=['POST'])
     def get_balances(self, **kwargs):
@@ -537,4 +559,5 @@ class HRLeaveController(http.Controller):
                 'balances': balances,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            _logger.error("HR Leaves API error: %s", e)
+            return {'success': False, 'error': 'Erreur serveur'}

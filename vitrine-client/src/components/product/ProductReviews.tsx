@@ -6,6 +6,7 @@ import { backendClient } from '@/lib/backend/client';
 import { Button } from '@/components/common/Button';
 import { useAuthStore } from '@/store/authStore';
 import { useToast } from '@/store/toastStore';
+import { logger } from '@/lib/logger';
 
 interface Review {
   id: number;
@@ -103,7 +104,7 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
         setData(response as ReviewsData);
       }
     } catch (error) {
-      console.error('Error fetching reviews:', error);
+      logger.error('Error fetching reviews:', error);
     } finally {
       setIsLoading(false);
     }
@@ -159,7 +160,7 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
         });
       }
     } catch (error) {
-      console.error('Error voting:', error);
+      logger.error('Error voting:', error);
     }
   };
 

@@ -47,9 +47,10 @@ class QuelyFinanceApi(BaseController):
                 'data': categories
             })
         except Exception as e:
+            _logger.error("Finance API error: %s", e)
             return request.make_json_response({
                 'success': False,
-                'error': str(e)
+                'error': 'Erreur serveur'
             }, status=500)
 
     @http.route('/api/finance/categories', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
@@ -113,7 +114,7 @@ class QuelyFinanceApi(BaseController):
         except Exception as e:
             return {
                 'success': False,
-                'error': str(e)
+                'error': 'Erreur serveur'
             }
 
     # ===================================================================
@@ -173,7 +174,7 @@ class QuelyFinanceApi(BaseController):
             })
         except Exception as e:
             _logger.error(f"Get supplier invoices error: {e}")
-            return request.make_json_response({'success': False, 'error': str(e)}, status=500)
+            return request.make_json_response({'success': False, 'error': 'Erreur serveur'}, status=500)
 
     @http.route('/api/finance/supplier-invoices/upcoming', type='http', auth='user', methods=['GET'], csrf=False, cors='*')
     def get_upcoming_supplier_invoices(self, **kwargs):
@@ -312,7 +313,7 @@ class QuelyFinanceApi(BaseController):
             return request.make_json_response({'success': True, 'data': data})
         except Exception as e:
             _logger.error(f"Get taxes error: {e}")
-            return request.make_json_response({'success': False, 'error': str(e)}, status=500)
+            return request.make_json_response({'success': False, 'error': 'Erreur serveur'}, status=500)
 
     @http.route('/api/finance/taxes/purchase', type='http', auth='user', methods=['GET'], csrf=False, cors='*')
     def get_purchase_taxes(self, **kwargs):
@@ -338,7 +339,7 @@ class QuelyFinanceApi(BaseController):
             return request.make_json_response({'success': True, 'data': data})
         except Exception as e:
             _logger.error(f"Get purchase taxes error: {e}")
-            return request.make_json_response({'success': False, 'error': str(e)}, status=500)
+            return request.make_json_response({'success': False, 'error': 'Erreur serveur'}, status=500)
 
     # ===================================================================
     # JOURNAUX COMPTABLES - Utilisation account.journal natif
@@ -378,7 +379,7 @@ class QuelyFinanceApi(BaseController):
             return request.make_json_response({'success': True, 'data': data})
         except Exception as e:
             _logger.error(f"Get journals error: {e}")
-            return request.make_json_response({'success': False, 'error': str(e)}, status=500)
+            return request.make_json_response({'success': False, 'error': 'Erreur serveur'}, status=500)
 
     # ===================================================================
     # BUDGETS - Utilisation account.budget natif (si module installé)
@@ -437,7 +438,7 @@ class QuelyFinanceApi(BaseController):
             return request.make_json_response({'success': True, 'data': data})
         except Exception as e:
             _logger.error(f"Get budgets error: {e}")
-            return request.make_json_response({'success': False, 'error': str(e)}, status=500)
+            return request.make_json_response({'success': False, 'error': 'Erreur serveur'}, status=500)
 
     @http.route('/api/finance/budgets', type='jsonrpc', auth='user', methods=['POST'], csrf=False, cors='*')
     def create_budget(self):
@@ -475,4 +476,4 @@ class QuelyFinanceApi(BaseController):
             }
         except Exception as e:
             _logger.error(f"Create budget error: {e}")
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}

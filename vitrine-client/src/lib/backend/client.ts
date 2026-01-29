@@ -211,6 +211,36 @@ export class BackendClient {
     return this.jsonrpc(`/products/${productId}/recommendations`, { limit });
   }
 
+  async getFrequentlyBoughtTogether(productId: number, limit: number = 4): Promise<APIResponse & {
+    data?: {
+      products: Array<{ id: number; name: string; slug: string; price: number; image_url: string | null; in_stock: boolean; co_purchase_count: number }>;
+      bundle_total: number;
+      bundle_discount: number;
+      bundle_price: number;
+    }
+  }> {
+    return this.jsonrpc(`/products/${productId}/frequently-bought-together`, { limit });
+  }
+
+  async getUserPurchasedProducts(): Promise<APIResponse & { data?: { product_ids: number[] } }> {
+    return this.jsonrpc('/user/purchased-products', {});
+  }
+
+  async getProductVolumePricing(productId: number, pricelistId?: number): Promise<APIResponse & {
+    data?: {
+      base_price: number;
+      currency: string;
+      tiers: Array<{
+        min_quantity: number;
+        price: number;
+        discount_percent: number;
+        savings_per_unit: number;
+      }>;
+    }
+  }> {
+    return this.jsonrpc(`/products/${productId}/volume-pricing`, { pricelist_id: pricelistId });
+  }
+
   // ========================================
   // SEARCH
   // ========================================
@@ -221,6 +251,56 @@ export class BackendClient {
       limit,
       include_categories: includeCategories
     });
+  }
+
+  async searchSemantic(query: string, options?: { limit?: number; categoryId?: number }): Promise<APIResponse & {
+    data?: {
+      products: Array<{
+        id: number;
+        name: string;
+        slug: string;
+        price: number;
+        compare_at_price: number | null;
+        image_url: string | null;
+        category: string | null;
+        in_stock: boolean;
+        is_bestseller: boolean;
+        relevance_score: number;
+      }>;
+      query_expansion: string[];
+      total_found: number;
+    }
+  }> {
+    return this.jsonrpc('/search/semantic', {
+      query,
+      limit: options?.limit ?? 20,
+      category_id: options?.categoryId,
+    });
+  }
+
+  // ========================================
+  // REFERRAL / PARRAINAGE
+  // ========================================
+
+  async getReferralInfo(): Promise<APIResponse & {
+    data?: {
+      referral_code: string;
+      referral_link: string;
+      referred_count: number;
+      successful_referrals: number;
+      pending_referrals: number;
+      earned_rewards: number;
+      reward_rate: number;
+      rewards: { referrer: string; referee: string };
+    }
+  }> {
+    return this.jsonrpc('/referral/info', {});
+  }
+
+  async validateReferralCode(code: string): Promise<APIResponse & {
+    data?: { referrer_name: string; discount: string; message: string }
+  }> {
+    return this.jsonrpc('/referral/apply', { code });
   }
 
   async getPopularSearches(limit: number = 5): Promise<APIResponse & { data?: { popular_searches: Array<{ query: string; type: string; count: number; category_id?: number }> } }> {
@@ -354,6 +434,15 @@ export class BackendClient {
 
   async getOrder(id: number): Promise<APIResponse & { order?: Order }> {
     return this.jsonrpc(`/orders/${id}`);
+  }
+
+  async reorderOrder(orderId: number): Promise<APIResponse & {
+    cart?: Cart;
+    added_products?: Array<{ name: string; quantity: number; adjusted: boolean }>;
+    unavailable_products?: Array<{ name: string; reason: string }>;
+    message?: string;
+  }> {
+    return this.jsonrpc(`/orders/${orderId}/reorder`);
   }
 
   async getAddresses(): Promise<APIResponse & { addresses?: Address[] }> {
@@ -634,6 +723,149 @@ export class BackendClient {
   }> {
     return this.jsonrpc(`/reviews/${reviewId}/helpful`, { helpful });
   }
+
+  // =========================================================================
+  // BLOG
+  // =========================================================================
+
+  async getBlogPosts(params: {
+    category_slug?: string;
+    tag_slug?: string;
+    featured_only?: boolean;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<{
+    success: boolean;
+    posts: BlogPost[];
+    total: number;
+    hasMore: boolean;
+    error?: string;
+  }> {
+    return this.jsonrpc('/blog/posts', params);
+  }
+
+  async getBlogPost(slug: string): Promise<{
+    success: boolean;
+    post?: BlogPost;
+    relatedPosts?: BlogPost[];
+    error?: string;
+  }> {
+    return this.jsonrpc(`/blog/posts/${slug}`, {});
+  }
+
+  async getBlogCategories(): Promise<{
+    success: boolean;
+    categories: BlogCategory[];
+    error?: string;
+  }> {
+    return this.jsonrpc('/blog/categories', {});
+  }
+
+  // =========================================================================
+  // TESTIMONIALS
+  // =========================================================================
+
+  async getTestimonials(params: {
+    featured_only?: boolean;
+    limit?: number;
+  } = {}): Promise<{
+    success: boolean;
+    testimonials: Testimonial[];
+    error?: string;
+  }> {
+    return this.jsonrpc('/testimonials', params);
+  }
+
+  // =========================================================================
+  // COLLECTIONS
+  // =========================================================================
+
+  async getCollections(): Promise<{
+    success: boolean;
+    collections: Collection[];
+    error?: string;
+  }> {
+    return this.jsonrpc('/collections', {});
+  }
+
+  async getCollection(slug: string): Promise<{
+    success: boolean;
+    collection?: Collection;
+    products?: Product[];
+    error?: string;
+  }> {
+    return this.jsonrpc(`/collections/${slug}`, {});
+  }
+
+  // =========================================================================
+  // FLASH SALES
+  // =========================================================================
+
+  async getFlashSales(): Promise<{
+    success: boolean;
+    flashSales: FlashSale[];
+    error?: string;
+  }> {
+    return this.jsonrpc('/flash-sales', {});
+  }
+}
+
+// Types pour les nouvelles entités
+export interface BlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content?: string;
+  coverUrl?: string;
+  categoryId: number;
+  categoryName: string;
+  authorName: string;
+  state: 'draft' | 'published' | 'archived';
+  publishedDate?: string;
+  isFeatured: boolean;
+  viewsCount: number;
+  readingTime: number;
+  tags: { id: number; name: string }[];
+}
+
+export interface BlogCategory {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  color: string;
+  postCount: number;
+}
+
+export interface Testimonial {
+  id: number;
+  authorName: string;
+  authorTitle?: string;
+  authorCompany?: string;
+  authorPhoto?: string;
+  content: string;
+  rating: number;
+  isFeatured: boolean;
+}
+
+export interface Collection {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  imageUrl?: string;
+  productCount: number;
+}
+
+export interface FlashSale {
+  id: number;
+  name: string;
+  description?: string;
+  bannerUrl?: string;
+  startDate: string;
+  endDate: string;
+  products: Product[];
 }
 
 // Instance singleton

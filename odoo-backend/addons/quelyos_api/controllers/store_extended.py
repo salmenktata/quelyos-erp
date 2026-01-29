@@ -50,7 +50,7 @@ class StoreExtendedController(BaseController):
             }
         except Exception as e:
             _logger.error(f'Error fetching reviews: {e}')
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/reviews/<int:review_id>/approve', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def approve_review(self, review_id):
@@ -65,7 +65,7 @@ class StoreExtendedController(BaseController):
                 return {'success': True, 'review': review.to_dict()}
             return {'success': False, 'error': 'Review not found'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/reviews/<int:review_id>/reject', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def reject_review(self, review_id, reason=None):
@@ -81,7 +81,7 @@ class StoreExtendedController(BaseController):
                 return {'success': True, 'review': review.to_dict()}
             return {'success': False, 'error': 'Review not found'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # REVIEWS - PUBLIC API (pour vitrine-client)
@@ -138,7 +138,7 @@ class StoreExtendedController(BaseController):
             }
         except Exception as e:
             _logger.error(f'Error fetching product reviews: {e}')
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/products/<int:product_id>/reviews/submit', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def submit_product_review(self, product_id, rating, content, title=None, author_name=None, author_email=None, pros=None, cons=None):
@@ -183,7 +183,7 @@ class StoreExtendedController(BaseController):
             }
         except Exception as e:
             _logger.error(f'Error submitting review: {e}')
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/reviews/<int:review_id>/helpful', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def mark_review_helpful(self, review_id, helpful=True):
@@ -204,7 +204,7 @@ class StoreExtendedController(BaseController):
                 'helpfulNo': review.helpful_no,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/reviews/<int:review_id>/reply', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def reply_review(self, review_id, reply):
@@ -219,7 +219,7 @@ class StoreExtendedController(BaseController):
                 return {'success': True, 'review': review.to_dict()}
             return {'success': False, 'error': 'Review not found'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # FAQ
@@ -241,7 +241,7 @@ class StoreExtendedController(BaseController):
                 'categories': [c.to_dict() for c in categories],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/faq/categories/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_faq_category(self, **kwargs):
@@ -269,7 +269,7 @@ class StoreExtendedController(BaseController):
 
             return {'success': True, 'category': cat.to_dict()}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/faq', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_faqs(self, category_id=None):
@@ -289,7 +289,7 @@ class StoreExtendedController(BaseController):
                 'faqs': [f.to_dict() for f in faqs],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/faq/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_faq(self, **kwargs):
@@ -317,7 +317,7 @@ class StoreExtendedController(BaseController):
 
             return {'success': True, 'faq': faq.to_dict()}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/faq/<int:faq_id>/delete', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def delete_faq(self, faq_id):
@@ -332,7 +332,7 @@ class StoreExtendedController(BaseController):
                 return {'success': True}
             return {'success': False, 'error': 'FAQ not found'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/faq/public', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_public_faqs(self, category_code=None, **kwargs):
@@ -377,7 +377,7 @@ class StoreExtendedController(BaseController):
             }
         except Exception as e:
             _logger.error(f"Get public FAQs error: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # COLLECTIONS
@@ -399,7 +399,7 @@ class StoreExtendedController(BaseController):
                 'collections': [c.to_dict() for c in collections],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/collections/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_collection(self, **kwargs):
@@ -434,7 +434,7 @@ class StoreExtendedController(BaseController):
 
             return {'success': True, 'collection': col.to_dict()}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # FLASH SALES
@@ -456,7 +456,7 @@ class StoreExtendedController(BaseController):
                 'flashSales': [s.to_dict() for s in sales],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/flash-sales/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_flash_sale(self, **kwargs):
@@ -498,7 +498,7 @@ class StoreExtendedController(BaseController):
 
             return {'success': True, 'flashSale': sale.to_dict()}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # BUNDLES
@@ -520,7 +520,7 @@ class StoreExtendedController(BaseController):
                 'bundles': [b.to_dict() for b in bundles],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/bundles/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_bundle(self, **kwargs):
@@ -559,7 +559,7 @@ class StoreExtendedController(BaseController):
 
             return {'success': True, 'bundle': bundle.to_dict()}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # TESTIMONIALS
@@ -581,7 +581,7 @@ class StoreExtendedController(BaseController):
                 'testimonials': [t.to_dict() for t in testimonials],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/testimonials/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_testimonial(self, **kwargs):
@@ -613,7 +613,7 @@ class StoreExtendedController(BaseController):
 
             return {'success': True, 'testimonial': testimonial.to_dict()}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # BLOG
@@ -635,7 +635,7 @@ class StoreExtendedController(BaseController):
                 'categories': [c.to_dict() for c in categories],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/blog/posts', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_blog_posts(self, **kwargs):
@@ -660,7 +660,7 @@ class StoreExtendedController(BaseController):
                 'posts': [p.to_dict(include_content=False) for p in posts],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/blog/posts/<int:post_id>', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_blog_post(self, post_id):
@@ -674,7 +674,7 @@ class StoreExtendedController(BaseController):
                 return {'success': True, 'post': post.to_dict()}
             return {'success': False, 'error': 'Post not found'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/blog/posts/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_blog_post(self, **kwargs):
@@ -703,7 +703,7 @@ class StoreExtendedController(BaseController):
 
             return {'success': True, 'post': post.to_dict()}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # LOYALTY
@@ -724,7 +724,7 @@ class StoreExtendedController(BaseController):
                 return {'success': True, 'program': program.to_dict()}
             return {'success': True, 'program': None}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/loyalty/program/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_loyalty_program(self, **kwargs):
@@ -767,7 +767,7 @@ class StoreExtendedController(BaseController):
 
             return {'success': True, 'program': program.to_dict()}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/loyalty/members', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_loyalty_members(self, **kwargs):
@@ -785,7 +785,7 @@ class StoreExtendedController(BaseController):
                 'members': [m.to_dict() for m in members],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # TICKETS (SAV)
@@ -819,7 +819,7 @@ class StoreExtendedController(BaseController):
                 'total': total,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/tickets/<int:ticket_id>', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def get_ticket(self, ticket_id):
@@ -835,7 +835,7 @@ class StoreExtendedController(BaseController):
                 return {'success': True, 'ticket': data}
             return {'success': False, 'error': 'Ticket not found'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/tickets/<int:ticket_id>/reply', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def reply_ticket(self, ticket_id, content):
@@ -856,7 +856,7 @@ class StoreExtendedController(BaseController):
                 return {'success': True, 'ticket': ticket.to_dict()}
             return {'success': False, 'error': 'Ticket not found'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/tickets/<int:ticket_id>/status', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def update_ticket_status(self, ticket_id, state, resolution=None):
@@ -879,7 +879,7 @@ class StoreExtendedController(BaseController):
                 return {'success': True, 'ticket': ticket.to_dict()}
             return {'success': False, 'error': 'Ticket not found'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # SALES REPORTS
@@ -940,7 +940,7 @@ class StoreExtendedController(BaseController):
                 }
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # WISHLIST ANALYTICS
@@ -982,7 +982,7 @@ class StoreExtendedController(BaseController):
                 'products': results,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # STOCK ALERTS
@@ -1036,7 +1036,7 @@ class StoreExtendedController(BaseController):
                 'outOfStock': out_of_stock,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # PRODUCT ATTRIBUTES
@@ -1064,7 +1064,7 @@ class StoreExtendedController(BaseController):
                 } for a in attributes],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/attributes/save', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def save_attribute(self, **kwargs):
@@ -1108,7 +1108,7 @@ class StoreExtendedController(BaseController):
                 'name': attr.name,
             }}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # IMPORT/EXPORT
@@ -1148,7 +1148,7 @@ class StoreExtendedController(BaseController):
                 'count': len(data),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/admin/products/import', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def import_products(self, products):
@@ -1210,7 +1210,7 @@ class StoreExtendedController(BaseController):
                 'errors': errors,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     def _get_company_from_tenant(self):
         """Helper pour récupérer la company du tenant"""

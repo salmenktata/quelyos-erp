@@ -67,7 +67,7 @@ class HRAppraisalController(http.Controller):
                 'total': total,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/appraisals/<int:appraisal_id>', type='jsonrpc', auth='user', methods=['POST'])
     def get_appraisal(self, appraisal_id, **kwargs):
@@ -86,7 +86,7 @@ class HRAppraisalController(http.Controller):
                 'goals': [g.get_goal_data() for g in goals],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/appraisals/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_appraisal(self, **kwargs):
@@ -128,7 +128,7 @@ class HRAppraisalController(http.Controller):
                 'message': 'Évaluation créée avec succès',
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/appraisals/<int:appraisal_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_appraisal(self, appraisal_id, **kwargs):
@@ -158,7 +158,7 @@ class HRAppraisalController(http.Controller):
                 'message': 'Évaluation mise à jour',
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/appraisals/<int:appraisal_id>/action', type='jsonrpc', auth='user', methods=['POST'])
     def appraisal_action(self, appraisal_id, action, **kwargs):
@@ -188,7 +188,7 @@ class HRAppraisalController(http.Controller):
                 'message': f'Action {action} effectuée',
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # OBJECTIFS
@@ -229,7 +229,7 @@ class HRAppraisalController(http.Controller):
                 'total': total,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/goals/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_goal(self, **kwargs):
@@ -260,7 +260,7 @@ class HRAppraisalController(http.Controller):
                 'message': 'Objectif créé avec succès',
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/goals/<int:goal_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_goal(self, goal_id, **kwargs):
@@ -282,7 +282,7 @@ class HRAppraisalController(http.Controller):
                 'goal': goal.get_goal_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/goals/<int:goal_id>/action', type='jsonrpc', auth='user', methods=['POST'])
     def goal_action(self, goal_id, action, **kwargs):
@@ -308,7 +308,7 @@ class HRAppraisalController(http.Controller):
                 'goal': goal.get_goal_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # COMPÉTENCES
@@ -330,7 +330,7 @@ class HRAppraisalController(http.Controller):
                 'skill_types': [t.get_type_data() for t in types],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/skills', type='jsonrpc', auth='user', methods=['POST'])
     def get_skills(self, **kwargs):
@@ -352,7 +352,7 @@ class HRAppraisalController(http.Controller):
                 'skills': [s.get_skill_data() for s in skills],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/employees/<int:employee_id>/skills', type='jsonrpc', auth='user', methods=['POST'])
     def get_employee_skills(self, employee_id, **kwargs):
@@ -366,7 +366,7 @@ class HRAppraisalController(http.Controller):
                 'employee_skills': [s.get_employee_skill_data() for s in skills],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/employees/<int:employee_id>/skills/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_employee_skills(self, employee_id, skills, **kwargs):
@@ -414,7 +414,7 @@ class HRAppraisalController(http.Controller):
                 'message': 'Compétences mises à jour',
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/skills/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_skill(self, **kwargs):
@@ -445,7 +445,7 @@ class HRAppraisalController(http.Controller):
                 'skill': skill.get_skill_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/skill-types/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_skill_type(self, **kwargs):
@@ -475,4 +475,4 @@ class HRAppraisalController(http.Controller):
                 'skill_type': skill_type.get_type_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}

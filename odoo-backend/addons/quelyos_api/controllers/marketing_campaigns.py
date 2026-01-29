@@ -50,7 +50,7 @@ class MarketingCampaignController(BaseController):
                 'offset': offset,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/campaigns/create', type='json', auth='public', csrf=False, methods=['POST'])
     def create_campaign(self, **kwargs):
@@ -86,7 +86,7 @@ class MarketingCampaignController(BaseController):
                 'campaign': campaign.to_dict(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/campaigns/<int:campaign_id>', type='json', auth='public', csrf=False, methods=['POST'])
     def get_campaign(self, campaign_id, **kwargs):
@@ -101,7 +101,7 @@ class MarketingCampaignController(BaseController):
                 'campaign': campaign.to_dict(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/campaigns/<int:campaign_id>/update', type='json', auth='public', csrf=False, methods=['POST'])
     def update_campaign(self, campaign_id, **kwargs):
@@ -129,7 +129,7 @@ class MarketingCampaignController(BaseController):
                 'campaign': campaign.to_dict(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/campaigns/<int:campaign_id>/send', type='json', auth='public', csrf=False, methods=['POST'])
     def send_campaign(self, campaign_id, **kwargs):
@@ -149,7 +149,7 @@ class MarketingCampaignController(BaseController):
                 'campaign': campaign.to_dict(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/campaigns/<int:campaign_id>/schedule', type='json', auth='public', csrf=False, methods=['POST'])
     def schedule_campaign(self, campaign_id, **kwargs):
@@ -171,7 +171,7 @@ class MarketingCampaignController(BaseController):
                 'campaign': campaign.to_dict(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/campaigns/<int:campaign_id>/duplicate', type='json', auth='public', csrf=False, methods=['POST'])
     def duplicate_campaign(self, campaign_id, **kwargs):
@@ -188,7 +188,7 @@ class MarketingCampaignController(BaseController):
                 'campaign': new_campaign.to_dict(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/campaigns/<int:campaign_id>/delete', type='json', auth='public', csrf=False, methods=['POST'])
     def delete_campaign(self, campaign_id, **kwargs):
@@ -202,7 +202,7 @@ class MarketingCampaignController(BaseController):
 
             return {'success': True}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # CONTACT LISTS
@@ -225,7 +225,7 @@ class MarketingCampaignController(BaseController):
                 'total': total,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/contact-lists/create', type='json', auth='public', csrf=False, methods=['POST'])
     def create_contact_list(self, **kwargs):
@@ -253,7 +253,7 @@ class MarketingCampaignController(BaseController):
                 'contact_list': contact_list.to_dict(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/contact-lists/<int:list_id>', type='json', auth='public', csrf=False, methods=['POST'])
     def get_contact_list(self, list_id, **kwargs):
@@ -279,7 +279,7 @@ class MarketingCampaignController(BaseController):
                 'contact_list': data,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/contact-lists/<int:list_id>/update', type='json', auth='public', csrf=False, methods=['POST'])
     def update_contact_list(self, list_id, **kwargs):
@@ -307,7 +307,7 @@ class MarketingCampaignController(BaseController):
                 'contact_list': contact_list.to_dict(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/contact-lists/<int:list_id>/delete', type='json', auth='public', csrf=False, methods=['POST'])
     def delete_contact_list(self, list_id, **kwargs):
@@ -321,7 +321,7 @@ class MarketingCampaignController(BaseController):
 
             return {'success': True}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # EMAIL TEMPLATES
@@ -347,7 +347,7 @@ class MarketingCampaignController(BaseController):
                 'templates': [t.to_dict() for t in templates],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # DASHBOARD
@@ -442,7 +442,7 @@ class MarketingCampaignController(BaseController):
                 'recent_campaigns': [c.to_dict() for c in recent_campaigns],
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # =========================================================================
     # IMPORT CSV CONTACTS
@@ -506,7 +506,7 @@ class MarketingCampaignController(BaseController):
                 'preview': preview_rows,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/marketing/contacts/import', type='json', auth='public', csrf=False, methods=['POST'])
     def import_csv_contacts(self, **kwargs):
@@ -620,4 +620,4 @@ class MarketingCampaignController(BaseController):
                 'list_name': contact_list.name,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}

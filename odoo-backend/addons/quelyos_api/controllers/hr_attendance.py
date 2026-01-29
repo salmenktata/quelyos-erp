@@ -64,7 +64,7 @@ class HRAttendanceController(http.Controller):
                 'offset': offset,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/attendance/today', type='jsonrpc', auth='user', methods=['POST'])
     def get_today_attendance(self, **kwargs):
@@ -81,7 +81,7 @@ class HRAttendanceController(http.Controller):
                 **summary,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/attendance/check-in', type='jsonrpc', auth='user', methods=['POST'])
     def check_in(self, **kwargs):
@@ -111,7 +111,7 @@ class HRAttendanceController(http.Controller):
                 'attendance': attendance_data,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/attendance/check-out', type='jsonrpc', auth='user', methods=['POST'])
     def check_out(self, **kwargs):
@@ -141,7 +141,7 @@ class HRAttendanceController(http.Controller):
                 'attendance': attendance_data,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/attendance/report', type='jsonrpc', auth='user', methods=['POST'])
     def get_attendance_report(self, **kwargs):
@@ -167,7 +167,7 @@ class HRAttendanceController(http.Controller):
                 **report,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/attendance/<int:attendance_id>/validate', type='jsonrpc', auth='user', methods=['POST'])
     def validate_attendance(self, attendance_id, **kwargs):
@@ -184,7 +184,7 @@ class HRAttendanceController(http.Controller):
                 'attendance': attendance.get_attendance_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/attendance/<int:attendance_id>/anomaly', type='jsonrpc', auth='user', methods=['POST'])
     def mark_anomaly(self, attendance_id, **kwargs):
@@ -202,7 +202,7 @@ class HRAttendanceController(http.Controller):
                 'attendance': attendance.get_attendance_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/attendance/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_attendance(self, **kwargs):
@@ -238,7 +238,7 @@ class HRAttendanceController(http.Controller):
                 'attendance': attendance.get_attendance_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/attendance/<int:attendance_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_attendance(self, attendance_id, **kwargs):
@@ -264,4 +264,4 @@ class HRAttendanceController(http.Controller):
                 'attendance': attendance.get_attendance_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}

@@ -66,7 +66,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching POS configs: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/config/<int:config_id>', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_pos_config(self, config_id, **kwargs):
@@ -90,7 +90,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching POS config {config_id}: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # ═══════════════════════════════════════════════════════════════════════════
     # SESSIONS
@@ -148,7 +148,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error opening POS session: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/session/close', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def close_session(self, session_id, closing_cash, notes=None, **kwargs):
@@ -197,7 +197,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error closing POS session: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/session/<int:session_id>', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_session(self, session_id, **kwargs):
@@ -218,7 +218,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching session {session_id}: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/sessions', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_sessions(self, config_id=None, state=None, limit=50, offset=0, **kwargs):
@@ -254,7 +254,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching sessions: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/sessions/active', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_active_sessions(self, **kwargs):
@@ -279,7 +279,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching active sessions: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # ═══════════════════════════════════════════════════════════════════════════
     # PRODUITS & CATALOGUE
@@ -369,7 +369,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching POS products: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/product/barcode', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_product_by_barcode(self, barcode, config_id, **kwargs):
@@ -429,7 +429,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching product by barcode: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/categories', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_categories(self, config_id=None, **kwargs):
@@ -458,7 +458,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching categories: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # ═══════════════════════════════════════════════════════════════════════════
     # COMMANDES
@@ -541,7 +541,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error creating POS order: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/order/<int:order_id>/pay', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def pay_order(self, order_id, payments, **kwargs):
@@ -575,7 +575,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error paying POS order {order_id}: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/order/<int:order_id>/cancel', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def cancel_order(self, order_id, reason=None, **kwargs):
@@ -599,7 +599,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error cancelling POS order {order_id}: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/order/<int:order_id>', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_order(self, order_id, **kwargs):
@@ -620,7 +620,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching POS order {order_id}: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/orders', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_orders(self, session_id=None, state=None, limit=50, offset=0, **kwargs):
@@ -656,7 +656,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching POS orders: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # ═══════════════════════════════════════════════════════════════════════════
     # CLIENTS
@@ -706,7 +706,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error searching customers: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/customer/create', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def create_customer(self, name, phone=None, email=None, **kwargs):
@@ -766,7 +766,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error creating customer: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # ═══════════════════════════════════════════════════════════════════════════
     # SYNC OFFLINE
@@ -845,7 +845,7 @@ class POSController(BaseController):
                     results.append({
                         'offlineId': offline_id,
                         'status': 'error',
-                        'error': str(e),
+                        'error': 'Erreur serveur',
                     })
 
             return {
@@ -859,7 +859,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error syncing offline orders: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # ═══════════════════════════════════════════════════════════════════════════
     # DASHBOARD & RAPPORTS
@@ -962,7 +962,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching POS dashboard: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/pos/session/<int:session_id>/report', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def get_session_report(self, session_id, **kwargs):
@@ -983,7 +983,7 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching session report: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     # ═══════════════════════════════════════════════════════════════════════════
     # MÉTHODES DE PAIEMENT
@@ -1018,4 +1018,4 @@ class POSController(BaseController):
 
         except Exception as e:
             _logger.error(f"Error fetching payment methods: {e}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}

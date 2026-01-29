@@ -7,6 +7,9 @@ import { ToastContainer } from "@/components/common/Toast";
 import { AppProviders } from "@/components/providers";
 import { siteConfig } from "@/lib/config/site";
 import { generateOrganizationSchema } from "@/lib/utils/seo";
+import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
+import { PushNotificationPrompt } from "@/components/pwa/PushNotificationPrompt";
+import { FAQChatbot } from "@/components/chat/FAQChatbot";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,6 +37,14 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
+        {/* PWA Manifest */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#dc2626" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Boutique" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+
         {/* Preload LCP hero image */}
         <link
           rel="preload"
@@ -57,6 +68,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
         <AppProviders>
+          <ServiceWorkerRegistration />
           <div className="flex flex-col min-h-screen">
             <HeaderWrapper />
             <main className="flex-grow">
@@ -65,6 +77,8 @@ export default function RootLayout({
             <Footer />
           </div>
           <ToastContainer />
+          <FAQChatbot />
+          <PushNotificationPrompt />
         </AppProviders>
       </body>
     </html>

@@ -25,7 +25,7 @@ class EmailSettingsController(http.Controller):
 
         except Exception as e:
             _logger.error("Error fetching email config: %s", str(e))
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur lors de la récupération de la configuration'}
 
     @http.route('/api/admin/email/config/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_email_config(self, **kwargs):
@@ -93,7 +93,7 @@ class EmailSettingsController(http.Controller):
 
         except Exception as e:
             _logger.error("Error updating email config: %s", str(e))
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur lors de la mise à jour de la configuration'}
 
     @http.route('/api/admin/email/test', type='jsonrpc', auth='user', methods=['POST'])
     def test_email_connection(self, **kwargs):
@@ -118,7 +118,7 @@ class EmailSettingsController(http.Controller):
 
         except Exception as e:
             _logger.error("Error testing email connection: %s", str(e))
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur lors du test de connexion'}
 
     def _send_test_email(self, config, recipient):
         """Send a test email"""
@@ -134,7 +134,7 @@ class EmailSettingsController(http.Controller):
 
         except Exception as e:
             _logger.error("Error sending test email: %s", str(e))
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur lors de l\'envoi de l\'email de test'}
 
     def _send_smtp_test(self, config, recipient):
         """Send test email via SMTP"""
@@ -175,7 +175,7 @@ class EmailSettingsController(http.Controller):
 
         except Exception as e:
             _logger.error("SMTP send error: %s", str(e))
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur d\'envoi SMTP'}
 
     def _send_brevo_test(self, config, recipient):
         """Send test email via Brevo"""
@@ -209,7 +209,7 @@ class EmailSettingsController(http.Controller):
 
         except Exception as e:
             _logger.error("Brevo send error: %s", str(e))
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur d\'envoi Brevo'}
 
     def _send_sendgrid_test(self, config, recipient):
         """Send test email via SendGrid"""
@@ -243,4 +243,4 @@ class EmailSettingsController(http.Controller):
 
         except Exception as e:
             _logger.error("SendGrid send error: %s", str(e))
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur d\'envoi SendGrid'}

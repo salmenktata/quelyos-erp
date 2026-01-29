@@ -5,6 +5,7 @@ import { useToast } from '@/store/toastStore';
 
 export function NewsletterForm() {
   const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
   const handleNewsletter = async (e: React.FormEvent) => {
@@ -14,12 +15,26 @@ export function NewsletterForm() {
       return;
     }
 
+    setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Inscription réussie ! Merci de votre confiance');
-      setEmail('');
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Inscription réussie ! Merci de votre confiance');
+        setEmail('');
+      } else {
+        toast.error(data.error || 'Erreur lors de l\'inscription');
+      }
     } catch {
       toast.error('Erreur lors de l\'inscription. Veuillez réessayer.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -42,12 +57,14 @@ export function NewsletterForm() {
         <button
           type="submit"
           className="bg-white text-primary px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-all hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!email}
+          disabled={!email || isLoading}
         >
-          S'inscrire
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-          </svg>
+          {isLoading ? 'Inscription...' : 'S\'inscrire'}
+          {!isLoading && (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          )}
         </button>
       </div>
       <p className="mt-4 text-sm text-white/70">

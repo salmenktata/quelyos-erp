@@ -148,7 +148,7 @@ class HealthController(http.Controller):
             _logger.error(f"Database health check failed: {e}")
             return {
                 'status': 'error',
-                'error': str(e),
+                'error': 'Erreur serveur',
             }
 
     def _check_redis(self) -> dict:
@@ -180,7 +180,7 @@ class HealthController(http.Controller):
             _logger.error(f"Redis health check failed: {e}")
             return {
                 'status': 'error',
-                'error': str(e),
+                'error': 'Erreur serveur',
             }
 
     def _check_disk(self) -> dict:
@@ -202,7 +202,7 @@ class HealthController(http.Controller):
         except Exception as e:
             return {
                 'status': 'unknown',
-                'error': str(e),
+                'error': 'Erreur serveur',
             }
 
     def _check_memory(self) -> dict:
@@ -218,7 +218,7 @@ class HealthController(http.Controller):
         except Exception as e:
             return {
                 'status': 'unknown',
-                'error': str(e),
+                'error': 'Erreur serveur',
             }
 
     def _get_metrics(self) -> dict:

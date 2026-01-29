@@ -61,7 +61,7 @@ class HRContractController(http.Controller):
                 'offset': offset,
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/contracts/<int:contract_id>', type='jsonrpc', auth='user', methods=['POST'])
     def get_contract(self, contract_id, **kwargs):
@@ -76,7 +76,7 @@ class HRContractController(http.Controller):
                 'contract': contract.get_contract_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/contracts/create', type='jsonrpc', auth='user', methods=['POST'])
     def create_contract(self, **kwargs):
@@ -128,7 +128,7 @@ class HRContractController(http.Controller):
                 'contract': contract.get_contract_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/contracts/<int:contract_id>/update', type='jsonrpc', auth='user', methods=['POST'])
     def update_contract(self, contract_id, **kwargs):
@@ -168,7 +168,7 @@ class HRContractController(http.Controller):
                 'contract': contract.get_contract_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/contracts/<int:contract_id>/open', type='jsonrpc', auth='user', methods=['POST'])
     def open_contract(self, contract_id, **kwargs):
@@ -185,7 +185,7 @@ class HRContractController(http.Controller):
                 'contract': contract.get_contract_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/contracts/<int:contract_id>/close', type='jsonrpc', auth='user', methods=['POST'])
     def close_contract(self, contract_id, **kwargs):
@@ -202,7 +202,7 @@ class HRContractController(http.Controller):
                 'contract': contract.get_contract_data(),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
 
     @http.route('/api/hr/contracts/expiring', type='jsonrpc', auth='user', methods=['POST'])
     def get_expiring_contracts(self, **kwargs):
@@ -236,4 +236,4 @@ class HRContractController(http.Controller):
                 'total': len(contracts),
             }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': 'Erreur serveur'}
