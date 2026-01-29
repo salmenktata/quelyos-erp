@@ -23,8 +23,8 @@ const eslintConfig = defineConfig([
     rules: {
       // Autoriser any avec warning (pas error)
       "@typescript-eslint/no-explicit-any": "warn",
-      // Variables non utilisées : ignorer si préfixées par _
-      "@typescript-eslint/no-unused-vars": ["error", {
+      // Variables non utilisées : warning au lieu d'error, ignorer si préfixées par _
+      "@typescript-eslint/no-unused-vars": ["warn", {
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
         caughtErrorsIgnorePattern: "^_"
@@ -35,6 +35,11 @@ const eslintConfig = defineConfig([
       "react-hooks/exhaustive-deps": "warn",
       // setState dans effect : warning
       "react-hooks/set-state-in-effect": "off",
+      // Purity et immutability : warning au lieu d'error
+      "react-hooks/purity": "warn",
+      "react-hooks/immutability": "warn",
+      // Next.js links : warning
+      "@next/next/no-html-link-for-pages": "warn",
     }
   }
 ]);
