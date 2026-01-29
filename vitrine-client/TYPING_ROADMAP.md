@@ -2,7 +2,8 @@
 
 **Objectif** : Réduire les 98 `any` TypeScript de manière progressive et sécurisée.
 
-**Statut actuel** : 98 warnings `@typescript-eslint/no-explicit-any`
+**Statut initial** : 98 warnings `@typescript-eslint/no-explicit-any`
+**Statut final** : ✅ **0 any dans le scope** (src/components, src/lib, src/hooks)
 
 ---
 
