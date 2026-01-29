@@ -48,6 +48,83 @@
 ## Langue
 Français pour communications. Code en anglais.
 
+## 🔧 ESLINT - GÉNÉRATION CODE CONFORME
+**RÉFLEXE ABSOLU** : Toujours générer du code ESLint-compliant
+
+### TypeScript Strict
+```typescript
+// ❌ INTERDIT - any
+catch (error: any) { }
+const data: any = response;
+
+// ✅ OBLIGATOIRE - Types explicites
+catch (error: unknown) { }
+catch (_error) { }  // si non utilisé
+const data: ApiResponse = response;
+```
+
+### Variables Non Utilisées
+```typescript
+// ❌ INTERDIT
+const { data, error } = await fetch();  // error non utilisé
+
+// ✅ OBLIGATOIRE - Préfixe underscore
+const { data, _error } = await fetch();
+// ou omettre si destructuring
+const { data } = await fetch();
+```
+
+### Apostrophes JSX
+```tsx
+// ❌ INTERDIT - Apostrophes directes
+<p>L'utilisateur n'a pas de compte</p>
+
+// ✅ OBLIGATOIRE - Échapper ou template string
+<p>L&apos;utilisateur n&apos;a pas de compte</p>
+<p>{`L'utilisateur n'a pas de compte`}</p>
+```
+
+### useEffect Dependencies
+```typescript
+// ❌ INTERDIT - Deps manquantes
+useEffect(() => {
+  fetchData();
+}, []);
+
+// ✅ OBLIGATOIRE - Toutes les deps ou useCallback
+const fetchData = useCallback(async () => { ... }, []);
+useEffect(() => {
+  fetchData();
+}, [fetchData]);
+```
+
+### Imports ES6
+```typescript
+// ❌ INTERDIT
+const fs = require('fs');
+
+// ✅ OBLIGATOIRE
+import fs from 'fs';
+import { readFile } from 'fs';
+```
+
+### setState dans useEffect
+```typescript
+// ❌ INTERDIT - setState synchrone dans effect
+useEffect(() => {
+  const stored = localStorage.getItem('theme');
+  if (stored) setTheme(stored);  // ❌
+}, []);
+
+// ✅ OBLIGATOIRE - Initialisation via useState ou lazy init
+const [theme, setTheme] = useState(() => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('theme') || 'light';
+  }
+  return 'light';
+});
+```
+
 ## 🌓 DARK/LIGHT MODE - VÉRIFICATION AUTOMATIQUE OBLIGATOIRE
 **RÉFLEXE ABSOLU** : TOUJOURS vérifier les deux modes sans rappel
 - **Chaque modification UI** : Tester light ET dark automatiquement
