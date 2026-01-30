@@ -13,6 +13,7 @@ import { Edit, Trash2, Zap, Clock, TrendingUp, AlertCircle } from 'lucide-react'
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface FlashSale {
   id: number;
@@ -50,12 +51,13 @@ export default function FlashSales() {
   const fetchSales = async () => {
     setError(null);
     try {
-      const res = await fetch('/api/admin/flash-sales', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; flashSales: FlashSale[] } }>(
+        '/api/admin/flash-sales',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
+        }
+      );
       if (data.result?.success) {
         setSales(data.result.flashSales || []);
       } else {

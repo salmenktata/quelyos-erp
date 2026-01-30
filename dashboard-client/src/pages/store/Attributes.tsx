@@ -13,6 +13,7 @@ import { Plus, Edit, Trash2, Palette, Tag } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button, SkeletonTable, PageNotice } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface AttributeValue {
   id: number;
@@ -41,12 +42,13 @@ export default function Attributes() {
   const fetchAttributes = async () => {
     setError(null);
     try {
-      const res = await fetch('/api/admin/attributes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; attributes: Attribute[] } }>(
+        '/api/admin/attributes',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
+        }
+      );
       if (data.result?.success) {
         setAttributes(data.result.attributes);
       } else {
@@ -62,12 +64,13 @@ export default function Attributes() {
   const saveAttribute = async () => {
     if (!editing) return;
     try {
-      const res = await fetch('/api/admin/attributes/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: editing }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean } }>(
+        '/api/admin/attributes/save',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: editing }),
+        }
+      );
       if (data.result?.success) {
         setEditing(null);
         fetchAttributes();

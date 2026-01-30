@@ -12,6 +12,7 @@ import { AlertTriangle, Package, RefreshCw, Settings, AlertCircle } from 'lucide
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface StockAlert {
   id: number;
@@ -42,12 +43,13 @@ export default function StockAlerts() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/stock/alerts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { threshold } }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; lowStock: StockAlert[]; outOfStock: OutOfStock[] } }>(
+        '/api/admin/stock/alerts',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { threshold } }),
+        }
+      );
       if (data.result?.success) {
         setLowStock(data.result.lowStock || []);
         setOutOfStock(data.result.outOfStock || []);

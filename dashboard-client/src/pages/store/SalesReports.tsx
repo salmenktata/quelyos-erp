@@ -12,6 +12,7 @@ import { TrendingUp, ShoppingCart, DollarSign, Package, Calendar, AlertCircle } 
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface SalesReport {
   totalRevenue: number;
@@ -42,16 +43,17 @@ export default function SalesReports() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/reports/sales', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'call',
-          params: { date_from: dateRange.from, date_to: dateRange.to }
-        }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; report: SalesReport } }>(
+        '/api/admin/reports/sales',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'call',
+            params: { date_from: dateRange.from, date_to: dateRange.to }
+          }),
+        }
+      );
       if (data.result?.success) {
         setReport(data.result.report);
       } else {

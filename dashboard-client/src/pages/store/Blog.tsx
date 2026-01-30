@@ -13,6 +13,7 @@ import { Plus, Edit, Trash2, Eye, FileText, Clock, Tag, AlertCircle } from 'luci
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface BlogPost {
   id: number;
@@ -56,12 +57,13 @@ export default function Blog() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/admin/blog/categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; categories: BlogCategory[] } }>(
+        '/api/admin/blog/categories',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
+        }
+      );
       if (data.result?.success) {
         setCategories(data.result.categories);
       }
@@ -77,12 +79,13 @@ export default function Blog() {
       const params: Record<string, number> = {};
       if (selectedCategory) params.category_id = selectedCategory;
 
-      const res = await fetch('/api/admin/blog/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; posts: BlogPost[] } }>(
+        '/api/admin/blog/posts',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params }),
+        }
+      );
       if (data.result?.success) {
         setPosts(data.result.posts);
       } else {

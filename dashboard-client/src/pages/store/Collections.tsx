@@ -14,6 +14,7 @@ import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { logger } from '@/lib/logger';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface Collection {
   id: number;
@@ -53,12 +54,13 @@ export default function Collections() {
   const fetchCollections = async () => {
     setError(null);
     try {
-      const res = await fetch('/api/admin/collections', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; collections: Collection[] } }>(
+        '/api/admin/collections',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
+        }
+      );
       if (data.result?.success) {
         setCollections(data.result.collections || []);
       } else {
@@ -74,12 +76,13 @@ export default function Collections() {
   const saveCollection = async () => {
     if (!editing) return;
     try {
-      const res = await fetch('/api/admin/collections/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: editing }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean } }>(
+        '/api/admin/collections/save',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: editing }),
+        }
+      );
       if (data.result?.success) {
         setEditing(null);
         fetchCollections();

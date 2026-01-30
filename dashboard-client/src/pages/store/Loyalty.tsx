@@ -13,6 +13,7 @@ import { Award, Users, TrendingUp, Star, Gift, Truck, AlertCircle } from 'lucide
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface LoyaltyLevel {
   id: number;
@@ -59,12 +60,13 @@ export default function Loyalty() {
   const fetchProgram = async () => {
     setError(null);
     try {
-      const res = await fetch('/api/admin/loyalty/program', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; program: LoyaltyProgram } }>(
+        '/api/admin/loyalty/program',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
+        }
+      );
       if (data.result?.success) {
         setProgram(data.result.program);
       }
@@ -77,12 +79,13 @@ export default function Loyalty() {
 
   const fetchMembers = async () => {
     try {
-      const res = await fetch('/api/admin/loyalty/members', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { limit: 20 } }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; members: LoyaltyMember[] } }>(
+        '/api/admin/loyalty/members',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { limit: 20 } }),
+        }
+      );
       if (data.result?.success) {
         setMembers(data.result.members || []);
       }

@@ -14,6 +14,7 @@ import { MessageSquare, Clock, User, Send, AlertCircle, CheckCircle, XCircle } f
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface Ticket {
   id: number;
@@ -60,12 +61,13 @@ export default function Tickets() {
       if (filter.priority) params.priority = filter.priority;
       if (filter.category) params.category = filter.category;
 
-      const res = await fetch('/api/admin/tickets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; tickets: Ticket[] } }>(
+        '/api/admin/tickets',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params }),
+        }
+      );
       if (data.result?.success) {
         setTickets(data.result.tickets);
       } else {

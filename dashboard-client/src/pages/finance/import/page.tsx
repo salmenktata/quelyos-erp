@@ -25,6 +25,7 @@ import { ValidationStep } from "@/components/finance/import/ValidationStep";
 import { useImportWizard } from "@/hooks/useImportWizard";
 import { logger } from "@quelyos/logger";
 import type { StepInfo, FieldType } from "@/types/import";
+import { apiFetchJson } from "@/lib/apiFetch";
 
 const STEPS: StepInfo[] = [
   { id: "upload", label: "Téléversement", icon: Upload, completed: false },
@@ -43,15 +44,12 @@ export default function ImportPage() {
   useEffect(() => {
     async function fetchAccounts() {
       try {
-        const response = await fetch('/api/ecommerce/accounts', {
-          credentials: "include",
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setAccounts(data);
-          if (data.length > 0 && !state.selectedAccountId) {
-            dispatch({ type: "SELECT_ACCOUNT", payload: data[0].id });
-          }
+        const data = await apiFetchJson<Array<{ id: number; name: string }>>(
+          '/api/ecommerce/accounts'
+        );
+        setAccounts(data);
+        if (data.length > 0 && !state.selectedAccountId) {
+          dispatch({ type: "SELECT_ACCOUNT", payload: data[0].id });
         }
       } catch (error) {
         logger.error("Error fetching accounts:", error);

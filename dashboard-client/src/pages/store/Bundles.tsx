@@ -13,6 +13,7 @@ import { Plus, Edit, Trash2, Package, Tag, AlertCircle } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface Bundle {
   id: number;
@@ -49,12 +50,13 @@ export default function Bundles() {
   const fetchBundles = async () => {
     setError(null);
     try {
-      const res = await fetch('/api/admin/bundles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; bundles: Bundle[] } }>(
+        '/api/admin/bundles',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
+        }
+      );
       if (data.result?.success) {
         setBundles(data.result.bundles || []);
       } else {

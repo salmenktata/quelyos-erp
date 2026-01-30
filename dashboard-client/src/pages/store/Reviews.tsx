@@ -13,6 +13,7 @@ import { Star, Check, X, MessageSquare, AlertCircle } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface Review {
   id: number;
@@ -48,12 +49,13 @@ export default function Reviews() {
       const params: Record<string, string> = {};
       if (filter !== 'all') params.state = filter;
 
-      const res = await fetch('/api/admin/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; reviews: Review[] } }>(
+        '/api/admin/reviews',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params }),
+        }
+      );
       if (data.result?.success) {
         setReviews(data.result.reviews || []);
       } else {
@@ -67,24 +69,26 @@ export default function Reviews() {
   };
 
   const handleApprove = async (id: number) => {
-    const res = await fetch(`/api/admin/reviews/${id}/approve`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
-    });
-    const data = await res.json();
+    const data = await apiFetchJson<{ result?: { success: boolean } }>(
+      `/api/admin/reviews/${id}/approve`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
+      }
+    );
     if (data.result?.success) {
       fetchReviews();
     }
   };
 
   const handleReject = async (id: number) => {
-    const res = await fetch(`/api/admin/reviews/${id}/reject`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { reason: 'Non conforme' } }),
-    });
-    const data = await res.json();
+    const data = await apiFetchJson<{ result?: { success: boolean } }>(
+      `/api/admin/reviews/${id}/reject`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { reason: 'Non conforme' } }),
+      }
+    );
     if (data.result?.success) {
       fetchReviews();
     }
@@ -92,12 +96,13 @@ export default function Reviews() {
 
   const handleReply = async () => {
     if (!selectedReview || !replyText) return;
-    const res = await fetch(`/api/admin/reviews/${selectedReview.id}/reply`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { reply: replyText } }),
-    });
-    const data = await res.json();
+    const data = await apiFetchJson<{ result?: { success: boolean } }>(
+      `/api/admin/reviews/${selectedReview.id}/reply`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { reply: replyText } }),
+      }
+    );
     if (data.result?.success) {
       setSelectedReview(null);
       setReplyText('');

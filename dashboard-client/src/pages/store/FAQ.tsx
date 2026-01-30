@@ -14,6 +14,7 @@ import { Plus, Edit, Trash2, ChevronDown, ChevronRight, HelpCircle, AlertCircle 
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface FAQCategory {
   id: number;
@@ -54,12 +55,13 @@ export default function FAQPage() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/admin/faq/categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; categories: FAQCategory[] } }>(
+        '/api/admin/faq/categories',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
+        }
+      );
       if (data.result?.success) {
         setCategories(data.result.categories || []);
       }
@@ -75,12 +77,13 @@ export default function FAQPage() {
       const params: Record<string, number> = {};
       if (selectedCategory) params.category_id = selectedCategory;
 
-      const res = await fetch('/api/admin/faq', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; faqs: FAQ[] } }>(
+        '/api/admin/faq',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params }),
+        }
+      );
       if (data.result?.success) {
         setFaqs(data.result.faqs || []);
       } else {
@@ -95,12 +98,13 @@ export default function FAQPage() {
 
   const saveCategory = async () => {
     try {
-      const res = await fetch('/api/admin/faq/categories/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: categoryForm }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean } }>(
+        '/api/admin/faq/categories/save',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: categoryForm }),
+        }
+      );
       if (data.result?.success) {
         setShowCategoryForm(false);
         setCategoryForm({ name: '', code: '', icon: 'HelpCircle' });
@@ -114,12 +118,13 @@ export default function FAQPage() {
   const saveFaq = async () => {
     if (!editingFaq) return;
     try {
-      const res = await fetch('/api/admin/faq/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: editingFaq }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean } }>(
+        '/api/admin/faq/save',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: editingFaq }),
+        }
+      );
       if (data.result?.success) {
         setEditingFaq(null);
         fetchFaqs();
@@ -133,12 +138,13 @@ export default function FAQPage() {
   const deleteFaq = async (id: number) => {
     if (!confirm('Supprimer cette FAQ ?')) return;
     try {
-      const res = await fetch(`/api/admin/faq/${id}/delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean } }>(
+        `/api/admin/faq/${id}/delete`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
+        }
+      );
       if (data.result?.success) {
         fetchFaqs();
         fetchCategories();

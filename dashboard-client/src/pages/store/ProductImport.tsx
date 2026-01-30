@@ -13,6 +13,7 @@ import { Upload, Download, FileSpreadsheet, Check, AlertCircle, X } from 'lucide
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface ImportResult {
   created: number;
@@ -30,12 +31,13 @@ export default function ProductImport() {
   const handleExport = async () => {
     setExporting(true);
     try {
-      const res = await fetch('/api/admin/products/export', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { format: 'csv' } }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; products: Record<string, unknown>[] } }>(
+        '/api/admin/products/export',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { format: 'csv' } }),
+        }
+      );
       if (data.result?.success) {
         const products = data.result.products;
 
@@ -116,12 +118,13 @@ export default function ProductImport() {
         return obj;
       });
 
-      const res = await fetch('/api/admin/products/import', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { products } }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: ImportResult }>(
+        '/api/admin/products/import',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { products } }),
+        }
+      );
       if (data.result) {
         setResult(data.result);
       }

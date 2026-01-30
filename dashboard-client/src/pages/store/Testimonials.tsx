@@ -13,6 +13,7 @@ import { Plus, Edit, Trash2, Quote, Star, User, AlertCircle } from 'lucide-react
 import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
+import { apiFetchJson } from '@/lib/apiFetch';
 
 interface Testimonial {
   id: number;
@@ -40,12 +41,13 @@ export default function Testimonials() {
   const fetchTestimonials = async () => {
     setError(null);
     try {
-      const res = await fetch('/api/admin/testimonials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean; testimonials: Testimonial[] } }>(
+        '/api/admin/testimonials',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {} }),
+        }
+      );
       if (data.result?.success) {
         setTestimonials(data.result.testimonials || []);
       } else {
@@ -61,12 +63,13 @@ export default function Testimonials() {
   const saveTestimonial = async () => {
     if (!editing) return;
     try {
-      const res = await fetch('/api/admin/testimonials/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: editing }),
-      });
-      const data = await res.json();
+      const data = await apiFetchJson<{ result?: { success: boolean } }>(
+        '/api/admin/testimonials/save',
+        {
+          method: 'POST',
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: editing }),
+        }
+      );
       if (data.result?.success) {
         setEditing(null);
         fetchTestimonials();
