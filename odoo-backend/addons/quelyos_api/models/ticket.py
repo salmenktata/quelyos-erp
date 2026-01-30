@@ -156,25 +156,28 @@ class SupportTicket(models.Model):
         ('breached', 'Dépassé'),
     ], string='Statut SLA résolution', compute='_compute_sla_status')
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Surcharge create pour générer séquence et publier événement WebSocket"""
-        if vals.get('name', _('New')) == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('quelyos.ticket') or _('New')
+        # Générer séquences pour chaque ticket
+        for vals in vals_list:
+            if vals.get('name', _('New')) == _('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('quelyos.ticket') or _('New')
 
-        ticket = super().create(vals)
+        tickets = super().create(vals_list)
 
-        # Publier événement WebSocket
-        ticket._publish_ws_event('ticket.created', {
-            'ticketId': ticket.id,
-            'tenantId': ticket.company_id.id,
-            'tenantName': ticket.company_id.name,
-            'priority': ticket.priority,
-            'subject': ticket.subject,
-            'category': ticket.category,
-        })
+        # Publier événement WebSocket pour chaque ticket
+        for ticket in tickets:
+            ticket._publish_ws_event('ticket.created', {
+                'ticketId': ticket.id,
+                'tenantId': ticket.company_id.id,
+                'tenantName': ticket.company_id.name,
+                'priority': ticket.priority,
+                'subject': ticket.subject,
+                'category': ticket.category,
+            })
 
-        return ticket
+        return tickets
 
     @api.depends('message_ids')
     def _compute_message_count(self):
