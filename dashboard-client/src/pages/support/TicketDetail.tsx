@@ -13,7 +13,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Layout } from '@/components/Layout'
 import { Breadcrumbs, Button, SkeletonTable } from '@/components/common'
 import { TicketStatusBadge, TicketPriorityBadge } from '@/components/support/TicketBadges'
-import { useTicketDetail, useReplyTicket, useCloseTicket, useTicketAttachments, useUploadAttachment, useDeleteAttachment } from '@/hooks/useTickets'
+import { useTicketDetail, useReplyTicket, useCloseTicket, useTicketAttachments, useUploadAttachment, useDeleteAttachment, useTemplates } from '@/hooks/useTickets'
 import { useChannel } from '@/lib/websocket/hooks'
 import { useQueryClient } from '@tanstack/react-query'
 import { Send, CheckCircle, MessageSquare, Clock, User, Paperclip, Upload, X, Download } from 'lucide-react'
@@ -28,6 +28,7 @@ export default function TicketDetail() {
   const ticketId = id ? parseInt(id, 10) : null
   const { data, isLoading, error } = useTicketDetail(ticketId)
   const { data: attachmentsData } = useTicketAttachments(ticketId)
+  const { data: templatesData } = useTemplates()
   const replyMutation = useReplyTicket(ticketId || 0)
   const closeMutation = useCloseTicket(ticketId || 0)
   const uploadMutation = useUploadAttachment(ticketId || 0)
@@ -105,6 +106,17 @@ export default function TicketDetail() {
       await deleteMutation.mutateAsync(attachmentId)
     } catch (_error) {
       // Erreur gérée par le hook
+    }
+  }
+
+  const handleSelectTemplate = (templateId: string) => {
+    if (!templateId || !templatesData?.templates) return
+
+    const template = templatesData.templates.find(t => t.id === parseInt(templateId, 10))
+    if (template) {
+      // Convertir HTML en texte simple basique (strip tags)
+      const plainText = template.content.replace(/<[^>]*>/g, '')
+      setReplyContent(plainText)
     }
   }
 
@@ -288,6 +300,28 @@ export default function TicketDetail() {
           {/* Formulaire de réponse */}
           {ticket.state !== 'closed' && (
             <form onSubmit={handleReply} className="border-t border-gray-200 dark:border-gray-700 pt-4">
+              {/* Sélection template */}
+              {templatesData?.templates && templatesData.templates.length > 0 && (
+                <div className="mb-4">
+                  <label htmlFor="template" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Utiliser un template
+                  </label>
+                  <select
+                    id="template"
+                    onChange={(e) => handleSelectTemplate(e.target.value)}
+                    defaultValue=""
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="">Sélectionner un template...</option>
+                    {templatesData.templates.map((template) => (
+                      <option key={template.id} value={template.id}>
+                        {template.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <label htmlFor="reply" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Votre réponse
               </label>

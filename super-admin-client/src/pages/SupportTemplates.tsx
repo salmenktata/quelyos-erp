@@ -24,7 +24,7 @@ import {
 import { api } from '@/lib/api/gateway'
 import { useToast } from '@/hooks/useToast'
 
-interface Template {
+export interface Template {
   id: number
   name: string
   content: string

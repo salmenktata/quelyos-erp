@@ -76,6 +76,16 @@ interface Attachment {
   url: string
 }
 
+interface Template {
+  id: number
+  name: string
+  content: string
+  category: string
+  sequence: number
+  active: boolean
+  created_at: string
+}
+
 export function SupportTickets() {
   const queryClient = useQueryClient()
   const toast = useToast()
@@ -140,6 +150,18 @@ export function SupportTickets() {
       return response.data
     },
     enabled: !!selectedTicket,
+  })
+
+  // Requête templates
+  const { data: templatesData } = useQuery({
+    queryKey: ['super-admin-templates'],
+    queryFn: async () => {
+      const response = await api.request<{ success: boolean; templates: Template[] }>({
+        method: 'GET',
+        path: '/api/super-admin/templates',
+      })
+      return response.data
+    },
   })
 
   // Mutation répondre
@@ -282,6 +304,17 @@ export function SupportTickets() {
   const handleAssign = async (userId: number | null) => {
     if (!selectedTicket) return
     await assignMutation.mutateAsync({ ticketId: selectedTicket.id, userId })
+  }
+
+  const handleSelectTemplate = (templateId: string) => {
+    if (!templateId || !templatesData?.templates) return
+
+    const template = templatesData.templates.find(t => t.id === parseInt(templateId, 10))
+    if (template) {
+      // Convertir HTML en texte simple (strip tags)
+      const plainText = template.content.replace(/<[^>]*>/g, '')
+      setReplyContent(plainText)
+    }
   }
 
   const handleSaveNotes = async () => {
@@ -683,6 +716,28 @@ export function SupportTickets() {
               {/* Formulaire réponse */}
               {selectedTicket.state !== 'closed' && (
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                  {/* Sélection template */}
+                  {templatesData?.templates && templatesData.templates.length > 0 && (
+                    <div className="mb-4">
+                      <label htmlFor="template" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Utiliser un template
+                      </label>
+                      <select
+                        id="template"
+                        onChange={(e) => handleSelectTemplate(e.target.value)}
+                        defaultValue=""
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="">Sélectionner un template...</option>
+                        {templatesData.templates.map((template) => (
+                          <option key={template.id} value={template.id}>
+                            {template.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                   <label htmlFor="reply" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Votre réponse
                   </label>
