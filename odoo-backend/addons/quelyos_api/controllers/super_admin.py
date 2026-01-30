@@ -4317,3 +4317,85 @@ class SuperAdminController(http.Controller):
                 {'success': False, 'error': str(e)},
                 headers=cors_headers, status=500
             )
+
+    # ========================================
+    # Historique Client
+    # ========================================
+
+    @http.route('/api/super-admin/customers/<int:partner_id>/tickets', type='http', auth='public',
+                methods=['GET', 'OPTIONS'], csrf=False)
+    def customer_ticket_history(self, partner_id):
+        """Historique complet des tickets d'un client"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            # Vérifier que le partner existe
+            partner = request.env['res.partner'].sudo().browse(partner_id)
+            if not partner.exists():
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Client non trouvé'
+                }, headers=cors_headers, status=404)
+
+            # Récupérer tous les tickets du client
+            tickets = request.env['quelyos.ticket'].sudo().search([
+                ('partner_id', '=', partner_id)
+            ], order='create_date desc')
+
+            # Statistiques globales
+            total_tickets = len(tickets)
+            open_tickets = len(tickets.filtered(lambda t: t.state in ('new', 'open', 'pending')))
+            resolved_tickets = len(tickets.filtered(lambda t: t.state in ('resolved', 'closed')))
+            
+            # Temps moyen de résolution (tickets résolus uniquement)
+            resolved_with_time = tickets.filtered(lambda t: t.resolution_time > 0)
+            avg_resolution_time = sum(t.resolution_time for t in resolved_with_time) / len(resolved_with_time) if resolved_with_time else 0
+
+            # Satisfaction moyenne
+            rated_tickets = tickets.filtered(lambda t: t.satisfaction_rating)
+            avg_satisfaction = sum(int(t.satisfaction_rating) for t in rated_tickets) / len(rated_tickets) if rated_tickets else 0
+
+            return request.make_json_response({
+                'success': True,
+                'customer': {
+                    'id': partner.id,
+                    'name': partner.name,
+                    'email': partner.email,
+                    'phone': partner.phone,
+                },
+                'stats': {
+                    'total': total_tickets,
+                    'open': open_tickets,
+                    'resolved': resolved_tickets,
+                    'avgResolutionTime': round(avg_resolution_time, 2),
+                    'avgSatisfaction': round(avg_satisfaction, 2),
+                },
+                'tickets': [t.to_dict_super_admin() for t in tickets]
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error fetching customer ticket history")
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=500
+            )
