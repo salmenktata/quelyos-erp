@@ -259,7 +259,7 @@ export function BillingCard() {
       {/* Billing interval toggle (only for FREE users) */}
       {currentPlan === "FREE" && (
         <div className="flex items-center justify-center gap-3">
-          <span className={`text-sm ${billingInterval === "month" ? "text-gray-900 font-medium" : "text-gray-500"}`}>
+          <span className={`text-sm ${billingInterval === "month" ? "text-gray-900 dark:text-white font-medium" : "text-gray-500"}`}>
             Mensuel
           </span>
           <button
@@ -274,7 +274,7 @@ export function BillingCard() {
               }`}
             />
           </button>
-          <span className={`text-sm ${billingInterval === "year" ? "text-gray-900 font-medium" : "text-gray-500"}`}>
+          <span className={`text-sm ${billingInterval === "year" ? "text-gray-900 dark:text-white font-medium" : "text-gray-500"}`}>
             Annuel
           </span>
           {billingInterval === "year" && (
