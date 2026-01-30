@@ -1556,6 +1556,9 @@ class SuperAdminController(http.Controller):
             backup_id = backup.id
             db_name = request.env.cr.dbname
 
+            # IMPORTANT: Commit pour que le thread voit le record
+            request.env.cr.commit()
+
             # Lancer le backup en tâche de fond (via threading avec nouveau cursor)
             def _execute_backup_thread():
                 try:
