@@ -14,6 +14,7 @@ import { Monitoring } from '@/pages/Monitoring'
 import { Backups } from '@/pages/Backups'
 import { Security } from '@/pages/Security'
 import { SupportTickets } from '@/pages/SupportTickets'
+import { SupportTemplates } from '@/pages/SupportTemplates'
 import { AuditLogs } from '@/pages/AuditLogs'
 import { Settings } from '@/pages/Settings'
 import { InactivityWarning } from './InactivityWarning'
@@ -39,6 +40,7 @@ function PageViewTracker() {
       '/monitoring': 'Monitoring',
       '/security': 'Security',
       '/support-tickets': 'Support Tickets',
+      '/support-templates': 'Support Templates',
       '/audit-logs': 'Audit Logs',
       '/backups': 'Backups',
       '/settings': 'Settings',
@@ -89,6 +91,7 @@ export function AuthenticatedApp() {
           <Route path="monitoring" element={<Monitoring />} />
           <Route path="security" element={<Security />} />
           <Route path="support-tickets" element={<SupportTickets />} />
+          <Route path="support-templates" element={<SupportTemplates />} />
           <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="backups" element={<Backups />} />
           <Route path="settings" element={<Settings />} />
