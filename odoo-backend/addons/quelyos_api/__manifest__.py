@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos API',
-    'version': '19.0.1.16.0',
+    'version': '19.0.1.17.0',
     'category': 'Quelyos/API',
     'summary': 'API REST pour frontend e-commerce et backoffice',
     'author': 'Quelyos',
@@ -55,7 +55,7 @@
         # 'data/hr_sequence.xml',  # TEMPORAIREMENT DÉSACTIVÉ
         'data/ticket_sequence.xml',
         'data/sla_policies.xml',
-        'data/email_template_satisfaction_request.xml',
+        # 'data/email_template_satisfaction_request.xml',  # Créé via hooks.py (workaround validation XML)
         'data/pos_demo_data.xml',
         'data/store_demo_data.xml',
         'data/theme_data.xml',
@@ -71,6 +71,7 @@
         'views/theme_views.xml',
     ],
     'pre_init_hook': 'pre_init_hook',
+    'post_init_hook': 'post_init_hook',
     'installable': True,
     'application': True,
     'auto_install': False,

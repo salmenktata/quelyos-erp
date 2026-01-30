@@ -26,3 +26,4 @@ def pre_init_hook(cr):
 
 from . import controllers
 from . import models
+from . import hooks
