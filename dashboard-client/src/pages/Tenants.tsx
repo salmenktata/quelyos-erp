@@ -89,7 +89,7 @@ export default function Tenants() {
     <Layout>
       <div className="p-6 bg-white dark:bg-gray-800 min-h-screen">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Tenants / Boutiques</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100">Tenants / Boutiques</h1>
         </div>
 
         <div className={`grid gap-6 ${editingTenant ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
@@ -112,7 +112,7 @@ export default function Tenants() {
                       className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${editingTenant?.id === tenant.id ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}`}
                       onClick={() => handleOpenEdit(tenant)}
                     >
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">{tenant.name}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100">{tenant.name}</td>
                       <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{tenant.code}</td>
                       <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{tenant.domain}</td>
                       <td className="px-4 py-3">
@@ -138,7 +138,7 @@ export default function Tenants() {
           {editingTenant && (
             <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100">
                   {editingTenant.name}
                 </h2>
                 <button
@@ -159,7 +159,7 @@ export default function Tenants() {
                     className={`px-3 py-2 text-sm font-medium ${
                       activeTab === 'general'
                         ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:hover:text-gray-300'
                     }`}
                   >
                     Infos
@@ -169,7 +169,7 @@ export default function Tenants() {
                     className={`px-3 py-2 text-sm font-medium ${
                       activeTab === 'theme'
                         ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:hover:text-gray-300'
                     }`}
                   >
                     Thème
@@ -180,30 +180,30 @@ export default function Tenants() {
               {activeTab === 'general' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Nom</label>
                     <input
                       type="text"
                       value={editingTenant.name}
                       disabled
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Code</label>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Code</label>
                     <input
                       type="text"
                       value={editingTenant.code}
                       disabled
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Domaine</label>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Domaine</label>
                     <input
                       type="text"
                       value={editingTenant.domain}
                       disabled
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-100"
                     />
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
@@ -216,7 +216,7 @@ export default function Tenants() {
                 <div className="space-y-5">
                   {/* Logos */}
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Logos</h3>
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100 mb-3">Logos</h3>
                     <div className="grid grid-cols-2 gap-3">
                       <ImageUpload
                         label="Logo"
@@ -236,7 +236,7 @@ export default function Tenants() {
 
                   {/* Couleurs */}
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Couleurs</h3>
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100 mb-3">Couleurs</h3>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
                         <input
@@ -251,7 +251,7 @@ export default function Tenants() {
                             type="text"
                             value={themeData.primary}
                             onChange={(e) => setThemeData({ ...themeData, primary: e.target.value })}
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100"
                           />
                         </div>
                       </div>
@@ -268,7 +268,7 @@ export default function Tenants() {
                             type="text"
                             value={themeData.secondary}
                             onChange={(e) => setThemeData({ ...themeData, secondary: e.target.value })}
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100"
                           />
                         </div>
                       </div>
@@ -285,7 +285,7 @@ export default function Tenants() {
                             type="text"
                             value={themeData.accent}
                             onChange={(e) => setThemeData({ ...themeData, accent: e.target.value })}
-                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100"
                           />
                         </div>
                       </div>
@@ -294,11 +294,11 @@ export default function Tenants() {
 
                   {/* Typographie */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Police</label>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Police</label>
                     <select
                       value={themeData.font_family}
                       onChange={(e) => setThemeData({ ...themeData, font_family: e.target.value as typeof themeData.font_family })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 focus:ring-2 focus:ring-indigo-500"
                     >
                       <option value="inter">Inter</option>
                       <option value="roboto">Roboto</option>
@@ -318,7 +318,7 @@ export default function Tenants() {
                         onChange={(e) => setThemeData({ ...themeData, enable_dark_mode: e.target.checked })}
                         className="w-4 h-4 text-indigo-600 border-gray-300 dark:border-gray-600 rounded focus:ring-indigo-500"
                       />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">Activer le mode sombre</span>
+                      <span className="text-sm text-gray-900 dark:text-white dark:text-gray-300">Activer le mode sombre</span>
                     </label>
                   </div>
 

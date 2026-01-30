@@ -33,13 +33,13 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4">
         {isCreating ? 'Nouveau Slide' : 'Modifier le Slide'}
       </h2>
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
+          <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Nom *</label>
           <input
             type="text"
             value={formData.name}
@@ -50,7 +50,7 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Titre *</label>
+          <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Titre *</label>
           <input
             type="text"
             value={formData.title}
@@ -62,7 +62,7 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sous-titre</label>
+          <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Sous-titre</label>
           <input
             type="text"
             value={formData.subtitle}
@@ -73,7 +73,7 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+          <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Description</label>
           <textarea
             value={formData.description}
             onChange={e => updateField('description', e.target.value)}
@@ -91,7 +91,7 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bouton principal *</label>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Bouton principal *</label>
             <input
               type="text"
               value={formData.cta_text}
@@ -102,7 +102,7 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lien principal *</label>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Lien principal *</label>
             <input
               type="text"
               value={formData.cta_link}
@@ -116,7 +116,7 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bouton secondaire</label>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Bouton secondaire</label>
             <input
               type="text"
               value={formData.cta_secondary_text}
@@ -126,7 +126,7 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lien secondaire</label>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Lien secondaire</label>
             <input
               type="text"
               value={formData.cta_secondary_link}
@@ -145,7 +145,7 @@ export function HeroSlideForm({ formData, isCreating, onFormDataChange, onSave, 
             onChange={e => updateField('active', e.target.checked)}
             className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
           />
-          <label htmlFor="active" className="text-sm text-gray-700 dark:text-gray-300">Actif</label>
+          <label htmlFor="active" className="text-sm text-gray-900 dark:text-white dark:text-gray-300">Actif</label>
         </div>
       </div>
 

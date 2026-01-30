@@ -111,14 +111,14 @@ export default function StockValuationPage() {
         <div className="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                 <Calendar className="inline mr-2 h-4 w-4" />
                 Date
               </label>
               <select
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               >
                 {TIME_RANGES.map(range => (
                   <option key={range.value} value={range.value}>
@@ -148,7 +148,7 @@ export default function StockValuationPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">Valeur Totale</p>
                 <DollarSign className="h-5 w-5 text-green-600" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mt-2">
                 {formatAmount(kpis.totalvalue)}
               </p>
             </div>
@@ -157,7 +157,7 @@ export default function StockValuationPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">Quantité Totale</p>
                 <Package className="h-5 w-5 text-blue-600" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mt-2">
                 {kpis.total_qty.toFixed(0)} unités
               </p>
             </div>
@@ -166,7 +166,7 @@ export default function StockValuationPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">Valeur Moy. / Produit</p>
                 <TrendingUp className="h-5 w-5 text-purple-600" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mt-2">
                 {formatAmount(kpis.avgvalue_per_product)}
               </p>
             </div>
@@ -175,7 +175,7 @@ export default function StockValuationPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">Nombre de Produits</p>
                 <Tag className="h-5 w-5 text-orange-600" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mt-2">
                 {kpis.product_count}
               </p>
             </div>
@@ -186,7 +186,7 @@ export default function StockValuationPage() {
         {byWarehouse.length > 0 && (
           <div className="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 flex items-center">
                 <Warehouse className="mr-2 h-5 w-5 text-blue-600" />
                 Valorisation par Entrepôt
               </h3>
@@ -212,10 +212,10 @@ export default function StockValuationPage() {
                 <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                   {byWarehouse.map((warehouse) => (
                     <tr key={warehouse.warehouse_id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100">
                         {warehouse.warehouse_name}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100 font-semibold">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white dark:text-gray-100 font-semibold">
                         {formatAmount(warehouse.totalvalue)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
@@ -236,7 +236,7 @@ export default function StockValuationPage() {
         {byCategory.length > 0 && (
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 flex items-center">
                 <Tag className="mr-2 h-5 w-5 text-purple-600" />
                 Valorisation par Catégorie
               </h3>
@@ -262,10 +262,10 @@ export default function StockValuationPage() {
                 <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                   {byCategory.map((category) => (
                     <tr key={category.category_id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100">
                         {category.category_name}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100 font-semibold">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white dark:text-gray-100 font-semibold">
                         {formatAmount(category.totalvalue)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">

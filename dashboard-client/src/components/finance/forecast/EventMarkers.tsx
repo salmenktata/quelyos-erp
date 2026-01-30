@@ -87,7 +87,7 @@ export function EventMarkers({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900 text-lg">
+        <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
           Événements annotés
           <span className="ml-2 text-sm font-normal text-gray-500">
             ({events.length})
@@ -120,11 +120,11 @@ export function EventMarkers({
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="bg-gray-50 rounded-lg p-4 border border-gray-200 space-y-3"
+          className="bg-gray-50 rounded-lg p-4 border border-gray-200 dark:border-gray-700 space-y-3"
         >
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                 Date
               </label>
               <input
@@ -139,7 +139,7 @@ export function EventMarkers({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                 Libellé
               </label>
               <input
@@ -156,7 +156,7 @@ export function EventMarkers({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
               Description (optionnel)
             </label>
             <textarea
@@ -174,7 +174,7 @@ export function EventMarkers({
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               Annuler
             </button>
@@ -199,11 +199,11 @@ export function EventMarkers({
           events.map((event) => (
             <div
               key={event.id || event.date + event.label}
-              className="flex items-start justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+              className="flex items-start justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 transition-colors"
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium text-gray-900 dark:text-white">
                     {event.label}
                   </span>
 
@@ -219,7 +219,7 @@ export function EventMarkers({
                     </span>
                   )}
                   {event.type === "manual" && (
-                    <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-gray-200 text-gray-900 dark:text-white px-2 py-0.5 rounded-full">
                       Manuel
                     </span>
                   )}

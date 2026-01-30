@@ -37,7 +37,7 @@ export function ForecastChart({
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[500px] bg-gray-50 rounded-lg border border-gray-200">
+      <div className="flex items-center justify-center h-[500px] bg-gray-50 rounded-lg border border-gray-200 dark:border-gray-700">
         <p className="text-gray-500">Aucune donnée de prévision disponible</p>
       </div>
     );
@@ -200,8 +200,8 @@ function CustomTooltip({ active, payload, label, formatCurrency }: CustomTooltip
   const date = new Date(label || '');
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-3 shadow-xl">
-      <p className="font-semibold text-gray-900 mb-2 text-sm">
+    <div className="bg-white/95 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-xl">
+      <p className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
         {date.toLocaleDateString("fr-FR", {
           weekday: "short",
           year: "numeric",
@@ -231,7 +231,7 @@ function CustomTooltip({ active, payload, label, formatCurrency }: CustomTooltip
               />
               <span className="text-gray-600">{entry.name}:</span>
             </div>
-            <span className="font-semibold text-gray-900">
+            <span className="font-semibold text-gray-900 dark:text-white">
               {formatCurrency(entry.value ?? 0)}
             </span>
           </div>
@@ -240,7 +240,7 @@ function CustomTooltip({ active, payload, label, formatCurrency }: CustomTooltip
 
       {/* Show components if available */}
       {(payload[0] as { payload?: { components?: { trend: number; seasonal: number; planned: number } } })?.payload?.components && (
-        <div className="mt-2 pt-2 border-t border-gray-200">
+        <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
           <p className="text-xs font-medium text-gray-500 mb-1">Composants:</p>
           <div className="text-xs text-gray-600 space-y-0.5">
             <div className="flex justify-between">

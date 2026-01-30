@@ -28,7 +28,7 @@ export function BreakEvenCard({ value = 0, progress = 0, isLoading, formatAmount
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Point mort</h3>
-      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+      <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mt-1">
         {format(value)}
       </p>
       <div className="mt-2">

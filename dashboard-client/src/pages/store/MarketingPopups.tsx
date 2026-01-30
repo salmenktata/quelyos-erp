@@ -169,7 +169,7 @@ export default function MarketingPopupsPage() {
 
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Popups Marketing</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100">Popups Marketing</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Popups promotionnelles et d'engagement</p>
           </div>
           {!showForm && <Button onClick={handleNew}>Nouveau</Button>}
@@ -209,7 +209,7 @@ export default function MarketingPopupsPage() {
                       className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${editingPopup?.id === p.id ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}`}
                       onClick={() => handleEdit(p)}
                     >
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{p.name}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-white dark:text-gray-100">{p.name}</td>
                       <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{p.popup_type}</td>
                       <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{p.views_count || 0}</td>
                       <td className="px-4 py-3">
@@ -238,7 +238,7 @@ export default function MarketingPopupsPage() {
           {showForm && (
             <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
               <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100">
                   {isCreating ? 'Nouvelle Popup' : 'Modifier la Popup'}
                 </h2>
               </div>
@@ -251,7 +251,7 @@ export default function MarketingPopupsPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setActiveTab(tab)}
-                    className={`!rounded-none px-4 py-2 text-sm font-medium ${activeTab === tab ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                    className={`!rounded-none px-4 py-2 text-sm font-medium ${activeTab === tab ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:hover:text-gray-200'}`}
                   >
                     {tab === 'general' ? 'Général' : tab === 'trigger' ? 'Déclencheur' : 'Design'}
                   </Button>
@@ -263,11 +263,11 @@ export default function MarketingPopupsPage() {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom *</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Nom *</label>
                         <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Type</label>
                         <select value={formData.popup_type} onChange={e => setFormData({ ...formData, popup_type: e.target.value as typeof formData.popup_type })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm">
                           <option value="newsletter">Newsletter</option>
                           <option value="promotion">Promotion</option>
@@ -279,34 +279,34 @@ export default function MarketingPopupsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Titre</label>
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Titre</label>
                       <input type="text" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm" />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sous-titre</label>
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Sous-titre</label>
                       <input type="text" value={formData.subtitle} onChange={e => setFormData({ ...formData, subtitle: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm" />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contenu HTML</label>
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Contenu HTML</label>
                       <textarea rows={3} value={formData.content} onChange={e => setFormData({ ...formData, content: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Texte CTA</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Texte CTA</label>
                         <input type="text" value={formData.cta_text} onChange={e => setFormData({ ...formData, cta_text: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lien CTA</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Lien CTA</label>
                         <input type="text" value={formData.cta_link} onChange={e => setFormData({ ...formData, cta_link: e.target.value })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm" />
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <input type="checkbox" id="active" checked={formData.active} onChange={e => setFormData({ ...formData, active: e.target.checked })} className="w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                      <label htmlFor="active" className="text-sm text-gray-700 dark:text-gray-300">Actif</label>
+                      <label htmlFor="active" className="text-sm text-gray-900 dark:text-white dark:text-gray-300">Actif</label>
                     </div>
                   </>
                 )}
@@ -314,7 +314,7 @@ export default function MarketingPopupsPage() {
                 {activeTab === 'trigger' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Déclencheur</label>
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Déclencheur</label>
                       <select value={formData.trigger_type} onChange={e => setFormData({ ...formData, trigger_type: e.target.value as typeof formData.trigger_type })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm">
                         <option value="immediate">Immédiat</option>
                         <option value="delay">Après délai</option>
@@ -325,20 +325,20 @@ export default function MarketingPopupsPage() {
 
                     {formData.trigger_type === 'delay' && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Délai (sec)</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Délai (sec)</label>
                         <input type="number" min="0" value={formData.trigger_delay} onChange={e => setFormData({ ...formData, trigger_delay: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm" />
                       </div>
                     )}
 
                     {formData.trigger_type === 'scroll' && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Scroll %</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Scroll %</label>
                         <input type="number" min="0" max="100" value={formData.trigger_scroll_percent} onChange={e => setFormData({ ...formData, trigger_scroll_percent: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm" />
                       </div>
                     )}
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pages ciblées</label>
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Pages ciblées</label>
                       <select value={formData.target_pages} onChange={e => setFormData({ ...formData, target_pages: e.target.value as typeof formData.target_pages })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm">
                         <option value="all">Toutes</option>
                         <option value="home">Homepage</option>
@@ -351,11 +351,11 @@ export default function MarketingPopupsPage() {
                     <div className="space-y-2">
                       <label className="flex items-center gap-2">
                         <input type="checkbox" checked={formData.show_once_per_session} onChange={e => setFormData({ ...formData, show_once_per_session: e.target.checked })} className="w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">1x par session</span>
+                        <span className="text-sm text-gray-900 dark:text-white dark:text-gray-300">1x par session</span>
                       </label>
                       <label className="flex items-center gap-2">
                         <input type="checkbox" checked={formData.show_once_per_user} onChange={e => setFormData({ ...formData, show_once_per_user: e.target.checked })} className="w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">1x par utilisateur</span>
+                        <span className="text-sm text-gray-900 dark:text-white dark:text-gray-300">1x par utilisateur</span>
                       </label>
                     </div>
                   </>
@@ -365,7 +365,7 @@ export default function MarketingPopupsPage() {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Position</label>
                         <select value={formData.position} onChange={e => setFormData({ ...formData, position: e.target.value as typeof formData.position })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm">
                           <option value="center">Centre</option>
                           <option value="bottom_right">Bas droite</option>
@@ -374,22 +374,22 @@ export default function MarketingPopupsPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Largeur max (px)</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Largeur max (px)</label>
                         <input type="number" min="300" max="800" value={formData.max_width} onChange={e => setFormData({ ...formData, max_width: parseInt(e.target.value) || 500 })} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-100 text-sm" />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fond</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Fond</label>
                         <input type="color" value={formData.background_color} onChange={e => setFormData({ ...formData, background_color: e.target.value })} className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Texte</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Texte</label>
                         <input type="color" value={formData.text_color} onChange={e => setFormData({ ...formData, text_color: e.target.value })} className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CTA</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">CTA</label>
                         <input type="color" value={formData.cta_color} onChange={e => setFormData({ ...formData, cta_color: e.target.value })} className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer" />
                       </div>
                     </div>

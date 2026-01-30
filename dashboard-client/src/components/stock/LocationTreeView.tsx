@@ -94,7 +94,7 @@ function TreeNode({
         {/* Nom et infos */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+            <span className="text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100 truncate">
               {node.name}
             </span>
             {node.usage === 'view' && (

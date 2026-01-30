@@ -269,7 +269,7 @@ export default function Menus() {
           {/* Formulaire inline */}
           {showForm && (
             <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4">
                 {isCreating ? 'Nouveau Menu' : 'Modifier le Menu'}
               </h2>
 
@@ -300,7 +300,7 @@ export default function Menus() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Libellé affiché *</label>
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Libellé affiché *</label>
                   <input
                     type="text"
                     value={formData.label}
@@ -311,7 +311,7 @@ export default function Menus() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL *</label>
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">URL *</label>
                   <input
                     type="text"
                     value={formData.url}
@@ -345,7 +345,7 @@ export default function Menus() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">Description</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -358,15 +358,15 @@ export default function Menus() {
                 <div className="flex flex-wrap gap-4">
                   <label className="flex items-center gap-2">
                     <input type="checkbox" checked={formData.active} onChange={(e) => setFormData({ ...formData, active: e.target.checked })} className="w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Actif</span>
+                    <span className="text-sm text-gray-900 dark:text-white dark:text-gray-300">Actif</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input type="checkbox" checked={formData.open_new_tab} onChange={(e) => setFormData({ ...formData, open_new_tab: e.target.checked })} className="w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Nouvel onglet</span>
+                    <span className="text-sm text-gray-900 dark:text-white dark:text-gray-300">Nouvel onglet</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input type="checkbox" checked={formData.requires_auth} onChange={(e) => setFormData({ ...formData, requires_auth: e.target.checked })} className="w-4 h-4 text-indigo-600 border-gray-300 rounded" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Auth requise</span>
+                    <span className="text-sm text-gray-900 dark:text-white dark:text-gray-300">Auth requise</span>
                   </label>
                 </div>
               </div>

@@ -82,13 +82,13 @@ function LocationTreeSelect({ value, onChange, tree, excludeId, warehouseId, lab
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
         {label}
       </label>
       <select
         value={value || ''}
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : undefined)}
-        className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+        className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
       >
         <option value="">-- Aucun parent (racine) --</option>
         {flattenedOptions.map((option) => (
@@ -247,7 +247,7 @@ export function LocationFormModal({
         <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-2xl w-full">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white dark:text-gray-100">
               {mode === 'create' ? 'Créer un emplacement' : 'Modifier l\'emplacement'}
             </h2>
             <button
@@ -263,14 +263,14 @@ export function LocationFormModal({
             <div className="px-6 py-4 space-y-4">
               {/* Nom */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                   <MapPin className="inline mr-2 h-4 w-4" />
                   Nom de l'emplacement *
                 </label>
                 <input
                   type="text"
                   {...form.register('name')}
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   placeholder="Rayon A"
                 />
                 {form.formState.errors.name && (
@@ -282,7 +282,7 @@ export function LocationFormModal({
 
               {/* Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                   Type d'emplacement *
                 </label>
                 <div className="grid grid-cols-2 gap-4">
@@ -303,7 +303,7 @@ export function LocationFormModal({
                     />
                     <Package className="h-5 w-5 text-green-600 dark:text-green-400" />
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-gray-100">Stock physique</div>
+                      <div className="font-medium text-gray-900 dark:text-white dark:text-gray-100">Stock physique</div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">Contient des produits</div>
                     </div>
                   </label>
@@ -325,7 +325,7 @@ export function LocationFormModal({
                     />
                     <Folder className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-gray-100">Catégorie</div>
+                      <div className="font-medium text-gray-900 dark:text-white dark:text-gray-100">Catégorie</div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">Dossier organisationnel</div>
                     </div>
                   </label>
@@ -339,13 +339,13 @@ export function LocationFormModal({
 
               {/* Entrepôt */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                   Entrepôt *
                 </label>
                 <select
                   {...form.register('warehouse_id', { valueAsNumber: true })}
                   disabled={mode === 'edit'}
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">-- Sélectionner --</option>
                   {warehouses?.map((wh) => (
@@ -391,14 +391,14 @@ export function LocationFormModal({
 
               {/* Code-barres */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                   <Barcode className="inline mr-2 h-4 w-4" />
                   Code-barres (optionnel)
                 </label>
                 <input
                   type="text"
                   {...form.register('barcode')}
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm font-mono"
+                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm font-mono"
                   placeholder="123456789"
                 />
               </div>
@@ -418,7 +418,7 @@ export function LocationFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="px-4 py-2 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Annuler
               </button>

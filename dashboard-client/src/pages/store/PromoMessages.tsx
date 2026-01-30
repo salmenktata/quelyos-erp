@@ -142,7 +142,7 @@ export default function PromoMessages() {
                       className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${editingMessage?.id === m.id ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}`}
                       onClick={() => handleEdit(m)}
                     >
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{m.name}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-white dark:text-gray-100">{m.name}</td>
                       <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">{m.text}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-1 text-xs rounded-full ${m.active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
@@ -176,7 +176,7 @@ export default function PromoMessages() {
           {/* Formulaire inline */}
           {showForm && (
             <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4">
                 {isCreating ? 'Nouveau Message' : 'Modifier le Message'}
               </h2>
 
@@ -224,7 +224,7 @@ export default function PromoMessages() {
                     onChange={e => setFormData({ ...formData, active: e.target.checked })}
                     className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                   />
-                  <label htmlFor="active" className="text-sm text-gray-700 dark:text-gray-300">Actif</label>
+                  <label htmlFor="active" className="text-sm text-gray-900 dark:text-white dark:text-gray-300">Actif</label>
                 </div>
               </div>
 

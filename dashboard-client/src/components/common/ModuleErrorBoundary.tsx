@@ -103,7 +103,7 @@ export class ModuleErrorBoundary extends Component<ModuleErrorBoundaryProps, Mod
             </button>
             <button
               onClick={this.handleGoBack}
-              className="inline-flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+              className="inline-flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-100 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour au tableau de bord

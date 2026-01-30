@@ -151,9 +151,9 @@ export default function ScenarioComparison() {
 
     return (
       <div className="grid grid-cols-4 gap-4 py-3 border-b border-gray-200 dark:border-gray-700 items-center">
-        <div className="font-medium text-sm text-gray-900 dark:!text-white">{label}</div>
+        <div className="font-medium text-sm text-gray-900 dark:text-white dark:!text-white">{label}</div>
         {comparisonData.map((scenario) => {
-          if (!scenario.metrics) return <div key={scenario.id} className="text-gray-900 dark:!text-white">-</div>;
+          if (!scenario.metrics) return <div key={scenario.id} className="text-gray-900 dark:text-white dark:!text-white">-</div>;
 
           const value = scenario.metrics[metricKey];
           const isBest = scenario.id === bestId;
@@ -189,7 +189,7 @@ export default function ScenarioComparison() {
         <div className="flex items-center gap-3 mb-4">
           <GitCompare className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:!text-white">Comparaison de scénarios</h3>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white dark:!text-white">Comparaison de scénarios</h3>
             <p className="text-sm text-muted-foreground">
               Comparez jusqu'à 3 stratégies d'optimisation différentes
             </p>
@@ -240,15 +240,15 @@ export default function ScenarioComparison() {
       {/* Tableau de comparaison */}
       {comparisonData.length > 0 && (
         <Card className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:!text-white mb-4">Comparaison des métriques</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white dark:!text-white mb-4">Comparaison des métriques</h3>
 
           <div className="space-y-1">
             {/* En-têtes */}
             <div className="grid grid-cols-4 gap-4 pb-3 border-b-2 border-gray-300 dark:border-gray-600 font-semibold">
-              <div className="text-gray-900 dark:!text-white">Métrique</div>
+              <div className="text-gray-900 dark:text-white dark:!text-white">Métrique</div>
               {comparisonData.map((scenario) => (
                 <div key={scenario.id} className="text-center">
-                  <div className="font-bold text-gray-900 dark:!text-white">{scenario.name}</div>
+                  <div className="font-bold text-gray-900 dark:text-white dark:!text-white">{scenario.name}</div>
                   <div className="text-xs text-muted-foreground">
                     {STRATEGIES[scenario.strategy as keyof typeof STRATEGIES]}
                   </div>
@@ -342,7 +342,7 @@ export default function ScenarioComparison() {
       {comparisonData.length === 0 && (
         <Card className="p-12 text-center">
           <GitCompare className="h-16 w-16 mx-auto text-muted-foreground opacity-50 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:!text-white mb-2">Aucun scénario sélectionné</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white dark:!text-white mb-2">Aucun scénario sélectionné</h3>
           <p className="text-muted-foreground">
             Sélectionnez jusqu'à 3 scénarios pour les comparer côte à côte
           </p>

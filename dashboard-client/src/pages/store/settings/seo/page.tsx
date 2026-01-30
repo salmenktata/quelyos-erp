@@ -230,7 +230,7 @@ export default function SeoSettingsPage() {
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition ${
               mainTab === "global"
                 ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:hover:text-gray-300"
             }`}
           >
             <Settings className="h-4 w-4" />
@@ -241,7 +241,7 @@ export default function SeoSettingsPage() {
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition ${
               mainTab === "pages"
                 ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:hover:text-gray-300"
             }`}
           >
             <List className="h-4 w-4" />
@@ -266,7 +266,7 @@ export default function SeoSettingsPage() {
             <div className="space-y-6">
               {/* Titre du site */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-2">
                   <Globe className="h-4 w-4" />
                   Titre du site
                 </label>
@@ -292,7 +292,7 @@ export default function SeoSettingsPage() {
 
               {/* Meta description */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-2">
                   <FileText className="h-4 w-4" />
                   Meta description
                 </label>
@@ -320,7 +320,7 @@ export default function SeoSettingsPage() {
 
               {/* Mots-clés */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-2">
                   <Search className="h-4 w-4" />
                   Mots-clés
                 </label>
@@ -338,7 +338,7 @@ export default function SeoSettingsPage() {
 
               {/* Image Open Graph */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-2">
                   <Image className="h-4 w-4" />
                   Image de partage (Open Graph)
                 </label>
@@ -357,7 +357,7 @@ export default function SeoSettingsPage() {
 
               {/* Preview */}
               <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-4">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <p className="text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-3">
                   Aperçu Google
                 </p>
                 <div className="space-y-1">
@@ -417,7 +417,7 @@ export default function SeoSettingsPage() {
                       }`}
                       onClick={() => handleEdit(m)}
                     >
-                      <td className="px-4 py-3 text-sm font-mono text-gray-900 dark:text-gray-100">
+                      <td className="px-4 py-3 text-sm font-mono text-gray-900 dark:text-white dark:text-gray-100">
                         {m.slug}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
@@ -487,7 +487,7 @@ export default function SeoSettingsPage() {
                     className={`px-4 py-2 text-sm font-medium transition ${
                       formTab === tab
                         ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:hover:text-gray-200"
                     }`}
                   >
                     {tab === "meta" ? "Balises Meta" : tab === "og" ? "Open Graph" : "Avancé"}

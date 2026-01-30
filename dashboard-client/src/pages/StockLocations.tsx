@@ -143,7 +143,7 @@ export default function StockLocations() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Recherche */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                 <Search className="inline mr-2 h-4 w-4" />
                 Recherche
               </label>
@@ -152,20 +152,20 @@ export default function StockLocations() {
                 placeholder="Nom, chemin complet, code-barres..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               />
             </div>
 
             {/* Filtre Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                 <Filter className="inline mr-2 h-4 w-4" />
                 Type
               </label>
               <select
                 value={usageFilter}
                 onChange={(e) => setUsageFilter(e.target.value as any)}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               >
                 <option value="all">Tous les types</option>
                 <option value="internal">Stock physique</option>
@@ -175,13 +175,13 @@ export default function StockLocations() {
 
             {/* Filtre Entrepôt */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                 Entrepôt
               </label>
               <select
                 value={warehouseFilter || ''}
                 onChange={(e) => setWarehouseFilter(e.target.value ? Number(e.target.value) : undefined)}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               >
                 <option value="">Tous les entrepôts</option>
                 {warehouses.map((wh) => (
@@ -197,14 +197,14 @@ export default function StockLocations() {
           <div className="mt-4 flex items-center gap-2">
             <button
               onClick={handleExpandAll}
-              className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+              className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-900 dark:text-white dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
             >
               <Maximize2 className="h-3 w-3 mr-1" />
               Tout déplier
             </button>
             <button
               onClick={handleCollapseAll}
-              className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+              className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-900 dark:text-white dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
             >
               <Minimize2 className="h-3 w-3 mr-1" />
               Tout replier
@@ -222,7 +222,7 @@ export default function StockLocations() {
           <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">Total emplacements</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{locations.length}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100">{locations.length}</p>
             </div>
             <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">Stock physique</p>

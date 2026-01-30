@@ -160,10 +160,10 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
         <div className="fixed inset-0 bg-black/50" onClick={onClose} />
 
         {/* Modal */}
-        <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full">
+        <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Créer un Entrepôt
             </h2>
             <button
@@ -205,7 +205,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
             {step === 1 && (
               <form onSubmit={form1.handleSubmit(handleStep1Submit)} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                     <Building className="inline mr-2 h-4 w-4" />
                     Nom de l'entrepôt *
                   </label>
@@ -222,7 +222,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                     Code entrepôt * (max 5 caractères)
                   </label>
                   <input
@@ -241,7 +241,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                     Société *
                   </label>
                   <select
@@ -277,7 +277,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
                       {...form2.register('use_existing_partner')}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
                       Utiliser une adresse existante
                     </span>
                   </label>
@@ -285,7 +285,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
 
                 {form2.watch('use_existing_partner') ? (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                       Sélectionner un contact
                     </label>
                     <select
@@ -299,7 +299,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
                 ) : (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                         <MapPin className="inline mr-2 h-4 w-4" />
                         Nom du contact
                       </label>
@@ -312,7 +312,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                         Rue
                       </label>
                       <input
@@ -324,7 +324,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                           Ville
                         </label>
                         <input
@@ -334,7 +334,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
                           Code postal
                         </label>
                         <input
@@ -355,7 +355,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                    className="px-4 py-2 bg-gray-200 text-gray-900 dark:text-white rounded-md hover:bg-gray-300"
                   >
                     Retour
                   </button>
@@ -380,16 +380,16 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
                 <div className="space-y-3">
                   <div>
                     <label className="text-sm font-medium text-gray-600">Nom :</label>
-                    <p className="text-gray-900">{step1Data.name}</p>
+                    <p className="text-gray-900 dark:text-white">{step1Data.name}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-600">Code :</label>
-                    <p className="text-gray-900 font-mono">{step1Data.code}</p>
+                    <p className="text-gray-900 dark:text-white font-mono">{step1Data.code}</p>
                   </div>
                   {step2Data?.partner_name && (
                     <div>
                       <label className="text-sm font-medium text-gray-600">Adresse :</label>
-                      <p className="text-gray-900">
+                      <p className="text-gray-900 dark:text-white">
                         {step2Data.partner_name}
                         {step2Data.partner_street && <>, {step2Data.partner_street}</>}
                         {step2Data.partner_city && <>, {step2Data.partner_city}</>}
@@ -413,7 +413,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
                     type="button"
                     onClick={handleBack}
                     disabled={isPending}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50"
+                    className="px-4 py-2 bg-gray-200 text-gray-900 dark:text-white rounded-md hover:bg-gray-300 disabled:opacity-50"
                   >
                     Retour
                   </button>

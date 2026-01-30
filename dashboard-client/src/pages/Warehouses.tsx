@@ -213,7 +213,7 @@ export default function Warehouses() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Entrepôts</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100">Entrepôts</h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Gérez vos entrepôts et locations de stock multi-sites
             </p>
@@ -254,7 +254,7 @@ export default function Warehouses() {
               placeholder="Rechercher par nom, code ou société... (Cmd+F)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+              className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
               aria-label="Rechercher un entrepôt"
             />
             {searchQuery && (
@@ -273,14 +273,14 @@ export default function Warehouses() {
 
           {/* Sort */}
           <div className="flex items-center gap-2">
-            <label htmlFor="warehouse-sort" className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+            <label htmlFor="warehouse-sort" className="text-sm text-gray-900 dark:text-white dark:text-gray-300 whitespace-nowrap">
               Trier par :
             </label>
             <select
               id="warehouse-sort"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
               aria-label="Sélectionner l'ordre de tri"
             >
               <option value="name">Nom</option>
@@ -299,7 +299,7 @@ export default function Warehouses() {
                 className="w-4 h-4 text-indigo-600 dark:text-indigo-500 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
                 aria-label="Filtrer uniquement les entrepôts actifs"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">Actifs uniquement</span>
+              <span className="text-sm text-gray-900 dark:text-white dark:text-gray-300 whitespace-nowrap">Actifs uniquement</span>
             </label>
           </div>
         </div>
@@ -311,7 +311,7 @@ export default function Warehouses() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Entrepôts</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100" aria-live="polite">
+                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white dark:text-gray-100" aria-live="polite">
                   {stats.total}
                 </p>
               </div>
@@ -364,7 +364,7 @@ export default function Warehouses() {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
                         {warehouse.name}
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Code : {warehouse.code}</p>
@@ -430,7 +430,7 @@ export default function Warehouses() {
                 <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
                   <Building2 className="w-12 h-12 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Aucun entrepôt trouvé</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white dark:text-gray-100 mb-2">Aucun entrepôt trouvé</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                   {searchQuery
                     ? `Aucun entrepôt ne correspond à "${searchQuery}"`

@@ -39,7 +39,7 @@ import {
 } from '@/hooks/useLiveEvents'
 
 const STATE_LABELS: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  draft: { label: 'Brouillon', color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300', icon: <Clock className="h-3 w-3" /> },
+  draft: { label: 'Brouillon', color: 'bg-gray-100 text-gray-900 dark:text-white dark:bg-gray-700 dark:text-gray-300', icon: <Clock className="h-3 w-3" /> },
   scheduled: { label: 'Planifié', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', icon: <Calendar className="h-3 w-3" /> },
   live: { label: 'En direct', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: <Video className="h-3 w-3" /> },
   ended: { label: 'Terminé', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: <CheckCircle className="h-3 w-3" /> },
@@ -256,7 +256,7 @@ export default function LiveEvents() {
                               {event.hostName?.[0] || 'L'}
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{event.name}</p>
+                              <p className="text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100">{event.name}</p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">par {event.hostName || event.host}</p>
                             </div>
                           </div>
@@ -337,7 +337,7 @@ export default function LiveEvents() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                     Titre *
                   </label>
                   <input
@@ -350,7 +350,7 @@ export default function LiveEvents() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                     Description
                   </label>
                   <textarea
@@ -364,7 +364,7 @@ export default function LiveEvents() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                       Présentateur *
                     </label>
                     <input
@@ -376,7 +376,7 @@ export default function LiveEvents() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                       Durée (min)
                     </label>
                     <input
@@ -391,7 +391,7 @@ export default function LiveEvents() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                     Date et heure *
                   </label>
                   <input
@@ -403,7 +403,7 @@ export default function LiveEvents() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                     URL image de couverture
                   </label>
                   <input
@@ -423,7 +423,7 @@ export default function LiveEvents() {
                       onChange={(e) => setFormData({ ...formData, notifySubscribers: e.target.checked })}
                       className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Notifier abonnés</span>
+                    <span className="text-sm text-gray-900 dark:text-white dark:text-gray-300">Notifier abonnés</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -432,7 +432,7 @@ export default function LiveEvents() {
                       onChange={(e) => setFormData({ ...formData, chatEnabled: e.target.checked })}
                       className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Chat activé</span>
+                    <span className="text-sm text-gray-900 dark:text-white dark:text-gray-300">Chat activé</span>
                   </label>
                 </div>
 

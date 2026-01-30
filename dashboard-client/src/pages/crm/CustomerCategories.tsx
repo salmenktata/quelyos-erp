@@ -241,7 +241,7 @@ export default function CustomerCategories() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100">
               Catégories / Tags Clients
             </h1>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -270,7 +270,7 @@ export default function CustomerCategories() {
               placeholder="Rechercher une catégorie..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               aria-label="Rechercher une catégorie"
             />
             {searchQuery && (
@@ -290,7 +290,7 @@ export default function CustomerCategories() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'name' | 'clients')}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               aria-label="Trier les catégories"
             >
               <option value="name">Trier par nom</option>
@@ -300,7 +300,7 @@ export default function CustomerCategories() {
             <select
               value={colorFilter ?? ''}
               onChange={(e) => setColorFilter(e.target.value ? Number(e.target.value) : null)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               aria-label="Filtrer par couleur"
             >
               <option value="">Toutes les couleurs</option>
@@ -319,7 +319,7 @@ export default function CustomerCategories() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Catégories</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white dark:text-gray-100">
                   {filteredCategories?.length || 0}
                 </p>
               </div>
@@ -418,7 +418,7 @@ export default function CustomerCategories() {
                       aria-label={`Couleur: ${colors.find((c) => c.value === category.color)?.name}`}
                     />
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white dark:text-gray-100 truncate">
                         {category.name}
                       </h3>
                       {category.parent_name && (
@@ -493,7 +493,7 @@ export default function CustomerCategories() {
                     />
                   </svg>
                 </div>
-                <p className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                <p className="text-lg font-medium text-gray-900 dark:text-white dark:text-gray-100 mb-2">
                   Aucune catégorie trouvée
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
@@ -533,7 +533,7 @@ export default function CustomerCategories() {
               <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 animate-modal-appear">
                 <h2
                   id="create-modal-title"
-                  className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4"
+                  className="text-xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mb-4"
                 >
                   Nouvelle catégorie client
                 </h2>
@@ -541,7 +541,7 @@ export default function CustomerCategories() {
                   <div>
                     <label
                       htmlFor="category-name"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-2"
                     >
                       Nom de la catégorie
                     </label>
@@ -550,7 +550,7 @@ export default function CustomerCategories() {
                       type="text"
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ex: Clients VIP, Grossistes..."
                       required
                       autoFocus
@@ -558,7 +558,7 @@ export default function CustomerCategories() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-2">
                       Couleur
                     </label>
                     <div className="grid grid-cols-5 gap-2" role="radiogroup" aria-label="Sélectionner une couleur">
@@ -585,7 +585,7 @@ export default function CustomerCategories() {
                     <button
                       type="button"
                       onClick={() => setIsCreateModalOpen(false)}
-                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200"
+                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200"
                     >
                       Annuler
                     </button>
@@ -620,7 +620,7 @@ export default function CustomerCategories() {
               <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 animate-modal-appear">
                 <h2
                   id="edit-modal-title"
-                  className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4"
+                  className="text-xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mb-4"
                 >
                   Modifier la catégorie
                 </h2>
@@ -628,7 +628,7 @@ export default function CustomerCategories() {
                   <div>
                     <label
                       htmlFor="edit-category-name"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-2"
                     >
                       Nom de la catégorie
                     </label>
@@ -637,14 +637,14 @@ export default function CustomerCategories() {
                       type="text"
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       required
                       autoFocus
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-2">
                       Couleur
                     </label>
                     <div className="grid grid-cols-5 gap-2" role="radiogroup" aria-label="Sélectionner une couleur">
@@ -671,7 +671,7 @@ export default function CustomerCategories() {
                     <button
                       type="button"
                       onClick={() => setIsEditModalOpen(false)}
-                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200"
+                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200"
                     >
                       Annuler
                     </button>
@@ -723,7 +723,7 @@ export default function CustomerCategories() {
                   <div className="flex-1">
                     <h2
                       id="delete-modal-title"
-                      className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2"
+                      className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-2"
                     >
                       Supprimer la catégorie ?
                     </h2>
@@ -739,7 +739,7 @@ export default function CustomerCategories() {
                     <div className="flex gap-3">
                       <button
                         onClick={() => setIsDeleteModalOpen(false)}
-                        className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200"
+                        className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200"
                       >
                         Annuler
                       </button>

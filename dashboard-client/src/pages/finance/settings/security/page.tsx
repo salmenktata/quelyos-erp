@@ -413,7 +413,7 @@ export default function SecurityPage() {
                   Scannez ce QR code avec votre application d&apos;authentification
                 </p>
                 {twoFAQRCode && (
-                  <div className="inline-block rounded-xl bg-white p-4">
+                  <div className="inline-block rounded-xl bg-white dark:bg-gray-800 p-4">
                     <img src={twoFAQRCode} alt="QR Code 2FA" className="w-40 h-40" />
                   </div>
                 )}

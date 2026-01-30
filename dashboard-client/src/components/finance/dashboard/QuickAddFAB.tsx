@@ -51,7 +51,7 @@ export const QuickAddFAB = memo(function QuickAddFAB({
         />
 
         {/* Ripple effect on click */}
-        <span className="absolute inset-0 rounded-full bg-white opacity-0 transition-opacity group-active:opacity-20" />
+        <span className="absolute inset-0 rounded-full bg-white dark:bg-gray-800 opacity-0 transition-opacity group-active:opacity-20" />
       </button>
 
       {/* Tooltip on hover - Hidden on mobile */}

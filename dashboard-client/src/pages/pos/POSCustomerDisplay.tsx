@@ -166,7 +166,7 @@ export default function POSCustomerDisplay() {
 
       {/* QR Code fidélité */}
       <footer className="p-6 flex items-center justify-center gap-8">
-        <div className="bg-white rounded-2xl p-4 flex items-center gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 flex items-center gap-4">
           <QrCode className="h-16 w-16 text-gray-800" />
           <div>
             <p className="font-bold text-gray-800">Scannez pour rejoindre</p>
@@ -248,9 +248,9 @@ export default function POSCustomerDisplay() {
         <h1 className="text-4xl font-bold text-white mb-4">Paiement en cours</h1>
         <p className="text-2xl text-blue-200 mb-8">Total: {total.toFixed(2)} TND</p>
         <div className="flex items-center justify-center gap-2">
-          <div className="w-4 h-4 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <div className="w-4 h-4 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-4 h-4 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="w-4 h-4 bg-white dark:bg-gray-800 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="w-4 h-4 bg-white dark:bg-gray-800 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <div className="w-4 h-4 bg-white dark:bg-gray-800 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
         </div>
       </div>
     </div>

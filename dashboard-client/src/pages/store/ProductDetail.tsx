@@ -48,7 +48,7 @@ export default function ProductDetail() {
         <div className="p-4 md:p-8">
           <div className="text-center py-12">
             <CubeIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100">
               Produit non trouvé
             </h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -97,7 +97,7 @@ export default function ProductDetail() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100">
                   {product.name}
                 </h1>
                 {product.ribbon && (
@@ -148,7 +148,7 @@ export default function ProductDetail() {
             {/* Images */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4 flex items-center gap-2">
                   <PhotoIcon className="h-5 w-5" />
                   Images
                 </h2>
@@ -183,7 +183,7 @@ export default function ProductDetail() {
             {/* Informations générales */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4 flex items-center gap-2">
                   <TagIcon className="h-5 w-5" />
                   Informations générales
                 </h2>
@@ -191,14 +191,14 @@ export default function ProductDetail() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Prix de vente</dt>
-                      <dd className="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      <dd className="mt-1 text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100">
                         {(product.price ?? 0).toFixed(2)} €
                       </dd>
                     </div>
                     {product.standard_price !== undefined && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Coût</dt>
-                        <dd className="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        <dd className="mt-1 text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100">
                           {product.standard_price.toFixed(2)} €
                         </dd>
                       </div>
@@ -208,7 +208,7 @@ export default function ProductDetail() {
                   {product.category && (
                     <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Catégorie</dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                      <dd className="mt-1 text-sm text-gray-900 dark:text-white dark:text-gray-100">
                         {product.category.name}
                       </dd>
                     </div>
@@ -217,7 +217,7 @@ export default function ProductDetail() {
                   {product.barcode && (
                     <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Code-barres</dt>
-                      <dd className="mt-1 text-sm font-mono text-gray-900 dark:text-gray-100">
+                      <dd className="mt-1 text-sm font-mono text-gray-900 dark:text-white dark:text-gray-100">
                         {product.barcode}
                       </dd>
                     </div>
@@ -226,7 +226,7 @@ export default function ProductDetail() {
                   {product.detailed_type && (
                     <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Type de produit</dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                      <dd className="mt-1 text-sm text-gray-900 dark:text-white dark:text-gray-100">
                         {productTypeLabels[product.detailed_type] || product.detailed_type}
                       </dd>
                     </div>
@@ -235,7 +235,7 @@ export default function ProductDetail() {
                   {product.uom_name && (
                     <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Unité de mesure</dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                      <dd className="mt-1 text-sm text-gray-900 dark:text-white dark:text-gray-100">
                         {product.uom_name}
                       </dd>
                     </div>
@@ -244,7 +244,7 @@ export default function ProductDetail() {
                   {product.description && (
                     <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                      <dd className="mt-1 text-sm text-gray-900 dark:text-white dark:text-gray-100 whitespace-pre-wrap">
                         {product.description}
                       </dd>
                     </div>
@@ -253,7 +253,7 @@ export default function ProductDetail() {
                   {product.description_purchase && (
                     <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description d'achat</dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                      <dd className="mt-1 text-sm text-gray-900 dark:text-white dark:text-gray-100 whitespace-pre-wrap">
                         {product.description_purchase}
                       </dd>
                     </div>
@@ -279,7 +279,7 @@ export default function ProductDetail() {
             {(product.weight || product.volume || product.product_length || product.product_width || product.product_height) && (
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4 flex items-center gap-2">
                     <ScaleIcon className="h-5 w-5" />
                     Dimensions et poids
                   </h2>
@@ -287,7 +287,7 @@ export default function ProductDetail() {
                     {product.weight && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Poids</dt>
-                        <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                        <dd className="mt-1 text-sm text-gray-900 dark:text-white dark:text-gray-100">
                           {product.weight} kg
                         </dd>
                       </div>
@@ -295,7 +295,7 @@ export default function ProductDetail() {
                     {product.volume && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Volume</dt>
-                        <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                        <dd className="mt-1 text-sm text-gray-900 dark:text-white dark:text-gray-100">
                           {product.volume} m³
                         </dd>
                       </div>
@@ -303,7 +303,7 @@ export default function ProductDetail() {
                     {product.product_length && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Longueur</dt>
-                        <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                        <dd className="mt-1 text-sm text-gray-900 dark:text-white dark:text-gray-100">
                           {product.product_length} m
                         </dd>
                       </div>
@@ -311,7 +311,7 @@ export default function ProductDetail() {
                     {product.product_width && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Largeur</dt>
-                        <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                        <dd className="mt-1 text-sm text-gray-900 dark:text-white dark:text-gray-100">
                           {product.product_width} m
                         </dd>
                       </div>
@@ -319,7 +319,7 @@ export default function ProductDetail() {
                     {product.product_height && (
                       <div>
                         <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Hauteur</dt>
-                        <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                        <dd className="mt-1 text-sm text-gray-900 dark:text-white dark:text-gray-100">
                           {product.product_height} m
                         </dd>
                       </div>
@@ -335,21 +335,21 @@ export default function ProductDetail() {
             {/* Stock */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4 flex items-center gap-2">
                   <CubeIcon className="h-5 w-5" />
                   Stock
                 </h2>
                 <div className="space-y-4">
                   <div>
                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Quantité disponible</dt>
-                    <dd className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    <dd className="mt-1 text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100">
                       {product.qty_available}
                     </dd>
                   </div>
                   {product.virtual_available !== undefined && (
                     <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Stock prévisionnel</dt>
-                      <dd className="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      <dd className="mt-1 text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100">
                         {product.virtual_available}
                       </dd>
                     </div>
@@ -372,7 +372,7 @@ export default function ProductDetail() {
             {product.variant_count !== undefined && product.variant_count > 0 && (
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4 flex items-center gap-2">
                     <ChartBarIcon className="h-5 w-5" />
                     Variantes
                   </h2>
@@ -397,13 +397,13 @@ export default function ProductDetail() {
             {product.taxes && product.taxes.length > 0 && (
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4">
                     Taxes
                   </h2>
                   <ul className="space-y-2">
                     {product.taxes.map((tax: { id: number; name: string; amount: number; amount_type: string }) => (
                       <li key={tax.id} className="flex items-center justify-between text-sm">
-                        <span className="text-gray-900 dark:text-gray-100">{tax.name}</span>
+                        <span className="text-gray-900 dark:text-white dark:text-gray-100">{tax.name}</span>
                         <span className="text-gray-500 dark:text-gray-400">
                           {tax.amount_type === 'percent' ? `${tax.amount}%` : `${tax.amount} €`}
                         </span>
@@ -417,7 +417,7 @@ export default function ProductDetail() {
             {/* Actions rapides */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4">
                   Actions rapides
                 </h2>
                 <div className="space-y-2">
@@ -453,13 +453,13 @@ export default function ProductDetail() {
             {product.create_date && (
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-4">
                     Métadonnées
                   </h2>
                   <dl className="space-y-2 text-sm">
                     <div>
                       <dt className="text-gray-500 dark:text-gray-400">Créé le</dt>
-                      <dd className="text-gray-900 dark:text-gray-100">
+                      <dd className="text-gray-900 dark:text-white dark:text-gray-100">
                         {new Date(product.create_date).toLocaleDateString('fr-FR', {
                           year: 'numeric',
                           month: 'long',
@@ -469,14 +469,14 @@ export default function ProductDetail() {
                     </div>
                     <div>
                       <dt className="text-gray-500 dark:text-gray-400">ID Système</dt>
-                      <dd className="text-gray-900 dark:text-gray-100 font-mono">
+                      <dd className="text-gray-900 dark:text-white dark:text-gray-100 font-mono">
                         #{product.id}
                       </dd>
                     </div>
                     {product.slug && (
                       <div>
                         <dt className="text-gray-500 dark:text-gray-400">Slug</dt>
-                        <dd className="text-gray-900 dark:text-gray-100 font-mono text-xs break-all">
+                        <dd className="text-gray-900 dark:text-white dark:text-gray-100 font-mono text-xs break-all">
                           {product.slug}
                         </dd>
                       </div>

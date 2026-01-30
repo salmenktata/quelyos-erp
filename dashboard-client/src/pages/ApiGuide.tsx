@@ -10,7 +10,7 @@ export default function ApiGuide() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Key className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white dark:text-gray-100">
               Guide : Obtenir vos clés API Images
             </h1>
           </div>
@@ -45,7 +45,7 @@ export default function ApiGuide() {
           <section className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mb-2">
                   Option 1 : Unsplash (Recommandé)
                 </h2>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -69,7 +69,7 @@ export default function ApiGuide() {
 
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-2">
                   Étapes (30 secondes)
                 </h3>
                 <ol className="space-y-3 list-decimal list-inside text-gray-700 dark:text-gray-300">
@@ -102,7 +102,7 @@ export default function ApiGuide() {
               </div>
 
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-300 dark:border-gray-600">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+                <p className="text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100 mb-2">
                   Exemple de clé Access Key :
                 </p>
                 <code className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-800 dark:text-gray-200">
@@ -116,7 +116,7 @@ export default function ApiGuide() {
           <section className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mb-2">
                   Option 2 : Pexels (Alternative)
                 </h2>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -137,7 +137,7 @@ export default function ApiGuide() {
 
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-2">
                   Étapes (30 secondes)
                 </h3>
                 <ol className="space-y-3 list-decimal list-inside text-gray-700 dark:text-gray-300">
@@ -168,7 +168,7 @@ export default function ApiGuide() {
               </div>
 
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-300 dark:border-gray-600">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+                <p className="text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100 mb-2">
                   Exemple de clé API Key :
                 </p>
                 <code className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-800 dark:text-gray-200">
@@ -180,7 +180,7 @@ export default function ApiGuide() {
 
           {/* Configuration */}
           <section className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-6 border border-indigo-200 dark:border-indigo-800">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mb-4 flex items-center gap-2">
               <Key className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
               Configuration dans le backoffice
             </h2>
@@ -209,7 +209,7 @@ export default function ApiGuide() {
               </ol>
 
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-300 dark:border-gray-600">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+                <p className="text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100 mb-2 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   Bon à savoir
                 </p>
@@ -225,14 +225,14 @@ export default function ApiGuide() {
 
           {/* Troubleshooting */}
           <section className="bg-red-50 dark:bg-red-900/20 rounded-lg p-6 border border-red-200 dark:border-red-800">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mb-4 flex items-center gap-2">
               <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
               Dépannage
             </h2>
 
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-2">
                   Erreur "Clé invalide ou expirée"
                 </h3>
                 <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1 ml-6 list-disc">
@@ -243,7 +243,7 @@ export default function ApiGuide() {
               </div>
 
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-2">
                   Erreur "Limite atteinte"
                 </h3>
                 <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1 ml-6 list-disc">
@@ -254,7 +254,7 @@ export default function ApiGuide() {
               </div>
 
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-2">
                   La recherche ne fonctionne toujours pas
                 </h3>
                 <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1 ml-6 list-disc">

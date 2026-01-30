@@ -121,33 +121,33 @@ export default function StockTurnoverPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Date Début */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                 Date Début
               </label>
               <input
                 type="date"
                 value={dateRange.start_date}
                 onChange={(e) => setDateRange(prev => ({ ...prev, start_date: e.target.value }))}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               />
             </div>
 
             {/* Date Fin */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                 Date Fin
               </label>
               <input
                 type="date"
                 value={dateRange.end_date}
                 onChange={(e) => setDateRange(prev => ({ ...prev, end_date: e.target.value }))}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               />
             </div>
 
             {/* Filtre Statut */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                 <Filter className="inline mr-2 h-4 w-4" />
                 Statut Rotation
               </label>
@@ -157,7 +157,7 @@ export default function StockTurnoverPage() {
                   setStatusFilter(e.target.value as TurnoverStatus | 'all')
                   setPage(0)
                 }}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               >
                 <option value="all">Tous les statuts</option>
                 <option value="excellent">Excellent (≥12)</option>
@@ -218,7 +218,7 @@ export default function StockTurnoverPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">Ratio Rotation Moyen</p>
                 <TrendingUp className="h-5 w-5 text-green-600" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mt-2">
                 {kpis.avg_turnover_ratio.toFixed(2)}
               </p>
             </div>
@@ -245,7 +245,7 @@ export default function StockTurnoverPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">Ventes Totales</p>
                 <Package className="h-5 w-5 text-blue-600" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mt-2">
                 {kpis.total_sales_qty.toFixed(0)} unités
               </p>
             </div>
@@ -268,7 +268,7 @@ export default function StockTurnoverPage() {
         ) : (
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white dark:text-gray-100">
                 Produits ({total} résultats)
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -305,18 +305,18 @@ export default function StockTurnoverPage() {
                     <tr key={product.product_id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                       <td className="px-6 py-4">
                         <div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{product.name}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100">{product.name}</div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">{product.sku}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white dark:text-gray-100">
                         {product.qty_sold?.toFixed(0) || '0'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
                         {product.avg_stock?.toFixed(0) || '0'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
-                        <span className="font-semibold text-gray-900 dark:text-gray-100">
+                        <span className="font-semibold text-gray-900 dark:text-white dark:text-gray-100">
                           {product.turnover_ratio?.toFixed(2) || '0.00'}
                         </span>
                       </td>
@@ -340,17 +340,17 @@ export default function StockTurnoverPage() {
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Précédent
                 </button>
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-sm text-gray-900 dark:text-white dark:text-gray-300">
                   Page {page + 1} sur {totalPages}
                 </span>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Suivant
                 </button>

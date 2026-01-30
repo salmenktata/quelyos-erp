@@ -114,7 +114,7 @@ export default function ReorderingRules() {
         <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
             <p className="text-sm text-gray-500 dark:text-gray-400">Règles actives</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white dark:text-gray-100">
               {rules.filter(r => r.active).length}
             </p>
           </div>
@@ -144,13 +144,13 @@ export default function ReorderingRules() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Filtre Entrepôt */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                 Entrepôt
               </label>
               <select
                 value={warehouseFilter || ''}
                 onChange={(e) => setWarehouseFilter(e.target.value ? Number(e.target.value) : undefined)}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               >
                 <option value="">Tous les entrepôts</option>
                 {warehouses.map((wh) => (
@@ -163,14 +163,14 @@ export default function ReorderingRules() {
 
             {/* Filtre Statut */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                 <Filter className="inline mr-2 h-4 w-4" />
                 Statut
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               >
                 <option value="all">Toutes les règles</option>
                 <option value="triggered">Déclenchées uniquement</option>
@@ -234,7 +234,7 @@ export default function ReorderingRules() {
                     <tr key={rule.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white dark:text-gray-100">
                             {rule.product_name}
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -242,12 +242,12 @@ export default function ReorderingRules() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white dark:text-gray-100">
                         {rule.warehouse_name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-900 dark:text-gray-100">
+                          <span className="text-sm text-gray-900 dark:text-white dark:text-gray-100">
                             {rule.current_stock}
                           </span>
                           {rule.is_triggered && (
@@ -258,7 +258,7 @@ export default function ReorderingRules() {
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white dark:text-gray-100">
                         Min: <strong>{rule.min_qty}</strong> / Max: <strong>{rule.max_qty}</strong>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -302,7 +302,7 @@ export default function ReorderingRules() {
                                 const dropdown = e.currentTarget.parentElement
                                 if (dropdown) dropdown.classList.add('hidden')
                               }}
-                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-900 dark:text-white dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
                             >
                               <Pencil className="h-4 w-4" />
                               Modifier
@@ -314,7 +314,7 @@ export default function ReorderingRules() {
                                 const dropdown = e.currentTarget.parentElement
                                 if (dropdown) dropdown.classList.add('hidden')
                               }}
-                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-900 dark:text-white dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
                               <Power className="h-4 w-4" />
                               {rule.active ? 'Désactiver' : 'Activer'}

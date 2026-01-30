@@ -32,7 +32,7 @@ export function HeroSlideTable({ slides, isLoading, editingSlideId, onEdit, onDe
               className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${editingSlideId === s.id ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}`}
               onClick={() => onEdit(s)}
             >
-              <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{s.name}</td>
+              <td className="px-4 py-3 text-sm text-gray-900 dark:text-white dark:text-gray-100">{s.name}</td>
               <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{s.title}</td>
               <td className="px-4 py-3">
                 <span className={`inline-flex px-2 py-1 text-xs rounded-full ${s.active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>

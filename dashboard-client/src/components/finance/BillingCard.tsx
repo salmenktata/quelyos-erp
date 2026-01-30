@@ -153,7 +153,7 @@ export function BillingCard() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 flex items-center justify-center min-h-[400px]">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center justify-center min-h-[400px]">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
       </div>
     );
@@ -164,7 +164,7 @@ export function BillingCard() {
   const isCanceled = subscription?.cancelAtPeriodEnd || false;
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 space-y-8">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">Abonnement</h2>

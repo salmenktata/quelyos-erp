@@ -140,7 +140,7 @@ export function DateRangePicker({ value, onChange, placeholder, className = '' }
           />
           <div className="absolute z-20 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
             <div className="p-4">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white dark:text-gray-100 mb-3">
                 Périodes prédéfinies
               </h3>
               <div className="space-y-1">

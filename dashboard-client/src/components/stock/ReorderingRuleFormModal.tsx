@@ -157,7 +157,7 @@ export function ReorderingRuleFormModal({
         <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-2xl w-full">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white dark:text-gray-100">
               {mode === 'create' ? 'Créer une règle de réapprovisionnement' : 'Modifier la règle'}
             </h2>
             <button
@@ -173,14 +173,14 @@ export function ReorderingRuleFormModal({
             <div className="px-6 py-4 space-y-4">
               {/* Produit */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                   <Package className="inline mr-2 h-4 w-4" />
                   Produit *
                 </label>
                 <select
                   {...form.register('product_id', { valueAsNumber: true })}
                   disabled={mode === 'edit'}
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">-- Sélectionner un produit --</option>
                   {products.map((product) => (
@@ -214,14 +214,14 @@ export function ReorderingRuleFormModal({
 
               {/* Entrepôt */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                   <Warehouse className="inline mr-2 h-4 w-4" />
                   Entrepôt *
                 </label>
                 <select
                   {...form.register('warehouse_id', { valueAsNumber: true })}
                   disabled={mode === 'edit'}
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">-- Sélectionner un entrepôt --</option>
                   {warehouses.map((wh) => (
@@ -245,7 +245,7 @@ export function ReorderingRuleFormModal({
               {/* Seuils */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                     <TrendingUp className="inline mr-2 h-4 w-4" />
                     Seuil minimum *
                   </label>
@@ -253,7 +253,7 @@ export function ReorderingRuleFormModal({
                     type="number"
                     step="0.01"
                     {...form.register('product_min_qty', { valueAsNumber: true })}
-                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                     placeholder="10"
                   />
                   {form.formState.errors.product_min_qty && (
@@ -266,14 +266,14 @@ export function ReorderingRuleFormModal({
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                     Seuil maximum *
                   </label>
                   <input
                     type="number"
                     step="0.01"
                     {...form.register('product_max_qty', { valueAsNumber: true })}
-                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                     placeholder="50"
                   />
                   {form.formState.errors.product_max_qty && (
@@ -289,14 +289,14 @@ export function ReorderingRuleFormModal({
 
               {/* Quantité multiple */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
                   Quantité multiple (optionnel)
                 </label>
                 <input
                   type="number"
                   step="0.01"
                   {...form.register('qty_multiple', { valueAsNumber: true })}
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   placeholder="1"
                   defaultValue={1}
                 />
@@ -344,7 +344,7 @@ export function ReorderingRuleFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="px-4 py-2 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Annuler
               </button>

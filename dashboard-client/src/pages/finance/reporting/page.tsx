@@ -231,7 +231,7 @@ export default function ReportingHubPage() {
                   Générez un PDF consolidé de tous vos rapports
                 </p>
               </div>
-              <button data-guide="report-export" className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition-all hover:scale-105">
+              <button data-guide="report-export" className="flex items-center gap-2 rounded-lg bg-white dark:bg-gray-800 px-4 py-2 text-sm font-semibold text-slate-900 transition-all hover:scale-105">
                 Télécharger PDF
                 <ArrowRight className="h-4 w-4" />
               </button>
