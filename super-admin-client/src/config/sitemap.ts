@@ -10,6 +10,7 @@ export interface AppRoute {
   name: string
   description?: string
   module?: string
+  type?: 'static' | 'dynamic' // dynamic si contient [slug], :id, etc.
 }
 
 export interface AppSection {
@@ -353,3 +354,33 @@ export const getSitemapStats = () => {
     appStats,
   }
 }
+
+// Détecter type route (static vs dynamic)
+export function getRouteType(path: string): 'static' | 'dynamic' {
+  // Routes dynamiques contiennent [slug], :param, [...slug], etc.
+  return /\[|:/.test(path) ? 'dynamic' : 'static'
+}
+
+// Extraire modules uniques (Dashboard Client)
+export function getDashboardModules(): string[] {
+  const dashboardApp = sitemapData.find(app => app.id === 'dashboard-client')
+  if (!dashboardApp) return []
+
+  const modules = new Set<string>()
+  dashboardApp.routes.forEach(route => {
+    if (route.module) {
+      modules.add(route.module)
+    }
+  })
+
+  return Array.from(modules).sort()
+}
+
+// Enrichir routes avec type auto-détecté
+export const enrichedSitemapData = sitemapData.map(app => ({
+  ...app,
+  routes: app.routes.map(route => ({
+    ...route,
+    type: route.type || getRouteType(route.path),
+  })),
+}))

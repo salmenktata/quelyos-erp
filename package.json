@@ -27,11 +27,17 @@
     "test": "pnpm -r test",
     "type-check": "pnpm -r type-check",
     "clean": "pnpm -r exec rm -rf node_modules dist .next .turbo",
-    "prepare": "husky"
+    "prepare": "husky",
+    "generate-sitemap": "tsx scripts/generate-sitemap.ts",
+    "generate-sitemap:dry": "tsx scripts/generate-sitemap.ts --dry-run",
+    "validate-sitemap": "tsx scripts/validate-sitemap.ts",
+    "validate-sitemap:fix": "tsx scripts/validate-sitemap.ts --fix"
   },
   "devDependencies": {
+    "globby": "^14.0.2",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.7"
+    "lint-staged": "^16.2.7",
+    "tsx": "^4.19.2"
   },
   "lint-staged": {
     "dashboard-client/**/*.{ts,tsx}": [
