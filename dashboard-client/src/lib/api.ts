@@ -34,6 +34,24 @@ import type {
   Ribbon,
 } from '@quelyos/types'
 import { logger } from '@quelyos/logger'
+import { tokenService } from './tokenService'
+
+// Types JWT Login Response
+interface JWTLoginResponse {
+  success: boolean
+  access_token?: string
+  expires_in?: number
+  user?: {
+    id: number
+    name: string
+    login: string
+    email?: string
+    groups?: string[]
+    tenant_id?: number
+    tenant_domain?: string
+  }
+  error?: string
+}
 
 // Développement : accès direct au backend via VITE_API_URL
 // Production : URL backend configurée dans .env.production
@@ -41,24 +59,19 @@ const API_URL = import.meta.env.VITE_API_URL || ''
 
 class ApiClient {
   private baseUrl: string
-  private sessionId: string | null = null
   private tenantId: number | null = null
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl
-    // Récupérer le session_id du localStorage et nettoyer les valeurs invalides
-    const storedSession = localStorage.getItem('session_id')
-    // Ne garder que les sessions valides (pas "null", "undefined", ou vide)
-    if (storedSession && storedSession !== 'null' && storedSession !== 'undefined' && storedSession.trim() !== '') {
-      this.sessionId = storedSession
+    // Récupérer le tenant_id du tokenService ou localStorage (legacy)
+    const user = tokenService.getUser()
+    if (user?.tenantId) {
+      this.tenantId = user.tenantId
     } else {
-      this.sessionId = null
-      localStorage.removeItem('session_id')
-    }
-    // Récupérer le tenant_id du localStorage
-    const storedTenantId = localStorage.getItem('tenant_id')
-    if (storedTenantId && storedTenantId !== 'null') {
-      this.tenantId = parseInt(storedTenantId, 10)
+      const storedTenantId = localStorage.getItem('tenant_id')
+      if (storedTenantId && storedTenantId !== 'null') {
+        this.tenantId = parseInt(storedTenantId, 10)
+      }
     }
   }
 
@@ -89,19 +102,18 @@ class ApiClient {
       'Content-Type': 'application/json',
     }
 
-    // Utiliser Authorization au lieu de X-Session-Id (déjà autorisé par CORS)
-    if (this.sessionId && this.sessionId !== 'null' && this.sessionId !== 'undefined') {
-      headers['Authorization'] = `Bearer ${this.sessionId}`
+    // Utiliser JWT Bearer token du tokenService
+    const accessToken = tokenService.getAccessToken()
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`
     }
 
     logger.debug('[API] Sending fetch to:', url)
     const response = await fetch(url, {
       method: 'POST',
       headers,
-      // credentials: 'omit' car le backend utilise Access-Control-Allow-Origin: *
-      // qui est incompatible avec credentials: 'include'
-      // Authentification via X-Session-Id header à la place
-      credentials: 'omit',
+      // credentials: 'include' pour permettre au backend d'envoyer/lire les cookies HttpOnly
+      credentials: 'include',
       body: JSON.stringify({
         jsonrpc: '2.0',
         method: 'call',
@@ -116,11 +128,9 @@ class ApiClient {
     logger.debug('[API] Response status:', response.status, response.statusText)
 
     if (!response.ok) {
-      if (response.status === 401 && !import.meta.env.DEV) {
-        // Session expirée, nettoyer et rediriger (seulement en production)
-        this.sessionId = null
-        localStorage.removeItem('session_id')
-        localStorage.removeItem('user')
+      if (response.status === 401) {
+        // Session expirée, nettoyer et rediriger
+        tokenService.clear()
         window.location.href = '/login'
         throw new Error('Session expirée')
       }
@@ -132,25 +142,20 @@ class ApiClient {
     if (json.error) {
       // Vérifier si c'est une erreur d'authentification
       const errorMessage = json.error.data?.message || json.error.message || 'API Error'
-      if (!import.meta.env.DEV && (errorMessage.toLowerCase().includes('session') || errorMessage.toLowerCase().includes('authentication'))) {
-        // Rediriger vers login seulement en production
-        this.sessionId = null
-        localStorage.removeItem('session_id')
-        localStorage.removeItem('user')
+      if (errorMessage.toLowerCase().includes('session') || errorMessage.toLowerCase().includes('authentication')) {
+        // Rediriger vers login
+        tokenService.clear()
         window.location.href = '/login'
         throw new Error('Session expirée')
       }
       throw new Error(errorMessage)
     }
 
-    // Vérifier si le résultat est null UNIQUEMENT si on a une session
+    // Vérifier si le résultat est null UNIQUEMENT si on a un token
     // (les endpoints publics peuvent retourner null légitimement)
-    // TEMPORAIRE DEV : Désactiver la redirection automatique
-    if (json.result === null && !endpoint.includes('/logout') && this.sessionId && !import.meta.env.DEV) {
-      // Si le résultat est null et qu'on a une session, c'est probablement une session expirée
-      this.sessionId = null
-      localStorage.removeItem('session_id')
-      localStorage.removeItem('user')
+    if (json.result === null && !endpoint.includes('/logout') && tokenService.isAuthenticated()) {
+      // Si le résultat est null et qu'on a un token, c'est probablement une session expirée
+      tokenService.clear()
       window.location.href = '/login'
       throw new Error('Session expirée')
     }
@@ -170,44 +175,113 @@ class ApiClient {
 
   // ==================== AUTH ====================
 
+  /**
+   * Login avec JWT Bearer - utilise /api/auth/sso-login
+   */
   async login(email: string, password: string): Promise<LoginResponse> {
     logger.debug('[API] login() called with email:', email)
-    const result = await this.request<LoginResponse>('/api/ecommerce/auth/login', {
-      email,
-      password,
-    })
-    logger.debug('[API] login() result:', result)
 
-    if (result.success && result.session_id) {
-      logger.debug('[API] Login successful, storing session')
-      this.sessionId = result.session_id
-      localStorage.setItem('session_id', result.session_id)
-      if (result.user) {
-        // Les groupes sont déjà inclus dans result.user depuis le backend
-        localStorage.setItem('user', JSON.stringify(result.user))
-        logger.debug('[API] User stored with groups:', (result.user as any).groups?.length || 0, 'groups')
-      }
-      logger.debug('[API] Session stored:', this.sessionId?.substring(0, 20) + '...')
-    } else {
-      logger.warn('[API] Login failed or no session_id:', result)
-    }
-
-    return result
-  }
-
-  async getUserInfo(): Promise<APIResponse<{ user: { id: number; name: string; email: string; login: string; groups: string[] } }>> {
-    // Utiliser credentials: 'include' pour envoyer les cookies de session backend
-    const url = `${this.baseUrl}/api/auth/user-info`
+    // Appel direct REST (pas JSON-RPC) pour sso-login
+    const url = `${this.baseUrl}/api/auth/sso-login`
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // Envoyer cookies pour auth backend
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'call',
-        params: {},
-        id: Math.random(),
-      }),
+      credentials: 'include',
+      body: JSON.stringify({ login: email, password }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const result = (await response.json()) as JWTLoginResponse
+    logger.debug('[API] login() result:', result)
+
+    if (result.success && result.access_token && result.user) {
+      logger.debug('[API] Login successful, storing JWT tokens')
+
+      // Stocker via tokenService
+      tokenService.setTokens(result.access_token, result.expires_in || 900, result.user)
+
+      // Mettre à jour le tenant_id si présent
+      if (result.user.tenant_id) {
+        this.tenantId = result.user.tenant_id
+      }
+
+      logger.debug('[API] JWT stored, user:', result.user.name)
+
+      // Convertir en format LoginResponse pour compatibilité
+      return {
+        success: true,
+        session_id: result.access_token, // Pour compatibilité legacy
+        user: {
+          id: result.user.id,
+          name: result.user.name,
+          email: result.user.email || result.user.login,
+          login: result.user.login,
+          groups: result.user.groups || [],
+        },
+      } as LoginResponse
+    } else {
+      logger.warn('[API] Login failed:', result.error)
+      return {
+        success: false,
+        error: result.error || 'Identifiants invalides',
+      } as LoginResponse
+    }
+  }
+
+  /**
+   * Rafraîchit le token JWT via /api/auth/refresh
+   */
+  async refreshToken(): Promise<boolean> {
+    try {
+      logger.info('[API] Refreshing JWT token...')
+
+      const response = await fetch(`${this.baseUrl}/api/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Envoie le refresh token cookie
+      })
+
+      if (!response.ok) {
+        logger.warn('[API] Refresh failed with status:', response.status)
+        return false
+      }
+
+      const result = (await response.json()) as JWTLoginResponse
+
+      if (result.success && result.access_token && result.user) {
+        tokenService.setTokens(result.access_token, result.expires_in || 900, result.user)
+        logger.info('[API] JWT token refreshed successfully')
+        return true
+      }
+
+      logger.warn('[API] Refresh failed:', result.error)
+      return false
+    } catch (error) {
+      logger.error('[API] Refresh error:', error)
+      return false
+    }
+  }
+
+  /**
+   * Récupère les infos utilisateur via /api/auth/me (JWT Bearer)
+   */
+  async getUserInfo(): Promise<APIResponse<{ user: { id: number; name: string; email: string; login: string; groups: string[] } }>> {
+    const accessToken = tokenService.getAccessToken()
+    if (!accessToken) {
+      return { success: false, error: 'Non authentifié' } as APIResponse<{ user: { id: number; name: string; email: string; login: string; groups: string[] } }>
+    }
+
+    const url = `${this.baseUrl}/api/auth/me`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -215,19 +289,54 @@ class ApiClient {
     }
 
     const data = await response.json()
-    return data.result || data
+    return data
   }
 
+  /**
+   * Déconnexion - efface les tokens et appelle le backend
+   */
   async logout(): Promise<APIResponse> {
-    const result = await this.request<APIResponse>('/api/ecommerce/auth/logout')
-    this.sessionId = null
-    localStorage.removeItem('session_id')
-    localStorage.removeItem('user')
-    return result
+    try {
+      const accessToken = tokenService.getAccessToken()
+      if (accessToken) {
+        await fetch(`${this.baseUrl}/api/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          credentials: 'include',
+        })
+      }
+    } catch (error) {
+      logger.error('[API] Logout error:', error)
+    } finally {
+      tokenService.clear()
+    }
+    return { success: true }
   }
 
+  /**
+   * Vérifie la session via /api/auth/me
+   */
   async checkSession(): Promise<SessionResponse> {
-    return this.request<SessionResponse>('/api/ecommerce/auth/session')
+    if (!tokenService.isAuthenticated()) {
+      return { success: false, is_authenticated: false }
+    }
+
+    try {
+      const userInfo = await this.getUserInfo()
+      if (userInfo.success && userInfo.data?.user) {
+        return {
+          success: true,
+          is_authenticated: true,
+          user: userInfo.data.user,
+        }
+      }
+      return { success: false, is_authenticated: false }
+    } catch {
+      return { success: false, is_authenticated: false }
+    }
   }
 
   async register(data: { name: string; email: string; password: string; phone?: string }) {
@@ -819,8 +928,9 @@ class ApiClient {
     const url = `${this.baseUrl}/api/ecommerce/orders/${orderId}/delivery-slip`
 
     const headers: HeadersInit = {}
-    if (this.sessionId) {
-      headers['X-Session-Id'] = this.sessionId
+    const accessToken = tokenService.getAccessToken()
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`
     }
 
     const response = await fetch(url, {
@@ -1644,8 +1754,9 @@ class ApiClient {
     const url = `${this.baseUrl}/api/ecommerce/invoices/${invoiceId}/pdf`
 
     const headers: HeadersInit = {}
-    if (this.sessionId) {
-      headers['X-Session-Id'] = this.sessionId
+    const accessToken = tokenService.getAccessToken()
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`
     }
 
     const response = await fetch(url, {

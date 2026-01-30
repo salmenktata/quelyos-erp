@@ -416,186 +416,360 @@ class SuperAdminController(http.Controller):
     # INVOICES & TRANSACTIONS
     # =========================================================================
 
-    @http.route('/api/super-admin/invoices', type='json', auth='user', methods=['GET'], csrf=False)
+    @http.route('/api/super-admin/invoices', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
     def list_invoices(self):
         """Liste toutes les factures"""
-        self._check_super_admin()
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
 
-        invoices = request.env['account.move'].search([
-            ('tenant_id', '!=', False),
-            ('move_type', '=', 'out_invoice')
-        ], order='invoice_date desc', limit=200)
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
 
-        return [{
-            'id': inv.id,
-            'name': inv.name,
-            'tenant_id': inv.tenant_id.id,
-            'tenant_name': inv.tenant_id.name,
-            'amount_untaxed': inv.amount_untaxed,
-            'amount_total': inv.amount_total,
-            'state': inv.state,
-            'payment_state': inv.payment_state,
-            'invoice_date': inv.invoice_date.isoformat() if inv.invoice_date else None,
-            'due_date': inv.invoice_date_due.isoformat() if inv.invoice_date_due else None,
-        } for inv in invoices]
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
 
-    @http.route('/api/super-admin/invoices/summary', type='json', auth='user', methods=['GET'], csrf=False)
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
+
+        try:
+            invoices = request.env['account.move'].sudo().search([
+                ('tenant_id', '!=', False),
+                ('move_type', '=', 'out_invoice')
+            ], order='invoice_date desc', limit=200)
+
+            data = {
+                'success': True,
+                'data': [{
+                    'id': inv.id,
+                    'name': inv.name,
+                    'tenant_id': inv.tenant_id.id,
+                    'tenant_name': inv.tenant_id.name,
+                    'amount_untaxed': inv.amount_untaxed,
+                    'amount_total': inv.amount_total,
+                    'state': inv.state,
+                    'payment_state': inv.payment_state,
+                    'invoice_date': inv.invoice_date.isoformat() if inv.invoice_date else None,
+                    'due_date': inv.invoice_date_due.isoformat() if inv.invoice_date_due else None,
+                } for inv in invoices],
+            }
+            return request.make_json_response(data, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"List invoices error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
+    @http.route('/api/super-admin/invoices/summary', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
     def invoices_summary(self):
         """Summary facturation mois en cours"""
-        self._check_super_admin()
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
 
-        today = datetime.today()
-        month_start = today.replace(day=1)
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
 
-        Invoice = request.env['account.move']
-        Transaction = request.env['payment.transaction']
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
 
-        # Revenue total (ce mois)
-        paid_invoices = Invoice.search([
-            ('tenant_id', '!=', False),
-            ('move_type', '=', 'out_invoice'),
-            ('payment_state', '=', 'paid'),
-            ('invoice_date', '>=', month_start.date())
-        ])
-        total_revenue = sum(inv.amount_total for inv in paid_invoices)
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
 
-        # Factures impayées
-        unpaid_invoices = Invoice.search([
-            ('tenant_id', '!=', False),
-            ('move_type', '=', 'out_invoice'),
-            ('payment_state', '=', 'not_paid')
-        ])
-        unpaid_count = len(unpaid_invoices)
-        unpaid_amount = sum(inv.amount_total for inv in unpaid_invoices)
+        try:
+            today = datetime.today()
+            month_start = today.replace(day=1)
 
-        # Taux succès paiement (ce mois)
-        all_txs = Transaction.search_count([
-            ('create_date', '>=', month_start)
-        ])
-        success_txs = Transaction.search_count([
-            ('create_date', '>=', month_start),
-            ('state', '=', 'done')
-        ])
-        success_rate = (success_txs / all_txs * 100) if all_txs else 0
+            Invoice = request.env['account.move'].sudo()
+            Transaction = request.env['payment.transaction'].sudo()
 
-        # Transactions échouées
-        failed_txs = Transaction.search_count([
-            ('create_date', '>=', month_start),
-            ('state', '=', 'error')
-        ])
+            # Revenue total (ce mois)
+            paid_invoices = Invoice.search([
+                ('tenant_id', '!=', False),
+                ('move_type', '=', 'out_invoice'),
+                ('payment_state', '=', 'paid'),
+                ('invoice_date', '>=', month_start.date())
+            ])
+            total_revenue = sum(inv.amount_total for inv in paid_invoices)
 
-        return {
-            'total_revenue': total_revenue,
-            'unpaid_invoices': unpaid_count,
-            'unpaid_amount': unpaid_amount,
-            'success_rate': success_rate,
-            'failed_transactions': failed_txs,
-        }
+            # Factures impayées
+            unpaid_invoices = Invoice.search([
+                ('tenant_id', '!=', False),
+                ('move_type', '=', 'out_invoice'),
+                ('payment_state', '=', 'not_paid')
+            ])
+            unpaid_count = len(unpaid_invoices)
+            unpaid_amount = sum(inv.amount_total for inv in unpaid_invoices)
 
-    @http.route('/api/super-admin/transactions', type='json', auth='user', methods=['GET'], csrf=False)
+            # Taux succès paiement (ce mois)
+            all_txs = Transaction.search_count([
+                ('create_date', '>=', month_start)
+            ])
+            success_txs = Transaction.search_count([
+                ('create_date', '>=', month_start),
+                ('state', '=', 'done')
+            ])
+            success_rate = (success_txs / all_txs * 100) if all_txs else 0
+
+            # Transactions échouées
+            failed_txs = Transaction.search_count([
+                ('create_date', '>=', month_start),
+                ('state', '=', 'error')
+            ])
+
+            data = {
+                'success': True,
+                'total_revenue': total_revenue,
+                'unpaid_invoices': unpaid_count,
+                'unpaid_amount': unpaid_amount,
+                'success_rate': success_rate,
+                'failed_transactions': failed_txs,
+            }
+            return request.make_json_response(data, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"Invoices summary error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
+    @http.route('/api/super-admin/transactions', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
     def list_transactions(self):
         """Liste toutes les transactions"""
-        self._check_super_admin()
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
 
-        transactions = request.env['payment.transaction'].search([
-            ('tenant_id', '!=', False)
-        ], order='create_date desc', limit=200)
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
 
-        return [{
-            'id': tx.id,
-            'reference': tx.reference,
-            'tenant_id': tx.tenant_id.id,
-            'tenant_name': tx.tenant_id.name,
-            'amount': tx.amount,
-            'state': tx.state,
-            'provider': tx.provider_id.name if tx.provider_id else 'N/A',
-            'date': tx.create_date.isoformat() if tx.create_date else None,
-            'error_message': tx.state_message if tx.state == 'error' else None,
-        } for tx in transactions]
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
+
+        try:
+            transactions = request.env['payment.transaction'].sudo().search([
+                ('tenant_id', '!=', False)
+            ], order='create_date desc', limit=200)
+
+            data = {
+                'success': True,
+                'data': [{
+                    'id': tx.id,
+                    'reference': tx.reference,
+                    'tenant_id': tx.tenant_id.id,
+                    'tenant_name': tx.tenant_id.name,
+                    'amount': tx.amount,
+                    'state': tx.state,
+                    'provider': tx.provider_id.name if tx.provider_id else 'N/A',
+                    'date': tx.create_date.isoformat() if tx.create_date else None,
+                    'error_message': tx.state_message if tx.state == 'error' else None,
+                } for tx in transactions],
+            }
+            return request.make_json_response(data, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"List transactions error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
 
     # =========================================================================
     # PROVISIONING & MONITORING
     # =========================================================================
 
-    @http.route('/api/super-admin/provisioning-jobs', type='json', auth='user', methods=['GET'], csrf=False)
+    @http.route('/api/super-admin/provisioning-jobs', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
     def list_provisioning_jobs(self):
         """Liste tous les provisioning jobs"""
-        self._check_super_admin()
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
 
-        jobs = request.env['quelyos.provisioning.job'].sudo().search([], order='create_date desc', limit=50)
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
 
-        return [{
-            'id': job.id,
-            'tenant_id': job.tenant_id.id if job.tenant_id else None,
-            'tenant_name': job.tenant_id.name if job.tenant_id else None,
-            'state': job.state,
-            'progress': job.progress,
-            'current_step': job.current_step,
-            'started_at': job.started_at.isoformat() if job.started_at else None,
-            'completed_at': job.completed_at.isoformat() if job.completed_at else None,
-            'error_message': job.error_message,
-        } for job in jobs]
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
 
-    @http.route('/api/super-admin/system/health', type='json', auth='user', methods=['GET'], csrf=False)
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
+
+        try:
+            jobs = request.env['quelyos.provisioning.job'].sudo().search([], order='create_date desc', limit=50)
+
+            data = {
+                'success': True,
+                'data': [{
+                    'id': job.id,
+                    'tenant_id': job.tenant_id.id if job.tenant_id else None,
+                    'tenant_name': job.tenant_id.name if job.tenant_id else None,
+                    'job_type': 'tenant_creation',
+                    'state': job.state,
+                    'progress': job.progress,
+                    'current_step': job.current_step,
+                    'started_at': job.started_at.isoformat() if job.started_at else None,
+                    'completed_at': job.completed_at.isoformat() if job.completed_at else None,
+                    'duration_seconds': 0,
+                    'error_message': job.error_message,
+                    'steps_completed': [],
+                } for job in jobs],
+            }
+            return request.make_json_response(data, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"List provisioning jobs error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
+    @http.route('/api/super-admin/system/health', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
     def system_health(self):
         """État des services système"""
-        self._check_super_admin()
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
 
-        # Backend (toujours UP si on répond)
-        backend_status = 'up'
-        backend_response_time = 50  # ms (simulé)
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
 
-        # PostgreSQL (vérifier via query)
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
+
         try:
-            request.env.cr.execute("SELECT 1")
-            postgres_status = 'up'
-            request.env.cr.execute("SELECT count(*) FROM pg_stat_activity")
-            postgres_connections = request.env.cr.fetchone()[0]
-        except Exception:
-            postgres_status = 'down'
-            postgres_connections = 0
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
 
-        # Redis (check via socket TCP)
-        import socket
         try:
-            redis_host = request.env['ir.config_parameter'].sudo().get_param('redis.host', 'redis')
-            redis_port = int(request.env['ir.config_parameter'].sudo().get_param('redis.port', '6379'))
+            import socket
 
-            # Test connexion TCP
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(2)
-            result = sock.connect_ex((redis_host, redis_port))
-            sock.close()
+            # Backend (toujours UP si on répond)
+            backend_status = 'up'
+            backend_response_time = 50  # ms (simulé)
 
-            if result == 0:
-                redis_status = 'up'
-                # Estimation mémoire (pas de vraie valeur sans client Redis)
-                redis_memory_mb = 128
-            else:
+            # PostgreSQL (vérifier via query)
+            try:
+                request.env.cr.execute("SELECT 1")
+                postgres_status = 'up'
+                request.env.cr.execute("SELECT count(*) FROM pg_stat_activity")
+                postgres_connections = request.env.cr.fetchone()[0]
+            except Exception:
+                postgres_status = 'down'
+                postgres_connections = 0
+
+            # Redis (check via socket TCP)
+            try:
+                redis_host = request.env['ir.config_parameter'].sudo().get_param('redis.host', 'redis')
+                redis_port = int(request.env['ir.config_parameter'].sudo().get_param('redis.port', '6379'))
+
+                # Test connexion TCP
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(2)
+                result = sock.connect_ex((redis_host, redis_port))
+                sock.close()
+
+                if result == 0:
+                    redis_status = 'up'
+                    redis_memory_mb = 128
+                else:
+                    redis_status = 'down'
+                    redis_memory_mb = 0
+            except Exception as e:
+                _logger.warning(f"Redis health check failed: {str(e)}")
                 redis_status = 'down'
                 redis_memory_mb = 0
+
+            # Stripe (vérifier dernière webhook)
+            stripe_status = 'up'
+            last_webhook = request.env['payment.transaction'].sudo().search(
+                [('provider_id.code', '=', 'stripe')], order='create_date desc', limit=1
+            )
+            last_webhook_received = last_webhook.create_date.isoformat() if last_webhook else None
+
+            data = {
+                'success': True,
+                'backend_status': backend_status,
+                'backend_response_time_ms': backend_response_time,
+                'postgres_status': postgres_status,
+                'postgres_connections': postgres_connections,
+                'redis_status': redis_status,
+                'redis_memory_mb': redis_memory_mb,
+                'stripe_status': stripe_status,
+                'last_webhook_received': last_webhook_received,
+            }
+            return request.make_json_response(data, headers=cors_headers)
+
         except Exception as e:
-            _logger.warning(f"Redis health check failed: {str(e)}")
-            redis_status = 'down'
-            redis_memory_mb = 0
-
-        # Stripe (vérifier dernière webhook)
-        stripe_status = 'up'
-        last_webhook = request.env['payment.transaction'].search(
-            [('provider_id.code', '=', 'stripe')], order='create_date desc', limit=1
-        )
-        last_webhook_received = last_webhook.create_date.isoformat() if last_webhook else None
-
-        return {
-            'backend_status': backend_status,
-            'backend_response_time_ms': backend_response_time,
-            'postgres_status': postgres_status,
-            'postgres_connections': postgres_connections,
-            'redis_status': redis_status,
-            'redis_memory_mb': redis_memory_mb,
-            'stripe_status': stripe_status,
-            'last_webhook_received': last_webhook_received,
-        }
+            _logger.error(f"System health error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
 
     # =========================================================================
     # HELPERS

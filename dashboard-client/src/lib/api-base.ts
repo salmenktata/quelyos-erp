@@ -6,6 +6,7 @@ import {
   backendCircuitBreaker,
   CircuitBreakerError,
 } from './api/circuitBreaker'
+import { tokenService } from './tokenService'
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8069'
 
@@ -35,8 +36,8 @@ export async function fetchApi<T>(
     ...fetchOptions
   } = options
 
-  // Utiliser session_id (auth principale) ou backend_session_token (legacy)
-  const token = localStorage.getItem('session_id') || localStorage.getItem('backend_session_token')
+  // Utiliser JWT Bearer token du tokenService
+  const token = tokenService.getAccessToken()
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',

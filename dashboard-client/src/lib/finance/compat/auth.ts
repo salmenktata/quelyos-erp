@@ -1,14 +1,18 @@
 /**
  * Adaptateur de compatibilité @quelyos/auth
- * Simule les fonctionnalités auth pour la migration finance
+ * Utilise tokenService pour la gestion JWT Bearer
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router'
+import { tokenService } from '@/lib/tokenService'
+import { api } from '@/lib/api'
 
 export interface User {
   id: number
   name: string
   email: string
+  login?: string
   role?: string
   groups: string[] // Groupes de sécurité backend (ex: ['Quelyos Stock User', ...])
 }
@@ -16,70 +20,165 @@ export interface User {
 export interface AuthContextType {
   user: User | null
   isLoading: boolean
-  login: (email: string, password: string) => Promise<void>
+  isAuthenticated: boolean
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   logout: () => void
+  checkAuth: () => Promise<boolean>
 }
 
-// Hook simplifié pour récupérer l'utilisateur depuis localStorage
+/**
+ * Hook d'authentification utilisant JWT Bearer via tokenService
+ */
 export function useAuth(): AuthContextType {
-  const [isLoading, setIsLoading] = useState(false)
-
-  // Récupère l'utilisateur depuis le token stocké
-  const getUser = useCallback((): User | null => {
-    try {
-      // Vérifier d'abord le user stocké par le login principal
-      const storedUser = localStorage.getItem('user')
-      if (storedUser) {
-        const user = JSON.parse(storedUser)
-        return {
-          id: user.id || 1,
-          name: user.name || 'Utilisateur',
-          email: user.email || '',
-          role: user.role || 'user',
-          groups: user.groups || []
-        }
-      }
-
-      // Fallback: essayer le JWT token (legacy)
-      const token = localStorage.getItem('backend_session_token')
-      if (!token) return null
-
-      // Décoder le payload JWT (simplifié)
-      const payload = JSON.parse(atob(token.split('.')[1]))
+  const navigate = useNavigate()
+  const initialized = useRef(false)
+  const [isLoading, setIsLoading] = useState(!tokenService.isAuthenticated())
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = tokenService.getUser()
+    if (storedUser) {
       return {
-        id: payload.uid || payload.sub || 1,
-        name: payload.name || 'Utilisateur',
-        email: payload.email || '',
-        role: payload.role || 'user',
-        groups: payload.groups || []
+        id: storedUser.id,
+        name: storedUser.name || '',
+        email: storedUser.email || '',
+        login: storedUser.login,
+        groups: storedUser.groups || [],
       }
+    }
+    return null
+  })
+
+  /**
+   * Vérifie l'authentification via /api/auth/me
+   */
+  const checkAuth = useCallback(async (): Promise<boolean> => {
+    if (!tokenService.isAuthenticated()) {
+      setUser(null)
+      setIsLoading(false)
+      return false
+    }
+
+    try {
+      const response = await api.getUserInfo()
+      const userData = response.data?.user
+
+      if (response.success && userData) {
+        setUser({
+          id: userData.id,
+          name: userData.name,
+          email: userData.email,
+          login: userData.login,
+          groups: userData.groups || [],
+        })
+        setIsLoading(false)
+        return true
+      }
+
+      // Token invalide
+      tokenService.clear()
+      setUser(null)
+      setIsLoading(false)
+      return false
     } catch {
-      return null
+      tokenService.clear()
+      setUser(null)
+      setIsLoading(false)
+      return false
     }
   }, [])
 
-  const login = async (email: string, password: string) => {
-    setIsLoading(true)
-    // Implémenté dans Login.tsx existant
-    setIsLoading(false)
-  }
+  /**
+   * Login avec credentials
+   */
+  const login = useCallback(
+    async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+      setIsLoading(true)
 
-  const logout = () => {
-    localStorage.removeItem('backend_session_token')
-    localStorage.removeItem('session_id')
-    localStorage.removeItem('user')
-    window.location.href = '/login'
-  }
+      try {
+        const result = await api.login(email, password)
+        // Cast étendu car api.login() renvoie un user avec login et groups
+        const userData = result.user as { id: number; name: string; email: string; login?: string; groups?: string[] } | undefined
+
+        if (result.success && userData) {
+          setUser({
+            id: userData.id,
+            name: userData.name,
+            email: userData.email,
+            login: userData.login,
+            groups: userData.groups || [],
+          })
+          setIsLoading(false)
+          return { success: true }
+        }
+
+        setIsLoading(false)
+        return { success: false, error: result.error || 'Identifiants invalides' }
+      } catch (error) {
+        setIsLoading(false)
+        return { success: false, error: error instanceof Error ? error.message : 'Erreur de connexion' }
+      }
+    },
+    []
+  )
+
+  /**
+   * Déconnexion
+   */
+  const logout = useCallback(async () => {
+    try {
+      await api.logout()
+    } finally {
+      setUser(null)
+      navigate('/login', { replace: true })
+    }
+  }, [navigate])
+
+  /**
+   * Configuration initiale
+   */
+  useEffect(() => {
+    if (initialized.current) return
+    initialized.current = true
+
+    // Connecter la fonction de refresh au tokenService
+    tokenService.setRefreshFunction(async () => {
+      return api.refreshToken()
+    })
+
+    // Écouter les événements du tokenService
+    const unsubscribe = tokenService.subscribe((event) => {
+      if (event === 'expired') {
+        setUser(null)
+        navigate('/login', { replace: true })
+      } else if (event === 'logout') {
+        setUser(null)
+      }
+    })
+
+    // Vérifier l'auth si on a un token
+    if (tokenService.isAuthenticated()) {
+      checkAuth()
+    } else {
+      setIsLoading(false)
+    }
+
+    return unsubscribe
+  }, [checkAuth, navigate])
 
   return {
-    user: getUser(),
+    user,
     isLoading,
+    isAuthenticated: !!user && tokenService.isAuthenticated(),
     login,
-    logout
+    logout,
+    checkAuth,
   }
 }
 
 export function useRequireAuth() {
-  const { user, isLoading } = useAuth()
-  return { user, isLoading, isAuthenticated: !!user }
+  const auth = useAuth()
+  return {
+    user: auth.user,
+    isLoading: auth.isLoading,
+    isAuthenticated: auth.isAuthenticated,
+  }
 }
