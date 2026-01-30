@@ -20,7 +20,8 @@ class SubscriptionPlan(models.Model):
     code = fields.Selection([
         ('starter', 'Starter'),
         ('pro', 'Pro'),
-        ('enterprise', 'Enterprise')
+        ('enterprise', 'Enterprise'),
+        ('custom', 'Custom'),
     ], string='Code', required=True, help='Code interne du plan')
 
     # Tarification
@@ -115,6 +116,22 @@ class SubscriptionPlan(models.Model):
         default=True,
         help='Désactiver pour ne plus proposer ce plan aux nouveaux clients'
     )
+
+    # Fonctionnalités booléennes (pour l'API super-admin)
+    feature_wishlist = fields.Boolean(string='Wishlist', default=False)
+    feature_reviews = fields.Boolean(string='Avis clients', default=False)
+    feature_newsletter = fields.Boolean(string='Newsletter', default=False)
+    feature_comparison = fields.Boolean(string='Comparateur produits', default=False)
+    feature_guest_checkout = fields.Boolean(string='Commande invité', default=True)
+    feature_api_access = fields.Boolean(string='Accès API', default=False)
+    feature_priority_support = fields.Boolean(string='Support prioritaire', default=False)
+    feature_custom_domain = fields.Boolean(string='Domaine personnalisé', default=False)
+
+    # Alias pour is_active
+    is_active = fields.Boolean(related='active', string='Actif', store=False)
+
+    # Séquence pour tri
+    sequence = fields.Integer(string='Séquence', default=10)
 
     # Statistiques
     subscription_count = fields.Integer(

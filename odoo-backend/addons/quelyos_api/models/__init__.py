@@ -91,3 +91,6 @@ from . import api_key
 from . import security_alert
 # Dunning (payment collection)
 from . import dunning
+# Security P5 - Rate Limiting, WAF
+from . import rate_limit
+from . import waf_rule

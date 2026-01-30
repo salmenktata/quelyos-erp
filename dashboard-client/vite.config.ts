@@ -6,14 +6,8 @@ import { visualizer } from 'rollup-plugin-visualizer'
 export default defineConfig({
   plugins: [
     react(),
-    // Bundle analyzer (généré à chaque build)
-    visualizer({
-      filename: './dist/stats.html',
-      open: false,
-      gzipSize: true,
-      brotliSize: true,
-    }),
   ],
+  appType: 'spa',
   build: {
     // Minification agressive
     minify: 'terser',
@@ -100,6 +94,7 @@ export default defineConfig({
   server: {
     port: 5175,
     open: true,
+    host: true,
     fs: {
       allow: [fileURLToPath(new URL('..', import.meta.url))],
     },

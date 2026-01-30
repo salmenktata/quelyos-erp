@@ -32,11 +32,16 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Gauge,
+  ShieldAlert,
+  Play,
+  Pause,
+  Settings,
 } from 'lucide-react'
 import { api } from '@/lib/api/gateway'
 import { useToast } from '@/hooks/useToast'
 
-type TabType = 'overview' | 'sessions' | 'ip-whitelist' | 'api-keys' | 'alerts'
+type TabType = 'overview' | 'sessions' | 'ip-whitelist' | 'api-keys' | 'alerts' | 'rate-limits' | 'waf'
 
 interface Session {
   id: number
@@ -96,6 +101,40 @@ interface SecurityAlert {
   auto_action_taken: string | null
 }
 
+interface RateLimitRule {
+  id: number
+  name: string
+  active: boolean
+  priority: number
+  target_type: 'global' | 'endpoint' | 'ip' | 'user'
+  endpoint_pattern: string | null
+  requests_limit: number
+  time_window: number
+  burst_limit: number
+  action_type: 'block' | 'throttle' | 'captcha' | 'warn'
+  block_duration: number
+  total_hits: number
+  total_blocks: number
+  last_triggered: string | null
+}
+
+interface WAFRule {
+  id: number
+  name: string
+  active: boolean
+  priority: number
+  rule_type: string
+  pattern: string | null
+  inspect_target: string
+  action: 'block' | 'log' | 'sanitize'
+  total_matches: number
+  total_blocks: number
+  last_triggered: string | null
+  description: string | null
+  cwe_id: string | null
+  owasp_category: string | null
+}
+
 interface SecuritySummary {
   alerts: {
     total: number
@@ -118,6 +157,8 @@ export function Security() {
     { id: 'ip-whitelist' as const, name: 'IP Whitelist', icon: Globe },
     { id: 'api-keys' as const, name: 'Clés API', icon: Key },
     { id: 'alerts' as const, name: 'Alertes', icon: AlertTriangle },
+    { id: 'rate-limits' as const, name: 'Rate Limits', icon: Gauge },
+    { id: 'waf' as const, name: 'WAF', icon: ShieldAlert },
   ]
 
   return (
@@ -159,6 +200,8 @@ export function Security() {
       {activeTab === 'ip-whitelist' && <IPWhitelistTab />}
       {activeTab === 'api-keys' && <APIKeysTab />}
       {activeTab === 'alerts' && <AlertsTab />}
+      {activeTab === 'rate-limits' && <RateLimitsTab />}
+      {activeTab === 'waf' && <WAFTab />}
     </div>
   )
 }
@@ -1140,6 +1183,644 @@ function AlertsTab() {
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+// =============================================================================
+// RATE LIMITS TAB
+// =============================================================================
+
+function RateLimitsTab() {
+  const [showModal, setShowModal] = useState(false)
+  const [newRule, setNewRule] = useState<{
+    name: string
+    target_type: 'global' | 'endpoint' | 'ip' | 'user'
+    endpoint_pattern: string
+    requests_limit: number
+    time_window: number
+    burst_limit: number
+    action_type: 'block' | 'throttle' | 'captcha' | 'warn'
+    block_duration: number
+  }>({
+    name: '',
+    target_type: 'endpoint',
+    endpoint_pattern: '',
+    requests_limit: 100,
+    time_window: 60,
+    burst_limit: 20,
+    action_type: 'block',
+    block_duration: 300,
+  })
+  const queryClient = useQueryClient()
+  const toast = useToast()
+
+  const { data: rules = [], isLoading, refetch } = useQuery<RateLimitRule[]>({
+    queryKey: ['rate-limits'],
+    queryFn: async () => {
+      const response = await api.request<{ rules: RateLimitRule[] }>({
+        method: 'GET',
+        path: '/api/super-admin/security/rate-limits',
+      })
+      return response.data.rules || []
+    },
+  })
+
+  const createRule = useMutation({
+    mutationFn: async (data: typeof newRule) => {
+      return api.request({
+        method: 'POST',
+        path: '/api/super-admin/security/rate-limits',
+        body: data,
+      })
+    },
+    onSuccess: () => {
+      toast.success('Règle créée')
+      setShowModal(false)
+      setNewRule({
+        name: '',
+        target_type: 'endpoint',
+        endpoint_pattern: '',
+        requests_limit: 100,
+        time_window: 60,
+        burst_limit: 20,
+        action_type: 'block',
+        block_duration: 300,
+      })
+      queryClient.invalidateQueries({ queryKey: ['rate-limits'] })
+    },
+    onError: () => toast.error('Erreur lors de la création'),
+  })
+
+  const toggleRule = useMutation({
+    mutationFn: async ({ id, active }: { id: number; active: boolean }) => {
+      return api.request({
+        method: 'PUT',
+        path: `/api/super-admin/security/rate-limits/${id}`,
+        body: { active },
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rate-limits'] })
+    },
+  })
+
+  const deleteRule = useMutation({
+    mutationFn: async (id: number) => {
+      return api.request({
+        method: 'DELETE',
+        path: `/api/super-admin/security/rate-limits/${id}`,
+      })
+    },
+    onSuccess: () => {
+      toast.success('Règle supprimée')
+      queryClient.invalidateQueries({ queryKey: ['rate-limits'] })
+    },
+  })
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Rate Limiting</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Protection contre les abus et attaques DDoS
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => refetch()}
+            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setShowModal(true)}
+            className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Nouvelle règle
+          </button>
+        </div>
+      </div>
+
+      {/* Rules List */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-gray-50 dark:bg-gray-900/50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Règle</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Cible</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Limite</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Action</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Stats</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Statut</th>
+              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            {rules.map((rule) => (
+              <tr key={rule.id} className={!rule.active ? 'opacity-50' : ''}>
+                <td className="px-4 py-3">
+                  <div className="font-medium text-gray-900 dark:text-white">{rule.name}</div>
+                  <div className="text-xs text-gray-500">Priorité: {rule.priority}</div>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                  <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">
+                    {rule.target_type}
+                  </span>
+                  {rule.endpoint_pattern && (
+                    <div className="font-mono text-xs mt-1">{rule.endpoint_pattern}</div>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-sm">
+                  <div className="text-gray-900 dark:text-white">{rule.requests_limit} req/{rule.time_window}s</div>
+                  <div className="text-xs text-gray-500">Burst: {rule.burst_limit}</div>
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    rule.action_type === 'block' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                    rule.action_type === 'throttle' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                    'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                  }`}>
+                    {rule.action_type}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-sm">
+                  <div className="text-gray-600 dark:text-gray-400">{rule.total_hits} hits</div>
+                  <div className="text-red-600">{rule.total_blocks} blocks</div>
+                </td>
+                <td className="px-4 py-3">
+                  <button
+                    onClick={() => toggleRule.mutate({ id: rule.id, active: !rule.active })}
+                    className={`p-1 rounded ${rule.active ? 'text-green-600' : 'text-gray-400'}`}
+                  >
+                    {rule.active ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+                  </button>
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <button
+                    onClick={() => deleteRule.mutate(rule.id)}
+                    className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {rules.length === 0 && (
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            Aucune règle de rate limiting
+          </div>
+        )}
+      </div>
+
+      {/* Create Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Nouvelle règle de Rate Limiting
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
+                <input
+                  type="text"
+                  value={newRule.name}
+                  onChange={(e) => setNewRule({ ...newRule, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type de cible</label>
+                  <select
+                    value={newRule.target_type}
+                    onChange={(e) => setNewRule({ ...newRule, target_type: e.target.value as 'global' | 'endpoint' | 'ip' | 'user' })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="global">Global</option>
+                    <option value="endpoint">Endpoint</option>
+                    <option value="ip">IP</option>
+                    <option value="user">Utilisateur</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Action</label>
+                  <select
+                    value={newRule.action_type}
+                    onChange={(e) => setNewRule({ ...newRule, action_type: e.target.value as 'block' | 'throttle' | 'captcha' | 'warn' })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="block">Bloquer</option>
+                    <option value="throttle">Ralentir</option>
+                    <option value="warn">Avertir</option>
+                  </select>
+                </div>
+              </div>
+              {newRule.target_type === 'endpoint' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pattern Endpoint</label>
+                  <input
+                    type="text"
+                    placeholder="/api/auth/*"
+                    value={newRule.endpoint_pattern}
+                    onChange={(e) => setNewRule({ ...newRule, endpoint_pattern: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              )}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Limite</label>
+                  <input
+                    type="number"
+                    value={newRule.requests_limit}
+                    onChange={(e) => setNewRule({ ...newRule, requests_limit: parseInt(e.target.value) })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fenêtre (s)</label>
+                  <input
+                    type="number"
+                    value={newRule.time_window}
+                    onChange={(e) => setNewRule({ ...newRule, time_window: parseInt(e.target.value) })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Burst</label>
+                  <input
+                    type="number"
+                    value={newRule.burst_limit}
+                    onChange={(e) => setNewRule({ ...newRule, burst_limit: parseInt(e.target.value) })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => createRule.mutate(newRule)}
+                disabled={!newRule.name || createRule.isPending}
+                className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50"
+              >
+                {createRule.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Créer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// =============================================================================
+// WAF TAB
+// =============================================================================
+
+function WAFTab() {
+  const [showModal, setShowModal] = useState(false)
+  const [newRule, setNewRule] = useState<{
+    name: string
+    rule_type: string
+    pattern: string
+    inspect_target: string
+    action: 'block' | 'log' | 'sanitize'
+    description: string
+  }>({
+    name: '',
+    rule_type: 'custom_pattern',
+    pattern: '',
+    inspect_target: 'all',
+    action: 'block',
+    description: '',
+  })
+  const queryClient = useQueryClient()
+  const toast = useToast()
+
+  const { data: rules = [], isLoading, refetch } = useQuery<WAFRule[]>({
+    queryKey: ['waf-rules'],
+    queryFn: async () => {
+      const response = await api.request<{ rules: WAFRule[] }>({
+        method: 'GET',
+        path: '/api/super-admin/security/waf-rules',
+      })
+      return response.data.rules || []
+    },
+  })
+
+  const initDefaults = useMutation({
+    mutationFn: async () => {
+      return api.request({
+        method: 'POST',
+        path: '/api/super-admin/security/waf-rules/init-defaults',
+      })
+    },
+    onSuccess: () => {
+      toast.success('Règles par défaut initialisées')
+      queryClient.invalidateQueries({ queryKey: ['waf-rules'] })
+    },
+  })
+
+  const createRule = useMutation({
+    mutationFn: async (data: typeof newRule) => {
+      return api.request({
+        method: 'POST',
+        path: '/api/super-admin/security/waf-rules',
+        body: data,
+      })
+    },
+    onSuccess: () => {
+      toast.success('Règle créée')
+      setShowModal(false)
+      setNewRule({
+        name: '',
+        rule_type: 'custom_pattern',
+        pattern: '',
+        inspect_target: 'all',
+        action: 'block',
+        description: '',
+      })
+      queryClient.invalidateQueries({ queryKey: ['waf-rules'] })
+    },
+    onError: () => toast.error('Erreur lors de la création'),
+  })
+
+  const toggleRule = useMutation({
+    mutationFn: async ({ id, active }: { id: number; active: boolean }) => {
+      return api.request({
+        method: 'PUT',
+        path: `/api/super-admin/security/waf-rules/${id}`,
+        body: { active },
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['waf-rules'] })
+    },
+  })
+
+  const deleteRule = useMutation({
+    mutationFn: async (id: number) => {
+      return api.request({
+        method: 'DELETE',
+        path: `/api/super-admin/security/waf-rules/${id}`,
+      })
+    },
+    onSuccess: () => {
+      toast.success('Règle supprimée')
+      queryClient.invalidateQueries({ queryKey: ['waf-rules'] })
+    },
+  })
+
+  const getRuleTypeBadge = (type: string) => {
+    const colors: Record<string, string> = {
+      sql_injection: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      xss: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+      path_traversal: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      command_injection: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+      user_agent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      custom_pattern: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+    }
+    return colors[type] || colors.custom_pattern
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Web Application Firewall</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Protection contre les injections SQL, XSS et autres attaques
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => refetch()}
+            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+          {rules.length === 0 && (
+            <button
+              onClick={() => initDefaults.mutate()}
+              disabled={initDefaults.isPending}
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              Règles par défaut
+            </button>
+          )}
+          <button
+            onClick={() => setShowModal(true)}
+            className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Nouvelle règle
+          </button>
+        </div>
+      </div>
+
+      {/* Rules List */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-gray-50 dark:bg-gray-900/50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Règle</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Type</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Cible</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Action</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Stats</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Statut</th>
+              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            {rules.map((rule) => (
+              <tr key={rule.id} className={!rule.active ? 'opacity-50' : ''}>
+                <td className="px-4 py-3">
+                  <div className="font-medium text-gray-900 dark:text-white">{rule.name}</div>
+                  {rule.owasp_category && (
+                    <div className="text-xs text-gray-500">{rule.owasp_category}</div>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`px-2 py-1 text-xs rounded-full ${getRuleTypeBadge(rule.rule_type)}`}>
+                    {rule.rule_type.replace('_', ' ')}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                  {rule.inspect_target}
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    rule.action === 'block' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                    'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                  }`}>
+                    {rule.action}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-sm">
+                  <div className="text-gray-600 dark:text-gray-400">{rule.total_matches} matches</div>
+                  <div className="text-red-600">{rule.total_blocks} blocks</div>
+                </td>
+                <td className="px-4 py-3">
+                  <button
+                    onClick={() => toggleRule.mutate({ id: rule.id, active: !rule.active })}
+                    className={`p-1 rounded ${rule.active ? 'text-green-600' : 'text-gray-400'}`}
+                  >
+                    {rule.active ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+                  </button>
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <button
+                    onClick={() => deleteRule.mutate(rule.id)}
+                    className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {rules.length === 0 && (
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            <ShieldAlert className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>Aucune règle WAF configurée</p>
+            <p className="text-sm mt-2">Cliquez sur &quot;Règles par défaut&quot; pour initialiser les protections de base</p>
+          </div>
+        )}
+      </div>
+
+      {/* Create Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Nouvelle règle WAF
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
+                <input
+                  type="text"
+                  value={newRule.name}
+                  onChange={(e) => setNewRule({ ...newRule, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                  <select
+                    value={newRule.rule_type}
+                    onChange={(e) => setNewRule({ ...newRule, rule_type: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="custom_pattern">Pattern personnalisé</option>
+                    <option value="sql_injection">Injection SQL</option>
+                    <option value="xss">XSS</option>
+                    <option value="path_traversal">Path Traversal</option>
+                    <option value="command_injection">Command Injection</option>
+                    <option value="user_agent">User Agent</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cible</label>
+                  <select
+                    value={newRule.inspect_target}
+                    onChange={(e) => setNewRule({ ...newRule, inspect_target: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="all">Tout</option>
+                    <option value="url">URL</option>
+                    <option value="query_params">Paramètres GET</option>
+                    <option value="body">Corps requête</option>
+                    <option value="headers">En-têtes</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pattern (Regex)</label>
+                <input
+                  type="text"
+                  value={newRule.pattern}
+                  onChange={(e) => setNewRule({ ...newRule, pattern: e.target.value })}
+                  placeholder="Ex: <script.*>|javascript:"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Action</label>
+                <select
+                  value={newRule.action}
+                  onChange={(e) => setNewRule({ ...newRule, action: e.target.value as 'block' | 'log' | 'sanitize' })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="block">Bloquer</option>
+                  <option value="log">Logger seulement</option>
+                  <option value="sanitize">Nettoyer</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                <textarea
+                  value={newRule.description}
+                  onChange={(e) => setNewRule({ ...newRule, description: e.target.value })}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => createRule.mutate(newRule)}
+                disabled={!newRule.name || !newRule.pattern || createRule.isPending}
+                className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50"
+              >
+                {createRule.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Créer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

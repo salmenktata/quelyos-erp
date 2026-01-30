@@ -9,20 +9,18 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Filter, TrendingUp, TrendingDown } from 'lucide-react'
 import { api } from '@/lib/api/gateway'
-import { SubscriptionSchema, ChurnAnalysisSchema, MRRBreakdownSchema, validateApiResponse } from '@/lib/validators'
-import type { Subscription, ChurnAnalysis, MRRBreakdown } from '@/lib/validators'
-import { z } from 'zod'
+import { SubscriptionsResponseSchema, ChurnAnalysisSchema, MRRBreakdownSchema, validateApiResponse } from '@/lib/validators'
+import type { SubscriptionsResponse, ChurnAnalysis, MRRBreakdown } from '@/lib/validators'
 
 export function Subscriptions() {
   const [stateFilter, setStateFilter] = useState<string>('all')
   const [planFilter, setPlanFilter] = useState<string>('all')
 
-  const { data: subscriptions, isLoading } = useQuery({
+  const { data: subscriptionsResponse, isLoading } = useQuery({
     queryKey: ['super-admin-subscriptions', stateFilter, planFilter],
     queryFn: async () => {
-      const response = await api.request<Subscription[]>({
+      const response = await api.request<SubscriptionsResponse>({
         method: 'GET',
         path: '/api/super-admin/subscriptions',
         params: {
@@ -30,9 +28,11 @@ export function Subscriptions() {
           plan: planFilter !== 'all' ? planFilter : undefined,
         },
       })
-      return validateApiResponse(z.array(SubscriptionSchema), response.data)
+      return validateApiResponse(SubscriptionsResponseSchema, response.data)
     },
   })
+
+  const subscriptions = subscriptionsResponse?.data
 
   const { data: mrrBreakdown } = useQuery({
     queryKey: ['super-admin-mrr-breakdown'],
@@ -46,8 +46,8 @@ export function Subscriptions() {
   const { data: churnAnalysis } = useQuery({
     queryKey: ['super-admin-churn-analysis'],
     queryFn: async () => {
-      const response = await api.request<ChurnAnalysis[]>({ method: 'GET', path: '/api/super-admin/subscriptions/churn-analysis' })
-      return validateApiResponse(z.array(ChurnAnalysisSchema), response.data)
+      const response = await api.request<ChurnAnalysis>({ method: 'GET', path: '/api/super-admin/subscriptions/churn-analysis' })
+      return validateApiResponse(ChurnAnalysisSchema, response.data)
     },
     staleTime: 5 * 60 * 1000,
   })
@@ -171,12 +171,12 @@ export function Subscriptions() {
       </div>
 
       {/* Churn Analysis */}
-      {churnAnalysis && churnAnalysis.length > 0 && (
+      {churnAnalysis?.data && churnAnalysis.data.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Analyse Churn (12 mois)</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {churnAnalysis.slice(0, 6).map((item) => (
-              <div key={item.month} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            {churnAnalysis.data.slice(0, 6).map((item, index) => (
+              <div key={`${item.month}-${index}`} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                 <p className="text-xs text-gray-500 dark:text-gray-400">{item.month}</p>
                 <p className="text-lg font-bold text-gray-900 dark:text-white">{item.churn_rate.toFixed(1)}%</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">{item.churned_count} churned</p>

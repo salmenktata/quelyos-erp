@@ -19,6 +19,11 @@ export default defineConfig({
             allow: [fileURLToPath(new URL('..', import.meta.url))],
         },
         proxy: {
+            '/api/auth': {
+                target: 'http://localhost:8069',
+                changeOrigin: true,
+                secure: false,
+            },
             '/api/pos': {
                 target: 'http://localhost:8069',
                 changeOrigin: true,

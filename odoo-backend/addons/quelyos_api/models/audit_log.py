@@ -223,3 +223,188 @@ class AuditLog(models.Model):
             ('category', '=', 'security'),
             ('create_date', '>=', cutoff),
         ], limit=limit, order='create_date desc')
+
+    # ========== P5: Fonctionnalités avancées ==========
+
+    @api.model
+    def search_logs(self, filters=None, offset=0, limit=50):
+        """
+        Recherche avancée dans les logs avec pagination
+        filters: user_id, category, severity, success, date_from, date_to, search, ip_address
+        """
+        import json
+        from datetime import datetime
+
+        domain = []
+        filters = filters or {}
+
+        if filters.get('user_id'):
+            domain.append(('user_id', '=', int(filters['user_id'])))
+
+        if filters.get('category'):
+            domain.append(('category', '=', filters['category']))
+
+        if filters.get('severity'):
+            domain.append(('severity', '=', filters['severity']))
+
+        if filters.get('success') is not None:
+            domain.append(('success', '=', filters['success']))
+
+        if filters.get('date_from'):
+            domain.append(('create_date', '>=', filters['date_from']))
+
+        if filters.get('date_to'):
+            domain.append(('create_date', '<=', filters['date_to']))
+
+        if filters.get('ip_address'):
+            domain.append(('ip_address', '=', filters['ip_address']))
+
+        if filters.get('resource_type'):
+            domain.append(('resource_type', '=', filters['resource_type']))
+
+        if filters.get('search'):
+            search_term = filters['search']
+            domain.append('|')
+            domain.append('|')
+            domain.append(('action', 'ilike', search_term))
+            domain.append(('resource_name', 'ilike', search_term))
+            domain.append(('user_login', 'ilike', search_term))
+
+        total = self.sudo().search_count(domain)
+        logs = self.sudo().search(domain, offset=offset, limit=limit, order='create_date desc')
+
+        return {
+            'total': total,
+            'offset': offset,
+            'limit': limit,
+            'logs': [{
+                'id': log.id,
+                'timestamp': log.create_date.isoformat() if log.create_date else None,
+                'user_id': log.user_id.id if log.user_id else None,
+                'user_name': log.user_id.name if log.user_id else log.user_login or 'Système',
+                'user_login': log.user_login,
+                'ip_address': log.ip_address,
+                'action': log.action,
+                'category': log.category,
+                'severity': log.severity,
+                'resource_type': log.resource_type,
+                'resource_id': log.resource_id,
+                'resource_name': log.resource_name,
+                'success': log.success,
+                'error_message': log.error_message,
+                'details': json.loads(log.details) if log.details else None,
+            } for log in logs]
+        }
+
+    @api.model
+    def export_csv(self, filters=None, limit=10000):
+        """Export des logs en CSV"""
+        import csv
+        import io
+
+        result = self.search_logs(filters=filters, offset=0, limit=limit)
+
+        output = io.StringIO()
+        writer = csv.writer(output)
+
+        # En-têtes
+        headers = ['Date/Heure', 'Utilisateur', 'Login', 'IP', 'Action', 'Catégorie',
+                   'Sévérité', 'Ressource', 'ID Ressource', 'Succès', 'Erreur']
+        writer.writerow(headers)
+
+        # Données
+        for log in result['logs']:
+            writer.writerow([
+                log['timestamp'],
+                log['user_name'],
+                log['user_login'] or '',
+                log['ip_address'] or '',
+                log['action'],
+                log['category'],
+                log['severity'],
+                log['resource_type'] or '',
+                log['resource_id'] or '',
+                'Oui' if log['success'] else 'Non',
+                log['error_message'] or '',
+            ])
+
+        return output.getvalue()
+
+    @api.model
+    def get_statistics(self, days=7):
+        """Statistiques des logs sur N jours"""
+        from datetime import datetime, timedelta
+
+        date_from = datetime.now() - timedelta(days=days)
+
+        # Total par catégorie
+        self.env.cr.execute("""
+            SELECT category, COUNT(*) as count
+            FROM quelyos_audit_log
+            WHERE create_date >= %s
+            GROUP BY category
+            ORDER BY count DESC
+        """, [date_from])
+        by_category = dict(self.env.cr.fetchall())
+
+        # Total par sévérité
+        self.env.cr.execute("""
+            SELECT severity, COUNT(*) as count
+            FROM quelyos_audit_log
+            WHERE create_date >= %s
+            GROUP BY severity
+        """, [date_from])
+        by_severity = dict(self.env.cr.fetchall())
+
+        # Succès vs échecs
+        self.env.cr.execute("""
+            SELECT success, COUNT(*) as count
+            FROM quelyos_audit_log
+            WHERE create_date >= %s
+            GROUP BY success
+        """, [date_from])
+        by_success = {str(r[0]): r[1] for r in self.env.cr.fetchall()}
+
+        # Top utilisateurs
+        self.env.cr.execute("""
+            SELECT COALESCE(u.name, l.user_login, 'Système'), COUNT(*) as count
+            FROM quelyos_audit_log l
+            LEFT JOIN res_users u ON l.user_id = u.id
+            WHERE l.create_date >= %s
+            GROUP BY COALESCE(u.name, l.user_login, 'Système')
+            ORDER BY count DESC
+            LIMIT 10
+        """, [date_from])
+        top_users = [{'name': r[0], 'count': r[1]} for r in self.env.cr.fetchall()]
+
+        # Top actions
+        self.env.cr.execute("""
+            SELECT action, COUNT(*) as count
+            FROM quelyos_audit_log
+            WHERE create_date >= %s
+            GROUP BY action
+            ORDER BY count DESC
+            LIMIT 10
+        """, [date_from])
+        top_actions = [{'action': r[0], 'count': r[1]} for r in self.env.cr.fetchall()]
+
+        # Timeline par jour
+        self.env.cr.execute("""
+            SELECT DATE(create_date) as day, COUNT(*) as count
+            FROM quelyos_audit_log
+            WHERE create_date >= %s
+            GROUP BY DATE(create_date)
+            ORDER BY day
+        """, [date_from])
+        timeline = [{'date': str(r[0]), 'count': r[1]} for r in self.env.cr.fetchall()]
+
+        return {
+            'period_days': days,
+            'total': sum(by_category.values()) if by_category else 0,
+            'by_category': by_category,
+            'by_severity': by_severity,
+            'by_success': by_success,
+            'top_users': top_users,
+            'top_actions': top_actions,
+            'timeline': timeline,
+        }

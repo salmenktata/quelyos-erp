@@ -21,18 +21,34 @@ import {
   Clock,
   AlertTriangle,
   Loader2,
+  Settings,
+  Calendar,
+  Save,
 } from 'lucide-react'
 import { api } from '@/lib/api/gateway'
-import { BackupsResponseSchema, validateApiResponse } from '@/lib/validators'
-import type { Backup, BackupsResponse } from '@/lib/validators'
+import { BackupsResponseSchema, BackupScheduleSchema, validateApiResponse } from '@/lib/validators'
+import type { Backup, BackupsResponse, BackupSchedule } from '@/lib/validators'
 import { ConfirmModal } from '@/components/common/ConfirmModal'
 import { useToast } from '@/hooks/useToast'
+
+const DEFAULT_SCHEDULE: BackupSchedule = {
+  enabled: false,
+  frequency: 'daily',
+  day_of_week: 1,
+  day_of_month: 1,
+  hour: 2,
+  minute: 0,
+  backup_type: 'full',
+  retention_count: 7,
+}
 
 export function Backups() {
   const queryClient = useQueryClient()
   const toast = useToast()
   const [restoreTarget, setRestoreTarget] = useState<Backup | null>(null)
   const [backupType, setBackupType] = useState<'full' | 'incremental'>('full')
+  const [showSchedulePanel, setShowSchedulePanel] = useState(false)
+  const [schedule, setSchedule] = useState<BackupSchedule>(DEFAULT_SCHEDULE)
 
   const { data, isLoading } = useQuery({
     queryKey: ['super-admin-backups'],
@@ -41,7 +57,12 @@ export function Backups() {
         method: 'GET',
         path: '/api/super-admin/backups',
       })
-      return validateApiResponse(BackupsResponseSchema, response.data)
+      const validated = validateApiResponse(BackupsResponseSchema, response.data)
+      // Sync schedule state with server data if available
+      if (validated.schedule) {
+        setSchedule(validated.schedule)
+      }
+      return validated
     },
     refetchInterval: 30000,
   })
@@ -77,6 +98,24 @@ export function Backups() {
     },
     onError: () => {
       toast.error('Erreur lors de la restauration')
+    },
+  })
+
+  const saveSchedule = useMutation({
+    mutationFn: async (newSchedule: BackupSchedule) => {
+      return api.request({
+        method: 'POST',
+        path: '/api/super-admin/backups/schedule',
+        body: newSchedule,
+      })
+    },
+    onSuccess: () => {
+      toast.success('Programmation sauvegardée')
+      queryClient.invalidateQueries({ queryKey: ['super-admin-backups'] })
+      queryClient.invalidateQueries({ queryKey: ['super-admin-backup-schedule'] })
+    },
+    onError: () => {
+      toast.error('Erreur lors de la sauvegarde')
     },
   })
 
@@ -121,6 +160,17 @@ export function Backups() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowSchedulePanel(!showSchedulePanel)}
+            className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition ${
+              showSchedulePanel
+                ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300'
+                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-teal-500'
+            }`}
+          >
+            <Calendar className="w-4 h-4" />
+            Programmer
+          </button>
           <select
             value={backupType}
             onChange={(e) => setBackupType(e.target.value as 'full' | 'incremental')}
@@ -144,8 +194,181 @@ export function Backups() {
         </div>
       </div>
 
+      {/* Schedule Panel */}
+      {showSchedulePanel && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Settings className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Programmation Backup Automatique
+              </h2>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {schedule.enabled ? 'Activé' : 'Désactivé'}
+              </span>
+              <div
+                className={`relative w-11 h-6 rounded-full transition-colors ${
+                  schedule.enabled ? 'bg-teal-500' : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+                onClick={() => setSchedule({ ...schedule, enabled: !schedule.enabled })}
+              >
+                <div
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                    schedule.enabled ? 'translate-x-5' : ''
+                  }`}
+                />
+              </div>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Fréquence */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Fréquence
+              </label>
+              <select
+                value={schedule.frequency}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, frequency: e.target.value as BackupSchedule['frequency'] })
+                }
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="daily">Quotidien</option>
+                <option value="weekly">Hebdomadaire</option>
+                <option value="monthly">Mensuel</option>
+              </select>
+            </div>
+
+            {/* Jour de la semaine (si hebdomadaire) */}
+            {schedule.frequency === 'weekly' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Jour
+                </label>
+                <select
+                  value={schedule.day_of_week}
+                  onChange={(e) => setSchedule({ ...schedule, day_of_week: parseInt(e.target.value) })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value={1}>Lundi</option>
+                  <option value={2}>Mardi</option>
+                  <option value={3}>Mercredi</option>
+                  <option value={4}>Jeudi</option>
+                  <option value={5}>Vendredi</option>
+                  <option value={6}>Samedi</option>
+                  <option value={0}>Dimanche</option>
+                </select>
+              </div>
+            )}
+
+            {/* Jour du mois (si mensuel) */}
+            {schedule.frequency === 'monthly' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Jour du mois
+                </label>
+                <select
+                  value={schedule.day_of_month}
+                  onChange={(e) => setSchedule({ ...schedule, day_of_month: parseInt(e.target.value) })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  {Array.from({ length: 28 }, (_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Heure */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Heure
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={schedule.hour}
+                  onChange={(e) => setSchedule({ ...schedule, hour: parseInt(e.target.value) })}
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <option key={i} value={i}>
+                      {i.toString().padStart(2, '0')}h
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={schedule.minute}
+                  onChange={(e) => setSchedule({ ...schedule, minute: parseInt(e.target.value) })}
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  {[0, 15, 30, 45].map((m) => (
+                    <option key={m} value={m}>
+                      {m.toString().padStart(2, '0')}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Type de backup */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Type
+              </label>
+              <select
+                value={schedule.backup_type}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, backup_type: e.target.value as 'full' | 'incremental' })
+                }
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="full">Complet</option>
+                <option value="incremental">Incrémental</option>
+              </select>
+            </div>
+
+            {/* Rétention */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Rétention (backups)
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={365}
+                value={schedule.retention_count}
+                onChange={(e) =>
+                  setSchedule({ ...schedule, retention_count: parseInt(e.target.value) || 7 })
+                }
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={() => saveSchedule.mutate(schedule)}
+              disabled={saveSchedule.isPending}
+              className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition disabled:opacity-50"
+            >
+              {saveSchedule.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+              Sauvegarder
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Info Card */}
-      {data?.next_scheduled_backup && (
+      {data?.next_scheduled_backup && typeof data.next_scheduled_backup === 'string' && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex items-center gap-3">
           <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           <span className="text-blue-800 dark:text-blue-200">

@@ -559,6 +559,7 @@ class AuthController(http.Controller):
                     'name': user.name,
                     'email': user.email or '',
                     'login': user.login,
+                    'groups': [g.name for g in user.groups_id] if user.groups_id else [],
                 },
                 'claims': {
                     'tenant_id': claims.get('tenant_id'),

@@ -79,7 +79,7 @@ import {
 // TYPES
 // ============================================================================
 
-export type ModuleId = 'home' | 'finance' | 'store' | 'stock' | 'crm' | 'marketing' | 'hr' | 'pos'
+export type ModuleId = 'home' | 'finance' | 'store' | 'stock' | 'crm' | 'marketing' | 'hr' | 'pos' | 'support'
 
 export interface SubMenuItem {
   name: string
@@ -466,6 +466,26 @@ export const MODULES: Module[] = [
         title: 'Configuration',
         items: [
           { name: 'Paramètres', path: '/hr/settings', icon: Settings },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'support',
+    name: 'Support',
+    shortName: 'Support',
+    icon: HeadphonesIcon,
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-100 dark:bg-purple-900/30',
+    description: 'Assistance et tickets',
+    basePath: '/support',
+    sections: [
+      {
+        title: 'Assistance',
+        items: [
+          { name: 'Mes Tickets', path: '/support/tickets', icon: MessageSquare },
+          { name: 'Créer un Ticket', path: '/support/tickets/new', icon: FileEdit },
+          { name: 'FAQ', path: '/support/faq', icon: HelpCircle },
         ],
       },
     ],

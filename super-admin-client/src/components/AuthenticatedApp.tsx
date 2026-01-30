@@ -13,6 +13,7 @@ import { Billing } from '@/pages/Billing'
 import { Monitoring } from '@/pages/Monitoring'
 import { Backups } from '@/pages/Backups'
 import { Security } from '@/pages/Security'
+import { AuditLogs } from '@/pages/AuditLogs'
 import { Settings } from '@/pages/Settings'
 import { InactivityWarning } from './InactivityWarning'
 import { useInactivityLogout } from '@/hooks/useInactivityLogout'
@@ -36,6 +37,7 @@ function PageViewTracker() {
       '/billing': 'Billing',
       '/monitoring': 'Monitoring',
       '/security': 'Security',
+      '/audit-logs': 'Audit Logs',
       '/backups': 'Backups',
       '/settings': 'Settings',
     }
@@ -84,6 +86,7 @@ export function AuthenticatedApp() {
           <Route path="billing" element={<Billing />} />
           <Route path="monitoring" element={<Monitoring />} />
           <Route path="security" element={<Security />} />
+          <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="backups" element={<Backups />} />
           <Route path="settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

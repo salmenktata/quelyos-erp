@@ -7,3 +7,4 @@ export * from './crm-notices';
 export * from './finance-notices';
 export * from './hr-notices';
 export * from './analytics';
+export * from './support-notices';

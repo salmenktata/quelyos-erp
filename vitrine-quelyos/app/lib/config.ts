@@ -30,8 +30,8 @@ export const config = {
   // URLs Finance
   finance: {
     app: FINANCE_BASE,
-    login: "/finance/login",
-    register: "/finance/register",
+    login: "/auth/login",
+    register: "/auth/register",
     dashboard: join(FINANCE_BASE, "/dashboard"),
     accounts: join(FINANCE_BASE, "/dashboard/accounts"),
     forecast: join(FINANCE_BASE, "/dashboard/forecast"),

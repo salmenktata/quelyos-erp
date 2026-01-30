@@ -22,6 +22,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/tarifs", changeFrequency: "monthly", priority: 0.9 },
     { path: "/secteurs", changeFrequency: "monthly", priority: 0.7 },
     { path: "/contact", changeFrequency: "monthly", priority: 0.7 },
+    { path: "/docs", changeFrequency: "weekly", priority: 0.8 },
+    { path: "/faq", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/about", changeFrequency: "monthly", priority: 0.7 },
+    { path: "/support", changeFrequency: "monthly", priority: 0.7 },
+    { path: "/security", changeFrequency: "monthly", priority: 0.6 },
 
     // Modules - Pages principales
     { path: "/crm", changeFrequency: "monthly", priority: 0.8 },
@@ -34,9 +39,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/finance", changeFrequency: "weekly", priority: 0.9 },
     { path: "/finance/pricing", changeFrequency: "monthly", priority: 0.8 },
     { path: "/finance/features", changeFrequency: "monthly", priority: 0.8 },
-    { path: "/finance/about", changeFrequency: "monthly", priority: 0.7 },
-    { path: "/finance/contact", changeFrequency: "monthly", priority: 0.7 },
-    { path: "/finance/support", changeFrequency: "monthly", priority: 0.7 },
     { path: "/finance/roadmap", changeFrequency: "weekly", priority: 0.7 },
     { path: "/finance/backlog", changeFrequency: "weekly", priority: 0.6 },
     { path: "/finance/backlog-technique", changeFrequency: "weekly", priority: 0.5 },
@@ -66,18 +68,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/finance/templates/bureau-etudes", changeFrequency: "monthly", priority: 0.5 },
 
     // Finance - Resources & Comparison
-    { path: "/finance/docs", changeFrequency: "weekly", priority: 0.6 },
-    { path: "/finance/faq", changeFrequency: "monthly", priority: 0.6 },
     { path: "/finance/compare", changeFrequency: "monthly", priority: 0.6 },
-    { path: "/finance/security", changeFrequency: "monthly", priority: 0.5 },
-
-    // Finance - Legal
-    { path: "/finance/cgu", changeFrequency: "yearly", priority: 0.3 },
-    { path: "/finance/cgv", changeFrequency: "yearly", priority: 0.3 },
-    { path: "/finance/confidentialite", changeFrequency: "yearly", priority: 0.3 },
-    { path: "/finance/privacy", changeFrequency: "yearly", priority: 0.3 },
-    { path: "/finance/mentions-legales", changeFrequency: "yearly", priority: 0.3 },
     { path: "/finance/terms", changeFrequency: "yearly", priority: 0.3 },
+
+    // Legal Pages (Global)
+    { path: "/legal/cgu", changeFrequency: "yearly", priority: 0.3 },
+    { path: "/legal/cgv", changeFrequency: "yearly", priority: 0.3 },
+    { path: "/legal/confidentialite", changeFrequency: "yearly", priority: 0.3 },
+    { path: "/legal/privacy", changeFrequency: "yearly", priority: 0.3 },
+    { path: "/legal/mentions-legales", changeFrequency: "yearly", priority: 0.3 },
+
+    // Auth Pages (Global)
+    { path: "/auth/login", changeFrequency: "monthly", priority: 0.4 },
+    { path: "/auth/register", changeFrequency: "monthly", priority: 0.4 },
+    { path: "/auth/forgot-password", changeFrequency: "monthly", priority: 0.3 },
 
     // Marketing App - Main Pages
     { path: "/marketing", changeFrequency: "weekly", priority: 0.9 },

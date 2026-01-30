@@ -10,24 +10,25 @@
 import { useQuery } from '@tanstack/react-query'
 import { Activity, CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react'
 import { api } from '@/lib/api/gateway'
-import { ProvisioningJobSchema, SystemHealthSchema, validateApiResponse } from '@/lib/validators'
-import type { ProvisioningJob, SystemHealth } from '@/lib/validators'
-import { z } from 'zod'
+import { ProvisioningJobsResponseSchema, SystemHealthSchema, validateApiResponse } from '@/lib/validators'
+import type { ProvisioningJobsResponse, ProvisioningJob, SystemHealth } from '@/lib/validators'
 
 export function Monitoring() {
-  const { data: jobs, isLoading: jobsLoading } = useQuery({
+  const { data: jobsResponse, isLoading: jobsLoading } = useQuery({
     queryKey: ['super-admin-provisioning-jobs'],
     queryFn: async () => {
-      const response = await api.request<ProvisioningJob[]>({ method: 'GET', path: '/api/super-admin/provisioning-jobs' })
-      return validateApiResponse(z.array(ProvisioningJobSchema), response.data)
+      const response = await api.request<ProvisioningJobsResponse>({ method: 'GET', path: '/api/super-admin/provisioning-jobs' })
+      return validateApiResponse(ProvisioningJobsResponseSchema, response.data)
     },
     refetchInterval: (query) => {
-      const hasRunningJobs = (query.state.data as ProvisioningJob[] | undefined)?.some(
+      const hasRunningJobs = (query.state.data as ProvisioningJobsResponse | undefined)?.data?.some(
         (job) => job.state === 'running' || job.state === 'pending'
       )
       return hasRunningJobs ? 5000 : false
     },
   })
+
+  const jobs = jobsResponse?.data
 
   const { data: health } = useQuery({
     queryKey: ['super-admin-system-health'],

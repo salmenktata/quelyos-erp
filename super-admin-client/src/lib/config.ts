@@ -47,7 +47,8 @@ function loadConfig(): AppConfig {
     environment: import.meta.env.VITE_ENV || import.meta.env.MODE,
     debug: import.meta.env.VITE_DEBUG === 'true',
 
-    apiUrl: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8069',
+    // En dev, utiliser le proxy Vite (URL vide = même origine)
+    apiUrl: import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? '' : 'http://localhost:8069'),
     apiTimeout: parseInt(import.meta.env.VITE_API_TIMEOUT || '30000'),
     apiRetryAttempts: parseInt(import.meta.env.VITE_API_RETRY_ATTEMPTS || '3'),
 
@@ -78,7 +79,7 @@ function loadConfig(): AppConfig {
       console.warn('Using default values for invalid config fields')
       return configSchema.parse({
         ...rawConfig,
-        apiUrl: rawConfig.apiUrl || 'http://localhost:8069',
+        apiUrl: rawConfig.apiUrl || (import.meta.env.DEV ? '' : 'http://localhost:8069'),
       })
     }
 

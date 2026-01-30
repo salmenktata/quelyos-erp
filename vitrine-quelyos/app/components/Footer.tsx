@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Github, Linkedin, Mail, Sparkles } from "lucide-react";
+import { Linkedin, Mail, Sparkles } from "lucide-react";
 import Container from "./Container";
 
 export default function Footer() {
@@ -130,7 +130,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/finance/docs"
+                  href="/docs"
                   className="text-sm text-slate-400 hover:text-white"
                 >
                   Documentation
@@ -138,7 +138,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/finance/faq"
+                  href="/faq"
                   className="text-sm text-slate-400 hover:text-white"
                 >
                   FAQ
@@ -146,21 +146,11 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/finance/support"
+                  href="/support"
                   className="text-sm text-slate-400 hover:text-white"
                 >
                   Support
                 </Link>
-              </li>
-              <li>
-                <a
-                  href="https://github.com/salmenktata"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-slate-400 hover:text-white"
-                >
-                  GitHub
-                </a>
               </li>
             </ul>
           </div>
@@ -191,17 +181,6 @@ export default function Footer() {
                   LinkedIn
                 </a>
               </li>
-              <li>
-                <a
-                  href="https://github.com/salmenktata"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-slate-400 hover:text-white"
-                >
-                  <Github className="h-4 w-4" />
-                  GitHub
-                </a>
-              </li>
             </ul>
           </div>
         </div>
@@ -213,25 +192,25 @@ export default function Footer() {
           </p>
           <div className="flex gap-6">
             <Link
-              href="/mentions-legales"
+              href="/legal/mentions-legales"
               className="text-sm text-slate-500 hover:text-slate-300"
             >
               Mentions légales
             </Link>
             <Link
-              href="/confidentialite"
+              href="/legal/confidentialite"
               className="text-sm text-slate-500 hover:text-slate-300"
             >
               Confidentialité
             </Link>
             <Link
-              href="/cgu"
+              href="/legal/cgu"
               className="text-sm text-slate-500 hover:text-slate-300"
             >
               CGU
             </Link>
             <Link
-              href="/cgv"
+              href="/legal/cgv"
               className="text-sm text-slate-500 hover:text-slate-300"
             >
               CGV

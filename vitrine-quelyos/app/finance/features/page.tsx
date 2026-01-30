@@ -38,36 +38,36 @@ import Container from "@/app/components/Container";
 const coreFeatures = [
   {
     icon: Bell,
-    title: "Alertes Trésorerie",
-    description: "Soyez averti avant qu'il ne soit trop tard. Alertes email automatiques quand votre solde approche du seuil critique ou si vos prévisions virent au rouge.",
-    href: "/finance/features/alerts",
+    title: "Alertes Intelligentes",
+    description: "Recevez une notification avant que votre trésorerie ne devienne critique. Vous êtes prévenu 2 semaines à l'avance pour agir sereinement.",
+    href: config.finance.register,
     color: "from-red-500 to-orange-500",
-    badge: "Nouveau",
-    stats: "Réaction en <1min",
+    badge: "Essentiel",
+    stats: "Alertes en temps réel",
   },
   {
     icon: TrendingUp,
-    title: "Prévisions IA Prophet.js",
-    description: "Dormez tranquille : notre algorithme ML vous projette à 30, 60 et 90 jours avec une fiabilité de 85-90%. Zones de confiance incluses.",
-    href: "/finance/features/forecast",
+    title: "Prévisions Automatiques",
+    description: "Visualisez votre trésorerie dans 1, 2 ou 3 mois. L'intelligence artificielle analyse votre historique et vous projette dans l'avenir avec précision.",
+    href: config.finance.register,
     color: "from-cyan-500 to-blue-500",
-    stats: "85-90% fiable",
+    stats: "Visibilité 90 jours",
   },
   {
     icon: Sparkles,
-    title: "Scénarios What-If",
-    description: "Et si j'embauche ? Et si je perds ce client ? Testez vos décisions avant de les prendre. Simulateur interactif avec impact en temps réel.",
-    href: config.finance.dashboard + "/forecast",
+    title: "Simulateur de Décisions",
+    description: "Embaucher un salarié ? Investir dans du matériel ? Testez l'impact sur votre trésorerie avant de vous engager.",
+    href: config.finance.register,
     color: "from-purple-500 to-pink-500",
-    stats: "Décisions éclairées",
+    stats: "Scénarios illimités",
   },
   {
     icon: BarChart3,
-    title: "Dashboard Temps Réel",
-    description: "Votre cockpit financier : KPIs essentiels, évolution sur 30 jours, budgets, prévisions. Tout ce qu'il faut pour piloter en 10 secondes.",
-    href: "/finance/features/dashboard",
+    title: "Tableau de Bord Simple",
+    description: "Tous vos indicateurs financiers en un coup d'œil. Comprenez votre situation en 30 secondes, sans être expert-comptable.",
+    href: config.finance.register,
     color: "from-indigo-500 to-violet-500",
-    stats: "Vue à 360°",
+    stats: "Vue instantanée",
   },
 ];
 
@@ -75,47 +75,47 @@ const mlFeatures = [
   {
     icon: Brain,
     title: "Catégorisation Automatique",
-    description: "L'IA suggère la bonne catégorie en analysant la description de vos transactions. Acceptez en 1 clic. Plus vous l'utilisez, plus elle devient précise.",
+    description: "Fini la saisie manuelle ! L'intelligence artificielle classe automatiquement vos dépenses : salaires, fournitures, loyer... Vous validez en 1 clic.",
     color: "from-violet-500 to-purple-500",
-    badge: "Nouveau",
-    stats: "-90% temps de saisie",
-    impact: "TF-IDF + Naive Bayes",
+    badge: "IA",
+    stats: "90% de temps gagné",
+    impact: "Apprentissage continu",
   },
   {
     icon: Copy,
-    title: "Détection de Doublons",
-    description: "Évitez la double-comptabilisation : notre algorithme détecte les doublons lors des imports CSV avec 95% de précision, même avec des typos.",
+    title: "Détection des Doublons",
+    description: "Importez vos relevés bancaires sans crainte. Le système repère automatiquement les transactions en double pour éviter les erreurs de comptabilisation.",
     color: "from-emerald-500 to-teal-500",
-    badge: "Nouveau",
-    stats: "95.73% précision",
-    impact: "Fuzzy Matching Levenshtein",
+    badge: "IA",
+    stats: "Fiabilité 95%+",
+    impact: "Reconnaissance intelligente",
   },
   {
     icon: AlertTriangle,
-    title: "Alertes Anomalies",
-    description: "Détection automatique des dépenses inhabituelles. Soyez alerté instantanément si une transaction sort de l'ordinaire (3x+ la moyenne).",
+    title: "Détection d'Anomalies",
+    description: "Repérez instantanément les dépenses inhabituelles. Si un montant sort de l'ordinaire, vous êtes alerté immédiatement par email.",
     color: "from-orange-500 to-red-500",
-    badge: "Nouveau",
-    stats: "+25% fraudes détectées",
-    impact: "Isolation Forest ML",
+    badge: "IA",
+    stats: "Protection 24/7",
+    impact: "Surveillance automatique",
   },
   {
     icon: Lightbulb,
-    title: "Budgets Intelligents",
-    description: "L'IA analyse vos 6-12 derniers mois et recommande le montant optimal pour chaque budget. Détection de saisonnalité incluse.",
+    title: "Suggestions de Budgets",
+    description: "Difficile de fixer un budget réaliste ? L'IA analyse votre historique et vous propose des montants adaptés à votre activité et votre saisonnalité.",
     color: "from-cyan-500 to-blue-500",
-    badge: "Nouveau",
-    stats: "94% de confiance",
-    impact: "Régression Quantile",
+    badge: "IA",
+    stats: "Recommandations personnalisées",
+    impact: "Analyse sur 12 mois",
   },
   {
     icon: UserCheck,
-    title: "Scoring Risque Client B2B",
-    description: "Évaluez automatiquement le risque de retard de paiement de vos clients. Score 0-100, prédiction du délai, recommandations actionnables.",
+    title: "Évaluation Clients",
+    description: "Évaluez le risque de retard de paiement de chaque client. Recevez un score de fiabilité et des recommandations pour sécuriser vos encaissements.",
     color: "from-pink-500 to-rose-500",
-    badge: "Nouveau",
-    stats: "-25% retards paiement",
-    impact: "6 features analysées",
+    badge: "B2B",
+    stats: "Moins de retards",
+    impact: "Prédiction de risque",
   },
 ];
 
@@ -123,61 +123,61 @@ const powerFeatures = [
   {
     icon: Wallet,
     title: "Multi-Comptes & Devises",
-    description: "Tous vos comptes au même endroit : banques, caisses, crypto. EUR, TND, USD, MAD... Conversion automatique.",
+    description: "Gérez tous vos comptes en un seul endroit : comptes bancaires, caisses, portefeuilles crypto. Support de l'Euro, Dinar, Dollar et autres devises avec conversion automatique.",
     color: "from-emerald-500 to-teal-500",
   },
   {
     icon: FolderKanban,
-    title: "Portefeuilles Pro",
-    description: "Regroupez par projet, activité ou entité juridique. Consolidation automatique.",
+    title: "Organisation par Projet",
+    description: "Regroupez vos finances par projet, activité commerciale ou entité juridique. Visualisez la rentabilité de chaque activité séparément.",
     color: "from-violet-500 to-purple-500",
   },
   {
     icon: PieChart,
-    title: "Budgets Intelligents",
-    description: "Alertes à 80% et 100%. Tracking mensuel. Catégorisation automatique.",
+    title: "Suivi de Budgets",
+    description: "Définissez des budgets mensuels par catégorie. Recevez des alertes quand vous atteignez 80% puis 100% de votre enveloppe.",
     color: "from-amber-500 to-orange-500",
   },
   {
     icon: Receipt,
-    title: "Transactions CRUD",
-    description: "Ajout, modification, suppression. Filtres avancés. Catégorisation manuelle ou auto.",
+    title: "Gestion des Transactions",
+    description: "Ajoutez, modifiez ou supprimez vos opérations facilement. Recherchez et filtrez vos transactions avec précision.",
     color: "from-green-500 to-emerald-500",
   },
   {
     icon: Upload,
-    title: "Import CSV/Excel",
-    description: "Mapping intelligent. Synchronisation bancaire en préparation (Q2 2026).",
+    title: "Import Relevés Bancaires",
+    description: "Importez vos relevés bancaires au format CSV ou Excel. Le système reconnaît automatiquement le format et classe vos transactions.",
     color: "from-blue-500 to-cyan-500",
   },
   {
     icon: LineChart,
-    title: "8 Types de Rapports",
-    description: "Comptes, catégories, flux, portefeuilles, cashflow, rentabilité, prévisions, overview.",
+    title: "Rapports Complets",
+    description: "8 types de rapports disponibles : vue d'ensemble, flux de trésorerie, rentabilité, évolution des comptes, analyses par catégorie et bien plus.",
     color: "from-pink-500 to-rose-500",
   },
   {
     icon: Calendar,
-    title: "Planificateur",
-    description: "Transactions récurrentes et projets futurs. Planning sur 12 mois.",
+    title: "Planification Future",
+    description: "Programmez vos dépenses récurrentes (salaires, loyers, abonnements) et anticipez vos projets futurs sur 12 mois.",
     color: "from-indigo-500 to-blue-500",
   },
   {
     icon: Users,
-    title: "Collaboration Équipe",
-    description: "Invitations, rôles, permissions. Audit trail complet.",
+    title: "Travail en Équipe",
+    description: "Invitez votre comptable ou vos associés. Définissez des rôles et permissions pour chaque membre. Historique complet des actions.",
     color: "from-teal-500 to-green-500",
   },
   {
     icon: Settings,
-    title: "Paramètres Avancés",
-    description: "TVA, devises, catégories, flux de paiement, notifications, intégrations.",
+    title: "Configuration Complète",
+    description: "Personnalisez les catégories, configurez la TVA, gérez vos moyens de paiement, paramétrez vos notifications et intégrations.",
     color: "from-slate-500 to-gray-500",
   },
   {
     icon: Shield,
-    title: "Sécurité Bancaire",
-    description: "Chiffrement AES-256, JWT, RGPD, backups quotidiens, logs d'audit.",
+    title: "Sécurité Maximale",
+    description: "Vos données sont chiffrées et sauvegardées quotidiennement. Conformité RGPD garantie. Hébergement sécurisé en Europe.",
     color: "from-zinc-500 to-slate-500",
   },
 ];
@@ -230,7 +230,7 @@ export default function FeaturesPage() {
           >
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-2 text-sm text-indigo-300">
               <Sparkles className="h-4 w-4" />
-              19 fonctionnalités en production • 5 algorithmes IA • 135 features sur la roadmap
+              19 fonctionnalités disponibles • Intelligence artificielle intégrée
             </div>
 
             <h1 className="text-5xl font-bold leading-tight text-white sm:text-6xl lg:text-7xl">
@@ -366,18 +366,18 @@ export default function FeaturesPage() {
           >
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-2 text-sm text-violet-300">
               <Brain className="h-4 w-4" />
-              100% des modèles ML s&apos;exécutent localement • Zero coût de tokens
+              Intelligence artificielle incluse sans surcoût
             </div>
 
             <h2 className="text-4xl font-bold text-white sm:text-5xl">
-              Intelligence Artificielle{" "}
+              L&apos;intelligence artificielle{" "}
               <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                intégrée
+                au service de votre trésorerie
               </span>
             </h2>
             <p className="mt-4 text-lg text-slate-400 max-w-3xl mx-auto">
-              5 algorithmes de Machine Learning pour automatiser votre gestion financière.
-              <strong className="text-white block mt-2">Déployés en production, validés avec 95%+ de précision.</strong>
+              5 assistants intelligents pour automatiser vos tâches répétitives et vous faire gagner du temps.
+              <strong className="text-white block mt-2">Testé et approuvé par des centaines d&apos;entreprises.</strong>
             </p>
           </motion.div>
 
@@ -422,7 +422,7 @@ export default function FeaturesPage() {
                 <div className="mt-4 pt-4 border-t border-white/10">
                   <div className="flex items-center gap-2 text-xs text-slate-400">
                     <Zap className="h-3 w-3 text-violet-400" />
-                    <span>Aucun coût de tokens • Modèles locaux</span>
+                    <span>Inclus dans votre abonnement • Sans frais supplémentaires</span>
                   </div>
                 </div>
               </motion.div>
@@ -438,31 +438,31 @@ export default function FeaturesPage() {
             <div className="mx-auto max-w-3xl">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
                 <CheckCircle2 className="h-4 w-4" />
-                15/15 tests d&apos;intégration passent • Production Ready
+                Disponible immédiatement • Aucune configuration requise
               </div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                Les 5 algorithmes ML sont déjà déployés et opérationnels
+                Tous les assistants IA sont déjà actifs dans votre compte
               </h3>
               <p className="text-slate-300 mb-6">
-                Catégorisation automatique, détection de doublons (95.73% précision), alertes anomalies,
-                budgets intelligents (94% confiance), et scoring risque client. Tous validés, documentés et prêts à l&apos;emploi.
+                Dès votre inscription, profitez de la catégorisation automatique, détection des doublons,
+                alertes sur les anomalies, suggestions de budgets et évaluation de vos clients. Pas de configuration, ça fonctionne directement.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
                 <span className="flex items-center gap-2 text-slate-400">
                   <CheckCircle2 className="h-4 w-4 text-violet-400" />
-                  Python + FastAPI
+                  Activation automatique
                 </span>
                 <span className="flex items-center gap-2 text-slate-400">
                   <CheckCircle2 className="h-4 w-4 text-violet-400" />
-                  scikit-learn + scipy
+                  Aucun surcoût
                 </span>
                 <span className="flex items-center gap-2 text-slate-400">
                   <CheckCircle2 className="h-4 w-4 text-violet-400" />
-                  Docker Compose
+                  Disponible 24/7
                 </span>
                 <span className="flex items-center gap-2 text-slate-400">
                   <CheckCircle2 className="h-4 w-4 text-violet-400" />
-                  Health checks
+                  Mises à jour gratuites
                 </span>
               </div>
             </div>
