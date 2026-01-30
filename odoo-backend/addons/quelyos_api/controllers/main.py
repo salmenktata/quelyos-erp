@@ -427,6 +427,12 @@ class QuelyosAPI(BaseController):
     @http.route('/api/ecommerce/auth/login', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def auth_login(self, **kwargs):
         """Authentification utilisateur avec vérification du mot de passe"""
+        # Rate limiting - protection brute force
+        rate_error = check_rate_limit(request, RateLimitConfig.LOGIN, 'ecommerce_login')
+        if rate_error:
+            _logger.warning(f"Rate limit exceeded for ecommerce login from {request.httprequest.remote_addr}")
+            return rate_error
+
         try:
             _logger.info("========== LOGIN REQUEST RECEIVED ==========")
             params = self._get_params()
@@ -588,6 +594,12 @@ class QuelyosAPI(BaseController):
     @http.route('/api/ecommerce/auth/register', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
     def auth_register(self, **kwargs):
         """Inscription nouvel utilisateur"""
+        # Rate limiting - protection contre spam/abuse
+        rate_error = check_rate_limit(request, RateLimitConfig.REGISTER, 'ecommerce_register')
+        if rate_error:
+            _logger.warning(f"Rate limit exceeded for ecommerce registration from {request.httprequest.remote_addr}")
+            return rate_error
+
         try:
             params = self._get_params()
             name = params.get('name')

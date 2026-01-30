@@ -41,6 +41,7 @@ class RateLimitConfig:
     LOGIN = (5, 60)               # 5 tentatives/min (brute force protection)
     LOGIN_FAILED = (3, 300)       # 3 échecs puis blocage 5 min
     PASSWORD_RESET = (3, 3600)    # 3 demandes/heure
+    REGISTER = (3, 60)            # 3 inscriptions/min (anti-spam)
 
     # API publique
     PRODUCTS_LIST = (60, 60)      # 60 req/min

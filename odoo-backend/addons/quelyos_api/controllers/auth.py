@@ -979,6 +979,12 @@ class AuthController(http.Controller):
         Endpoint SSO pour authentification Passkey.
         Évite les conflits avec le module website.
         """
+        # Rate limiting - protection brute force (même limite que login standard)
+        rate_error = check_rate_limit(request, RateLimitConfig.LOGIN, 'passkey_login')
+        if rate_error:
+            _logger.warning(f"Rate limit exceeded for passkey login from {request.httprequest.remote_addr}")
+            return werkzeug_redirect(f'{FRONTEND_LOGIN_URL}?error=rate_limit', code=302)
+
         webauthn_response = kwargs.get('webauthn_response')
         redirect_url = kwargs.get('redirect', '/web')
 
