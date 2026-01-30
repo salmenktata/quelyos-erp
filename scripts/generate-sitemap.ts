@@ -1,18 +1,18 @@
 #!/usr/bin/env tsx
 
 /**
- * Script génération automatique Sitemap
+ * Script génération automatique Sitemap V2 (Fixed)
  *
  * Scanne les 4 applications et génère super-admin-client/src/config/sitemap.ts
+ * Utilise fs natif (pas de globby pour éviter problèmes dépendances)
  *
  * Usage:
  *   pnpm generate-sitemap
  *   pnpm generate-sitemap --dry-run  # Preview sans écrire
  */
 
-import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs'
-import { join, relative } from 'path'
-import { globbySync } from 'globby'
+import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'fs'
+import { join } from 'path'
 
 const ROOT_DIR = join(__dirname, '..')
 const DRY_RUN = process.argv.includes('--dry-run')
@@ -84,44 +84,99 @@ const APPS_CONFIG: AppConfig[] = [
 ]
 
 // ============================================================================
+// Utilitaires
+// ============================================================================
+
+function walkDir(dir: string, filter: (file: string) => boolean): string[] {
+  if (!existsSync(dir)) return []
+
+  const results: string[] = []
+
+  function walk(currentDir: string) {
+    try {
+      const files = readdirSync(currentDir)
+
+      for (const file of files) {
+        const filePath = join(currentDir, file)
+        const stat = statSync(filePath)
+
+        if (stat.isDirectory()) {
+          // Skip node_modules, .next, dist
+          if (!['node_modules', '.next', 'dist', '.turbo'].includes(file)) {
+            walk(filePath)
+          }
+        } else if (filter(filePath)) {
+          results.push(filePath)
+        }
+      }
+    } catch (_err) {
+      // Ignore permission errors
+    }
+  }
+
+  walk(dir)
+  return results
+}
+
+function pathToRoute(filePath: string, baseDir: string): string {
+  let route = filePath
+    .replace(baseDir, '')
+    .replace(/\/page\.tsx$/, '')
+    .replace(/\\page\.tsx$/, '')
+    .replace(/^\(.*?\)\//, '') // Remove route groups (shop)
+
+  if (!route || route === '/') {
+    return '/'
+  }
+
+  // Normalize slashes
+  route = route.replace(/\\/g, '/')
+
+  // Remove trailing slash
+  return route.replace(/\/$/, '')
+}
+
+function routeToName(route: string): string {
+  if (route === '/') return 'Accueil'
+
+  const segments = route.split('/').filter(Boolean)
+  const lastSegment = segments[segments.length - 1]
+
+  return lastSegment
+    .replace(/\[.*?\]/g, '') // Remove [slug]
+    .replace(/-/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+function isDynamic(path: string): boolean {
+  return /\[|:/.test(path)
+}
+
+// ============================================================================
 // Scanner Vitrine Quelyos (Next.js 14)
 // ============================================================================
 
 function scanVitrineQuelyos(): RouteInfo[] {
   console.log('📡 Scanning Vitrine Quelyos...')
-  const appDir = join(ROOT_DIR, 'vitrine-quelyos/app')
+  const appDir = join(ROOT_DIR, 'vitrine-quelyos', 'app')
 
-  if (!statSync(appDir, { throwIfNoEntry: false })) {
+  if (!existsSync(appDir)) {
     console.warn('⚠️  vitrine-quelyos/app not found, skipping')
     return []
   }
 
-  const pages = globbySync('**/page.tsx', { cwd: appDir, absolute: false })
+  const pages = walkDir(appDir, file => file.endsWith('page.tsx'))
 
   const routes = pages.map(page => {
-    // Convert file path to route
-    // app/page.tsx → /
-    // app/about/page.tsx → /about
-    // app/finance/features/[slug]/page.tsx → /finance/features/[slug]
-    let route = page.replace(/\/page\.tsx$/, '').replace(/^/, '/')
-    if (route === '/') route = '/'
-    else route = route.replace(/\/$/, '')
-
-    // Extract name from file (simple heuristic)
-    const segments = route.split('/').filter(Boolean)
-    const name = segments.length === 0
-      ? 'Accueil'
-      : segments[segments.length - 1]
-          .replace(/\[.*?\]/g, '') // Remove [slug]
-          .replace(/-/g, ' ')
-          .replace(/\b\w/g, l => l.toUpperCase())
-
-    const isDynamic = /\[/.test(route)
+    const route = pathToRoute(page, appDir)
+    const name = routeToName(route)
 
     return {
       path: route,
       name,
-      type: isDynamic ? 'dynamic' as const : 'static' as const,
+      type: isDynamic(route) ? 'dynamic' as const : 'static' as const,
     }
   })
 
@@ -135,20 +190,18 @@ function scanVitrineQuelyos(): RouteInfo[] {
 
 function scanDashboardClient(): RouteInfo[] {
   console.log('📡 Scanning Dashboard Client...')
-  const modulesPath = join(ROOT_DIR, 'dashboard-client/src/config/modules.ts')
+  const modulesPath = join(ROOT_DIR, 'dashboard-client', 'src', 'config', 'modules.ts')
 
-  if (!statSync(modulesPath, { throwIfNoEntry: false })) {
+  if (!existsSync(modulesPath)) {
     console.warn('⚠️  dashboard-client/src/config/modules.ts not found, skipping')
     return []
   }
 
   const routes: RouteInfo[] = []
-
-  // Parse modules.ts (simple regex extraction, not AST)
   const content = readFileSync(modulesPath, 'utf-8')
 
-  // Extract module definitions
-  const moduleMatches = content.matchAll(/{\s*id:\s*'(\w+)',\s*name:\s*'([^']+)'/g)
+  // Extract module names
+  const moduleMatches = content.matchAll(/id:\s*'(\w+)',\s*name:\s*'([^']+)'/g)
   const modules = Array.from(moduleMatches).map(m => ({ id: m[1], name: m[2] }))
 
   // Extract paths from items
@@ -157,15 +210,15 @@ function scanDashboardClient(): RouteInfo[] {
   for (const match of pathMatches) {
     const [, name, path] = match
 
-    // Try to infer module from path
-    const moduleId = path.split('/')[1] // /finance/accounts → finance
+    // Infer module from path
+    const moduleId = path.split('/')[1]
     const module = modules.find(m => m.id === moduleId)
 
     routes.push({
       path,
       name,
       module: module?.name,
-      type: /:|[\[]/.test(path) ? 'dynamic' : 'static',
+      type: isDynamic(path) ? 'dynamic' : 'static',
     })
   }
 
@@ -179,9 +232,9 @@ function scanDashboardClient(): RouteInfo[] {
 
 function scanSuperAdminClient(): RouteInfo[] {
   console.log('📡 Scanning Super Admin Client...')
-  const layoutPath = join(ROOT_DIR, 'super-admin-client/src/components/Layout.tsx')
+  const layoutPath = join(ROOT_DIR, 'super-admin-client', 'src', 'components', 'Layout.tsx')
 
-  if (!statSync(layoutPath, { throwIfNoEntry: false })) {
+  if (!existsSync(layoutPath)) {
     console.warn('⚠️  super-admin-client Layout.tsx not found, skipping')
     return []
   }
@@ -203,7 +256,7 @@ function scanSuperAdminClient(): RouteInfo[] {
     routes.push({
       path,
       name,
-      type: /:|[\[]/.test(path) ? 'dynamic' : 'static',
+      type: isDynamic(path) ? 'dynamic' : 'static',
     })
   }
 
@@ -217,40 +270,23 @@ function scanSuperAdminClient(): RouteInfo[] {
 
 function scanVitrineClient(): RouteInfo[] {
   console.log('📡 Scanning Vitrine Client (E-commerce)...')
-  const appDir = join(ROOT_DIR, 'vitrine-client/src/app')
+  const appDir = join(ROOT_DIR, 'vitrine-client', 'src', 'app')
 
-  if (!statSync(appDir, { throwIfNoEntry: false })) {
+  if (!existsSync(appDir)) {
     console.warn('⚠️  vitrine-client/src/app not found, skipping')
     return []
   }
 
-  const pages = globbySync('**/page.tsx', { cwd: appDir, absolute: false })
+  const pages = walkDir(appDir, file => file.endsWith('page.tsx'))
 
   const routes = pages.map(page => {
-    // Convert file path to route
-    let route = page
-      .replace(/\/page\.tsx$/, '')
-      .replace(/^\(.*?\)\//, '') // Remove route groups (shop)
-      .replace(/^/, '/')
-
-    if (route === '/') route = '/'
-    else route = route.replace(/\/$/, '')
-
-    // Extract name
-    const segments = route.split('/').filter(Boolean)
-    const name = segments.length === 0
-      ? 'Accueil'
-      : segments[segments.length - 1]
-          .replace(/\[.*?\]/g, '')
-          .replace(/-/g, ' ')
-          .replace(/\b\w/g, l => l.toUpperCase())
-
-    const isDynamic = /\[/.test(route)
+    const route = pathToRoute(page, appDir)
+    const name = routeToName(route)
 
     return {
       path: route,
       name,
-      type: isDynamic ? 'dynamic' as const : 'static' as const,
+      type: isDynamic(route) ? 'dynamic' as const : 'static' as const,
     }
   })
 
@@ -371,7 +407,7 @@ export const enrichedSitemapData = sitemapData.map(app => ({
 // ============================================================================
 
 async function main() {
-  console.log('🚀 Sitemap Generator V2\n')
+  console.log('🚀 Sitemap Generator V2 (Fixed)\n')
 
   // Scanner toutes les apps
   const appsData: Record<string, RouteInfo[]> = {
@@ -390,15 +426,15 @@ async function main() {
 
   // Générer fichier
   const content = generateSitemapFile(appsData)
-  const outputPath = join(ROOT_DIR, 'super-admin-client/src/config/sitemap.ts')
+  const outputPath = join(ROOT_DIR, 'super-admin-client', 'src', 'config', 'sitemap.ts')
 
   if (DRY_RUN) {
-    console.log('\n🔍 DRY RUN - Preview:\n')
-    console.log(content.slice(0, 500) + '...\n')
+    console.log('\n🔍 DRY RUN - Preview (first 1000 chars):\n')
+    console.log(content.slice(0, 1000) + '...\n')
     console.log(`Would write to: ${outputPath}`)
   } else {
     writeFileSync(outputPath, content, 'utf-8')
-    console.log(`\n✅ Generated: ${relative(ROOT_DIR, outputPath)}`)
+    console.log(`\n✅ Generated: ${outputPath}`)
   }
 
   console.log('\n✨ Done!')
