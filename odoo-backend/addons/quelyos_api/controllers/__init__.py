@@ -4,6 +4,7 @@ from . import base
 from . import main
 # Domain Controllers (extracted from main.py)
 from . import products_ctrl
+from . import pricelists_ctrl
 from . import orders_ctrl
 from . import customers_ctrl
 from . import inventory_ctrl
@@ -48,6 +49,13 @@ from . import payment_stripe_connect
 from . import theme_analytics
 # Super Admin
 from . import super_admin
+from . import tenant_admin_ctrl
+from . import billing_ctrl
+from . import admin_analytics_ctrl
+from . import admin_security_ctrl
+from . import admin_backup_ctrl
+from . import admin_tickets_ctrl
+from . import admin_settings_ctrl
 # 2FA/TOTP
 from . import totp
 # Tickets Support
