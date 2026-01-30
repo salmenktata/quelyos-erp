@@ -1917,6 +1917,267 @@ class SuperAdminController(http.Controller):
         }
 
     # =========================================================================
+    # BACKUP SCHEDULES (Auto backups per tenant)
+    # =========================================================================
+
+    @http.route('/api/super-admin/backup-schedules', type='http', auth='public', methods=['GET', 'POST', 'OPTIONS'], csrf=False)
+    def backup_schedules(self):
+        """GET: Liste schedules | POST: Créer schedule"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
+
+        try:
+            Schedule = request.env['quelyos.backup.schedule'].sudo()
+
+            if request.httprequest.method == 'GET':
+                # Liste schedules
+                schedules = Schedule.search([], order='tenant_id, create_date desc')
+
+                data = {
+                    'success': True,
+                    'data': [self._serialize_schedule(s) for s in schedules],
+                    'total': len(schedules),
+                }
+                return request.make_json_response(data, headers=cors_headers)
+
+            elif request.httprequest.method == 'POST':
+                # Créer schedule
+                data = json.loads(request.httprequest.data.decode('utf-8')) if request.httprequest.data else {}
+
+                schedule = Schedule.create({
+                    'tenant_id': data.get('tenant_id'),
+                    'enabled': data.get('enabled', True),
+                    'frequency': data.get('frequency', 'daily'),
+                    'day_of_week': data.get('day_of_week'),
+                    'day_of_month': data.get('day_of_month'),
+                    'hour': data.get('hour', 2),
+                    'minute': data.get('minute', 0),
+                    'backup_type': 'tenant',
+                    'retention_count': data.get('retention_count', 7),
+                    'notification_email': data.get('notification_email'),
+                })
+
+                _logger.info(
+                    f"[AUDIT] Backup schedule created - User: {request.env.user.login} | "
+                    f"Tenant: {schedule.tenant_id.code} | Schedule ID: {schedule.id}"
+                )
+
+                return request.make_json_response({
+                    'success': True,
+                    'data': self._serialize_schedule(schedule),
+                }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"Backup schedules error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
+    @http.route('/api/super-admin/backup-schedules/<int:schedule_id>', type='http', auth='public', methods=['GET', 'PUT', 'DELETE', 'OPTIONS'], csrf=False)
+    def backup_schedule_detail(self, schedule_id):
+        """GET: Détails | PUT: Modifier | DELETE: Supprimer"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
+
+        try:
+            Schedule = request.env['quelyos.backup.schedule'].sudo()
+            schedule = Schedule.browse(schedule_id)
+
+            if not schedule.exists():
+                return request.make_json_response(
+                    {'success': False, 'error': 'Schedule non trouvé'},
+                    headers=cors_headers,
+                    status=404
+                )
+
+            if request.httprequest.method == 'GET':
+                return request.make_json_response({
+                    'success': True,
+                    'data': self._serialize_schedule(schedule),
+                }, headers=cors_headers)
+
+            elif request.httprequest.method == 'PUT':
+                data = json.loads(request.httprequest.data.decode('utf-8')) if request.httprequest.data else {}
+
+                update_vals = {}
+                if 'enabled' in data:
+                    update_vals['enabled'] = data['enabled']
+                if 'frequency' in data:
+                    update_vals['frequency'] = data['frequency']
+                if 'day_of_week' in data:
+                    update_vals['day_of_week'] = data['day_of_week']
+                if 'day_of_month' in data:
+                    update_vals['day_of_month'] = data['day_of_month']
+                if 'hour' in data:
+                    update_vals['hour'] = data['hour']
+                if 'minute' in data:
+                    update_vals['minute'] = data['minute']
+                if 'retention_count' in data:
+                    update_vals['retention_count'] = data['retention_count']
+                if 'notification_email' in data:
+                    update_vals['notification_email'] = data['notification_email']
+
+                schedule.write(update_vals)
+
+                _logger.info(
+                    f"[AUDIT] Backup schedule updated - User: {request.env.user.login} | "
+                    f"Schedule ID: {schedule_id}"
+                )
+
+                return request.make_json_response({
+                    'success': True,
+                    'data': self._serialize_schedule(schedule),
+                }, headers=cors_headers)
+
+            elif request.httprequest.method == 'DELETE':
+                tenant_code = schedule.tenant_id.code
+
+                schedule.unlink()
+
+                _logger.info(
+                    f"[AUDIT] Backup schedule deleted - User: {request.env.user.login} | "
+                    f"Schedule ID: {schedule_id} | Tenant: {tenant_code}"
+                )
+
+                return request.make_json_response({
+                    'success': True,
+                    'message': 'Schedule supprimé',
+                }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"Backup schedule detail error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
+    @http.route('/api/super-admin/backup-schedules/<int:schedule_id>/run-now', type='http', auth='public', methods=['POST', 'OPTIONS'], csrf=False)
+    def backup_schedule_run_now(self, schedule_id):
+        """Force l'exécution immédiate d'un schedule"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
+
+        try:
+            Schedule = request.env['quelyos.backup.schedule'].sudo()
+            schedule = Schedule.browse(schedule_id)
+
+            if not schedule.exists():
+                return request.make_json_response(
+                    {'success': False, 'error': 'Schedule non trouvé'},
+                    headers=cors_headers,
+                    status=404
+                )
+
+            _logger.info(
+                f"[AUDIT] Backup schedule force run - User: {request.env.user.login} | "
+                f"Schedule ID: {schedule_id} | Tenant: {schedule.tenant_id.code}"
+            )
+
+            # Exécuter immédiatement
+            schedule.execute_scheduled_backup()
+
+            return request.make_json_response({
+                'success': True,
+                'message': 'Backup lancé',
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"Backup schedule run now error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
+    def _serialize_schedule(self, schedule):
+        """Sérialise un schedule pour l'API"""
+        return {
+            'id': schedule.id,
+            'tenant_id': schedule.tenant_id.id,
+            'tenant_name': schedule.tenant_id.name,
+            'tenant_code': schedule.tenant_id.code,
+            'enabled': schedule.enabled,
+            'frequency': schedule.frequency,
+            'day_of_week': schedule.day_of_week,
+            'day_of_month': schedule.day_of_month,
+            'hour': schedule.hour,
+            'minute': schedule.minute,
+            'backup_type': schedule.backup_type,
+            'retention_count': schedule.retention_count,
+            'last_run': schedule.last_run.isoformat() if schedule.last_run else None,
+            'next_run': schedule.next_run.isoformat() if schedule.next_run else None,
+            'last_backup_id': schedule.last_backup_id.id if schedule.last_backup_id else None,
+            'last_status': schedule.last_status,
+            'notification_email': schedule.notification_email,
+        }
+
+    # =========================================================================
     # CORS SETTINGS
     # =========================================================================
 

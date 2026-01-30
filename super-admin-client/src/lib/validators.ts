@@ -346,6 +346,33 @@ export const BackupsResponseSchema = z.object({
   schedule: BackupScheduleSchema.optional(),
 })
 
+export const BackupScheduleRecordSchema = z.object({
+  id: z.number(),
+  tenant_id: z.number(),
+  tenant_name: z.string(),
+  tenant_code: z.string(),
+  enabled: z.boolean(),
+  frequency: z.enum(['daily', 'weekly', 'monthly']),
+  day_of_week: z.number().optional().nullable(),
+  day_of_month: z.number().optional().nullable(),
+  hour: z.number(),
+  minute: z.number(),
+  backup_type: z.enum(['tenant']),
+  retention_count: z.number(),
+  last_run: z.string().nullable(),
+  next_run: z.string().nullable(),
+  last_backup_id: z.number().nullable(),
+  last_status: z.enum(['success', 'failed']).nullable(),
+  notification_email: z.string().nullable(),
+})
+
+export const BackupSchedulesResponseSchema = z.object({
+  success: z.boolean().optional(),
+  error: z.string().optional(),
+  data: z.array(BackupScheduleRecordSchema).optional().default([]),
+  total: z.number().nonnegative().optional().default(0),
+})
+
 export const CorsEntrySchema = z.object({
   id: z.number(),
   domain: z.string(),

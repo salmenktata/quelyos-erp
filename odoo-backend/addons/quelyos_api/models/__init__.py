@@ -79,6 +79,7 @@ from . import res_users
 from . import provisioning_job
 # Super Admin - Backups & CORS
 from . import backup
+from . import backup_schedule
 from . import cors_entry
 # Audit logging
 from . import audit_log
