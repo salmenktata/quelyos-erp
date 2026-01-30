@@ -4,37 +4,70 @@ Configuration centrale du module quelyos_api
 """
 
 import os
+import logging
+
+_logger = logging.getLogger(__name__)
 
 # ==================== CONFIGURATION CORS ====================
 
-# Liste des origines autorisées pour les requêtes CORS
-# En production, restreindre strictement aux domaines légitimes
-ALLOWED_ORIGINS = [
-    # Environnement local développement
-    'http://localhost:3000',      # Frontend Next.js dev
-    'http://localhost:5173',      # Backoffice Vite dev (ancien port)
-    'http://localhost:5175',      # Backoffice Vite dev (nouveau port)
-    'http://localhost:5176',      # Super-admin-client Vite dev
-    'http://127.0.0.1:3000',      # Frontend Next.js dev (127.0.0.1)
-    'http://127.0.0.1:5173',      # Backoffice Vite dev (127.0.0.1)
-    'http://127.0.0.1:5175',      # Backoffice Vite dev (127.0.0.1, nouveau port)
-    'http://127.0.0.1:5176',      # Super-admin-client Vite dev (127.0.0.1)
+# Mode développement : autoriser toutes les origines localhost
+# ATTENTION : À désactiver en production via QUELYOS_DEV_MODE=false
+DEV_MODE = os.environ.get('QUELYOS_DEV_MODE', 'True').lower() in ('true', '1', 'yes')
 
-    # Production (à configurer selon votre déploiement)
-    # 'https://votre-domaine.com',
-    # 'https://admin.votre-domaine.com',
+# Liste des origines autorisées pour les requêtes CORS
+# En production, SEULES ces origines sont autorisées
+ALLOWED_ORIGINS = [
+    # ============ DÉVELOPPEMENT LOCAL ============
+    # Vitrine Quelyos (site vitrine)
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+
+    # Vitrine Client (e-commerce)
+    'http://localhost:3001',
+    'http://127.0.0.1:3001',
+
+    # Dashboard Client (backoffice)
+    'http://localhost:5175',
+    'http://127.0.0.1:5175',
+
+    # Super Admin Client
+    'http://localhost:5176',
+    'http://127.0.0.1:5176',
+
+    # Legacy ports (compatibilité)
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+
+    # ============ PRODUCTION ============
+    # Domaines Quelyos (à activer selon déploiement)
+    # 'https://quelyos.com',
+    # 'https://www.quelyos.com',
+    # 'https://app.quelyos.com',
+    # 'https://admin.quelyos.com',
+    # 'https://api.quelyos.com',
+
+    # Domaines tenants (pattern: https://*.quelyos.com)
+    # Gérés dynamiquement via QUELYOS_ALLOWED_ORIGINS
 ]
 
 # Variable d'environnement pour ajouter des origines dynamiquement
-# Format: QUELYOS_ALLOWED_ORIGINS="https://exemple.com,https://autre.com"
+# Format: QUELYOS_ALLOWED_ORIGINS="https://tenant1.quelyos.com,https://tenant2.quelyos.com"
 env_origins = os.environ.get('QUELYOS_ALLOWED_ORIGINS', '')
 if env_origins:
     additional_origins = [origin.strip() for origin in env_origins.split(',') if origin.strip()]
     ALLOWED_ORIGINS.extend(additional_origins)
+    _logger.info(f"CORS: {len(additional_origins)} origines ajoutées via env var")
 
-# Mode développement : autoriser toutes les origines localhost
-# ATTENTION : À désactiver en production !
-DEV_MODE = os.environ.get('QUELYOS_DEV_MODE', 'True').lower() in ('true', '1', 'yes')
+# Logging des origines autorisées au démarrage
+if DEV_MODE:
+    _logger.warning("CORS: Mode développement activé - localhost autorisé")
+else:
+    _logger.info(f"CORS: Mode production - {len(ALLOWED_ORIGINS)} origines autorisées")
+
+# Domaine wildcard pour tenants (*.quelyos.com)
+# Format: QUELYOS_WILDCARD_DOMAIN="quelyos.com"
+WILDCARD_DOMAIN = os.environ.get('QUELYOS_WILDCARD_DOMAIN', '')
+
 
 def is_origin_allowed(origin):
     """
@@ -54,8 +87,31 @@ def is_origin_allowed(origin):
     if DEV_MODE and ('localhost' in origin or '127.0.0.1' in origin):
         return True
 
-    # Vérifier si l'origine est dans la liste blanche
-    return origin in ALLOWED_ORIGINS
+    # Vérifier si l'origine est dans la liste blanche exacte
+    if origin in ALLOWED_ORIGINS:
+        return True
+
+    # Support wildcard pour sous-domaines tenants (ex: *.quelyos.com)
+    if WILDCARD_DOMAIN:
+        # Extraire le domaine de l'origine (https://tenant.quelyos.com -> tenant.quelyos.com)
+        try:
+            from urllib.parse import urlparse
+            parsed = urlparse(origin)
+            host = parsed.netloc or parsed.path
+
+            # Vérifier si c'est un sous-domaine du wildcard
+            if host.endswith(f'.{WILDCARD_DOMAIN}') or host == WILDCARD_DOMAIN:
+                # En production, exiger HTTPS
+                if not DEV_MODE and parsed.scheme != 'https':
+                    _logger.warning(f"CORS rejeté: {origin} (HTTPS requis en production)")
+                    return False
+                return True
+        except Exception:
+            pass
+
+    # Origine non autorisée - logger pour audit
+    _logger.warning(f"CORS rejeté: origine non autorisée '{origin}'")
+    return False
 
 
 def get_cors_headers(origin):
@@ -72,12 +128,31 @@ def get_cors_headers(origin):
         # Origine non autorisée : ne pas renvoyer d'en-têtes CORS
         return {}
 
-    return {
+    headers = {
         'Access-Control-Allow-Origin': origin,
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Session-Id, X-Request-Id',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Session-Id, X-Request-Id, X-Tenant-Id',
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Max-Age': '3600',  # Cache preflight pendant 1h
+        'Access-Control-Expose-Headers': 'X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Window',
+    }
+
+    return headers
+
+
+def get_security_headers():
+    """
+    Retourne les en-têtes de sécurité HTTP recommandés.
+
+    À ajouter à toutes les réponses API pour renforcer la sécurité.
+    """
+    return {
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'X-XSS-Protection': '1; mode=block',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+        'Pragma': 'no-cache',
     }
 
 
