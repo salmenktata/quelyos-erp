@@ -172,7 +172,7 @@ def validate_no_injection(value: str) -> bool:
 
 # Essayer d'importer Pydantic v2, sinon v1
 try:
-    from pydantic import BaseModel, Field, field_validator, model_validator
+    from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
     # EmailStr et HttpUrl nécessitent email-validator, on les remplace par str avec pattern
     PYDANTIC_V2 = True
 except ImportError:
@@ -225,13 +225,11 @@ if PYDANTIC_V2 is not None:
     class BaseSchema(BaseModel):
         """Classe de base pour tous les schémas"""
 
-        class Config:
-            # Pydantic v1 style
-            str_strip_whitespace = True
-            extra = 'forbid'
-
-            # Pour validation stricte
-            validate_assignment = True
+        model_config = ConfigDict(
+            str_strip_whitespace=True,
+            extra='forbid',
+            validate_assignment=True,
+        )
 
     class AddressSchema(BaseSchema):
         """Schéma d'adresse"""
