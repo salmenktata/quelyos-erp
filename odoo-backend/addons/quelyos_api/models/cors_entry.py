@@ -4,6 +4,8 @@ Modèle CORS Entry pour la gestion de la whitelist CORS dynamique
 """
 
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -37,9 +39,18 @@ class QuelyosCorsEntry(models.Model):
         help='Username who created this entry',
     )
 
-    _sql_constraints = [
-        ('domain_unique', 'UNIQUE(domain)', 'Domain must be unique'),
-    ]
+    @api.constrains('domain')
+    def _check_domain_unique(self):
+        """Contrainte d'unicité pour le domaine"""
+        for record in self:
+            # Chercher un autre enregistrement avec le même domaine
+            duplicate = self.search([
+                ('domain', '=', record.domain),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Domain must be unique'))
 
     @api.model
     def get_allowed_origins(self, tenant_id=None):

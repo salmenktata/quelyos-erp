@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class ProductCollection(models.Model):
@@ -45,13 +47,23 @@ class ProductCollection(models.Model):
     # SEO
     meta_title = fields.Char('Meta Title')
     meta_description = fields.Text('Meta Description')
-
-    _sql_constraints = [
-        ('unique_slug_company', 'UNIQUE(slug, company_id)',
-         'Le slug doit être unique par société'),
-    ]
-
     @api.depends('product_ids')
+
+    @api.constrains('slug', 'company_id')
+    def _check_unique_slug_company(self):
+        """Contrainte: Le slug doit être unique par société"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('slug', '=', record.slug),
+                ('company_id', '=', record.company_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le slug doit être unique par société'))
+
+
     def _compute_product_count(self):
         for col in self:
             col.product_count = len(col.product_ids)

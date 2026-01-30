@@ -11,6 +11,8 @@ Définit les différentes façons de payer en caisse :
 """
 
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class POSPaymentMethod(models.Model):
@@ -101,13 +103,23 @@ class POSPaymentMethod(models.Model):
         default='banknotes',
         help="Nom de l'icône lucide-react (banknotes, credit-card, smartphone, etc.)"
     )
-
-    _sql_constraints = [
-        ('code_company_unique', 'UNIQUE(code, company_id)',
-         'Le code de la méthode de paiement doit être unique par société'),
-    ]
-
     @api.onchange('type')
+
+    @api.constrains('code', 'company_id')
+    def _check_code_company_unique(self):
+        """Contrainte: Le code de la méthode de paiement doit être unique par société"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('code', '=', record.code),
+                ('company_id', '=', record.company_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le code de la méthode de paiement doit être unique par société'))
+
+
     def _onchange_type(self):
         """Met à jour les options par défaut selon le type"""
         if self.type == 'cash':

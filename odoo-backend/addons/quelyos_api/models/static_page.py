@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 import re
 
 class StaticPage(models.Model):
@@ -67,12 +68,23 @@ class StaticPage(models.Model):
     # Dates
     published_date = fields.Datetime('Date publication', default=fields.Datetime.now)
     updated_date = fields.Datetime('Dernière modification', readonly=True)
-
-    _sql_constraints = [
-        ('unique_slug_company', 'UNIQUE(slug, company_id)', 'Le slug doit être unique par société'),
-    ]
-
     @api.constrains('slug')
+
+    @api.constrains('slug', 'company_id')
+    def _check_unique_slug_company(self):
+        """Contrainte: Le slug doit être unique par société"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('slug', '=', record.slug),
+                ('company_id', '=', record.company_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le slug doit être unique par société'))
+
+
     def _check_slug(self):
         for page in self:
             if page.slug:

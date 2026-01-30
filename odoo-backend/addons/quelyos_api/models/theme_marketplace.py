@@ -12,6 +12,7 @@ Models:
 import logging
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 _logger = logging.getLogger(__name__)
 
@@ -75,13 +76,22 @@ class QuelyosThemeDesigner(models.Model):
     approval_date = fields.Datetime(string='Date Approbation')
 
     active = fields.Boolean(string='Actif', default=True)
-
-    _sql_constraints = [
-        ('unique_user', 'UNIQUE(user_id)', 'Un utilisateur ne peut avoir qu\'un seul profil designer'),
-        ('unique_email', 'UNIQUE(email)', 'Cet email est déjà utilisé'),
-    ]
-
     @api.depends('submission_ids', 'submission_ids.sales_count', 'submission_ids.total_revenue', 'submission_ids.average_rating')
+
+    @api.constrains('email')
+    def _check_unique_email(self):
+        """Contrainte: Cet email est déjà utilisé"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('email', '=', record.email),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Cet email est déjà utilisé'))
+
+
     def _compute_stats(self):
         for designer in self:
             approved_submissions = designer.submission_ids.filtered(lambda s: s.status == 'approved')

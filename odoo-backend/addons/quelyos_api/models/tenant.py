@@ -25,6 +25,7 @@ import secrets
 from datetime import timedelta
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class QuelyosTenant(models.Model):
@@ -435,17 +436,40 @@ class QuelyosTenant(models.Model):
     # ═══════════════════════════════════════════════════════════════════════════
     # CONTRAINTES
     # ═══════════════════════════════════════════════════════════════════════════
-
-    _sql_constraints = [
-        ('code_unique', 'UNIQUE(code)', 'Le code du tenant doit être unique'),
-        ('domain_unique', 'UNIQUE(domain)', 'Le domaine principal doit être unique'),
-    ]
-
     # ═══════════════════════════════════════════════════════════════════════════
     # COMPUTED FIELDS
     # ═══════════════════════════════════════════════════════════════════════════
 
     @api.depends('logo')
+
+    @api.constrains('code')
+    def _check_code_unique(self):
+        """Contrainte: Le code du tenant doit être unique"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('code', '=', record.code),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le code du tenant doit être unique'))
+
+
+    @api.constrains('domain')
+    def _check_domain_unique(self):
+        """Contrainte: Le domaine principal doit être unique"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('domain', '=', record.domain),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le domaine principal doit être unique'))
+
+
     def _compute_logo_url(self):
         """Génère l'URL publique du logo"""
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')

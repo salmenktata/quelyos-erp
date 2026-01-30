@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 import re
 
 
@@ -22,13 +24,23 @@ class BlogCategory(models.Model):
     )
     post_ids = fields.One2many('quelyos.blog.post', 'category_id', string='Articles')
     post_count = fields.Integer('Nb articles', compute='_compute_post_count')
-
-    _sql_constraints = [
-        ('unique_slug_company', 'UNIQUE(slug, company_id)',
-         'Le slug doit être unique par société'),
-    ]
-
     @api.depends('post_ids')
+
+    @api.constrains('slug', 'company_id')
+    def _check_unique_slug_company(self):
+        """Contrainte: Le slug doit être unique par société"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('slug', '=', record.slug),
+                ('company_id', '=', record.company_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le slug doit être unique par société'))
+
+
     def _compute_post_count(self):
         for cat in self:
             cat.post_count = len(cat.post_ids.filtered(lambda p: p.state == 'published'))
@@ -110,12 +122,6 @@ class BlogPost(models.Model):
     # Stats
     views_count = fields.Integer('Vues', default=0)
     reading_time = fields.Integer('Temps lecture (min)', compute='_compute_reading_time')
-
-    _sql_constraints = [
-        ('unique_slug_company', 'UNIQUE(slug, company_id)',
-         'Le slug doit être unique par société'),
-    ]
-
     @api.depends('content')
     def _compute_reading_time(self):
         for post in self:
@@ -177,8 +183,3 @@ class BlogTag(models.Model):
         required=True,
         default=lambda self: self.env.company
     )
-
-    _sql_constraints = [
-        ('unique_slug_company', 'UNIQUE(slug, company_id)',
-         'Le slug doit être unique par société'),
-    ]

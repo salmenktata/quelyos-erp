@@ -10,6 +10,7 @@ import json
 import logging
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
+from odoo.tools.translate import _
 
 _logger = logging.getLogger(__name__)
 
@@ -174,16 +175,26 @@ class QuelyosTheme(models.Model):
     # ═══════════════════════════════════════════════════════════════════════════
     # CONTRAINTES
     # ═══════════════════════════════════════════════════════════════════════════
-
-    _sql_constraints = [
-        ('code_unique', 'UNIQUE(code)', 'Le code du thème doit être unique !'),
-    ]
-
     # ═══════════════════════════════════════════════════════════════════════════
     # COMPUTED FIELDS
     # ═══════════════════════════════════════════════════════════════════════════
 
     @api.depends('review_ids.rating')
+
+    @api.constrains('code')
+    def _check_code_unique(self):
+        """Contrainte: Le code du thème doit être unique !"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('code', '=', record.code),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le code du thème doit être unique !'))
+
+
     def _compute_rating(self):
         for theme in self:
             if theme.review_ids:
@@ -397,8 +408,3 @@ class QuelyosThemeReview(models.Model):
     )
     title = fields.Char(string='Titre')
     comment = fields.Text(string='Commentaire')
-
-    _sql_constraints = [
-        ('rating_range', 'CHECK(rating >= 1 AND rating <= 5)', 'La note doit être entre 1 et 5'),
-        ('unique_review', 'UNIQUE(theme_id, tenant_id)', 'Un seul avis par tenant par thème'),
-    ]

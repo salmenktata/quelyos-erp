@@ -7,6 +7,8 @@ Hérite de hr.job pour bénéficier de toutes les fonctionnalités natives.
 """
 
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class HRJob(models.Model):
@@ -37,15 +39,25 @@ class HRJob(models.Model):
     # ═══════════════════════════════════════════════════════════════════════════
     # CONTRAINTES
     # ═══════════════════════════════════════════════════════════════════════════
-
-    _sql_constraints = [
-        ('name_tenant_uniq', 'unique(name, department_id, tenant_id)',
-         'Un poste avec ce nom existe déjà dans ce département !'),
-    ]
-
     # ═══════════════════════════════════════════════════════════════════════════
     # MÉTHODES API (pour frontend React)
     # ═══════════════════════════════════════════════════════════════════════════
+
+    @api.constrains('name', 'department_id', 'tenant_id')
+    def _check_name_tenant_uniq(self):
+        """Contrainte: Un poste avec ce nom existe déjà dans ce département !"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('name', '=', record.name),
+                ('department_id', '=', record.department_id),
+                ('tenant_id', '=', record.tenant_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Un poste avec ce nom existe déjà dans ce département !'))
+
 
     def get_job_data(self):
         """Retourne les données du poste pour l'API."""

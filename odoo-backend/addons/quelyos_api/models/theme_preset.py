@@ -9,6 +9,7 @@ appliquer en un clic à leur boutique.
 import json
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class QuelyosThemePreset(models.Model):
@@ -175,12 +176,22 @@ class QuelyosThemePreset(models.Model):
     # ═══════════════════════════════════════════════════════════════════════════
     # CONTRAINTES
     # ═══════════════════════════════════════════════════════════════════════════
-
-    _sql_constraints = [
-        ('code_unique', 'UNIQUE(code)', 'Le code doit être unique !')
-    ]
+    @api.constrains('code')
 
     @api.constrains('code')
+    def _check_code_unique(self):
+        """Contrainte: Le code doit être unique !"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('code', '=', record.code),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le code doit être unique !'))
+
+
     def _check_code(self):
         for preset in self:
             if not preset.code.isalnum() and '-' not in preset.code and '_' not in preset.code:

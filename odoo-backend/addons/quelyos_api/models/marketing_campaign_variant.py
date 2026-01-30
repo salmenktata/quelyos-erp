@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class MarketingCampaignVariant(models.Model):
@@ -136,13 +137,23 @@ class MarketingCampaignVariant(models.Model):
         store=True,
         readonly=True
     )
-
-    _sql_constraints = [
-        ('variant_unique', 'UNIQUE(campaign_id, variant_letter)',
-         'Une seule variante par lettre par campagne'),
-    ]
-
     @api.depends('campaign_id.name', 'variant_letter')
+
+    @api.constrains('campaign_id', 'variant_letter')
+    def _check_variant_unique(self):
+        """Contrainte: Une seule variante par lettre par campagne"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('campaign_id', '=', record.campaign_id),
+                ('variant_letter', '=', record.variant_letter),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Une seule variante par lettre par campagne'))
+
+
     def _compute_name(self):
         """Générer nom basé sur campagne et variante"""
         for record in self:

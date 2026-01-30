@@ -164,10 +164,19 @@ class LoyaltyMember(models.Model):
     # Dates
     join_date = fields.Date('Date adhésion', default=fields.Date.today)
 
-    _sql_constraints = [
-        ('unique_member', 'UNIQUE(partner_id, program_id)',
-         'Un client ne peut adhérer qu\'une fois au programme'),
-    ]
+    @api.constrains('partner_id', 'program_id')
+    def _check_unique_member(self):
+        """Contrainte: Un client ne peut adhérer qu'une fois au programme"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('partner_id', '=', record.partner_id.id),
+                ('program_id', '=', record.program_id.id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Un client ne peut adhérer qu\'une fois au programme'))
 
     @api.depends('total_points_earned', 'program_id.level_ids')
     def _compute_level(self):

@@ -7,6 +7,8 @@ Hérite de hr.leave.type pour bénéficier de l'intégration avec hr_holidays.
 """
 
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class HRLeaveType(models.Model):
@@ -45,15 +47,24 @@ class HRLeaveType(models.Model):
     # ═══════════════════════════════════════════════════════════════════════════
     # CONTRAINTES
     # ═══════════════════════════════════════════════════════════════════════════
-
-    _sql_constraints = [
-        ('code_tenant_uniq', 'unique(code, tenant_id)',
-         'Ce code de type de congé existe déjà !'),
-    ]
-
     # ═══════════════════════════════════════════════════════════════════════════
     # MÉTHODES
     # ═══════════════════════════════════════════════════════════════════════════
+
+    @api.constrains('code', 'tenant_id')
+    def _check_code_tenant_uniq(self):
+        """Contrainte: Ce code de type de congé existe déjà !"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('code', '=', record.code),
+                ('tenant_id', '=', record.tenant_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Ce code de type de congé existe déjà !'))
+
 
     @api.model
     def create_default_types(self, tenant_id):

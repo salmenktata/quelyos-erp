@@ -8,6 +8,8 @@ import secrets
 import logging
 from datetime import datetime, timedelta
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 from odoo.exceptions import AccessDenied
 
 _logger = logging.getLogger(__name__)
@@ -62,9 +64,19 @@ class AuthRefreshToken(models.Model):
         help='Token révoqué (logout explicite)'
     )
 
-    _sql_constraints = [
-        ('token_hash_unique', 'unique(token_hash)', 'Token hash must be unique')
-    ]
+    @api.constrains('token_hash')
+    def _check_token_hash_unique(self):
+        """Contrainte: Token hash must be unique"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('token_hash', '=', record.token_hash),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Token hash must be unique'))
+
 
     @api.model
     def generate_token(self, user_id, ip_address=None, user_agent=None):

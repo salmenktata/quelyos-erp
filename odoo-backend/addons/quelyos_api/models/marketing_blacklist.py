@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 import secrets
 import hashlib
 
@@ -37,10 +39,20 @@ class MarketingBlacklist(models.Model):
         default=lambda self: self.env.company
     )
 
-    _sql_constraints = [
-        ('email_unique', 'UNIQUE(email, company_id)',
-         'Cet email est déjà dans la liste noire'),
-    ]
+    @api.constrains('email', 'company_id')
+    def _check_email_unique(self):
+        """Contrainte: Cet email est déjà dans la liste noire"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('email', '=', record.email),
+                ('company_id', '=', record.company_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Cet email est déjà dans la liste noire'))
+
 
     @api.model
     def create(self, vals):

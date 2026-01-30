@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 import secrets
 import hashlib
 from urllib.parse import urlparse
@@ -77,13 +79,22 @@ class LinkTracker(models.Model):
         string='Société',
         default=lambda self: self.env.company
     )
-
-    _sql_constraints = [
-        ('token_unique', 'UNIQUE(token)',
-         'Le token doit être unique'),
-    ]
-
     @api.depends('url')
+
+    @api.constrains('token')
+    def _check_token_unique(self):
+        """Contrainte: Le token doit être unique"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('token', '=', record.token),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le token doit être unique'))
+
+
     def _compute_name(self):
         """Générer nom basé sur URL"""
         for record in self:

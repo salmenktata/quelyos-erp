@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 class ApiSettings(models.Model):
     _name = 'quelyos.api.settings'
@@ -16,9 +18,19 @@ class ApiSettings(models.Model):
     ], string='Category', default='other')
     is_active = fields.Boolean(string='Active', default=True)
 
-    _sql_constraints = [
-        ('name_unique', 'UNIQUE(name)', 'Setting name must be unique')
-    ]
+    @api.constrains('name')
+    def _check_name_unique(self):
+        """Contrainte: Setting name must be unique"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('name', '=', record.name),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Setting name must be unique'))
+
 
     @api.model
     def get_setting(self, name, default=None):

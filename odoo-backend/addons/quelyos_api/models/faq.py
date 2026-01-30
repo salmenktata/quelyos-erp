@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class FAQCategory(models.Model):
@@ -21,13 +23,23 @@ class FAQCategory(models.Model):
     )
     faq_ids = fields.One2many('quelyos.faq', 'category_id', string='Questions')
     faq_count = fields.Integer('Nb questions', compute='_compute_faq_count')
-
-    _sql_constraints = [
-        ('unique_code_company', 'UNIQUE(code, company_id)',
-         'Le code doit être unique par société'),
-    ]
-
     @api.depends('faq_ids')
+
+    @api.constrains('code', 'company_id')
+    def _check_unique_code_company(self):
+        """Contrainte: Le code doit être unique par société"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('code', '=', record.code),
+                ('company_id', '=', record.company_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le code doit être unique par société'))
+
+
     def _compute_faq_count(self):
         for cat in self:
             cat.faq_count = len(cat.faq_ids.filtered(lambda f: f.is_published))

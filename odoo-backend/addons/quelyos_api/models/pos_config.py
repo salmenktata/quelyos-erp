@@ -12,6 +12,7 @@ Chaque terminal POS a sa propre configuration :
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class POSConfig(models.Model):
@@ -250,13 +251,23 @@ class POSConfig(models.Model):
     # ═══════════════════════════════════════════════════════════════════════════
     # CONTRAINTES
     # ═══════════════════════════════════════════════════════════════════════════
-
-    _sql_constraints = [
-        ('code_tenant_unique', 'UNIQUE(code, tenant_id)',
-         'Le code du terminal doit être unique par tenant'),
-    ]
-
     @api.constrains('max_discount_percent')
+
+    @api.constrains('code', 'tenant_id')
+    def _check_code_tenant_unique(self):
+        """Contrainte: Le code du terminal doit être unique par tenant"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('code', '=', record.code),
+                ('tenant_id', '=', record.tenant_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le code du terminal doit être unique par tenant'))
+
+
     def _check_max_discount(self):
         for config in self:
             if config.max_discount_percent < 0 or config.max_discount_percent > 100:

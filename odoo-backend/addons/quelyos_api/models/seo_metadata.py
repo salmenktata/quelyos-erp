@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 import re
 
 class SeoMetadata(models.Model):
@@ -68,12 +69,22 @@ class SeoMetadata(models.Model):
     title_length = fields.Integer('Longueur Title', compute='_compute_lengths', store=False)
     description_length = fields.Integer('Longueur Description', compute='_compute_lengths', store=False)
     seo_score = fields.Integer('Score SEO', compute='_compute_seo_score', store=False, help='Score sur 100')
-
-    _sql_constraints = [
-        ('unique_slug', 'UNIQUE(slug)', 'Le slug doit être unique'),
-    ]
-
     @api.depends('meta_title', 'meta_description')
+
+    @api.constrains('slug')
+    def _check_unique_slug(self):
+        """Contrainte: Le slug doit être unique"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('slug', '=', record.slug),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le slug doit être unique'))
+
+
     def _compute_lengths(self):
         for record in self:
             record.title_length = len(record.meta_title) if record.meta_title else 0

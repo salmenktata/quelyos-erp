@@ -7,6 +7,8 @@ Hérite de hr.department pour bénéficier de toutes les fonctionnalités native
 """
 
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class HRDepartment(models.Model):
@@ -25,6 +27,22 @@ class HRDepartment(models.Model):
     )
 
     @api.constrains('tenant_id')
+
+    @api.constrains('code', 'tenant_id')
+    def _check_code_tenant_uniq(self):
+        """Contrainte: Le code du département doit être unique par tenant !"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('code', '=', record.code),
+                ('tenant_id', '=', record.tenant_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le code du département doit être unique par tenant !'))
+
+
     def _check_tenant_id_api(self):
         """Vérifie que tenant_id est défini pour les créations via API."""
         # Les enregistrements natifs Odoo peuvent ne pas avoir de tenant_id
@@ -43,12 +61,6 @@ class HRDepartment(models.Model):
     # ═══════════════════════════════════════════════════════════════════════════
     # CONTRAINTES
     # ═══════════════════════════════════════════════════════════════════════════
-
-    _sql_constraints = [
-        ('code_tenant_uniq', 'unique(code, tenant_id)',
-         'Le code du département doit être unique par tenant !'),
-    ]
-
     # ═══════════════════════════════════════════════════════════════════════════
     # MÉTHODES API (pour frontend React)
     # ═══════════════════════════════════════════════════════════════════════════

@@ -9,6 +9,7 @@ incluant l'intégration avec hr_payroll et hr_attendance.
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class HREmployee(models.Model):
@@ -105,23 +106,72 @@ class HREmployee(models.Model):
     # ═══════════════════════════════════════════════════════════════════════════
     # CONTRAINTES
     # ═══════════════════════════════════════════════════════════════════════════
-
-    _sql_constraints = [
-        ('employee_number_tenant_uniq', 'unique(employee_number, tenant_id)',
-         'Le matricule doit être unique par tenant !'),
-        ('work_email_tenant_uniq', 'unique(work_email, tenant_id)',
-         'Cet email professionnel est déjà utilisé !'),
-        ('cnss_tenant_uniq', 'unique(cnss_number, tenant_id)',
-         'Ce numéro CNSS est déjà utilisé !'),
-        ('cin_tenant_uniq', 'unique(cin_number, tenant_id)',
-         'Ce numéro CIN est déjà utilisé !'),
-    ]
-
     # ═══════════════════════════════════════════════════════════════════════════
     # COMPUTED FIELDS
     # ═══════════════════════════════════════════════════════════════════════════
 
     @api.depends('first_name', 'last_name')
+
+    @api.constrains('employee_number', 'tenant_id')
+    def _check_employee_number_tenant_uniq(self):
+        """Contrainte: Le matricule doit être unique par tenant !"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('employee_number', '=', record.employee_number),
+                ('tenant_id', '=', record.tenant_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le matricule doit être unique par tenant !'))
+
+
+    @api.constrains('work_email', 'tenant_id')
+    def _check_work_email_tenant_uniq(self):
+        """Contrainte: Cet email professionnel est déjà utilisé !"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('work_email', '=', record.work_email),
+                ('tenant_id', '=', record.tenant_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Cet email professionnel est déjà utilisé !'))
+
+
+    @api.constrains('cnss_number', 'tenant_id')
+    def _check_cnss_tenant_uniq(self):
+        """Contrainte: Ce numéro CNSS est déjà utilisé !"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('cnss_number', '=', record.cnss_number),
+                ('tenant_id', '=', record.tenant_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Ce numéro CNSS est déjà utilisé !'))
+
+
+    @api.constrains('cin_number', 'tenant_id')
+    def _check_cin_tenant_uniq(self):
+        """Contrainte: Ce numéro CIN est déjà utilisé !"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('cin_number', '=', record.cin_number),
+                ('tenant_id', '=', record.tenant_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Ce numéro CIN est déjà utilisé !'))
+
+
     def _compute_name_from_parts(self):
         """Calcule le nom complet à partir du prénom et nom."""
         for employee in self:

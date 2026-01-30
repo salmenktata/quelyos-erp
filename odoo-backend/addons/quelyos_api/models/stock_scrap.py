@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 from odoo.exceptions import UserError
 
 
@@ -130,10 +132,13 @@ class StockScrap(models.Model):
         required=True
     )
 
-    _sql_constraints = [
-        ('scrap_qty_positive', 'CHECK(scrap_qty > 0)',
-         'La quantité mise au rebut doit être positive'),
-    ]
+    @api.constrains('scrap_qty')
+    def _check_scrap_qty_positive(self):
+        """Contrainte: La quantité doit être positive"""
+        for record in self:
+            if not (scrap_qty > 0):
+                raise ValidationError(_('La quantité doit être positive'))
+
 
     @api.model
     def create(self, vals):

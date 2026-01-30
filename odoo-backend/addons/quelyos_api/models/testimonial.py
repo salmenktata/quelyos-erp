@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class Testimonial(models.Model):
@@ -37,10 +39,13 @@ class Testimonial(models.Model):
         ('all', 'Partout'),
     ], string='Afficher sur', default='homepage')
 
-    _sql_constraints = [
-        ('rating_range', 'CHECK(rating >= 1 AND rating <= 5)',
-         'La note doit être entre 1 et 5'),
-    ]
+    @api.constrains('rating')
+    def _check_rating_range(self):
+        """Contrainte: La note doit être entre 1 et 5"""
+        for record in self:
+            if not (rating >= 1 and rating <= 5):
+                raise ValidationError(_('La note doit être entre 1 et 5'))
+
 
     def get_avatar_url(self):
         self.ensure_one()

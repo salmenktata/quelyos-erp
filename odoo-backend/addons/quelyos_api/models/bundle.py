@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class ProductBundle(models.Model):
@@ -49,13 +51,23 @@ class ProductBundle(models.Model):
     # Période (optionnel)
     date_start = fields.Date('Date début')
     date_end = fields.Date('Date fin')
-
-    _sql_constraints = [
-        ('unique_slug_company', 'UNIQUE(slug, company_id)',
-         'Le slug doit être unique par société'),
-    ]
-
     @api.depends('line_ids', 'line_ids.quantity', 'line_ids.product_id.list_price', 'bundle_price')
+
+    @api.constrains('slug', 'company_id')
+    def _check_unique_slug_company(self):
+        """Contrainte: Le slug doit être unique par société"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('slug', '=', record.slug),
+                ('company_id', '=', record.company_id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le slug doit être unique par société'))
+
+
     def _compute_prices(self):
         for bundle in self:
             bundle.product_count = len(bundle.line_ids)

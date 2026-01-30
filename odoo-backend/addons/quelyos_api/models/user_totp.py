@@ -7,6 +7,7 @@ Stocke les secrets TOTP et codes de backup des utilisateurs.
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError, AccessDenied
+from odoo.tools.translate import _
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -58,9 +59,18 @@ class UserTOTP(models.Model):
         'Bloqué jusqu\'à',
     )
 
-    _sql_constraints = [
-        ('user_unique', 'UNIQUE(user_id)', 'Un utilisateur ne peut avoir qu\'une configuration TOTP'),
-    ]
+    @api.constrains('user_id')
+    def _check_user_unique(self):
+        """Contrainte: Un utilisateur ne peut avoir qu'une configuration TOTP"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('user_id', '=', record.user_id.id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Un utilisateur ne peut avoir qu\'une configuration TOTP'))
 
     @api.model
     def setup_totp(self, user_id: int) -> dict:

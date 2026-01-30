@@ -4,6 +4,8 @@ API Keys Management - Clés API pour intégrations tierces.
 """
 
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 from odoo.exceptions import AccessDenied
 import secrets
 import hashlib
@@ -76,9 +78,19 @@ class APIKey(models.Model):
     revoked_at = fields.Datetime('Révoqué le')
     revoked_by = fields.Many2one('res.users', string='Révoqué par')
 
-    _sql_constraints = [
-        ('key_prefix_unique', 'UNIQUE(key_prefix)', 'Le préfixe de clé doit être unique'),
-    ]
+    @api.constrains('key_prefix')
+    def _check_key_prefix_unique(self):
+        """Contrainte: Le préfixe de clé doit être unique"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('key_prefix', '=', record.key_prefix),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Le préfixe de clé doit être unique'))
+
 
     @api.model
     def generate_key(self, name, user_id, scope='read', tenant_id=None, expires_days=None, **kwargs):

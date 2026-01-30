@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 
 
 class ProductReview(models.Model):
@@ -75,14 +76,31 @@ class ProductReview(models.Model):
         store=True
     )
 
-    _sql_constraints = [
-        ('rating_range', 'CHECK(rating >= 1 AND rating <= 5)',
-         'La note doit être entre 1 et 5'),
-        ('unique_review', 'UNIQUE(product_id, partner_id, company_id)',
-         'Un client ne peut laisser qu\'un seul avis par produit'),
-    ]
+    @api.constrains('product_id', 'partner_id', 'company_id')
+    def _check_unique_review(self):
+        """Contrainte: Un client ne peut laisser qu'un seul avis par produit"""
+        for record in self:
+            # Chercher un doublon
+            duplicate = self.search([
+                ('product_id', '=', record.product_id.id),
+                ('partner_id', '=', record.partner_id.id),
+                ('company_id', '=', record.company_id.id),
+                ('id', '!=', record.id)
+            ], limit=1)
+
+            if duplicate:
+                raise ValidationError(_('Un client ne peut laisser qu\'un seul avis par produit'))
 
     @api.depends('partner_id', 'product_id')
+
+    @api.constrains('rating')
+    def _check_rating_range(self):
+        """Contrainte: La note doit être entre 1 et 5"""
+        for record in self:
+            if not (record.rating >= 1 and record.rating <= 5):
+                raise ValidationError(_('La note doit être entre 1 et 5'))
+
+
     def _compute_verified_purchase(self):
         """Vérifie si le client a acheté le produit"""
         for review in self:

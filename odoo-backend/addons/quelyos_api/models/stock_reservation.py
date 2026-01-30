@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.tools.translate import _
 from datetime import datetime, timedelta
 
 
@@ -130,13 +131,16 @@ class StockReservation(models.Model):
         readonly=True,
         help='Stock disponible au moment de la création de la réservation'
     )
-
-    _sql_constraints = [
-        ('reserved_qty_positive', 'CHECK(reserved_qty > 0)',
-         'La quantité réservée doit être positive'),
-    ]
-
     @api.constrains('reserved_qty', 'product_id', 'location_id')
+
+    @api.constrains('reserved_qty')
+    def _check_reserved_qty_positive(self):
+        """Contrainte: La quantité réservée doit être positive"""
+        for record in self:
+            if not (reserved_qty > 0):
+                raise ValidationError(_('La quantité réservée doit être positive'))
+
+
     def _check_available_stock(self):
         """Vérifier que le stock disponible est suffisant"""
         for record in self:
