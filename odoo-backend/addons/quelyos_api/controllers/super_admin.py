@@ -3832,3 +3832,100 @@ class SuperAdminController(http.Controller):
                 {'success': False, 'error': str(e)},
                 headers=cors_headers, status=500
             )
+
+    @http.route('/api/super-admin/users', type='http', auth='public',
+                methods=['GET', 'OPTIONS'], csrf=False)
+    def list_admin_users(self):
+        """Liste des utilisateurs système disponibles pour assignation"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            # Récupérer tous les utilisateurs avec groupe system (super admins)
+            users = request.env['res.users'].sudo().search([
+                ('groups_id', 'in', request.env.ref('base.group_system').id),
+                ('active', '=', True)
+            ], order='name')
+
+            return request.make_json_response({
+                'success': True,
+                'users': [{
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login,
+                    'email': user.email,
+                } for user in users]
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error listing admin users")
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/tickets/<int:ticket_id>/notes', type='http', auth='public',
+                methods=['PUT'], csrf=False)
+    def ticket_notes(self, ticket_id):
+        """Sauvegarder les notes internes d'un ticket"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            data = request.get_json_data()
+            notes = data.get('notes', '')
+
+            ticket = request.env['quelyos.ticket'].sudo().browse(ticket_id)
+
+            if not ticket.exists():
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Ticket non trouvé'
+                }, headers=cors_headers, status=404)
+
+            ticket.write({'internal_notes': notes})
+
+            return request.make_json_response({
+                'success': True,
+                'ticket': ticket.to_dict_super_admin()
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error saving ticket notes")
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=500
+            )
