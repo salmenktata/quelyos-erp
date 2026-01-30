@@ -40,3 +40,5 @@ from . import theme_analytics
 from . import super_admin
 # 2FA/TOTP
 from . import totp
+# Tickets Support
+from . import ticket

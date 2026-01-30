@@ -35,6 +35,7 @@ class SupportTicket(models.Model):
     # Contenu
     description = fields.Html('Description', required=True)
     category = fields.Selection([
+        # Catégories Store (existantes - compatibilité)
         ('order', 'Problème commande'),
         ('product', 'Problème produit'),
         ('delivery', 'Problème livraison'),
@@ -42,6 +43,12 @@ class SupportTicket(models.Model):
         ('refund', 'Demande remboursement'),
         ('payment', 'Problème paiement'),
         ('account', 'Problème compte'),
+        # Nouvelles catégories génériques
+        ('technical', 'Support technique'),
+        ('billing', 'Facturation/Abonnement'),
+        ('feature_request', 'Demande fonctionnalité'),
+        ('bug', 'Signalement bug'),
+        ('question', 'Question générale'),
         ('other', 'Autre'),
     ], string='Catégorie', required=True, default='other')
 
@@ -99,15 +106,46 @@ class SupportTicket(models.Model):
     ], string='Satisfaction')
     satisfaction_comment = fields.Text('Commentaire satisfaction')
 
+    # Champs Super Admin
+    internal_notes = fields.Html(
+        'Notes internes',
+        help='Notes visibles uniquement par les administrateurs'
+    )
+    is_visible_to_customer = fields.Boolean(
+        'Visible client',
+        default=True,
+        help='Si False, ticket uniquement visible par Super Admin'
+    )
+    source = fields.Selection([
+        ('dashboard', 'Dashboard Client'),
+        ('ecommerce', 'Site E-commerce'),
+        ('store', 'Module Boutique'),
+        ('other', 'Autre'),
+    ], string='Source', default='dashboard')
+
     # Délais
     response_time = fields.Float('Temps première réponse (h)', compute='_compute_times')
     resolution_time = fields.Float('Temps résolution (h)', compute='_compute_times')
 
     @api.model
     def create(self, vals):
+        """Surcharge create pour générer séquence et publier événement WebSocket"""
         if vals.get('name', _('New')) == _('New'):
             vals['name'] = self.env['ir.sequence'].next_by_code('quelyos.ticket') or _('New')
-        return super().create(vals)
+
+        ticket = super().create(vals)
+
+        # Publier événement WebSocket
+        ticket._publish_ws_event('ticket.created', {
+            'ticketId': ticket.id,
+            'tenantId': ticket.company_id.id,
+            'tenantName': ticket.company_id.name,
+            'priority': ticket.priority,
+            'subject': ticket.subject,
+            'category': ticket.category,
+        })
+
+        return ticket
 
     @api.depends('message_ids')
     def _compute_message_count(self):
@@ -154,30 +192,69 @@ class SupportTicket(models.Model):
             'resolution_date': False,
         })
 
+    def write(self, vals):
+        """Surcharge write pour publier changements WebSocket"""
+        result = super().write(vals)
+
+        if 'state' in vals or 'priority' in vals:
+            for ticket in self:
+                ticket._publish_ws_event('ticket.updated', {
+                    'ticketId': ticket.id,
+                    'state': ticket.state,
+                    'priority': ticket.priority,
+                })
+
+        return result
+
+    def _publish_ws_event(self, event, data):
+        """Publier événement WebSocket via bus.bus"""
+        self.env['bus.bus']._sendone(
+            'tickets',  # channel
+            event,      # event type
+            data        # payload
+        )
+
     def to_dict(self):
+        """Sérialisation pour API client"""
         self.ensure_one()
         return {
             'id': self.id,
             'reference': self.name,
             'subject': self.subject,
-            'customerId': self.partner_id.id,
-            'customerName': self.partner_id.name,
-            'customerEmail': self.email,
-            'orderId': self.order_id.id if self.order_id else None,
-            'orderName': self.order_id.name if self.order_id else None,
             'description': self.description,
             'category': self.category,
             'priority': self.priority,
             'state': self.state,
             'assignedTo': self.assigned_to.name if self.assigned_to else None,
-            'resolution': self.resolution,
             'messageCount': self.message_count,
+            'createdAt': self.create_date.isoformat() if self.create_date else None,
+            'updatedAt': self.write_date.isoformat() if self.write_date else None,
+        }
+
+    def to_dict_super_admin(self):
+        """Sérialisation enrichie pour Super Admin"""
+        self.ensure_one()
+        data = self.to_dict()
+        data.update({
+            'tenantId': self.company_id.id,
+            'tenantName': self.company_id.name,
+            'customerId': self.partner_id.id,
+            'customerName': self.partner_id.name,
+            'customerEmail': self.email,
+            'internalNotes': self.internal_notes,
+            'isVisibleToCustomer': self.is_visible_to_customer,
+            'orderId': self.order_id.id if self.order_id else None,
+            'orderName': self.order_id.name if self.order_id else None,
+            'productId': self.product_id.id if self.product_id else None,
+            'productName': self.product_id.name if self.product_id else None,
             'satisfactionRating': self.satisfaction_rating,
+            'satisfactionComment': self.satisfaction_comment,
+            'resolution': self.resolution,
             'responseTime': self.response_time,
             'resolutionTime': self.resolution_time,
-            'createdAt': self.create_date.isoformat() if self.create_date else None,
             'resolvedAt': self.resolution_date.isoformat() if self.resolution_date else None,
-        }
+        })
+        return data
 
 
 class TicketMessage(models.Model):
@@ -204,6 +281,21 @@ class TicketMessage(models.Model):
         store=True
     )
     attachment_ids = fields.Many2many('ir.attachment', string='Pièces jointes')
+
+    @api.model
+    def create(self, vals):
+        """Surcharge create pour publier événement WebSocket"""
+        message = super().create(vals)
+
+        # Publier événement
+        message.ticket_id._publish_ws_event('ticket.replied', {
+            'ticketId': message.ticket_id.id,
+            'messageId': message.id,
+            'authorName': message.author_id.name,
+            'isStaff': message.is_staff,
+        })
+
+        return message
 
     @api.depends('author_id')
     def _compute_is_staff(self):

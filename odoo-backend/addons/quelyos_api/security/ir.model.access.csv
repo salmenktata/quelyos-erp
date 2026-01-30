@@ -118,9 +118,11 @@ access_loyalty_transaction_manager,quelyos.loyalty.transaction manager,model_que
 access_ticket_public,quelyos.ticket public,model_quelyos_ticket,base.group_public,1,0,0,0
 access_ticket_user,quelyos.ticket user,model_quelyos_ticket,group_quelyos_store_user,1,1,1,0
 access_ticket_manager,quelyos.ticket manager,model_quelyos_ticket,group_quelyos_store_manager,1,1,1,1
+access_ticket_system,quelyos.ticket system,model_quelyos_ticket,base.group_system,1,1,1,1
 access_ticket_message_public,quelyos.ticket.message public,model_quelyos_ticket_message,base.group_public,1,0,0,0
 access_ticket_message_user,quelyos.ticket.message user,model_quelyos_ticket_message,group_quelyos_store_user,1,1,1,0
 access_ticket_message_manager,quelyos.ticket.message manager,model_quelyos_ticket_message,group_quelyos_store_manager,1,1,1,1
+access_ticket_message_system,quelyos.ticket.message system,model_quelyos_ticket_message,base.group_system,1,1,1,1
 access_provisioning_job_public,quelyos.provisioning.job public,model_quelyos_provisioning_job,,1,0,0,0
 access_provisioning_job_manager,quelyos.provisioning.job manager,model_quelyos_provisioning_job,group_quelyos_finance_manager,1,1,1,1
 access_quelyos_theme_public,quelyos.theme public,model_quelyos_theme,base.group_public,1,0,0,0
@@ -152,3 +154,7 @@ access_quelyos_admin_session_system,quelyos.admin.session system,model_quelyos_a
 access_quelyos_ip_whitelist_system,quelyos.ip.whitelist system,model_quelyos_ip_whitelist,base.group_system,1,1,1,1
 access_quelyos_api_key_system,quelyos.api.key system,model_quelyos_api_key,base.group_system,1,1,1,1
 access_quelyos_security_alert_system,quelyos.security.alert system,model_quelyos_security_alert,base.group_system,1,1,1,1
+access_quelyos_rate_limit_rule_system,quelyos.rate.limit.rule system,model_quelyos_rate_limit_rule,base.group_system,1,1,1,1
+access_quelyos_rate_limit_counter_system,quelyos.rate.limit.counter system,model_quelyos_rate_limit_counter,base.group_system,1,1,1,1
+access_quelyos_waf_rule_system,quelyos.waf.rule system,model_quelyos_waf_rule,base.group_system,1,1,1,1
+access_quelyos_waf_log_system,quelyos.waf.log system,model_quelyos_waf_log,base.group_system,1,1,1,1

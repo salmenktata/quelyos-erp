@@ -2941,3 +2941,894 @@ class SuperAdminController(http.Controller):
                 {'success': False, 'error': 'Erreur serveur'},
                 headers=cors_headers, status=500
             )
+
+    # ========== P5: RATE LIMITING ==========
+
+    @http.route('/api/super-admin/security/rate-limits', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
+    def rate_limits_list(self):
+        """Liste des règles de rate limiting"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            return request.make_response('', headers=list(cors_headers.items()))
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            RateLimitRule = request.env['quelyos.rate.limit.rule'].sudo()
+            rules = RateLimitRule.search([], order='priority desc')
+
+            return request.make_json_response({
+                'success': True,
+                'rules': [{
+                    'id': rule.id,
+                    'name': rule.name,
+                    'active': rule.active,
+                    'priority': rule.priority,
+                    'target_type': rule.target_type,
+                    'endpoint_pattern': rule.endpoint_pattern,
+                    'requests_limit': rule.requests_limit,
+                    'time_window': rule.time_window,
+                    'burst_limit': rule.burst_limit,
+                    'action_type': rule.action_type,
+                    'block_duration': rule.block_duration,
+                    'total_hits': rule.total_hits,
+                    'total_blocks': rule.total_blocks,
+                    'last_triggered': rule.last_triggered.isoformat() if rule.last_triggered else None,
+                } for rule in rules]
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"Rate limits list error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/security/rate-limits', type='json', auth='public', methods=['POST'], csrf=False)
+    def rate_limits_create(self):
+        """Créer une règle de rate limiting"""
+        if not request.session.uid:
+            return {'success': False, 'error': 'Non authentifié'}
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return {'success': False, 'error': str(e)}
+
+        try:
+            data = request.jsonrequest
+            RateLimitRule = request.env['quelyos.rate.limit.rule'].sudo()
+
+            rule = RateLimitRule.create({
+                'name': data.get('name'),
+                'active': data.get('active', True),
+                'priority': data.get('priority', 10),
+                'target_type': data.get('target_type', 'endpoint'),
+                'endpoint_pattern': data.get('endpoint_pattern'),
+                'ip_address': data.get('ip_address'),
+                'requests_limit': data.get('requests_limit', 100),
+                'time_window': data.get('time_window', 60),
+                'burst_limit': data.get('burst_limit', 20),
+                'action_type': data.get('action_type', 'block'),
+                'block_duration': data.get('block_duration', 300),
+            })
+
+            return {'success': True, 'id': rule.id}
+
+        except Exception as e:
+            _logger.error(f"Rate limit create error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/super-admin/security/rate-limits/<int:rule_id>', type='json', auth='public', methods=['PUT', 'DELETE'], csrf=False)
+    def rate_limits_update_delete(self, rule_id):
+        """Modifier ou supprimer une règle de rate limiting"""
+        if not request.session.uid:
+            return {'success': False, 'error': 'Non authentifié'}
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return {'success': False, 'error': str(e)}
+
+        try:
+            RateLimitRule = request.env['quelyos.rate.limit.rule'].sudo()
+            rule = RateLimitRule.browse(rule_id)
+
+            if not rule.exists():
+                return {'success': False, 'error': 'Règle non trouvée'}
+
+            if request.httprequest.method == 'DELETE':
+                rule.unlink()
+                return {'success': True}
+
+            # PUT - Update
+            data = request.jsonrequest
+            vals = {}
+            for field in ['name', 'active', 'priority', 'target_type', 'endpoint_pattern',
+                          'requests_limit', 'time_window', 'burst_limit', 'action_type', 'block_duration']:
+                if field in data:
+                    vals[field] = data[field]
+
+            if vals:
+                rule.write(vals)
+
+            return {'success': True}
+
+        except Exception as e:
+            _logger.error(f"Rate limit update/delete error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    # ========== P5: AUDIT LOGS ==========
+
+    @http.route('/api/super-admin/audit-logs', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
+    def audit_logs_list(self):
+        """Liste des logs d'audit avec filtres et pagination"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            return request.make_response('', headers=list(cors_headers.items()))
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            params = request.httprequest.args
+            filters = {
+                'user_id': params.get('user_id'),
+                'category': params.get('category'),
+                'severity': params.get('severity'),
+                'success': params.get('success') == 'true' if params.get('success') else None,
+                'date_from': params.get('date_from'),
+                'date_to': params.get('date_to'),
+                'search': params.get('search'),
+                'ip_address': params.get('ip_address'),
+                'resource_type': params.get('resource_type'),
+            }
+            # Nettoyer les None
+            filters = {k: v for k, v in filters.items() if v is not None}
+
+            offset = int(params.get('offset', 0))
+            limit = min(int(params.get('limit', 50)), 200)
+
+            AuditLog = request.env['quelyos.audit.log'].sudo()
+            result = AuditLog.search_logs(filters=filters, offset=offset, limit=limit)
+
+            return request.make_json_response({
+                'success': True,
+                **result
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"Audit logs list error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/audit-logs/export', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
+    def audit_logs_export(self):
+        """Export des logs d'audit en CSV"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            return request.make_response('', headers=list(cors_headers.items()))
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            params = request.httprequest.args
+            filters = {
+                'user_id': params.get('user_id'),
+                'category': params.get('category'),
+                'severity': params.get('severity'),
+                'date_from': params.get('date_from'),
+                'date_to': params.get('date_to'),
+            }
+            filters = {k: v for k, v in filters.items() if v is not None}
+
+            AuditLog = request.env['quelyos.audit.log'].sudo()
+            csv_content = AuditLog.export_csv(filters=filters)
+
+            response = request.make_response(
+                csv_content,
+                headers={
+                    **cors_headers,
+                    'Content-Type': 'text/csv; charset=utf-8',
+                    'Content-Disposition': f'attachment; filename=audit_logs_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
+                }
+            )
+            return response
+
+        except Exception as e:
+            _logger.error(f"Audit logs export error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/audit-logs/stats', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
+    def audit_logs_stats(self):
+        """Statistiques des logs d'audit"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            return request.make_response('', headers=list(cors_headers.items()))
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            days = int(request.httprequest.args.get('days', 7))
+            AuditLog = request.env['quelyos.audit.log'].sudo()
+            stats = AuditLog.get_statistics(days=days)
+
+            return request.make_json_response({
+                'success': True,
+                **stats
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"Audit logs stats error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers, status=500
+            )
+
+    # ========== P5: WAF RULES ==========
+
+    @http.route('/api/super-admin/security/waf-rules', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
+    def waf_rules_list(self):
+        """Liste des règles WAF"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            return request.make_response('', headers=list(cors_headers.items()))
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            WAFRule = request.env['quelyos.waf.rule'].sudo()
+            rules = WAFRule.get_all_rules()
+
+            return request.make_json_response({
+                'success': True,
+                'rules': rules
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"WAF rules list error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/security/waf-rules', type='json', auth='public', methods=['POST'], csrf=False)
+    def waf_rules_create(self):
+        """Créer une règle WAF"""
+        if not request.session.uid:
+            return {'success': False, 'error': 'Non authentifié'}
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return {'success': False, 'error': str(e)}
+
+        try:
+            data = request.jsonrequest
+            WAFRule = request.env['quelyos.waf.rule'].sudo()
+
+            rule = WAFRule.create({
+                'name': data.get('name'),
+                'active': data.get('active', True),
+                'priority': data.get('priority', 10),
+                'rule_type': data.get('rule_type', 'custom_pattern'),
+                'pattern': data.get('pattern'),
+                'pattern_flags': data.get('pattern_flags', 'i'),
+                'inspect_target': data.get('inspect_target', 'all'),
+                'action': data.get('action', 'block'),
+                'block_response_code': data.get('block_response_code', 403),
+                'block_message': data.get('block_message', 'Request blocked by security rules'),
+                'exclude_ips': data.get('exclude_ips'),
+                'exclude_endpoints': data.get('exclude_endpoints'),
+                'description': data.get('description'),
+                'cwe_id': data.get('cwe_id'),
+                'owasp_category': data.get('owasp_category'),
+            })
+
+            return {'success': True, 'id': rule.id}
+
+        except Exception as e:
+            _logger.error(f"WAF rule create error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/super-admin/security/waf-rules/<int:rule_id>', type='json', auth='public', methods=['PUT', 'DELETE'], csrf=False)
+    def waf_rules_update_delete(self, rule_id):
+        """Modifier ou supprimer une règle WAF"""
+        if not request.session.uid:
+            return {'success': False, 'error': 'Non authentifié'}
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return {'success': False, 'error': str(e)}
+
+        try:
+            WAFRule = request.env['quelyos.waf.rule'].sudo()
+            rule = WAFRule.browse(rule_id)
+
+            if not rule.exists():
+                return {'success': False, 'error': 'Règle non trouvée'}
+
+            if request.httprequest.method == 'DELETE':
+                rule.unlink()
+                return {'success': True}
+
+            # PUT - Update
+            data = request.jsonrequest
+            vals = {}
+            for field in ['name', 'active', 'priority', 'rule_type', 'pattern', 'pattern_flags',
+                          'inspect_target', 'action', 'block_response_code', 'block_message',
+                          'exclude_ips', 'exclude_endpoints', 'description', 'cwe_id', 'owasp_category']:
+                if field in data:
+                    vals[field] = data[field]
+
+            if vals:
+                rule.write(vals)
+
+            return {'success': True}
+
+        except Exception as e:
+            _logger.error(f"WAF rule update/delete error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/super-admin/security/waf-rules/init-defaults', type='json', auth='public', methods=['POST'], csrf=False)
+    def waf_rules_init_defaults(self):
+        """Initialiser les règles WAF par défaut"""
+        if not request.session.uid:
+            return {'success': False, 'error': 'Non authentifié'}
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return {'success': False, 'error': str(e)}
+
+        try:
+            WAFRule = request.env['quelyos.waf.rule'].sudo()
+            WAFRule.init_default_rules()
+            return {'success': True, 'message': 'Règles par défaut initialisées'}
+
+        except Exception as e:
+            _logger.error(f"WAF init defaults error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @http.route('/api/super-admin/security/waf/logs', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
+    def waf_logs_list(self):
+        """Liste des logs WAF récents"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            return request.make_response('', headers=list(cors_headers.items()))
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            limit = min(int(request.httprequest.args.get('limit', 100)), 500)
+            WAFLog = request.env['quelyos.waf.log'].sudo()
+            logs = WAFLog.get_recent_logs(limit=limit)
+
+            return request.make_json_response({
+                'success': True,
+                'logs': logs
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"WAF logs list error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/security/waf/stats', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
+    def waf_stats(self):
+        """Statistiques WAF"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            return request.make_response('', headers=list(cors_headers.items()))
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            days = int(request.httprequest.args.get('days', 7))
+            WAFLog = request.env['quelyos.waf.log'].sudo()
+            stats = WAFLog.get_statistics(days=days)
+
+            return request.make_json_response({
+                'success': True,
+                **stats
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"WAF stats error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers, status=500
+            )
+
+    # =========================================================================
+    # SUPPORT TICKETS
+    # =========================================================================
+
+    @http.route('/api/super-admin/tickets', type='http', auth='public',
+                methods=['GET', 'OPTIONS'], csrf=False)
+    def tickets_list(self):
+        """Liste tous les tickets (tous tenants)"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            params = request.httprequest.args.to_dict()
+            domain = []
+
+            if params.get('tenant_id'):
+                domain.append(('company_id', '=', int(params['tenant_id'])))
+
+            if params.get('state'):
+                domain.append(('state', '=', params['state']))
+
+            if params.get('priority'):
+                domain.append(('priority', '=', params['priority']))
+
+            if params.get('category'):
+                domain.append(('category', '=', params['category']))
+
+            if params.get('search'):
+                search = params['search']
+                domain.append('|')
+                domain.append('|')
+                domain.append(('subject', 'ilike', search))
+                domain.append(('name', 'ilike', search))
+                domain.append(('partner_id.email', 'ilike', search))
+
+            limit = min(int(params.get('limit', 50)), 200)
+            offset = int(params.get('offset', 0))
+
+            tickets = request.env['quelyos.ticket'].sudo().search(
+                domain,
+                limit=limit,
+                offset=offset,
+                order='priority desc, create_date desc'
+            )
+
+            return request.make_json_response({
+                'success': True,
+                'tickets': [t.to_dict_super_admin() for t in tickets],
+                'total': request.env['quelyos.ticket'].sudo().search_count(domain)
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error listing tickets (super admin)")
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/tickets/<int:ticket_id>', type='http', auth='public',
+                methods=['GET', 'OPTIONS'], csrf=False)
+    def ticket_detail(self, ticket_id):
+        """Détail d'un ticket"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            ticket = request.env['quelyos.ticket'].sudo().browse(ticket_id)
+
+            if not ticket.exists():
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Ticket non trouvé'
+                }, headers=cors_headers, status=404)
+
+            messages = ticket.message_ids.sorted(key=lambda m: m.create_date)
+
+            return request.make_json_response({
+                'success': True,
+                'ticket': ticket.to_dict_super_admin(),
+                'messages': [m.to_dict() for m in messages]
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error getting ticket detail (super admin)")
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/tickets/<int:ticket_id>/reply', type='http', auth='public',
+                methods=['POST'], csrf=False)
+    def ticket_reply(self, ticket_id):
+        """Répondre à un ticket"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            data = request.get_json_data()
+            content = data.get('content')
+
+            if not content:
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Le contenu du message est requis'
+                }, headers=cors_headers, status=400)
+
+            ticket = request.env['quelyos.ticket'].sudo().browse(ticket_id)
+
+            if not ticket.exists():
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Ticket non trouvé'
+                }, headers=cors_headers, status=404)
+
+            message = request.env['quelyos.ticket.message'].sudo().create({
+                'ticket_id': ticket.id,
+                'author_id': request.env.user.partner_id.id,
+                'content': content,
+            })
+
+            # Marquer comme ouvert si nouveau
+            if ticket.state == 'new':
+                ticket.action_open()
+
+            return request.make_json_response({
+                'success': True,
+                'message': message.to_dict()
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error replying to ticket (super admin)")
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/tickets/<int:ticket_id>/assign', type='http', auth='public',
+                methods=['POST'], csrf=False)
+    def ticket_assign(self, ticket_id):
+        """Assigner un ticket"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            data = request.get_json_data()
+            user_id = data.get('userId')
+
+            ticket = request.env['quelyos.ticket'].sudo().browse(ticket_id)
+
+            if not ticket.exists():
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Ticket non trouvé'
+                }, headers=cors_headers, status=404)
+
+            ticket.write({'assigned_to': user_id if user_id else False})
+
+            # Publier événement WebSocket
+            if user_id:
+                ticket._publish_ws_event('ticket.assigned', {
+                    'ticketId': ticket.id,
+                    'assignedTo': ticket.assigned_to.name,
+                })
+
+            return request.make_json_response({
+                'success': True,
+                'ticket': ticket.to_dict_super_admin()
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error assigning ticket")
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/tickets/<int:ticket_id>/status', type='http', auth='public',
+                methods=['PUT'], csrf=False)
+    def ticket_status(self, ticket_id):
+        """Changer le statut d'un ticket"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            data = request.get_json_data()
+            new_state = data.get('state')
+
+            if not new_state:
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Le statut est requis'
+                }, headers=cors_headers, status=400)
+
+            ticket = request.env['quelyos.ticket'].sudo().browse(ticket_id)
+
+            if not ticket.exists():
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Ticket non trouvé'
+                }, headers=cors_headers, status=404)
+
+            # Utiliser les actions appropriées
+            if new_state == 'open':
+                ticket.action_open()
+            elif new_state == 'pending':
+                ticket.action_pending()
+            elif new_state == 'resolved':
+                ticket.action_resolve()
+            elif new_state == 'closed':
+                ticket.action_close()
+            else:
+                ticket.write({'state': new_state})
+
+            return request.make_json_response({
+                'success': True,
+                'ticket': ticket.to_dict_super_admin()
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error changing ticket status")
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/tickets/stats', type='http', auth='public',
+                methods=['GET', 'OPTIONS'], csrf=False)
+    def tickets_stats(self):
+        """Statistiques globales des tickets"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            Ticket = request.env['quelyos.ticket'].sudo()
+
+            # Compteurs par statut
+            by_state = {
+                'new': Ticket.search_count([('state', '=', 'new')]),
+                'open': Ticket.search_count([('state', '=', 'open')]),
+                'pending': Ticket.search_count([('state', '=', 'pending')]),
+                'resolved': Ticket.search_count([('state', '=', 'resolved')]),
+                'closed': Ticket.search_count([('state', '=', 'closed')]),
+            }
+
+            # Compteurs par priorité
+            by_priority = {
+                'urgent': Ticket.search_count([('priority', '=', 'urgent')]),
+                'high': Ticket.search_count([('priority', '=', 'high')]),
+                'medium': Ticket.search_count([('priority', '=', 'medium')]),
+                'low': Ticket.search_count([('priority', '=', 'low')]),
+            }
+
+            # Temps moyen de réponse et résolution
+            tickets_with_times = Ticket.search([
+                ('response_time', '>', 0)
+            ])
+
+            avg_response_time = sum(t.response_time for t in tickets_with_times) / len(tickets_with_times) if tickets_with_times else 0
+
+            tickets_resolved = Ticket.search([
+                ('resolution_time', '>', 0)
+            ])
+
+            avg_resolution_time = sum(t.resolution_time for t in tickets_resolved) / len(tickets_resolved) if tickets_resolved else 0
+
+            # Satisfaction moyenne
+            tickets_rated = Ticket.search([
+                ('satisfaction_rating', '!=', False)
+            ])
+
+            avg_satisfaction = sum(int(t.satisfaction_rating) for t in tickets_rated) / len(tickets_rated) if tickets_rated else 0
+
+            return request.make_json_response({
+                'success': True,
+                'total': Ticket.search_count([]),
+                'byState': by_state,
+                'byPriority': by_priority,
+                'avgResponseTime': round(avg_response_time, 2),
+                'avgResolutionTime': round(avg_resolution_time, 2),
+                'avgSatisfaction': round(avg_satisfaction, 2),
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error getting tickets stats")
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=500
+            )

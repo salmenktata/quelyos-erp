@@ -3,7 +3,7 @@
     <data noupdate="1">
         <record id="seq_support_ticket" model="ir.sequence">
             <field name="name">Support Ticket Sequence</field>
-            <field name="code">quelyos.support.ticket</field>
+            <field name="code">quelyos.ticket</field>
             <field name="prefix">TKT-</field>
             <field name="padding">5</field>
             <field name="number_next">1</field>
