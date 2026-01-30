@@ -41,6 +41,10 @@ access_cycle_count_user,quelyos.cycle.count user,model_quelyos_cycle_count,group
 access_cycle_count_manager,quelyos.cycle.count manager,model_quelyos_cycle_count,group_quelyos_stock_manager,1,1,1,1
 access_cycle_count_line_user,quelyos.cycle.count.line user,model_quelyos_cycle_count_line,group_quelyos_stock_user,1,1,1,0
 access_cycle_count_line_manager,quelyos.cycle.count.line manager,model_quelyos_cycle_count_line,group_quelyos_stock_manager,1,1,1,1
+access_stock_scrap_user,quelyos.stock.scrap user,model_quelyos_stock_scrap,group_quelyos_stock_user,1,1,1,0
+access_stock_scrap_manager,quelyos.stock.scrap manager,model_quelyos_stock_scrap,group_quelyos_stock_manager,1,1,1,1
+access_stock_reservation_user,quelyos.stock.reservation user,model_quelyos_stock_reservation,group_quelyos_stock_user,1,1,1,0
+access_stock_reservation_manager,quelyos.stock.reservation manager,model_quelyos_stock_reservation,group_quelyos_stock_manager,1,1,1,1
 access_email_config_admin,quelyos.email.config admin,model_quelyos_email_config,base.group_system,1,1,1,1
 access_marketing_campaign_public,quelyos.marketing.campaign public,model_quelyos_marketing_campaign,base.group_public,1,0,0,0
 access_marketing_campaign_user,quelyos.marketing.campaign user,model_quelyos_marketing_campaign,group_quelyos_marketing_user,1,1,1,0

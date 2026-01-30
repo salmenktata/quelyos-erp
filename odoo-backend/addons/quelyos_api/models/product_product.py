@@ -24,6 +24,18 @@ class ProductProduct(models.Model):
         help='Quantité disponible en stock excluant les réservations (commandes confirmées non livrées)'
     )
 
+    qty_reserved_manual = fields.Float(
+        string='Quantité Réservée Manuellement',
+        compute='_compute_qty_reserved_manual',
+        help='Quantité bloquée par réservations manuelles actives'
+    )
+
+    qty_available_after_manual_reservations = fields.Float(
+        string='Stock Disponible Après Réservations Manuelles',
+        compute='_compute_qty_reserved_manual',
+        help='Stock disponible après déduction des réservations manuelles'
+    )
+
     qty_sold_365 = fields.Float(
         string='Quantité Vendue (365j)',
         compute='_compute_stock_turnover',
@@ -67,6 +79,31 @@ class ProductProduct(models.Model):
 
             # Calculer stock disponible hors réservations
             product.qty_available_unreserved = max(0, product.qty_available - reserved_qty)
+
+    @api.depends('qty_available')
+    def _compute_qty_reserved_manual(self):
+        """
+        Calcul des réservations manuelles actives.
+
+        qty_reserved_manual = Somme des réservations actives pour ce produit
+        qty_available_after_manual_reservations = qty_available - qty_reserved_manual
+        """
+        for product in self:
+            # Récupérer réservations manuelles actives pour ce produit
+            reservations = self.env['quelyos.stock.reservation'].search([
+                ('product_id', '=', product.id),
+                ('state', '=', 'active'),
+            ])
+
+            # Sommer les quantités réservées
+            reserved_manual = sum(reservations.mapped('reserved_qty'))
+            product.qty_reserved_manual = reserved_manual
+
+            # Calculer stock disponible après réservations manuelles
+            product.qty_available_after_manual_reservations = max(
+                0,
+                product.qty_available - reserved_manual
+            )
 
     def _compute_stock_turnover(self):
         """

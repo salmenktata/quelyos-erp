@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos API',
-    'version': '19.0.1.32.0',
+    'version': '19.0.1.33.0',
     'category': 'Quelyos/API',
     'summary': 'API REST pour frontend e-commerce et backoffice',
     'author': 'Quelyos',
@@ -37,6 +37,7 @@
         'data/subscription_sequence.xml',
         'data/cycle_count_sequence.xml',
         'data/stock_scrap_sequence.xml',
+        'data/stock_reservation_sequence.xml',
         'data/payment_sequence.xml',
         'data/subscription_plan_data.xml',
         'data/default_admin_tenant.xml',
@@ -49,6 +50,7 @@
         'data/ir_cron_subscriptions.xml',
         'data/ir_cron_auth_tokens.xml',
         'data/ir_cron_backup_schedules.xml',
+        'data/ir_cron_reservations.xml',
         'data/ir_cron_sitemap_healthcheck.xml',
         'data/res_country_state_tn.xml',
         'data/email_templates_data.xml',

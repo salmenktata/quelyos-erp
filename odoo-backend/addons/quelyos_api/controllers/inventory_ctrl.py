@@ -6179,3 +6179,232 @@ class QuelyosInventoryAPI(BaseController):
                 'success': False,
                 'error': 'Une erreur est survenue'
             }
+
+    # =========================================================================
+    # STOCK RESERVATIONS (Réservations manuelles)
+    # =========================================================================
+
+    @http.route('/api/stock/reservations', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_stock_reservations(self, **kwargs):
+        """Liste des réservations avec filtres"""
+        try:
+            auth_result = self._authenticate_from_header()
+            if auth_result:
+                return auth_result
+
+            state = kwargs.get('state')  # 'draft', 'active', 'released', 'expired'
+            product_id = kwargs.get('product_id')
+            location_id = kwargs.get('location_id')
+            limit = kwargs.get('limit', 50)
+            offset = kwargs.get('offset', 0)
+
+            Reservation = request.env['quelyos.stock.reservation'].sudo()
+
+            domain = []
+            if state:
+                domain.append(('state', '=', state))
+            if product_id:
+                domain.append(('product_id', '=', int(product_id)))
+            if location_id:
+                domain.append(('location_id', '=', int(location_id)))
+
+            total = Reservation.search_count(domain)
+            reservations = Reservation.search(domain, limit=limit, offset=offset, order='create_date desc')
+
+            return {
+                'success': True,
+                'reservations': [r.to_dict() for r in reservations],
+                'total': total,
+                'limit': limit,
+                'offset': offset,
+            }
+
+        except Exception as e:
+            _logger.error(f"Get stock reservations error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/stock/reservations/<int:reservation_id>', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_stock_reservation_detail(self, reservation_id, **kwargs):
+        """Détails d'une réservation"""
+        try:
+            auth_result = self._authenticate_from_header()
+            if auth_result:
+                return auth_result
+
+            Reservation = request.env['quelyos.stock.reservation'].sudo()
+            reservation = Reservation.browse(reservation_id)
+
+            if not reservation.exists():
+                return {
+                    'success': False,
+                    'error': f'Réservation {reservation_id} introuvable'
+                }
+
+            return {
+                'success': True,
+                'reservation': reservation.to_dict(),
+            }
+
+        except Exception as e:
+            _logger.error(f"Get stock reservation detail error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
+
+    @http.route('/api/stock/reservations/create', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def create_stock_reservation(self, **kwargs):
+        """Créer une nouvelle réservation"""
+        try:
+            auth_result = self._authenticate_from_header()
+            if auth_result:
+                return auth_result
+
+            # Validation champs requis
+            required_fields = ['product_id', 'reserved_qty', 'location_id', 'reason']
+            for field in required_fields:
+                if not kwargs.get(field):
+                    return {
+                        'success': False,
+                        'error': f'Champ requis: {field}'
+                    }
+
+            Reservation = request.env['quelyos.stock.reservation'].sudo()
+
+            # Préparer valeurs
+            vals = {
+                'product_id': int(kwargs['product_id']),
+                'reserved_qty': float(kwargs['reserved_qty']),
+                'location_id': int(kwargs['location_id']),
+                'reason': kwargs['reason'],
+            }
+
+            # Champs optionnels
+            if kwargs.get('expiration_date'):
+                vals['expiration_date'] = kwargs['expiration_date']
+            if kwargs.get('notes'):
+                vals['notes'] = kwargs['notes']
+            if kwargs.get('tenant_id'):
+                vals['tenant_id'] = int(kwargs['tenant_id'])
+
+            # Créer réservation
+            reservation = Reservation.create(vals)
+
+            return {
+                'success': True,
+                'message': 'Réservation créée avec succès',
+                'reservation': reservation.to_dict(),
+            }
+
+        except Exception as e:
+            _logger.error(f"Create stock reservation error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': str(e) if str(e) else 'Une erreur est survenue'
+            }
+
+    @http.route('/api/stock/reservations/<int:reservation_id>/activate', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def activate_stock_reservation(self, reservation_id, **kwargs):
+        """Activer une réservation (vérifie stock disponible)"""
+        try:
+            auth_result = self._authenticate_from_header()
+            if auth_result:
+                return auth_result
+
+            Reservation = request.env['quelyos.stock.reservation'].sudo()
+            reservation = Reservation.browse(reservation_id)
+
+            if not reservation.exists():
+                return {
+                    'success': False,
+                    'error': f'Réservation {reservation_id} introuvable'
+                }
+
+            # Activer
+            reservation.action_activate()
+
+            return {
+                'success': True,
+                'message': 'Réservation activée avec succès',
+                'reservation': reservation.to_dict(),
+            }
+
+        except Exception as e:
+            _logger.error(f"Activate stock reservation error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': str(e) if str(e) else 'Une erreur est survenue'
+            }
+
+    @http.route('/api/stock/reservations/<int:reservation_id>/release', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def release_stock_reservation(self, reservation_id, **kwargs):
+        """Libérer une réservation manuellement"""
+        try:
+            auth_result = self._authenticate_from_header()
+            if auth_result:
+                return auth_result
+
+            Reservation = request.env['quelyos.stock.reservation'].sudo()
+            reservation = Reservation.browse(reservation_id)
+
+            if not reservation.exists():
+                return {
+                    'success': False,
+                    'error': f'Réservation {reservation_id} introuvable'
+                }
+
+            # Libérer
+            reservation.action_release()
+
+            return {
+                'success': True,
+                'message': 'Réservation libérée avec succès',
+                'reservation': reservation.to_dict(),
+            }
+
+        except Exception as e:
+            _logger.error(f"Release stock reservation error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': str(e) if str(e) else 'Une erreur est survenue'
+            }
+
+    @http.route('/api/stock/reservations/<int:reservation_id>/delete', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def delete_stock_reservation(self, reservation_id, **kwargs):
+        """Supprimer une réservation (brouillon uniquement)"""
+        try:
+            auth_result = self._authenticate_from_header()
+            if auth_result:
+                return auth_result
+
+            Reservation = request.env['quelyos.stock.reservation'].sudo()
+            reservation = Reservation.browse(reservation_id)
+
+            if not reservation.exists():
+                return {
+                    'success': False,
+                    'error': f'Réservation {reservation_id} introuvable'
+                }
+
+            if reservation.state not in ['draft', 'released', 'expired']:
+                return {
+                    'success': False,
+                    'error': 'Impossible de supprimer une réservation active'
+                }
+
+            reservation.unlink()
+
+            return {
+                'success': True,
+                'message': 'Réservation supprimée avec succès'
+            }
+
+        except Exception as e:
+            _logger.error(f"Delete stock reservation error: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': 'Une erreur est survenue'
+            }
