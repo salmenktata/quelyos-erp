@@ -1315,3 +1315,203 @@ class QuelyosOrdersAPI(BaseController):
         except Exception as e:
             _logger.error(f"Mondial Relay tracking error: {e}")
             return {'success': False, 'error': 'Une erreur est survenue'}
+
+    # =========================================================================
+    # LATE AVAILABILITY (Stock Future)
+    # =========================================================================
+
+    @http.route('/api/orders/fulfillment-status', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_orders_by_fulfillment(self, **kwargs):
+        """
+        Liste des commandes filtrées par disponibilité future du stock.
+
+        Paramètres :
+        - priority: 'immediate', 'short', 'medium', 'long', 'backorder' (optionnel)
+        - can_fulfill_now: true/false (optionnel)
+        - limit: nombre max de résultats (défaut: 50)
+        - offset: décalage pagination (défaut: 0)
+        - state: état commande ('draft', 'sale', etc.) (optionnel)
+        """
+        try:
+            auth_result = self._authenticate_from_header()
+            if auth_result:
+                return auth_result
+
+            priority = kwargs.get('priority')
+            can_fulfill_now = kwargs.get('can_fulfill_now')
+            limit = int(kwargs.get('limit', 50))
+            offset = int(kwargs.get('offset', 0))
+            state = kwargs.get('state')
+
+            SaleOrder = request.env['sale.order'].sudo()
+
+            domain = []
+            if priority:
+                domain.append(('fulfillment_priority', '=', priority))
+            if can_fulfill_now is not None:
+                domain.append(('can_fulfill_now', '=', bool(can_fulfill_now)))
+            if state:
+                domain.append(('state', '=', state))
+            else:
+                # Par défaut, exclure annulées et terminées
+                domain.append(('state', 'not in', ['cancel', 'done']))
+
+            total = SaleOrder.search_count(domain)
+            orders = SaleOrder.search(
+                domain,
+                limit=limit,
+                offset=offset,
+                order='expected_fulfillment_date asc, date_order desc'
+            )
+
+            import json
+            data = []
+            for order in orders:
+                missing_stock = []
+                if order.missing_stock_details:
+                    try:
+                        missing_stock = json.loads(order.missing_stock_details)
+                    except Exception:
+                        pass
+
+                data.append({
+                    'id': order.id,
+                    'name': order.name,
+                    'date_order': order.date_order.isoformat() if order.date_order else None,
+                    'state': order.state,
+                    'amount_total': order.amount_total,
+                    'customer_name': order.partner_id.name if order.partner_id else '',
+                    'can_fulfill_now': order.can_fulfill_now,
+                    'expected_fulfillment_date': order.expected_fulfillment_date.isoformat() if order.expected_fulfillment_date else None,
+                    'fulfillment_priority': order.fulfillment_priority,
+                    'missing_stock': missing_stock,
+                })
+
+            return {
+                'success': True,
+                'orders': data,
+                'total': total,
+                'limit': limit,
+                'offset': offset,
+            }
+
+        except Exception as e:
+            _logger.error(f"Get fulfillment status error: {e}", exc_info=True)
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    @http.route('/api/orders/<int:order_id>/fulfillment-detail', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_order_fulfillment_detail(self, order_id, **kwargs):
+        """
+        Détails complets de disponibilité pour une commande spécifique.
+
+        Retourne :
+        - État actuel du stock pour chaque ligne
+        - Dates estimées de réapprovisionnement
+        - Suggestions (split order, substitute products, etc.)
+        """
+        try:
+            auth_result = self._authenticate_from_header()
+            if auth_result:
+                return auth_result
+
+            SaleOrder = request.env['sale.order'].sudo()
+            order = SaleOrder.browse(order_id)
+
+            if not order.exists():
+                return {
+                    'success': False,
+                    'error': f'Commande {order_id} introuvable'
+                }
+
+            import json
+            missing_stock = []
+            if order.missing_stock_details:
+                try:
+                    missing_stock = json.loads(order.missing_stock_details)
+                except Exception:
+                    pass
+
+            # Analyser chaque ligne pour détails supplémentaires
+            lines_detail = []
+            for line in order.order_line:
+                product = line.product_id
+                qty_needed = line.product_uom_qty
+
+                lines_detail.append({
+                    'line_id': line.id,
+                    'product_id': product.id,
+                    'product_name': product.display_name,
+                    'sku': product.default_code or '',
+                    'qty_ordered': qty_needed,
+                    'qty_available': product.qty_available,
+                    'qty_available_unreserved': product.qty_available_unreserved,
+                    'qty_reserved_manual': product.qty_reserved_manual,
+                    'qty_available_after_manual_reservations': product.qty_available_after_manual_reservations,
+                    'is_sufficient': product.qty_available_after_manual_reservations >= qty_needed,
+                })
+
+            return {
+                'success': True,
+                'order': {
+                    'id': order.id,
+                    'name': order.name,
+                    'state': order.state,
+                    'can_fulfill_now': order.can_fulfill_now,
+                    'expected_fulfillment_date': order.expected_fulfillment_date.isoformat() if order.expected_fulfillment_date else None,
+                    'fulfillment_priority': order.fulfillment_priority,
+                    'missing_stock_summary': missing_stock,
+                    'lines_detail': lines_detail,
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get fulfillment detail error: {e}", exc_info=True)
+            return {'success': False, 'error': 'Une erreur est survenue'}
+
+    @http.route('/api/orders/fulfillment-stats', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    def get_fulfillment_statistics(self, **kwargs):
+        """
+        Statistiques globales de disponibilité des commandes.
+
+        Retourne :
+        - Nombre de commandes par priorité (immediate, short, medium, long, backorder)
+        - Nombre de commandes prêtes vs en attente
+        - Valeur totale bloquée par manque de stock
+        """
+        try:
+            auth_result = self._authenticate_from_header()
+            if auth_result:
+                return auth_result
+
+            SaleOrder = request.env['sale.order'].sudo()
+
+            # Compter par priorité (exclure cancel/done)
+            base_domain = [('state', 'not in', ['cancel', 'done'])]
+
+            stats_by_priority = {}
+            for priority in ['immediate', 'short', 'medium', 'long', 'backorder']:
+                count = SaleOrder.search_count(base_domain + [('fulfillment_priority', '=', priority)])
+                stats_by_priority[priority] = count
+
+            # Commandes prêtes vs en attente
+            ready_count = SaleOrder.search_count(base_domain + [('can_fulfill_now', '=', True)])
+            waiting_count = SaleOrder.search_count(base_domain + [('can_fulfill_now', '=', False)])
+
+            # Valeur totale bloquée
+            blocked_orders = SaleOrder.search(base_domain + [('can_fulfill_now', '=', False)])
+            blocked_value = sum(blocked_orders.mapped('amount_total'))
+
+            return {
+                'success': True,
+                'stats': {
+                    'by_priority': stats_by_priority,
+                    'ready_count': ready_count,
+                    'waiting_count': waiting_count,
+                    'total_pending': ready_count + waiting_count,
+                    'blocked_value': round(blocked_value, 2),
+                }
+            }
+
+        except Exception as e:
+            _logger.error(f"Get fulfillment stats error: {e}", exc_info=True)
+            return {'success': False, 'error': 'Une erreur est survenue'}

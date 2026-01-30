@@ -36,6 +36,142 @@ class SaleOrder(models.Model):
         help='Date d\'envoi de l\'email de récupération de panier abandonné'
     )
 
+    # Late Availability (disponibilité future du stock)
+    can_fulfill_now = fields.Boolean(
+        string='Peut être honorée maintenant',
+        compute='_compute_fulfillment_status',
+        store=True,
+        help='Tous les produits sont disponibles en stock'
+    )
+
+    expected_fulfillment_date = fields.Date(
+        string='Date de disponibilité estimée',
+        compute='_compute_fulfillment_status',
+        store=True,
+        help='Date à laquelle tous les produits seront disponibles'
+    )
+
+    missing_stock_details = fields.Text(
+        string='Détails stock manquant',
+        compute='_compute_fulfillment_status',
+        store=True,
+        help='JSON avec détails des produits en rupture et dates de réapprovisionnement'
+    )
+
+    fulfillment_priority = fields.Selection([
+        ('immediate', 'Immédiat (stock complet)'),
+        ('short', 'Court terme (< 7 jours)'),
+        ('medium', 'Moyen terme (7-30 jours)'),
+        ('long', 'Long terme (> 30 jours)'),
+        ('backorder', 'Rupture (aucune date)'),
+    ], string='Priorité de traitement', compute='_compute_fulfillment_status', store=True)
+
+    @api.depends('order_line.product_id', 'order_line.product_uom_qty', 'state')
+    def _compute_fulfillment_status(self):
+        """
+        Calculer la disponibilité future du stock pour cette commande.
+
+        Analyse chaque ligne de commande et détermine :
+        - Si la commande peut être honorée maintenant (stock suffisant)
+        - La date estimée de disponibilité complète
+        - Les détails des produits manquants
+        - La priorité de traitement
+        """
+        import json
+        from datetime import date, timedelta
+
+        for order in self:
+            # Ne calculer que pour les commandes confirmées ou en draft
+            if order.state in ['cancel', 'done']:
+                order.can_fulfill_now = False
+                order.expected_fulfillment_date = False
+                order.missing_stock_details = '{}'
+                order.fulfillment_priority = 'backorder'
+                continue
+
+            missing_products = []
+            latest_availability_date = None
+            all_available = True
+
+            for line in order.order_line:
+                product = line.product_id
+                qty_needed = line.product_uom_qty
+
+                # Vérifier stock disponible (hors réservations manuelles)
+                qty_available = product.qty_available_after_manual_reservations
+
+                if qty_available < qty_needed:
+                    all_available = False
+                    qty_missing = qty_needed - qty_available
+
+                    # Estimer date de disponibilité
+                    # Stratégie simple : vérifier s'il y a des achats/fabrications planifiés
+                    # Pour MVP, utiliser une estimation basée sur le lead time du fournisseur
+                    estimated_days = self._estimate_restock_days(product)
+                    estimated_date = date.today() + timedelta(days=estimated_days)
+
+                    if not latest_availability_date or estimated_date > latest_availability_date:
+                        latest_availability_date = estimated_date
+
+                    missing_products.append({
+                        'product_id': product.id,
+                        'product_name': product.display_name,
+                        'sku': product.default_code or '',
+                        'qty_needed': qty_needed,
+                        'qty_available': qty_available,
+                        'qty_missing': qty_missing,
+                        'estimated_date': estimated_date.isoformat() if estimated_date else None,
+                        'estimated_days': estimated_days,
+                    })
+
+            # Définir résultats
+            order.can_fulfill_now = all_available
+            order.expected_fulfillment_date = latest_availability_date
+            order.missing_stock_details = json.dumps(missing_products, ensure_ascii=False)
+
+            # Déterminer priorité
+            if all_available:
+                order.fulfillment_priority = 'immediate'
+            elif latest_availability_date:
+                days_until = (latest_availability_date - date.today()).days
+                if days_until <= 7:
+                    order.fulfillment_priority = 'short'
+                elif days_until <= 30:
+                    order.fulfillment_priority = 'medium'
+                else:
+                    order.fulfillment_priority = 'long'
+            else:
+                order.fulfillment_priority = 'backorder'
+
+    def _estimate_restock_days(self, product):
+        """
+        Estimer le nombre de jours avant réapprovisionnement.
+
+        Stratégie :
+        1. Vérifier s'il y a des purchase.order en cours pour ce produit
+        2. Sinon, utiliser le lead time du fournisseur principal
+        3. Par défaut : 14 jours
+        """
+        # Vérifier purchase orders en cours (state = 'purchase')
+        PurchaseOrderLine = self.env['purchase.order.line'].sudo()
+        incoming_purchases = PurchaseOrderLine.search([
+            ('product_id', '=', product.id),
+            ('order_id.state', 'in', ['draft', 'sent', 'to approve', 'purchase']),
+        ], order='date_planned asc', limit=1)
+
+        if incoming_purchases and incoming_purchases.date_planned:
+            days_until = (incoming_purchases.date_planned.date() - date.today()).days
+            return max(0, days_until)
+
+        # Utiliser lead time fournisseur
+        if product.seller_ids:
+            # Prendre le premier fournisseur
+            seller = product.seller_ids[0]
+            return seller.delay if seller.delay else 14
+
+        # Par défaut
+        return 14
+
     def _cron_abandoned_cart_recovery(self):
         """
         Cron job : Détecter les paniers abandonnés et envoyer des emails de relance
