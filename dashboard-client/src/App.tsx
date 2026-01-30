@@ -44,11 +44,15 @@ const LiveEvents = lazy(() => import('./pages/store/LiveEvents'))
 const TrendingProducts = lazy(() => import('./pages/store/TrendingProducts'))
 const Blog = lazy(() => import('./pages/store/Blog'))
 const Loyalty = lazy(() => import('./pages/store/Loyalty'))
-const Tickets = lazy(() => import('./pages/store/Tickets'))
 const SalesReports = lazy(() => import('./pages/store/SalesReports'))
 const StoreStockAlerts = lazy(() => import('./pages/store/StockAlerts'))
 const Attributes = lazy(() => import('./pages/store/Attributes'))
 const ProductImport = lazy(() => import('./pages/store/ProductImport'))
+
+// Lazy loaded pages - Support
+const SupportTickets = lazy(() => import('./pages/support/Tickets'))
+const NewTicket = lazy(() => import('./pages/support/NewTicket'))
+const TicketDetail = lazy(() => import('./pages/support/TicketDetail'))
 
 // Lazy loaded pages - Store Themes
 const ThemesMarketplace = lazy(() => import('./pages/store/themes/marketplace'))
@@ -536,14 +540,8 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/store/tickets"
-                element={
-                  <ProtectedRoute>
-                    <Tickets />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Redirection ancienne route vers nouveau module Support */}
+              <Route path="/store/tickets" element={<Navigate to="/support/tickets" replace />} />
               <Route
                 path="/store/sales-reports"
                 element={
@@ -665,6 +663,31 @@ export default function App() {
                 <Route path="payment-methods" element={<StoreSettingsPaymentMethods />} />
                 <Route path="notifications" element={<StoreSettingsNotifications />} />
               </Route>
+              {/* Support routes */}
+              <Route
+                path="/support/tickets"
+                element={
+                  <ProtectedRoute>
+                    <SupportTickets />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/support/tickets/new"
+                element={
+                  <ProtectedRoute>
+                    <NewTicket />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/support/tickets/:id"
+                element={
+                  <ProtectedRoute>
+                    <TicketDetail />
+                  </ProtectedRoute>
+                }
+              />
               {/* CRM routes */}
               <Route path="/crm" element={<Navigate to="/crm/customers" replace />} />
               <Route
