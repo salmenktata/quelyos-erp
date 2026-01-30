@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     "e2e/**",
     "**/*.test.ts",
     "**/*.spec.ts",
+    // Thèmes externes (code legacy)
+    "themes/**",
   ]),
   // Règles personnalisées - relaxer certaines contraintes
   {

@@ -2,8 +2,7 @@
  * Page liste articles blog - SSR avec données initiales
  */
 
-import { Suspense } from 'react';
-import { backendClient, BlogPost, BlogCategory } from '@/lib/backend/client';
+import { backendClient, BlogPost } from '@/lib/backend/client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getProxiedImageUrl } from '@/lib/image-proxy';

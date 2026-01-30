@@ -29,7 +29,7 @@ const DEFAULT_CONFIG = {
   customer_service_days: 'lundi au vendredi',
 };
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Essayer d'abord la méthode GET (endpoint main.py)
     let response = await fetch(`${BACKEND_URL}/api/ecommerce/site-config`, {
