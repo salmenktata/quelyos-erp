@@ -60,8 +60,8 @@ export default function StockValuationPage() {
 
     const rows = [
       ['Type', 'Nom', 'Valeur Totale', 'Quantité Totale', 'Nombre Produits'],
-      ...byWarehouse.map(w => ['Entrepôt', w.warehouse_name, w.total_value, w.total_qty, w.product_count]),
-      ...byCategory.map(c => ['Catégorie', c.category_name, c.total_value, c.total_qty, c.product_count])
+      ...byWarehouse.map(w => ['Entrepôt', w.warehouse_name, w.totalvalue, w.total_qty, w.product_count]),
+      ...byCategory.map(c => ['Catégorie', c.category_name, c.totalvalue, c.total_qty, c.product_count])
     ]
 
     const csv = rows.map(row => row.join(',')).join('\n')
@@ -150,7 +150,7 @@ export default function StockValuationPage() {
                 <DollarSign className="h-5 w-5 text-green-600" />
               </div>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
-                {formatAmount(kpis.total_value)}
+                {formatAmount(kpis.totalvalue)}
               </p>
             </div>
             <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
@@ -168,7 +168,7 @@ export default function StockValuationPage() {
                 <TrendingUp className="h-5 w-5 text-purple-600" />
               </div>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
-                {formatAmount(kpis.avg_value_per_product)}
+                {formatAmount(kpis.avgvalue_per_product)}
               </p>
             </div>
             <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
@@ -217,7 +217,7 @@ export default function StockValuationPage() {
                         {warehouse.warehouse_name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100 font-semibold">
-                        {formatAmount(warehouse.total_value)}
+                        {formatAmount(warehouse.totalvalue)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
                         {warehouse.total_qty.toFixed(0)}
@@ -267,7 +267,7 @@ export default function StockValuationPage() {
                         {category.category_name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100 font-semibold">
-                        {formatAmount(category.total_value)}
+                        {formatAmount(category.totalvalue)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
                         {category.total_qty.toFixed(0)}

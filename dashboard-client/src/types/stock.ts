@@ -5,9 +5,9 @@
 // ==================== STOCK VALUATION ====================
 
 export interface StockValuationKPIs {
-  total_value: number
+  totalvalue: number
   total_qty: number
-  avg_value_per_product: number
+  avgvalue_per_product: number
   valuation_method: string
   product_count: number
 }
@@ -15,7 +15,7 @@ export interface StockValuationKPIs {
 export interface StockValuationByWarehouse {
   warehouse_id: number
   warehouse_name: string
-  total_value: number
+  totalvalue: number
   total_qty: number
   product_count: number
 }
@@ -23,14 +23,14 @@ export interface StockValuationByWarehouse {
 export interface StockValuationByCategory {
   category_id: number
   category_name: string
-  total_value: number
+  totalvalue: number
   total_qty: number
   product_count: number
 }
 
 export interface StockValuationTimeline {
   date: string
-  total_value: number
+  totalvalue: number
 }
 
 export interface StockValuationResponse {

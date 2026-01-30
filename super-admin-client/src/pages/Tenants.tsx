@@ -147,7 +147,7 @@ export function Tenants() {
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{tenant.domain}</td>
                     <td className="px-6 py-4">
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300">
-                        {tenant.plan_code.toUpperCase()}
+                        {tenant.plan_code?.toUpperCase() ?? 'N/A'}
                       </span>
                     </td>
                     <td className="px-6 py-4">

@@ -595,7 +595,7 @@ export function VariantManager({
                       <>
                         <td className="py-2 px-3">
                           <span className="text-gray-900 dark:text-white">
-                            {variant.attribute_values.map((av) => av.name).join(' / ') ||
+                            {variant.attributevalues.map((av) => av.name).join(' / ') ||
                               variant.display_name}
                           </span>
                         </td>
@@ -745,7 +745,7 @@ export function VariantManager({
                       <>
                         <td className="py-2 px-3">
                           <span className="text-gray-900 dark:text-white">
-                            {variant.attribute_values.map((av) => av.name).join(' / ') ||
+                            {variant.attributevalues.map((av) => av.name).join(' / ') ||
                               variant.display_name}
                           </span>
                         </td>

@@ -44,7 +44,7 @@ export interface ProductVariant {
   image: string | null
   images?: VariantImage[]
   image_count?: number
-  attribute_values: Array<{
+  attributevalues: Array<{
     id: number
     name: string
     attribute_id: number

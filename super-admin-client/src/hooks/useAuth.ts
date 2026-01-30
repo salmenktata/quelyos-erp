@@ -1,23 +1,27 @@
 /**
- * Hook d'authentification avec gestion des cookies HttpOnly
+ * Hook d'authentification avec JWT Bearer
  *
  * Gère :
- * - Vérification de l'authentification
- * - Refresh automatique du token de session
+ * - Authentification via JWT access token
+ * - Refresh automatique avec rotation
  * - Logout
  * - Informations utilisateur
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router'
 import { gateway } from '@/lib/api'
+import { tokenService } from '@/lib/tokenService'
 import { useAnalytics } from './useAnalytics'
+import { logger } from '@/lib/logger'
 
 interface User {
   id: number
   name: string
   email: string
   login: string
+  tenant_id?: number
+  tenant_domain?: string
 }
 
 interface AuthState {
@@ -27,46 +31,102 @@ interface AuthState {
   error: string | null
 }
 
-const AUTH_CHECK_INTERVAL = 5 * 60 * 1000 // 5 minutes
-const REFRESH_BEFORE_EXPIRY = 5 * 60 * 1000 // 5 minutes avant expiration
+interface LoginResponse {
+  success: boolean
+  access_token?: string
+  expires_in?: number
+  user?: User
+  error?: string
+}
+
+interface RefreshResponse {
+  success: boolean
+  access_token?: string
+  expires_in?: number
+  user?: User
+  error?: string
+}
+
+interface MeResponse {
+  success: boolean
+  user?: User
+  claims?: {
+    tenant_id?: number
+    tenant_domain?: string
+    exp?: number
+  }
+  error?: string
+}
 
 export function useAuth() {
   const navigate = useNavigate()
   const { identifyUser, resetUser, trackEvent } = useAnalytics()
-  const [authState, setAuthState] = useState<AuthState>({
-    isAuthenticated: false,
-    isLoading: true,
-    user: null,
-    error: null,
+  const initialized = useRef(false)
+
+  // Initialiser depuis tokenService
+  const [authState, setAuthState] = useState<AuthState>(() => {
+    const isAuthenticated = tokenService.isAuthenticated()
+    const storedUser = tokenService.getUser()
+
+    return {
+      isAuthenticated,
+      isLoading: !isAuthenticated, // Si déjà auth, pas besoin de charger
+      user: storedUser ? {
+        id: storedUser.id,
+        name: '',
+        email: '',
+        login: storedUser.login,
+        tenant_id: storedUser.tenantId,
+        tenant_domain: storedUser.tenantDomain,
+      } : null,
+      error: null,
+    }
   })
 
   /**
-   * Vérifie l'authentification via l'endpoint /api/auth/user-info
+   * Vérifie l'authentification via /api/auth/me (JWT Bearer)
    */
   const checkAuth = useCallback(async (): Promise<boolean> => {
+    // Si pas de token, pas la peine de vérifier
+    if (!tokenService.isAuthenticated()) {
+      setAuthState({
+        isAuthenticated: false,
+        isLoading: false,
+        user: null,
+        error: null,
+      })
+      return false
+    }
+
     try {
-      const response = await gateway.post<{ success: boolean; user?: User; error?: string }>(
-        '/api/auth/user-info',
-        {}
-      )
+      const response = await gateway.get<MeResponse>('/api/auth/me')
 
       if (response.success && response.user) {
+        const user: User = {
+          ...response.user,
+          tenant_id: response.claims?.tenant_id,
+          tenant_domain: response.claims?.tenant_domain,
+        }
+
         setAuthState({
           isAuthenticated: true,
           isLoading: false,
-          user: response.user,
+          user,
           error: null,
         })
-        // Identifier l'utilisateur dans Posthog
+
+        // Identifier dans Posthog
         identifyUser(response.user.id, {
           name: response.user.name,
           email: response.user.email,
           login: response.user.login,
         })
+
         return true
       }
 
-      // Non authentifié
+      // Token invalide
+      tokenService.clear()
       setAuthState({
         isAuthenticated: false,
         isLoading: false,
@@ -74,47 +134,130 @@ export function useAuth() {
         error: response.error || 'Non authentifié',
       })
       return false
+
     } catch (error) {
+      logger.error('[Auth] checkAuth error:', error)
+      tokenService.clear()
       setAuthState({
         isAuthenticated: false,
         isLoading: false,
         user: null,
-        error: error instanceof Error ? error.message : 'Erreur d\'authentification',
+        error: error instanceof Error ? error.message : 'Erreur',
       })
       return false
     }
-  }, [])
+  }, [identifyUser])
 
   /**
-   * Rafraîchit le token de session via /api/auth/refresh
+   * Rafraîchit les tokens via /api/auth/refresh
    */
   const refreshToken = useCallback(async (): Promise<boolean> => {
     try {
-      const response = await gateway.post<{ success: boolean; user?: User; error?: string }>(
-        '/api/auth/refresh',
-        {}
-      )
+      logger.info('[Auth] Refreshing tokens...')
 
-      if (response.success && response.user) {
+      const response = await gateway.post<RefreshResponse>('/api/auth/refresh', {})
+
+      if (response.success && response.access_token && response.user) {
+        // Stocker les nouveaux tokens
+        tokenService.setTokens(
+          response.access_token,
+          response.expires_in || 900,
+          response.user
+        )
+
         setAuthState((prev) => ({
           ...prev,
           isAuthenticated: true,
           user: response.user!,
           error: null,
         }))
+
+        logger.info('[Auth] Tokens refreshed successfully')
         return true
       }
 
-      // Refresh failed → logout
-      console.warn('[Auth] Token refresh failed, logging out')
-      await logout()
+      // Refresh failed
+      logger.warn('[Auth] Token refresh failed:', response.error)
+      tokenService.clear()
+      setAuthState({
+        isAuthenticated: false,
+        isLoading: false,
+        user: null,
+        error: response.error || 'Session expirée',
+      })
       return false
+
     } catch (error) {
-      console.error('[Auth] Token refresh error:', error)
-      await logout()
+      logger.error('[Auth] Token refresh error:', error)
+      tokenService.clear()
+      setAuthState({
+        isAuthenticated: false,
+        isLoading: false,
+        user: null,
+        error: 'Erreur de refresh',
+      })
       return false
     }
   }, [])
+
+  /**
+   * Login avec credentials
+   */
+  const loginWithCredentials = useCallback(async (
+    login: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
+
+    try {
+      const response = await gateway.post<LoginResponse>('/api/auth/sso-login', {
+        login,
+        password,
+      })
+
+      if (response.success && response.access_token && response.user) {
+        // Stocker les tokens
+        tokenService.setTokens(
+          response.access_token,
+          response.expires_in || 900,
+          response.user
+        )
+
+        setAuthState({
+          isAuthenticated: true,
+          isLoading: false,
+          user: response.user,
+          error: null,
+        })
+
+        // Identifier dans Posthog
+        identifyUser(response.user.id, {
+          name: response.user.name,
+          email: response.user.email,
+          login: response.user.login,
+        })
+
+        trackEvent('login', { method: 'credentials' })
+        return { success: true }
+      }
+
+      setAuthState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: response.error || 'Identifiants invalides',
+      }))
+      return { success: false, error: response.error }
+
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erreur de connexion'
+      setAuthState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: message,
+      }))
+      return { success: false, error: message }
+    }
+  }, [identifyUser, trackEvent])
 
   /**
    * Déconnecte l'utilisateur
@@ -124,9 +267,9 @@ export function useAuth() {
       await gateway.post('/api/auth/logout', {})
       trackEvent('logout')
     } catch (error) {
-      console.error('[Auth] Logout error:', error)
+      logger.error('[Auth] Logout error:', error)
     } finally {
-      // Reset Posthog user
+      tokenService.clear()
       resetUser()
       setAuthState({
         isAuthenticated: false,
@@ -139,48 +282,44 @@ export function useAuth() {
   }, [navigate, trackEvent, resetUser])
 
   /**
-   * Login manuel (si besoin de forcer un check)
-   */
-  const login = useCallback(async () => {
-    setAuthState((prev) => ({ ...prev, isLoading: true }))
-    const authenticated = await checkAuth()
-    return authenticated
-  }, [checkAuth])
-
-  /**
-   * Vérifie l'auth au montage du composant
+   * Configuration initiale
    */
   useEffect(() => {
-    checkAuth()
-  }, [checkAuth])
+    if (initialized.current) return
+    initialized.current = true
 
-  /**
-   * Vérifie périodiquement l'authentification et refresh si nécessaire
-   */
-  useEffect(() => {
-    if (!authState.isAuthenticated) return
+    // Connecter la fonction de refresh au tokenService
+    tokenService.setRefreshFunction(refreshToken)
 
-    // Vérifier toutes les 5 minutes
-    const checkInterval = setInterval(() => {
+    // Écouter les événements du tokenService
+    const unsubscribe = tokenService.subscribe((event) => {
+      if (event === 'expired') {
+        logger.warn('[Auth] Token expired, redirecting to login')
+        setAuthState({
+          isAuthenticated: false,
+          isLoading: false,
+          user: null,
+          error: 'Session expirée',
+        })
+        navigate('/login', { replace: true })
+      }
+    })
+
+    // Vérifier l'auth si on a un token
+    if (tokenService.isAuthenticated()) {
       checkAuth()
-    }, AUTH_CHECK_INTERVAL)
-
-    // Refresh préventif toutes les 25 minutes (session expire dans 30min)
-    const refreshInterval = setInterval(() => {
-      refreshToken()
-    }, 25 * 60 * 1000)
-
-    return () => {
-      clearInterval(checkInterval)
-      clearInterval(refreshInterval)
+    } else {
+      setAuthState((prev) => ({ ...prev, isLoading: false }))
     }
-  }, [authState.isAuthenticated, checkAuth, refreshToken])
+
+    return unsubscribe
+  }, [checkAuth, refreshToken, navigate])
 
   return {
     ...authState,
     checkAuth,
     refreshToken,
     logout,
-    login,
+    login: loginWithCredentials,
   }
 }

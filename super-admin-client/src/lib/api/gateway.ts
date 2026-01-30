@@ -14,6 +14,7 @@
 import { config } from '@/lib/config'
 import { CircuitBreaker } from './circuitBreaker'
 import { withRetry, RETRY_CONFIGS } from './retry'
+import { tokenService } from '@/lib/tokenService'
 
 // Types
 export interface GatewayRequest {
@@ -291,10 +292,16 @@ class APIGateway {
       ...req.headers,
     }
 
+    // Ajouter le JWT Bearer token si disponible
+    const accessToken = tokenService.getAccessToken()
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`
+    }
+
     const options: RequestInit = {
       method: req.method,
       headers,
-      credentials: 'include', // Inclure les cookies HttpOnly dans les requêtes
+      credentials: 'include', // Inclure les cookies HttpOnly comme fallback
     }
 
     if (req.body && ['POST', 'PUT', 'PATCH'].includes(req.method)) {

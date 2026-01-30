@@ -1,6 +1,6 @@
 "use client";
 
-import { _AlertCircle, Download, XCircle, AlertTriangle, Info } from "lucide-react";
+import { AlertCircle, Download, XCircle, AlertTriangle, Info } from "lucide-react";
 import { GlassPanel } from "@/components/ui/glass";
 import type { ValidationErrorsProps } from "@/types/import";
 

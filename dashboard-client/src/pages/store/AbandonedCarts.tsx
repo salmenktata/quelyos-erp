@@ -126,7 +126,7 @@ export default function AbandonedCarts() {
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Valeur abandonnée</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                    {formatPrice(stats.abandoned_value)}
+                    {formatPrice(stats.abandonedvalue)}
                   </p>
                 </div>
               </div>
@@ -148,7 +148,7 @@ export default function AbandonedCarts() {
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Valeur récupérée</p>
                   <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
-                    {formatPrice(stats.recovered_value)}
+                    {formatPrice(stats.recoveredvalue)}
                   </p>
                 </div>
               </div>

@@ -282,33 +282,135 @@ class SuperAdminController(http.Controller):
     # SUBSCRIPTIONS
     # =========================================================================
 
-    @http.route('/api/super-admin/subscriptions', type='json', auth='user', methods=['GET'], csrf=False)
+    @http.route('/api/super-admin/subscriptions', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
     def list_subscriptions(self, state=None, plan=None):
         """Liste globale des subscriptions"""
-        self._check_super_admin()
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
 
-        domain = []
-        if state:
-            domain.append(('state', '=', state))
-        if plan:
-            domain.append(('plan_id.code', '=', plan))
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
 
-        Subscription = request.env['quelyos.subscription']
-        subscriptions = Subscription.search(domain, order='mrr desc')
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
 
-        return [self._serialize_subscription(s) for s in subscriptions]
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
 
-    @http.route('/api/super-admin/subscriptions/mrr-breakdown', type='json', auth='user', methods=['GET'], csrf=False)
+        try:
+            domain = []
+            if state:
+                domain.append(('state', '=', state))
+            if plan:
+                domain.append(('plan_id.code', '=', plan))
+
+            Subscription = request.env['quelyos.subscription']
+            subscriptions = Subscription.search(domain, order='mrr desc')
+
+            data = {
+                'success': True,
+                'data': [self._serialize_subscription(s) for s in subscriptions],
+                'total': len(subscriptions),
+            }
+            return request.make_json_response(data, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"List subscriptions error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
+    @http.route('/api/super-admin/subscriptions/mrr-breakdown', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
     def mrr_breakdown(self):
         """MRR par plan"""
-        self._check_super_admin()
-        return request.env['quelyos.subscription'].get_mrr_breakdown()
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
 
-    @http.route('/api/super-admin/subscriptions/churn-analysis', type='json', auth='user', methods=['GET'], csrf=False)
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
+
+        try:
+            data = request.env['quelyos.subscription'].get_mrr_breakdown()
+            return request.make_json_response({'success': True, **data}, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"MRR breakdown error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
+    @http.route('/api/super-admin/subscriptions/churn-analysis', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
     def churn_analysis(self, months=12):
         """Analyse churn sur N mois"""
-        self._check_super_admin()
-        return request.env['quelyos.subscription'].get_churn_analysis(months=months)
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
+
+        try:
+            data = request.env['quelyos.subscription'].get_churn_analysis(months=int(months))
+            return request.make_json_response({'success': True, 'data': data}, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"Churn analysis error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
 
     # =========================================================================
     # INVOICES & TRANSACTIONS

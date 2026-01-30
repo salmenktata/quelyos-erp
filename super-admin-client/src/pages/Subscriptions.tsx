@@ -137,7 +137,7 @@ export function Subscriptions() {
                     <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{sub.tenant_name}</td>
                     <td className="px-6 py-4">
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300">
-                        {sub.plan_code.toUpperCase()}
+                        {sub.plan_code?.toUpperCase() ?? 'N/A'}
                       </span>
                     </td>
                     <td className="px-6 py-4">

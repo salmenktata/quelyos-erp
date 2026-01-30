@@ -187,6 +187,54 @@ class AuthRefreshToken(models.Model):
         return count
 
     @api.model
+    def rotate_token(self, old_token_plain, ip_address=None, user_agent=None):
+        """
+        Effectue une rotation de refresh token.
+        Révoque l'ancien token et génère un nouveau.
+
+        Args:
+            old_token_plain (str): Ancien token à révoquer
+            ip_address (str): Adresse IP du client
+            user_agent (str): User agent du navigateur
+
+        Returns:
+            tuple: (new_token_plain, new_token_record, user) ou raises AccessDenied
+        """
+        # Valider et récupérer l'ancien token
+        old_hash = hashlib.sha256(old_token_plain.encode()).hexdigest()
+
+        old_record = self.sudo().search([
+            ('token_hash', '=', old_hash),
+            ('revoked', '=', False),
+        ], limit=1)
+
+        if not old_record:
+            _logger.warning("Rotation failed: token not found or revoked")
+            raise AccessDenied("Invalid refresh token")
+
+        # Vérifier expiration
+        if old_record.expires_at < fields.Datetime.now():
+            _logger.warning(f"Rotation failed: token expired for user {old_record.user_id.id}")
+            old_record.sudo().write({'revoked': True})
+            raise AccessDenied("Refresh token expired")
+
+        user = old_record.user_id
+
+        # Révoquer l'ancien token
+        old_record.sudo().write({'revoked': True})
+        _logger.info(f"Old refresh token revoked for user {user.id}")
+
+        # Générer un nouveau token
+        new_token_plain, new_token_record = self.generate_token(
+            user_id=user.id,
+            ip_address=ip_address or old_record.ip_address,
+            user_agent=user_agent or old_record.user_agent
+        )
+
+        _logger.info(f"Refresh token rotated for user {user.id}")
+        return new_token_plain, new_token_record, user
+
+    @api.model
     def cleanup_expired_tokens(self):
         """
         Cron pour nettoyer les tokens expirés (> 30 jours)

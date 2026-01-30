@@ -105,7 +105,7 @@ export default function Products() {
     include_archived: includeArchived,
     price_min: priceMin ? Number(priceMin) : undefined,
     price_max: priceMax ? Number(priceMax) : undefined,
-    attribute_value_ids: selectedAttributeValues.length > 0 ? selectedAttributeValues : undefined,
+    attributevalue_ids: selectedAttributeValues.length > 0 ? selectedAttributeValues : undefined,
   }
 
   // Récupérer les attributs disponibles pour les filtres

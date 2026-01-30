@@ -12,6 +12,16 @@ from odoo.addons.web.controllers.home import Home
 from odoo.exceptions import AccessDenied
 from ..config import get_cors_headers
 from ..lib.rate_limiter import check_rate_limit, RateLimitConfig, rate_limit_key, get_rate_limiter
+from ..lib.jwt_auth import (
+    generate_access_token,
+    validate_access_token,
+    validate_jwt_request,
+    extract_bearer_token,
+    require_jwt_auth,
+    TokenExpiredError,
+    InvalidTokenError,
+    ACCESS_TOKEN_EXPIRY_MINUTES,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -21,7 +31,9 @@ FRONTEND_LOGIN_URL = os.environ.get('FRONTEND_LOGIN_URL', 'http://localhost:3000
 # Cookie settings
 COOKIE_NAME_SESSION = 'session_token'
 COOKIE_NAME_REFRESH = 'refresh_token'
+COOKIE_NAME_ACCESS = 'access_token'  # JWT access token
 COOKIE_MAX_AGE_SESSION = 30 * 60  # 30 minutes
+COOKIE_MAX_AGE_ACCESS = ACCESS_TOKEN_EXPIRY_MINUTES * 60  # 15 minutes (JWT)
 COOKIE_MAX_AGE_REFRESH = 7 * 24 * 60 * 60  # 7 jours
 COOKIE_SECURE = os.environ.get('COOKIE_SECURE', 'false').lower() == 'true'  # HTTPS uniquement en prod
 COOKIE_SAMESITE = 'Lax'  # Protection CSRF
@@ -153,18 +165,38 @@ class AuthController(http.Controller):
 
             # Get session info
             session_id = request.session.sid
-
-            _logger.info(f"SSO login successful for user {login} (uid={uid})")
-
-            # Préparer la réponse
             user = request.env['res.users'].sudo().browse(uid)
+
+            # Récupérer tenant_id si l'utilisateur est lié à un tenant
+            tenant_id = None
+            tenant_domain = None
+            if hasattr(user, 'tenant_id') and user.tenant_id:
+                tenant_id = user.tenant_id.id
+                tenant_domain = user.tenant_id.domain
+
+            # Générer JWT access token (15 min)
+            access_token = generate_access_token(
+                user_id=uid,
+                user_login=user.login,
+                tenant_id=tenant_id,
+                tenant_domain=tenant_domain,
+            )
+
+            _logger.info(f"SSO login successful for user {login} (uid={uid}, tenant={tenant_id})")
+
+            # Préparer la réponse avec tokens pour clients Bearer
             user_data = {
                 'success': True,
+                'access_token': access_token,  # JWT pour Authorization: Bearer
+                'expires_in': ACCESS_TOKEN_EXPIRY_MINUTES * 60,  # Secondes
+                'token_type': 'Bearer',
                 'user': {
                     'id': user.id,
                     'name': user.name,
                     'email': user.email or '',
                     'login': user.login,
+                    'tenant_id': tenant_id,
+                    'tenant_domain': tenant_domain,
                 }
             }
 
@@ -200,6 +232,17 @@ class AuthController(http.Controller):
                 COOKIE_NAME_REFRESH,
                 refresh_token_plain,
                 max_age=COOKIE_MAX_AGE_REFRESH,
+                httponly=True,
+                secure=COOKIE_SECURE,
+                samesite=COOKIE_SAMESITE,
+                path='/'
+            )
+
+            # Définir cookie JWT access token (15 min) - optionnel pour clients cookies
+            response.set_cookie(
+                COOKIE_NAME_ACCESS,
+                access_token,
+                max_age=COOKIE_MAX_AGE_ACCESS,
                 httponly=True,
                 secure=COOKIE_SECURE,
                 samesite=COOKIE_SAMESITE,
@@ -422,26 +465,94 @@ class AuthController(http.Controller):
             response_data = {'success': False, 'error': 'Erreur lors de la récupération des informations utilisateur'}
             return request.make_json_response(response_data, headers=cors_headers)
 
+    @http.route('/api/auth/me', type='http', auth='none', methods=['GET', 'OPTIONS'], csrf=False)
+    @require_jwt_auth
+    def get_current_user(self, **kwargs):
+        """
+        Retourne les informations de l'utilisateur authentifié via JWT Bearer.
+
+        Headers requis:
+            Authorization: Bearer <access_token>
+
+        Returns:
+            JSON: {success: true, user: {...}, claims: {...}}
+        """
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        try:
+            # Les claims JWT sont disponibles via self.jwt_claims (défini par @require_jwt_auth)
+            claims = self.jwt_claims
+            user_id = claims.get('uid')
+
+            user = request.env['res.users'].sudo().browse(user_id)
+
+            if not user.exists():
+                return request.make_json_response(
+                    {'success': False, 'error': 'Utilisateur non trouvé'},
+                    headers=cors_headers,
+                    status=404
+                )
+
+            response_data = {
+                'success': True,
+                'user': {
+                    'id': user.id,
+                    'name': user.name,
+                    'email': user.email or '',
+                    'login': user.login,
+                },
+                'claims': {
+                    'tenant_id': claims.get('tenant_id'),
+                    'tenant_domain': claims.get('tenant_domain'),
+                    'exp': claims.get('exp'),
+                    'iat': claims.get('iat'),
+                }
+            }
+
+            return request.make_json_response(response_data, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"[me] Exception: {e}", exc_info=True)
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
     @http.route('/api/auth/refresh', type='json', auth='none', methods=['POST'], csrf=False, cors='*')
     def refresh_token(self, **kwargs):
         """
-        Renouvelle la session en utilisant le refresh token (depuis cookie HttpOnly)
+        Renouvelle les tokens en utilisant le refresh token (depuis cookie HttpOnly).
+        Effectue une rotation du refresh token pour plus de sécurité.
 
         Returns:
-            dict: {success: bool, user: {...}} ou {success: false, error: str}
+            dict: {success: bool, access_token: str, user: {...}} ou {success: false, error: str}
         """
         try:
             # Récupérer le refresh token depuis le cookie
-            refresh_token_plain = request.httprequest.cookies.get(COOKIE_NAME_REFRESH)
+            old_refresh_token = request.httprequest.cookies.get(COOKIE_NAME_REFRESH)
 
-            if not refresh_token_plain:
+            if not old_refresh_token:
                 return {'success': False, 'error': 'Refresh token manquant'}
 
-            # Valider le refresh token
+            # Rotation du refresh token (révoque l'ancien, génère un nouveau)
+            ip_address = request.httprequest.remote_addr
+            user_agent = request.httprequest.headers.get('User-Agent', '')
+
             try:
-                user = request.env['auth.refresh.token'].sudo().validate_token(refresh_token_plain)
+                new_refresh_token, _token_record, user = request.env['auth.refresh.token'].sudo().rotate_token(
+                    old_refresh_token,
+                    ip_address=ip_address,
+                    user_agent=user_agent
+                )
             except AccessDenied as e:
-                _logger.warning(f"Refresh token validation failed: {e}")
+                _logger.warning(f"Refresh token rotation failed: {e}")
                 return {'success': False, 'error': 'Refresh token invalide ou expiré'}
 
             # Créer une nouvelle session Odoo
@@ -453,20 +564,40 @@ class AuthController(http.Controller):
 
             session_id = request.session.sid
 
-            _logger.info(f"Token refreshed for user {user.login} (uid={user.id})")
+            # Récupérer tenant info
+            tenant_id = None
+            tenant_domain = None
+            if hasattr(user, 'tenant_id') and user.tenant_id:
+                tenant_id = user.tenant_id.id
+                tenant_domain = user.tenant_id.domain
 
-            # Préparer la réponse
+            # Générer nouveau JWT access token (15 min)
+            access_token = generate_access_token(
+                user_id=user.id,
+                user_login=user.login,
+                tenant_id=tenant_id,
+                tenant_domain=tenant_domain,
+            )
+
+            _logger.info(f"Token refreshed with rotation for user {user.login} (uid={user.id})")
+
+            # Préparer la réponse avec nouveaux tokens
             response_data = {
                 'success': True,
+                'access_token': access_token,
+                'expires_in': ACCESS_TOKEN_EXPIRY_MINUTES * 60,
+                'token_type': 'Bearer',
                 'user': {
                     'id': user.id,
                     'name': user.name,
                     'email': user.email or '',
                     'login': user.login,
+                    'tenant_id': tenant_id,
+                    'tenant_domain': tenant_domain,
                 }
             }
 
-            # Créer la réponse HTTP pour mettre à jour le cookie session
+            # Créer la réponse HTTP pour mettre à jour les cookies
             response = request.make_json_response(response_data)
 
             # Renouveler le cookie session (30 min)
@@ -474,6 +605,28 @@ class AuthController(http.Controller):
                 COOKIE_NAME_SESSION,
                 session_id,
                 max_age=COOKIE_MAX_AGE_SESSION,
+                httponly=True,
+                secure=COOKIE_SECURE,
+                samesite=COOKIE_SAMESITE,
+                path='/'
+            )
+
+            # Mettre à jour le cookie refresh token (rotation)
+            response.set_cookie(
+                COOKIE_NAME_REFRESH,
+                new_refresh_token,
+                max_age=COOKIE_MAX_AGE_REFRESH,
+                httponly=True,
+                secure=COOKIE_SECURE,
+                samesite=COOKIE_SAMESITE,
+                path='/'
+            )
+
+            # Mettre à jour le cookie JWT access token
+            response.set_cookie(
+                COOKIE_NAME_ACCESS,
+                access_token,
+                max_age=COOKIE_MAX_AGE_ACCESS,
                 httponly=True,
                 secure=COOKIE_SECURE,
                 samesite=COOKIE_SAMESITE,
@@ -524,6 +677,15 @@ class AuthController(http.Controller):
             )
             response.set_cookie(
                 COOKIE_NAME_REFRESH,
+                '',
+                max_age=0,
+                httponly=True,
+                secure=COOKIE_SECURE,
+                samesite=COOKIE_SAMESITE,
+                path='/'
+            )
+            response.set_cookie(
+                COOKIE_NAME_ACCESS,
                 '',
                 max_age=0,
                 httponly=True,

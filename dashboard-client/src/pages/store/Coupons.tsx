@@ -13,7 +13,7 @@ interface EditFormData {
   date_from: string
   date_to: string
   discount_type: string
-  discount_value: number
+  discountvalue: number
 }
 
 export default function Coupons() {
@@ -40,7 +40,7 @@ export default function Coupons() {
     date_from: '',
     date_to: '',
     discount_type: 'percent',
-    discount_value: 0,
+    discountvalue: 0,
   })
 
   const formatDate = (dateString: string | null) => {
@@ -74,7 +74,7 @@ export default function Coupons() {
       date_from: formatDateForInput(coupon.date_from),
       date_to: formatDateForInput(coupon.date_to),
       discount_type: coupon.reward?.discount_mode || 'percent',
-      discount_value:
+      discountvalue:
         coupon.reward?.discount_mode === 'percent'
           ? coupon.reward?.discount || 0
           : coupon.reward?.discount_fixed_amount || 0,
@@ -100,7 +100,7 @@ export default function Coupons() {
           date_from: editForm.date_from || null,
           date_to: editForm.date_to || null,
           discount_type: editForm.discount_type,
-          discount_value: editForm.discount_value,
+          discountvalue: editForm.discountvalue,
         },
       })
       addToast('success', 'Coupon mis à jour avec succès')
@@ -422,9 +422,9 @@ export default function Coupons() {
                   type="number"
                   min="0"
                   step="0.01"
-                  value={editForm.discount_value}
+                  value={editForm.discountvalue}
                   onChange={(e) =>
-                    setEditForm({ ...editForm, discount_value: parseFloat(e.target.value) || 0 })
+                    setEditForm({ ...editForm, discountvalue: parseFloat(e.target.value) || 0 })
                   }
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                 />

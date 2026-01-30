@@ -27,7 +27,7 @@ import { useToast } from '@/hooks/useToast'
 
 export function Settings() {
   const queryClient = useQueryClient()
-  const { showToast } = useToast()
+  const toast = useToast()
   const [newDomain, setNewDomain] = useState('')
   const [domainError, setDomainError] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<CorsEntry | null>(null)
@@ -52,12 +52,12 @@ export function Settings() {
       })
     },
     onSuccess: () => {
-      showToast('Domaine ajouté avec succès', 'success')
+      toast.success('Domaine ajouté avec succès')
       setNewDomain('')
       queryClient.invalidateQueries({ queryKey: ['super-admin-cors'] })
     },
     onError: () => {
-      showToast('Erreur lors de l\'ajout du domaine', 'error')
+      toast.error('Erreur lors de l\'ajout du domaine')
     },
   })
 
@@ -69,12 +69,12 @@ export function Settings() {
       })
     },
     onSuccess: () => {
-      showToast('Domaine supprimé', 'success')
+      toast.success('Domaine supprimé')
       setDeleteTarget(null)
       queryClient.invalidateQueries({ queryKey: ['super-admin-cors'] })
     },
     onError: () => {
-      showToast('Erreur lors de la suppression', 'error')
+      toast.error('Erreur lors de la suppression')
     },
   })
 
@@ -256,8 +256,8 @@ export function Settings() {
           onConfirm={() => removeDomain.mutate(deleteTarget.id)}
           title="Supprimer le domaine"
           message={`Êtes-vous sûr de vouloir supprimer "${deleteTarget.domain}" de la whitelist ? Les requêtes depuis ce domaine seront bloquées.`}
-          confirmLabel="Supprimer"
-          confirmVariant="danger"
+          confirmText="Supprimer"
+          variant="danger"
           isLoading={removeDomain.isPending}
         />
       )}

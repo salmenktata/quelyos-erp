@@ -170,7 +170,7 @@ export function Dashboard() {
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{tenant.name}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300">
-                        {tenant.plan_code.toUpperCase()}
+                        {tenant.plan?.toUpperCase() ?? 'N/A'}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-right font-medium text-gray-900 dark:text-white">
@@ -207,25 +207,27 @@ export function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {metrics.at_risk_customers.map((tenant) => (
-                  <tr key={tenant.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{tenant.name}</td>
-                    <td className="px-6 py-4 text-sm">
-                      <span
-                        className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          tenant.subscription_state === 'past_due'
-                            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-                            : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
-                        }`}
-                      >
-                        {tenant.subscription_state}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {tenant.users_count}/{tenant.max_users} users
+                {metrics.at_risk_customers.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="px-6 py-4 text-sm text-center text-gray-500 dark:text-gray-400">
+                      Aucun customer à risque
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  metrics.at_risk_customers.map((tenant) => (
+                    <tr key={tenant.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{tenant.name}</td>
+                      <td className="px-6 py-4 text-sm">
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300">
+                          {tenant.plan?.toUpperCase() ?? 'N/A'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-right font-medium text-gray-900 dark:text-white">
+                        {tenant.mrr.toLocaleString('fr-FR')} €
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -261,10 +263,10 @@ export function Dashboard() {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {metrics.recent_subscriptions.map((sub) => (
                 <tr key={sub.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{sub.tenant_name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">{sub.name}</td>
                   <td className="px-6 py-4 text-sm">
                     <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
-                      {sub.plan_code.toUpperCase()}
+                      {sub.plan?.toUpperCase() ?? 'N/A'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm">
@@ -281,7 +283,7 @@ export function Dashboard() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                    {new Date(sub.start_date).toLocaleDateString('fr-FR')}
+                    {sub.created_at ? new Date(sub.created_at).toLocaleDateString('fr-FR') : 'N/A'}
                   </td>
                   <td className="px-6 py-4 text-sm text-right font-medium text-gray-900 dark:text-white">
                     {sub.mrr.toLocaleString('fr-FR')} €

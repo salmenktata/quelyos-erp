@@ -242,9 +242,9 @@ export interface AbandonedCartsQueryParams {
 export interface CartRecoveryStats {
   period: string
   abandoned_count: number
-  abandoned_value: number
+  abandonedvalue: number
   recovered_count: number
-  recovered_value: number
+  recoveredvalue: number
   recovery_rate: number
 }
 
@@ -264,8 +264,8 @@ export interface OrderTracking {
 export interface OrderHistoryTrackingValue {
   field: string
   field_desc: string
-  old_value: string
-  new_value: string
+  oldvalue: string
+  newvalue: string
 }
 
 export interface OrderHistoryItem {
@@ -275,7 +275,7 @@ export interface OrderHistoryItem {
   body: string
   message_type: string
   subtype: string | null
-  tracking_values: OrderHistoryTrackingValue[]
+  trackingvalues: OrderHistoryTrackingValue[]
 }
 
 // ==================== PAGINATION ====================
@@ -314,7 +314,7 @@ export interface ProductsQueryParams {
   include_archived?: boolean;
   price_min?: number;
   price_max?: number;
-  attribute_value_ids?: number[];
+  attributevalue_ids?: number[];
   sort?: string;
   sort_by?: string;
   sort_order?: string;
@@ -324,7 +324,7 @@ export interface CouponCreate {
   code: string;
   name?: string;
   discount_type: 'percentage' | 'fixed_amount';
-  discount_value: number;
+  discountvalue: number;
   min_amount?: number;
   max_discount?: number;
   max_usage?: number;

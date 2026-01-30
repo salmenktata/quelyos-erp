@@ -12,19 +12,25 @@ import { z } from 'zod'
 export const TenantSchema = z.object({
   id: z.number(),
   name: z.string(),
+  code: z.string().optional(),
   domain: z.string(),
-  logo: z.string().optional(),
-  slogan: z.string().optional(),
-  subscription_id: z.number(),
-  subscription_state: z.enum(['trial', 'active', 'past_due', 'cancelled', 'expired']),
-  plan_code: z.enum(['starter', 'pro', 'enterprise']),
-  plan_name: z.string(),
+  status: z.enum(['provisioning', 'active', 'suspended', 'archived']).optional(),
+  logo: z.string().nullable().optional(),
+  slogan: z.string().nullable().optional(),
+  subscription_id: z.number().nullable().optional(),
+  subscription_state: z.union([
+    z.enum(['trial', 'active', 'past_due', 'cancelled', 'expired']),
+    z.literal(false),
+    z.null(),
+  ]).optional(),
+  plan_code: z.enum(['starter', 'pro', 'enterprise']).nullable().optional(),
+  plan_name: z.string().nullable().optional(),
   users_count: z.number().nonnegative(),
   products_count: z.number().nonnegative(),
   orders_count: z.number().nonnegative(),
-  max_users: z.number().positive(),
-  max_products: z.number().positive(),
-  max_orders_per_year: z.number().positive(),
+  max_users: z.number().nonnegative(), // 0 = illimité
+  max_products: z.number().nonnegative(), // 0 = illimité
+  max_orders_per_year: z.number().nonnegative(), // 0 = illimité
   mrr: z.number().nonnegative(),
   features: z.object({
     wishlist_enabled: z.boolean(),
@@ -33,35 +39,36 @@ export const TenantSchema = z.object({
     product_comparison_enabled: z.boolean(),
     guest_checkout_enabled: z.boolean(),
   }),
-  provisioning_job_id: z.number().optional(),
-  provisioning_status: z.enum(['pending', 'running', 'completed', 'failed']).optional(),
+  provisioning_job_id: z.number().nullable().optional(),
+  provisioning_status: z.enum(['pending', 'running', 'completed', 'failed']).nullable().optional(),
   created_at: z.string(),
 })
 
 export const SubscriptionSchema = z.object({
   id: z.number(),
-  tenant_id: z.number(),
-  tenant_name: z.string(),
-  tenant_domain: z.string(),
-  plan_id: z.number(),
-  plan_code: z.enum(['starter', 'pro', 'enterprise']),
-  plan_name: z.string(),
+  name: z.string().optional(),
+  tenant_id: z.number().nullable().optional(),
+  tenant_name: z.string().nullable().optional(),
+  tenant_domain: z.string().nullable().optional(),
+  plan_id: z.number().nullable().optional(),
+  plan_code: z.enum(['starter', 'pro', 'enterprise']).nullable().optional(),
+  plan_name: z.string().nullable().optional(),
   state: z.enum(['trial', 'active', 'past_due', 'cancelled', 'expired']),
   billing_cycle: z.enum(['monthly', 'yearly']),
   mrr: z.number().nonnegative(),
   price: z.number().nonnegative(),
-  start_date: z.string(),
-  trial_end_date: z.string().optional(),
-  next_billing_date: z.string().optional(),
-  end_date: z.string().optional(),
-  stripe_subscription_id: z.string().optional(),
-  stripe_customer_id: z.string().optional(),
-  users_usage: z.number().nonnegative(),
-  max_users: z.number().positive(),
-  products_usage: z.number().nonnegative(),
-  max_products: z.number().positive(),
-  orders_usage: z.number().nonnegative(),
-  max_orders_per_year: z.number().positive(),
+  start_date: z.string().nullable().optional(),
+  trial_end_date: z.string().nullable().optional(),
+  next_billing_date: z.string().nullable().optional(),
+  end_date: z.string().nullable().optional(),
+  stripe_subscription_id: z.string().nullable().optional(),
+  stripe_customer_id: z.string().nullable().optional(),
+  users_usage: z.number().nonnegative().optional(),
+  max_users: z.number().nonnegative(), // 0 = illimité
+  products_usage: z.number().nonnegative().optional(),
+  max_products: z.number().nonnegative(), // 0 = illimité
+  orders_usage: z.number().nonnegative().optional(),
+  max_orders_per_year: z.number().nonnegative(), // 0 = illimité
 })
 
 export const InvoiceSchema = z.object({
@@ -118,7 +125,25 @@ export const SystemHealthSchema = z.object({
 // SCHEMAS COMPOSÉS
 // ============================================================================
 
+// Schémas simplifiés pour le dashboard
+export const TopCustomerSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  mrr: z.number().nonnegative(),
+  plan: z.enum(['starter', 'pro', 'enterprise']).nullable().optional(),
+})
+
+export const RecentSubscriptionSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  plan: z.enum(['starter', 'pro', 'enterprise']).nullable().optional(),
+  state: z.enum(['trial', 'active', 'past_due', 'cancelled', 'expired']),
+  mrr: z.number().nonnegative(),
+  created_at: z.string().nullable().optional(),
+})
+
 export const DashboardMetricsSchema = z.object({
+  success: z.boolean().optional(),
   mrr: z.number().nonnegative(),
   arr: z.number().nonnegative(),
   active_subscriptions: z.number().nonnegative(),
@@ -135,9 +160,9 @@ export const DashboardMetricsSchema = z.object({
       revenue: z.number().nonnegative(),
     })
   ),
-  top_customers: z.array(TenantSchema),
-  at_risk_customers: z.array(TenantSchema),
-  recent_subscriptions: z.array(SubscriptionSchema),
+  top_customers: z.array(TopCustomerSchema),
+  at_risk_customers: z.array(TopCustomerSchema),
+  recent_subscriptions: z.array(RecentSubscriptionSchema),
 })
 
 export const MRRBreakdownSchema = z.object({
@@ -163,10 +188,11 @@ export const InvoicesSummarySchema = z.object({
 })
 
 export const TenantsResponseSchema = z.object({
+  success: z.boolean().optional(),
   data: z.array(TenantSchema),
   total: z.number().nonnegative(),
-  page: z.number().positive().optional(),
-  limit: z.number().positive().optional(),
+  page: z.number().nonnegative().optional(),
+  limit: z.number().nonnegative().optional(),
 })
 
 // ============================================================================

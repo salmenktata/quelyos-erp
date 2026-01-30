@@ -20,7 +20,7 @@ interface ProductVariant {
   standard_price?: number
   list_price: number
   image?: string | null
-  attribute_values: Array<{
+  attributevalues: Array<{
     id?: number
     name?: string
     attribute_id?: number
@@ -72,10 +72,10 @@ export function VariantStockTable({ productId, variants, onStockUpdated }: Props
 
   // Formater les attributs pour affichage
   const formatAttributes = (variant: ProductVariant) => {
-    if (!variant.attribute_values || variant.attribute_values.length === 0) {
+    if (!variant.attributevalues || variant.attributevalues.length === 0) {
       return 'Variante unique'
     }
-    return variant.attribute_values.map((av) => av.value_name).join(', ')
+    return variant.attributevalues.map((av) => av.value_name).join(', ')
   }
 
   // Badge de statut stock

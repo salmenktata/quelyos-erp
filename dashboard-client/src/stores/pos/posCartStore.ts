@@ -81,7 +81,7 @@ interface OrderCreateData {
   }[]
   partner_id: number | null
   discount_type: 'percent' | 'fixed' | null
-  discount_value: number
+  discountvalue: number
   note: string | null
 }
 
@@ -391,7 +391,7 @@ export const usePOSCartStore = create<CartState>()(
           })),
           partner_id: state.customer?.id || null,
           discount_type: state.discountType,
-          discount_value: state.discountValue,
+          discountvalue: state.discountValue,
           note: state.note || null,
         }
       },

@@ -18,7 +18,7 @@ export default function CouponForm() {
     name: '',
     code: '',
     discount_type: 'percentage',
-    discount_value: 0,
+    discountvalue: 0,
     date_from: '',
     date_to: '',
     max_usage: 0,
@@ -55,12 +55,12 @@ export default function CouponForm() {
       newErrors.code = 'Le code doit contenir au moins 3 caractères'
     }
 
-    if (formData.discount_value <= 0) {
-      newErrors.discount_value = 'La réduction doit être supérieure à 0'
+    if (formData.discountvalue <= 0) {
+      newErrors.discountvalue = 'La réduction doit être supérieure à 0'
     }
 
-    if (formData.discount_type === 'percentage' && formData.discount_value > 100) {
-      newErrors.discount_value = 'Le pourcentage ne peut pas dépasser 100%'
+    if (formData.discount_type === 'percentage' && formData.discountvalue > 100) {
+      newErrors.discountvalue = 'Le pourcentage ne peut pas dépasser 100%'
     }
 
     if (formData.date_from && formData.date_to) {
@@ -89,7 +89,7 @@ export default function CouponForm() {
         name: formData.name,
         code: formData.code.toUpperCase(), // Mettre en majuscules
         discount_type: formData.discount_type,
-        discount_value: formData.discount_value,
+        discountvalue: formData.discountvalue,
       }
 
       // Ajouter les champs optionnels seulement s'ils sont remplis
@@ -184,11 +184,11 @@ export default function CouponForm() {
             <Input
               label="Valeur de la réduction"
               type="number"
-              id="discount_value"
-              name="discount_value"
-              value={formData.discount_value.toString()}
+              id="discountvalue"
+              name="discountvalue"
+              value={formData.discountvalue.toString()}
               onChange={handleChange}
-              error={errors.discount_value}
+              error={errors.discountvalue}
               required
               min="0"
               max={formData.discount_type === 'percentage' ? '100' : undefined}

@@ -534,7 +534,7 @@ class ApiClient {
           standard_price: number
           qty_available: number
           image: string | null
-          attribute_values: Array<{
+          attributevalues: Array<{
             id: number
             name: string
             attribute_id: number
@@ -1379,7 +1379,7 @@ class ApiClient {
       date_from?: string | null
       date_to?: string | null
       discount_type?: string
-      discount_value?: number
+      discountvalue?: number
     }
   ) {
     return this.request<{

@@ -88,7 +88,7 @@ async function createOrder(params: CreateOrderParams): Promise<POSOrder> {
     lines: params.lines,
     partner_id: params.partnerId,
     discount_type: params.discountType,
-    discount_value: params.discountValue,
+    discountvalue: params.discountValue,
     note: params.note,
     offline_id: params.offlineId,
   })
@@ -217,7 +217,7 @@ export function usePOSCheckout() {
       lines: orderData.lines,
       partnerId: orderData.partner_id,
       discountType: orderData.discount_type,
-      discountValue: orderData.discount_value,
+      discountValue: orderData.discountvalue,
       note: orderData.note || undefined,
     })
 

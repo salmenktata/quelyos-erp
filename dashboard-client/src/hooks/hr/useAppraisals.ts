@@ -75,8 +75,8 @@ export interface Goal {
   priority_label: string
   goal_type: string
   goal_type_label: string
-  target_value: number
-  current_value: number
+  targetvalue: number
+  currentvalue: number
   unit: string
   appraisal_id: number | null
   notes: string
@@ -276,7 +276,7 @@ export function useCreateGoal() {
       period_start?: string
       priority?: string
       goal_type?: string
-      target_value?: number
+      targetvalue?: number
       unit?: string
       appraisal_id?: number
     }) => {

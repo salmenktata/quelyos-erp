@@ -138,7 +138,7 @@ interface TransactionListPageProps {
 
 export function TransactionListPage({ type }: TransactionListPageProps) {
   useRequireAuth();
-  const { _currency, formatAmount } = useCurrency();
+  const { currency, formatAmount } = useCurrency();
   const config = CONFIGS[type];
 
   // State

@@ -4,8 +4,8 @@ import { formatDate } from '../../lib/utils/formatters'
 
 interface TrackingValue {
   field_desc: string
-  old_value: string | null
-  new_value: string | null
+  oldvalue: string | null
+  newvalue: string | null
 }
 
 interface HistoryItem {
@@ -13,7 +13,7 @@ interface HistoryItem {
   author: string
   date: string | null
   body?: string | null
-  tracking_values?: TrackingValue[]
+  trackingvalues?: TrackingValue[]
   subtype?: string | null
   message_type?: string | null
 }
@@ -50,16 +50,16 @@ export function OrderHistory({ history, isLoading }: OrderHistoryProps) {
               <p className="text-xs text-gray-500 dark:text-gray-400">{item.date ? formatDate(item.date) : '-'}</p>
             </div>
 
-            {item.tracking_values && item.tracking_values.length > 0 ? (
+            {item.trackingvalues && item.trackingvalues.length > 0 ? (
               <div className="space-y-1">
-                {item.tracking_values.map((tracking, idx) => (
+                {item.trackingvalues.map((tracking, idx) => (
                   <div key={idx} className="text-xs text-gray-600 dark:text-gray-400">
                     <span className="font-medium">{tracking.field_desc} : </span>
                     <span className="line-through text-red-600 dark:text-red-400">
-                      {tracking.old_value || '(vide)'}
+                      {tracking.oldvalue || '(vide)'}
                     </span>
                     {' → '}
-                    <span className="text-green-600 dark:text-green-400">{tracking.new_value || '(vide)'}</span>
+                    <span className="text-green-600 dark:text-green-400">{tracking.newvalue || '(vide)'}</span>
                   </div>
                 ))}
               </div>

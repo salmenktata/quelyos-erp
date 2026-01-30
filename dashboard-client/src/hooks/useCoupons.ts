@@ -43,7 +43,7 @@ export function useUpdateCoupon() {
         date_from?: string | null
         date_to?: string | null
         discount_type?: string
-        discount_value?: number
+        discountvalue?: number
       }
     }) => api.updateCoupon(id, data),
     onSuccess: (_, variables) => {

@@ -30,7 +30,7 @@ import { useToast } from '@/hooks/useToast'
 
 export function Backups() {
   const queryClient = useQueryClient()
-  const { showToast } = useToast()
+  const toast = useToast()
   const [restoreTarget, setRestoreTarget] = useState<Backup | null>(null)
   const [backupType, setBackupType] = useState<'full' | 'incremental'>('full')
 
@@ -55,11 +55,11 @@ export function Backups() {
       })
     },
     onSuccess: () => {
-      showToast('Backup déclenché avec succès', 'success')
+      toast.success('Backup déclenché avec succès')
       queryClient.invalidateQueries({ queryKey: ['super-admin-backups'] })
     },
     onError: () => {
-      showToast('Erreur lors du déclenchement du backup', 'error')
+      toast.error('Erreur lors du déclenchement du backup')
     },
   })
 
@@ -71,12 +71,12 @@ export function Backups() {
       })
     },
     onSuccess: () => {
-      showToast('Restauration lancée avec succès', 'success')
+      toast.success('Restauration lancée avec succès')
       setRestoreTarget(null)
       queryClient.invalidateQueries({ queryKey: ['super-admin-backups'] })
     },
     onError: () => {
-      showToast('Erreur lors de la restauration', 'error')
+      toast.error('Erreur lors de la restauration')
     },
   })
 
@@ -269,8 +269,8 @@ export function Backups() {
           onConfirm={() => restoreBackup.mutate(restoreTarget.id)}
           title="Confirmer la restauration"
           message={`Êtes-vous sûr de vouloir restaurer le backup "${restoreTarget.filename}" ? Cette action est irréversible et écrasera les données actuelles.`}
-          confirmLabel="Restaurer"
-          confirmVariant="danger"
+          confirmText="Restaurer"
+          variant="danger"
           isLoading={restoreBackup.isPending}
         />
       )}

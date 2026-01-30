@@ -89,7 +89,7 @@ export function usePOSSync(options: UsePOSSyncOptions = {}) {
             amount: p.amount,
           })),
           discount_type: order.discountType,
-          discount_value: order.discountValue,
+          discountvalue: order.discountValue,
           note: order.note,
         }],
       })
