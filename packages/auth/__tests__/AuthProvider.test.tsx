@@ -13,7 +13,8 @@ import {
 } from "../jest.setup";
 
 // Mock fetch
-global.fetch = jest.fn();
+const mockFetch = jest.fn<typeof fetch>();
+global.fetch = mockFetch;
 
 const createWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (
@@ -24,14 +25,14 @@ const createWrapper = () => {
 describe("@quelyos/auth", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockClear();
+    mockFetch.mockClear();
     mockPathname.mockReturnValue("/");
   });
 
   describe("useAuth hook", () => {
     it("devrait initialiser avec user=null et isLoading=true", async () => {
       // Mock initial auth check to fail
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
         json: async () => ({ error: "Non authentifié" }),
@@ -58,7 +59,7 @@ describe("@quelyos/auth", () => {
       };
 
       // Auth check succeeds
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
         json: async () => ({ user: mockUser }),
@@ -76,7 +77,7 @@ describe("@quelyos/auth", () => {
     });
 
     it("devrait gérer l'échec de chargement utilisateur", async () => {
-      (global.fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce(
+      mockFetch.mockResolvedValueOnce(
         {
           ok: false,
           status: 401,
@@ -105,7 +106,7 @@ describe("@quelyos/auth", () => {
       };
 
       // Initial auth check fails
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
         json: async () => ({ error: "Non authentifié" }),
@@ -120,7 +121,7 @@ describe("@quelyos/auth", () => {
       });
 
       // Login succeeds
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
         json: async () => ({ user: mockUser }),
@@ -136,7 +137,7 @@ describe("@quelyos/auth", () => {
 
     it("devrait gérer l'échec de connexion", async () => {
       // Initial auth check fails
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
         json: async () => ({ error: "Non authentifié" }),
@@ -151,7 +152,7 @@ describe("@quelyos/auth", () => {
       });
 
       // Login fails
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
         json: async () => ({ error: "Identifiants invalides" }),
@@ -174,7 +175,7 @@ describe("@quelyos/auth", () => {
       };
 
       // Auth check succeeds
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
         json: async () => ({ user: mockUser }),
@@ -189,7 +190,7 @@ describe("@quelyos/auth", () => {
       });
 
       // Logout succeeds
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
         json: async () => ({ success: true }),
@@ -213,7 +214,7 @@ describe("@quelyos/auth", () => {
       };
 
       // Initial auth check fails with 401
-      (global.fetch as jest.Mock)
+      mockFetch
         .mockResolvedValueOnce({
           ok: false,
           status: 401,

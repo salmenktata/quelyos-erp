@@ -15,10 +15,13 @@ export interface User {
 export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  isAuthenticated?: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; user?: User; error?: string } | void>;
   logout: () => Promise<void>;
-  checkAuth: () => Promise<void>;
-  fetchWithAuth: (url: string, options?: RequestInit) => Promise<Response>;
+  refreshToken?: () => Promise<boolean>;
+  getToken?: () => string | null;
+  checkAuth?: () => Promise<void>;
+  fetchWithAuth?: (url: string, options?: RequestInit) => Promise<Response>;
 }
 
 export interface AuthProviderProps {

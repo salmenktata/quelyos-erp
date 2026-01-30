@@ -2,11 +2,11 @@ import "@testing-library/jest-dom";
 import { jest } from "@jest/globals";
 
 // Mock Next.js navigation with default implementations
-const mockPush = jest.fn();
-const mockReplace = jest.fn();
-const mockRefresh = jest.fn();
-const mockPathname = jest.fn(() => "/");
-const mockSearchParams = jest.fn(() => new URLSearchParams());
+const mockPush: ReturnType<typeof jest.fn> = jest.fn();
+const mockReplace: ReturnType<typeof jest.fn> = jest.fn();
+const mockRefresh: ReturnType<typeof jest.fn> = jest.fn();
+const mockPathname: ReturnType<typeof jest.fn> = jest.fn(() => "/");
+const mockSearchParams: ReturnType<typeof jest.fn> = jest.fn(() => new URLSearchParams());
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({

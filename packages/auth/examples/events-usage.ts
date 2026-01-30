@@ -3,14 +3,18 @@
  * Ce fichier montre comment réagir aux événements auth dans vos composants
  */
 
-import { useEffect } from "react";
 import { authEvents, useAuthEvent } from "@quelyos/auth";
+
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
 
 // Exemple 1 : Analytics tracking
 export function setupAuthAnalytics() {
   // Logger les logins pour analytics
   authEvents.on("login", ({ userId, email }) => {
-    // @ts-ignore - Exemple avec Google Analytics
     if (typeof window !== "undefined" && window.gtag) {
       window.gtag("event", "login", {
         user_id: userId,
@@ -23,7 +27,6 @@ export function setupAuthAnalytics() {
 
   // Logger les logouts
   authEvents.on("logout", ({ userId }) => {
-    // @ts-ignore
     if (typeof window !== "undefined" && window.gtag) {
       window.gtag("event", "logout", {
         user_id: userId,

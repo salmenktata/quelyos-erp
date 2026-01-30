@@ -44,7 +44,7 @@ export function AuthProviderVite({
     if (apiBaseUrl) return apiBaseUrl;
 
     // Vite env variables
-    const envUrl = import.meta.env?.VITE_API_URL || import.meta.env?.VITE_API_BASE_URL;
+    const envUrl = (import.meta as unknown as Record<string, Record<string, string>>).env?.VITE_API_URL || (import.meta as unknown as Record<string, Record<string, string>>).env?.VITE_API_BASE_URL;
     if (envUrl) return envUrl.replace(/\/$/, "");
 
     // Fallback
@@ -75,17 +75,17 @@ export function AuthProviderVite({
       if (data.success && data.valid && data.user) {
         setUser(data.user);
         authLogger.tokenRefreshSuccess();
-        authEvents.emit("tokenRefreshed", data.user);
+        authEvents.emit("token_refresh", { success: true });
         return true;
       } else {
         // Token invalide
         localStorage.removeItem(tokenKey);
         setUser(null);
-        authLogger.tokenRefreshFailed();
+        authLogger.tokenRefreshFailure("Token invalid");
         return false;
       }
     } catch (error) {
-      authLogger.error("Token verification failed", error);
+      authLogger.error("Token verification failed", error instanceof Error ? error : new Error(String(error)));
       localStorage.removeItem(tokenKey);
       setUser(null);
       if (onAuthError) onAuthError(error as Error);
@@ -120,13 +120,13 @@ export function AuthProviderVite({
         localStorage.setItem(tokenKey, data.token);
         setUser(data.user);
 
-        authLogger.loginSuccess(data.user);
-        authEvents.emit("login", data.user);
+        authLogger.loginSuccess(data.user?.id || "", email);
+        authEvents.emit("login", { userId: data.user?.id || "", email });
 
         return { success: true, user: data.user };
       } catch (error) {
-        authLogger.loginFailed(email, error);
-        authEvents.emit("loginError", error);
+        authLogger.loginFailure(email, error instanceof Error ? error.message : "Login failed");
+        authEvents.emit("auth_error", { error: error instanceof Error ? error : new Error(String(error)), context: "login" });
         if (onAuthError) onAuthError(error as Error);
         return {
           success: false,
@@ -143,7 +143,8 @@ export function AuthProviderVite({
    * Logout
    */
   const logout = useCallback(async () => {
-    authLogger.logout();
+    const currentUserId = user?.id || "";
+    authLogger.logoutInitiated(currentUserId);
 
     try {
       const token = localStorage.getItem(tokenKey);
@@ -157,13 +158,13 @@ export function AuthProviderVite({
         });
       }
     } catch (error) {
-      authLogger.error("Logout API call failed", error);
+      authLogger.error("Logout API call failed", error instanceof Error ? error : new Error(String(error)));
     } finally {
       localStorage.removeItem(tokenKey);
       setUser(null);
-      authEvents.emit("logout");
+      authEvents.emit("logout", { userId: currentUserId });
     }
-  }, [getApiBase, tokenKey]);
+  }, [getApiBase, tokenKey, user]);
 
   /**
    * Refresh token
@@ -192,14 +193,14 @@ export function AuthProviderVite({
         localStorage.setItem(tokenKey, data.token);
         if (data.user) setUser(data.user);
         authLogger.tokenRefreshSuccess();
-        authEvents.emit("tokenRefreshed", data.user);
+        authEvents.emit("token_refresh", { success: true });
         return true;
       } else {
         await logout();
         return false;
       }
     } catch (error) {
-      authLogger.tokenRefreshFailed();
+      authLogger.tokenRefreshFailure("Refresh request failed");
       await logout();
       return false;
     } finally {
