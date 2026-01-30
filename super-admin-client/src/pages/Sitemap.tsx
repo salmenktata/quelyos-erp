@@ -279,11 +279,19 @@ export function Sitemap() {
           <div className="flex flex-wrap gap-2">
             {(['static', 'dynamic'] as RouteType[]).map(type => {
               const isSelected = selectedTypes.has(type)
-              const count = enrichedSitemapData.reduce(
-                (acc, app) =>
-                  acc + app.routes.filter((r: AppRoute & { type: RouteType }) => r.type === type).length,
-                0
-              )
+              // Calculer count en tenant compte des filtres Apps et Modules
+              const count = enrichedSitemapData.reduce((acc, app) => {
+                // Skip si app filtrée
+                if (selectedApps.size > 0 && !selectedApps.has(app.id)) {
+                  return acc
+                }
+
+                // Filtrer routes par module et compter type
+                return acc + app.routes.filter((r: AppRoute & { type: RouteType }) => {
+                  const matchModule = selectedModules.size === 0 || (r.module && selectedModules.has(r.module))
+                  return matchModule && r.type === type
+                }).length
+              }, 0)
               return (
                 <button
                   key={type}
