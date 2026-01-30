@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos API',
-    'version': '19.0.1.12.0',
+    'version': '19.0.1.13.0',
     'category': 'Quelyos/API',
     'summary': 'API REST pour frontend e-commerce et backoffice',
     'author': 'Quelyos',
@@ -55,6 +55,7 @@
         # 'data/hr_sequence.xml',  # TEMPORAIREMENT DÉSACTIVÉ
         'data/ticket_sequence.xml',
         'data/sla_policies.xml',
+        'data/email_template_satisfaction_request.xml',
         'data/pos_demo_data.xml',
         'data/store_demo_data.xml',
         'data/theme_data.xml',

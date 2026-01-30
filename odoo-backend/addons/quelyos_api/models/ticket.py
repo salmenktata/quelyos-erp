@@ -105,6 +105,20 @@ class SupportTicket(models.Model):
         ('5', 'Très satisfait'),
     ], string='Satisfaction')
     satisfaction_comment = fields.Text('Commentaire satisfaction')
+    satisfaction_token = fields.Char(
+        'Token satisfaction',
+        copy=False,
+        help='Token unique pour accès sécurisé au formulaire de satisfaction'
+    )
+    satisfaction_email_sent = fields.Boolean(
+        'Email satisfaction envoyé',
+        default=False,
+        help='Indique si l\'email de demande de satisfaction a été envoyé'
+    )
+    satisfaction_email_sent_date = fields.Datetime(
+        'Date envoi email satisfaction',
+        help='Date d\'envoi de l\'email de demande de satisfaction'
+    )
 
     # Champs Super Admin
     internal_notes = fields.Html(
@@ -289,7 +303,10 @@ class SupportTicket(models.Model):
         })
 
     def write(self, vals):
-        """Surcharge write pour publier changements WebSocket"""
+        """Surcharge write pour publier changements WebSocket et envoyer email satisfaction"""
+        # Mémoriser anciens états pour détecter changements
+        old_states = {ticket.id: ticket.state for ticket in self}
+
         result = super().write(vals)
 
         if 'state' in vals or 'priority' in vals:
@@ -299,6 +316,13 @@ class SupportTicket(models.Model):
                     'state': ticket.state,
                     'priority': ticket.priority,
                 })
+
+        # Envoyer email satisfaction automatique lors résolution
+        if 'state' in vals and vals['state'] == 'resolved':
+            for ticket in self:
+                # Envoyer seulement si ticket vient d'être résolu (pas déjà résolu)
+                if old_states.get(ticket.id) != 'resolved' and not ticket.satisfaction_email_sent:
+                    ticket._send_satisfaction_email()
 
         return result
 
@@ -359,6 +383,41 @@ class SupportTicket(models.Model):
             'resolvedAt': self.resolution_date.isoformat() if self.resolution_date else None,
         })
         return data
+
+    def _send_satisfaction_email(self):
+        """Envoyer email de demande de satisfaction au client"""
+        self.ensure_one()
+
+        # Ne pas envoyer si déjà envoyé
+        if self.satisfaction_email_sent:
+            return
+
+        # Générer token unique si non existant
+        if not self.satisfaction_token:
+            import secrets
+            self.satisfaction_token = secrets.token_urlsafe(32)
+
+        # Trouver le template email
+        template = self.env.ref('quelyos_api.email_template_satisfaction_request', raise_if_not_found=False)
+        if not template:
+            # Fallback : créer template basique
+            return
+
+        # URL formulaire satisfaction (frontend publique)
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        satisfaction_url = f"{base_url}/satisfaction/{self.satisfaction_token}"
+
+        # Envoyer email
+        template.with_context(
+            satisfaction_url=satisfaction_url,
+            ticket=self,
+        ).send_mail(self.id, force_send=True)
+
+        # Marquer comme envoyé
+        self.write({
+            'satisfaction_email_sent': True,
+            'satisfaction_email_sent_date': fields.Datetime.now(),
+        })
 
 
 class TicketMessage(models.Model):

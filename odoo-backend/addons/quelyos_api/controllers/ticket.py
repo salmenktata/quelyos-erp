@@ -499,3 +499,141 @@ class TicketController(BaseController):
                 'success': False,
                 'error': str(e)
             }, headers=cors_headers, status=500)
+
+    # Routes publiques satisfaction (sans authentification)
+    @http.route('/api/tickets/satisfaction/<string:token>/info', type='http', auth='public',
+                methods=['GET', 'OPTIONS'], csrf=False)
+    def get_satisfaction_info(self, token):
+        """Récupérer infos ticket pour formulaire satisfaction (route publique)"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        try:
+            # Rechercher ticket par token (sudo car route publique)
+            ticket = request.env['quelyos.ticket'].sudo().search([
+                ('satisfaction_token', '=', token)
+            ], limit=1)
+
+            if not ticket:
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Token invalide ou expiré'
+                }, headers=cors_headers, status=404)
+
+            # Vérifier que ticket est résolu
+            if ticket.state not in ('resolved', 'closed'):
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Le ticket n\'est pas encore résolu'
+                }, headers=cors_headers, status=400)
+
+            # Vérifier expiration (30 jours après résolution)
+            if ticket.resolution_date:
+                from datetime import timedelta
+                from odoo import fields
+                expiration_date = ticket.resolution_date + timedelta(days=30)
+                if fields.Datetime.now() > expiration_date:
+                    return request.make_json_response({
+                        'success': False,
+                        'error': 'Le lien de satisfaction a expiré (valable 30 jours)'
+                    }, headers=cors_headers, status=410)
+
+            # Retourner infos ticket (données publiques seulement)
+            return request.make_json_response({
+                'success': True,
+                'ticket': {
+                    'reference': ticket.name,
+                    'subject': ticket.subject,
+                    'category': ticket.category,
+                    'resolvedAt': ticket.resolution_date.isoformat() if ticket.resolution_date else None,
+                    'satisfactionRating': ticket.satisfaction_rating,
+                    'satisfactionComment': ticket.satisfaction_comment,
+                    'alreadyRated': bool(ticket.satisfaction_rating),
+                }
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error getting satisfaction info")
+            return request.make_json_response({
+                'success': False,
+                'error': 'Erreur serveur'
+            }, headers=cors_headers, status=500)
+
+    @http.route('/api/tickets/satisfaction/<string:token>', type='http', auth='public',
+                methods=['POST', 'OPTIONS'], csrf=False)
+    def submit_satisfaction(self, token):
+        """Soumettre note de satisfaction (route publique)"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        try:
+            params = self._get_http_params()
+
+            # Validation
+            rating = params.get('rating')
+            if not rating or rating not in ('1', '2', '3', '4', '5'):
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Note de satisfaction requise (1-5)'
+                }, headers=cors_headers, status=400)
+
+            comment = params.get('comment', '').strip()
+
+            # Rechercher ticket par token
+            ticket = request.env['quelyos.ticket'].sudo().search([
+                ('satisfaction_token', '=', token)
+            ], limit=1)
+
+            if not ticket:
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Token invalide ou expiré'
+                }, headers=cors_headers, status=404)
+
+            # Vérifier que ticket est résolu
+            if ticket.state not in ('resolved', 'closed'):
+                return request.make_json_response({
+                    'success': False,
+                    'error': 'Le ticket n\'est pas encore résolu'
+                }, headers=cors_headers, status=400)
+
+            # Vérifier expiration (30 jours)
+            if ticket.resolution_date:
+                from datetime import timedelta
+                from odoo import fields
+                expiration_date = ticket.resolution_date + timedelta(days=30)
+                if fields.Datetime.now() > expiration_date:
+                    return request.make_json_response({
+                        'success': False,
+                        'error': 'Le lien de satisfaction a expiré (valable 30 jours)'
+                    }, headers=cors_headers, status=410)
+
+            # Enregistrer satisfaction
+            ticket.write({
+                'satisfaction_rating': rating,
+                'satisfaction_comment': comment if comment else False,
+            })
+
+            _logger.info(f"Satisfaction submitted for ticket {ticket.name}: {rating}/5")
+
+            return request.make_json_response({
+                'success': True,
+                'message': 'Merci pour votre avis !'
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.exception("Error submitting satisfaction")
+            return request.make_json_response({
+                'success': False,
+                'error': 'Erreur serveur'
+            }, headers=cors_headers, status=500)
