@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos API',
-    'version': '19.0.1.17.0',
+    'version': '19.0.1.21.0',
     'category': 'Quelyos/API',
     'summary': 'API REST pour frontend e-commerce et backoffice',
     'author': 'Quelyos',
@@ -69,6 +69,7 @@
         'views/promo_message_views.xml',
         'views/trust_badge_views.xml',
         'views/theme_views.xml',
+        'views/ai_unanswered_views.xml',
     ],
     'pre_init_hook': 'pre_init_hook',
     'post_init_hook': 'post_init_hook',

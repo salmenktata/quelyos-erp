@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logConversation, analyzeSentiment, shouldEscalateToHuman } from './analytics';
+import { getAIResponse, formatHistoryForAI } from './ai-providers';
 import { createApiLogger } from '@/lib/logger';
 
 const log = createApiLogger('POST /api/chat');
@@ -243,9 +244,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Détection d'intent et génération de réponse avec contexte
+    // Génération de réponse : tenter IA puis fallback keywords
     const startTime = Date.now();
-    const response = detectIntent(message, history);
+    let response: ChatResponse;
+
+    try {
+      // Tenter avec IA configurée dynamiquement
+      const aiHistory = formatHistoryForAI(history || []);
+      const aiResponse = await getAIResponse(message, aiHistory);
+
+      response = {
+        response: aiResponse.response,
+        suggestions: aiResponse.suggestions,
+        confidence: aiResponse.confidence,
+        intent: 'ai',
+      };
+    } catch (aiError) {
+      // Fallback sur détection par keywords si IA échoue
+      log.warn('[Chat] AI failed, fallback to keywords:', aiError);
+      response = detectIntent(message, history);
+    }
+
     const processingTime = Date.now() - startTime;
 
     // Analyse de sentiment

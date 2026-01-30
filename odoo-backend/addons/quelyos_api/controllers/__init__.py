@@ -42,3 +42,6 @@ from . import super_admin
 from . import totp
 # Tickets Support
 from . import ticket
+# IA Configuration
+from . import ai_public
+from . import super_admin_ai

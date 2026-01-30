@@ -24,12 +24,14 @@ import {
   Settings,
   Calendar,
   Save,
+  Trash2,
 } from 'lucide-react'
 import { api } from '@/lib/api/gateway'
 import { BackupsResponseSchema, BackupScheduleSchema, validateApiResponse } from '@/lib/validators'
 import type { Backup, BackupsResponse, BackupSchedule } from '@/lib/validators'
 import { ConfirmModal } from '@/components/common/ConfirmModal'
 import { useToast } from '@/hooks/useToast'
+import { ToastContainer } from '@/components/ToastContainer'
 
 const DEFAULT_SCHEDULE: BackupSchedule = {
   enabled: false,
@@ -46,6 +48,7 @@ export function Backups() {
   const queryClient = useQueryClient()
   const toast = useToast()
   const [restoreTarget, setRestoreTarget] = useState<Backup | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Backup | null>(null)
   const [backupType, setBackupType] = useState<'full' | 'incremental'>('full')
   const [showSchedulePanel, setShowSchedulePanel] = useState(false)
   const [schedule, setSchedule] = useState<BackupSchedule>(DEFAULT_SCHEDULE)
@@ -64,20 +67,21 @@ export function Backups() {
       }
       return validated
     },
-    refetchInterval: 30000,
+    refetchInterval: 3000, // Rafraîchir toutes les 3s pour voir la progression
   })
 
   const triggerBackup = useMutation({
     mutationFn: async (type: 'full' | 'incremental') => {
-      return api.request({
+      return api.request<{ backup_id: number }>({
         method: 'POST',
         path: '/api/super-admin/backups/trigger',
         body: { type },
       })
     },
-    onSuccess: () => {
+    onSuccess: async (response) => {
       toast.success('Backup déclenché avec succès')
-      queryClient.invalidateQueries({ queryKey: ['super-admin-backups'] })
+      // Refetch immédiat pour afficher la nouvelle ligne avec les vraies données
+      await queryClient.refetchQueries({ queryKey: ['super-admin-backups'] })
     },
     onError: () => {
       toast.error('Erreur lors du déclenchement du backup')
@@ -91,13 +95,36 @@ export function Backups() {
         path: `/api/super-admin/backups/${backupId}/restore`,
       })
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Restauration lancée avec succès')
       setRestoreTarget(null)
-      queryClient.invalidateQueries({ queryKey: ['super-admin-backups'] })
+      // Refetch immédiat
+      await queryClient.refetchQueries({ queryKey: ['super-admin-backups'] })
     },
     onError: () => {
       toast.error('Erreur lors de la restauration')
+    },
+  })
+
+  const deleteBackup = useMutation({
+    mutationFn: async (backupId: number) => {
+      return api.request({
+        method: 'DELETE',
+        path: `/api/super-admin/backups/${backupId}`,
+      })
+    },
+    onSuccess: async () => {
+      toast.success('Backup supprimé avec succès')
+      setDeleteTarget(null)
+      // Refetch immédiat et forcé
+      await queryClient.refetchQueries({
+        queryKey: ['super-admin-backups'],
+        type: 'active'
+      })
+    },
+    onError: () => {
+      toast.error('Erreur lors de la suppression')
+      setDeleteTarget(null)
     },
   })
 
@@ -109,10 +136,10 @@ export function Backups() {
         body: newSchedule,
       })
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Programmation sauvegardée')
-      queryClient.invalidateQueries({ queryKey: ['super-admin-backups'] })
-      queryClient.invalidateQueries({ queryKey: ['super-admin-backup-schedule'] })
+      // Refetch immédiat
+      await queryClient.refetchQueries({ queryKey: ['super-admin-backups'] })
     },
     onError: () => {
       toast.error('Erreur lors de la sauvegarde')
@@ -146,7 +173,9 @@ export function Backups() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -182,14 +211,19 @@ export function Backups() {
           <button
             onClick={() => triggerBackup.mutate(backupType)}
             disabled={triggerBackup.isPending}
-            className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {triggerBackup.isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Lancement...
+              </>
             ) : (
-              <Play className="w-4 h-4" />
+              <>
+                <Play className="w-4 h-4" />
+                Lancer Backup
+              </>
             )}
-            Lancer Backup
           </button>
         </div>
       </div>
@@ -448,32 +482,55 @@ export function Backups() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        {backup.status === 'completed' && backup.download_url && (
-                          <a
-                            href={backup.download_url}
-                            className="p-2 text-gray-500 hover:text-teal-600 dark:text-gray-400 dark:hover:text-teal-400"
-                            title="Télécharger"
-                          >
-                            <Download className="w-4 h-4" />
-                          </a>
-                        )}
-                        {backup.status === 'completed' && (
-                          <button
-                            onClick={() => setRestoreTarget(backup)}
-                            className="p-2 text-gray-500 hover:text-orange-600 dark:text-gray-400 dark:hover:text-orange-400"
-                            title="Restaurer"
-                          >
-                            <RotateCcw className="w-4 h-4" />
-                          </button>
-                        )}
-                        {backup.status === 'failed' && backup.error_message && (
-                          <span
-                            className="p-2 text-red-500 cursor-help"
-                            title={backup.error_message}
-                          >
-                            <AlertTriangle className="w-4 h-4" />
-                          </span>
-                        )}
+                        {backup.status === 'completed' ? (
+                          <>
+                            {backup.download_url && (
+                              <a
+                                href={backup.download_url}
+                                className="p-2 text-gray-500 hover:text-teal-600 dark:text-gray-400 dark:hover:text-teal-400"
+                                title="Télécharger"
+                              >
+                                <Download className="w-4 h-4" />
+                              </a>
+                            )}
+                            <button
+                              onClick={() => setRestoreTarget(backup)}
+                              className="p-2 text-gray-500 hover:text-orange-600 dark:text-gray-400 dark:hover:text-orange-400"
+                              title="Restaurer"
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                            </button>
+                          </>
+                        ) : backup.status === 'running' ? (
+                          <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>En cours...</span>
+                          </div>
+                        ) : backup.status === 'pending' ? (
+                          <div className="flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400">
+                            <Clock className="w-4 h-4" />
+                            <span>En attente</span>
+                          </div>
+                        ) : backup.status === 'failed' ? (
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="p-2 text-red-500 cursor-help"
+                              title={backup.error_message || 'Échec du backup'}
+                            >
+                              <AlertTriangle className="w-4 h-4" />
+                            </span>
+                            <span className="text-sm text-red-600 dark:text-red-400">Échec</span>
+                          </div>
+                        ) : null}
+
+                        {/* Bouton Delete disponible pour tous les statuts */}
+                        <button
+                          onClick={() => setDeleteTarget(backup)}
+                          className="p-2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -497,6 +554,21 @@ export function Backups() {
           isLoading={restoreBackup.isPending}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <ConfirmModal
+          isOpen={true}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={() => deleteBackup.mutate(deleteTarget.id)}
+          title="Confirmer la suppression"
+          message={`Êtes-vous sûr de vouloir supprimer le backup "${deleteTarget.filename}" ? Cette action est irréversible.`}
+          confirmText="Supprimer"
+          variant="danger"
+          isLoading={deleteBackup.isPending}
+        />
+      )}
     </div>
+    </>
   )
 }

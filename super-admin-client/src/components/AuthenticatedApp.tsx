@@ -13,6 +13,7 @@ import { Billing } from '@/pages/Billing'
 import { Monitoring } from '@/pages/Monitoring'
 import { Backups } from '@/pages/Backups'
 import { Security } from '@/pages/Security'
+import { AiConfig } from '@/pages/AiConfig'
 import { SupportTickets } from '@/pages/SupportTickets'
 import { SupportTemplates } from '@/pages/SupportTemplates'
 import { CustomerTicketHistory } from '@/pages/CustomerTicketHistory'
@@ -40,6 +41,7 @@ function PageViewTracker() {
       '/billing': 'Billing',
       '/monitoring': 'Monitoring',
       '/security': 'Security',
+      '/ai-config': 'AI Configuration',
       '/support-tickets': 'Support Tickets',
       '/support-templates': 'Support Templates',
       '/audit-logs': 'Audit Logs',
@@ -96,6 +98,7 @@ export function AuthenticatedApp() {
           <Route path="billing" element={<Billing />} />
           <Route path="monitoring" element={<Monitoring />} />
           <Route path="security" element={<Security />} />
+          <Route path="ai-config" element={<AiConfig />} />
           <Route path="support-tickets" element={<SupportTickets />} />
           <Route path="support-templates" element={<SupportTemplates />} />
           <Route path="customers/:customerId/tickets" element={<CustomerTicketHistory />} />

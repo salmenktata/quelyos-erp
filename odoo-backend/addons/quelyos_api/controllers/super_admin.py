@@ -1507,17 +1507,37 @@ class SuperAdminController(http.Controller):
                 'triggered_by': request.env.user.id,
             })
 
-            # Lancer le backup en tâche de fond
-            backup.with_delay().execute_backup()
+            backup_id = backup.id
+            db_name = request.env.cr.dbname
 
             _logger.info(
                 f"[AUDIT] Backup triggered - User: {request.env.user.login} | "
-                f"Type: {backup_type} | Backup ID: {backup.id}"
+                f"Type: {backup_type} | Backup ID: {backup_id}"
             )
+
+            # Lancer le backup en tâche de fond (via threading avec nouveau cursor)
+            def _execute_backup_thread():
+                try:
+                    import odoo
+                    from odoo.api import Environment
+                    from odoo.modules.registry import Registry
+                    registry = Registry(db_name)
+                    with registry.cursor() as cr:
+                        env = Environment(cr, odoo.SUPERUSER_ID, {})
+                        backup_record = env['quelyos.backup'].browse(backup_id)
+                        backup_record.execute_backup()
+                        cr.commit()
+                except Exception as e:
+                    _logger.error(f"Background backup thread error: {e}", exc_info=True)
+
+            import threading
+            thread = threading.Thread(target=_execute_backup_thread)
+            thread.daemon = True
+            thread.start()
 
             return request.make_json_response({
                 'success': True,
-                'backup_id': backup.id,
+                'backup_id': backup_id,
                 'message': 'Backup déclenché avec succès'
             }, headers=cors_headers)
 
@@ -1574,13 +1594,33 @@ class SuperAdminController(http.Controller):
                     status=400
                 )
 
+            db_name = request.env.cr.dbname
+            filename = backup.filename
+
             _logger.warning(
                 f"[AUDIT] Backup RESTORE initiated - User: {request.env.user.login} | "
-                f"Backup ID: {backup_id} | Filename: {backup.filename}"
+                f"Backup ID: {backup_id} | Filename: {filename}"
             )
 
-            # Lancer la restauration en tâche de fond
-            backup.with_delay().execute_restore()
+            # Lancer la restauration en tâche de fond (via threading avec nouveau cursor)
+            def _execute_restore_thread():
+                try:
+                    import odoo
+                    from odoo.api import Environment
+                    from odoo.modules.registry import Registry
+                    registry = Registry(db_name)
+                    with registry.cursor() as cr:
+                        env = Environment(cr, odoo.SUPERUSER_ID, {})
+                        backup_record = env['quelyos.backup'].browse(backup_id)
+                        backup_record.execute_restore()
+                        cr.commit()
+                except Exception as e:
+                    _logger.error(f"Background restore thread error: {e}", exc_info=True)
+
+            import threading
+            thread = threading.Thread(target=_execute_restore_thread)
+            thread.daemon = True
+            thread.start()
 
             return request.make_json_response({
                 'success': True,
@@ -1589,6 +1629,157 @@ class SuperAdminController(http.Controller):
 
         except Exception as e:
             _logger.error(f"Restore backup error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
+    @http.route('/api/super-admin/backups/<int:backup_id>/download', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
+    def download_backup(self, backup_id):
+        """Télécharge un backup"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
+
+        try:
+            Backup = request.env['quelyos.backup'].sudo()
+            backup = Backup.browse(backup_id)
+
+            if not backup.exists():
+                return request.make_json_response(
+                    {'success': False, 'error': 'Backup non trouvé'},
+                    headers=cors_headers,
+                    status=404
+                )
+
+            if backup.status != 'completed' or not backup.file_path:
+                return request.make_json_response(
+                    {'success': False, 'error': 'Backup non disponible pour téléchargement'},
+                    headers=cors_headers,
+                    status=400
+                )
+
+            import os
+            if not os.path.exists(backup.file_path):
+                return request.make_json_response(
+                    {'success': False, 'error': 'Fichier de backup introuvable'},
+                    headers=cors_headers,
+                    status=404
+                )
+
+            _logger.info(
+                f"[AUDIT] Backup DOWNLOAD - User: {request.env.user.login} | "
+                f"Backup ID: {backup_id} | Filename: {backup.filename}"
+            )
+
+            # Lire le fichier et retourner en téléchargement
+            with open(backup.file_path, 'rb') as f:
+                file_content = f.read()
+
+            headers = [
+                ('Content-Type', 'application/octet-stream'),
+                ('Content-Disposition', f'attachment; filename="{backup.filename}"'),
+                ('Content-Length', str(len(file_content))),
+            ]
+            headers.extend(cors_headers.items())
+
+            response = request.make_response(file_content, headers=headers)
+            return response
+
+        except Exception as e:
+            _logger.error(f"Download backup error: {e}")
+            return request.make_json_response(
+                {'success': False, 'error': 'Erreur serveur'},
+                headers=cors_headers,
+                status=500
+            )
+
+    @http.route('/api/super-admin/backups/<int:backup_id>', type='http', auth='public', methods=['DELETE', 'OPTIONS'], csrf=False)
+    def delete_backup(self, backup_id):
+        """Supprime un backup"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers,
+                status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers,
+                status=403
+            )
+
+        try:
+            Backup = request.env['quelyos.backup'].sudo()
+            backup = Backup.browse(backup_id)
+
+            if not backup.exists():
+                return request.make_json_response(
+                    {'success': False, 'error': 'Backup non trouvé'},
+                    headers=cors_headers,
+                    status=404
+                )
+
+            filename = backup.filename
+            file_path = backup.file_path
+
+            _logger.warning(
+                f"[AUDIT] Backup DELETE - User: {request.env.user.login} | "
+                f"Backup ID: {backup_id} | Filename: {filename} | Status: {backup.status}"
+            )
+
+            # Supprimer le fichier physique si existe
+            import os
+            if file_path and os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                    _logger.info(f"Backup file deleted: {file_path}")
+                except Exception as e:
+                    _logger.warning(f"Could not delete backup file: {e}")
+
+            # Supprimer l'enregistrement DB
+            backup.unlink()
+
+            return request.make_json_response({
+                'success': True,
+                'message': 'Backup supprimé'
+            }, headers=cors_headers)
+
+        except Exception as e:
+            _logger.error(f"Delete backup error: {e}")
             return request.make_json_response(
                 {'success': False, 'error': 'Erreur serveur'},
                 headers=cors_headers,

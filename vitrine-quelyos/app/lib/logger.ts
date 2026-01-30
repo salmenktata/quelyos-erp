@@ -3,6 +3,7 @@
  *
  * Masque automatiquement les logs en production pour éviter
  * l'exposition de détails techniques dans la console navigateur.
+ * Intégré avec Sentry pour monitoring en production.
  *
  * Usage:
  *   import { logger } from '@/lib/logger';
@@ -11,8 +12,11 @@
  *   logger.info('Panier créé:', cartId);
  */
 
+import { captureError } from './sentry';
+
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isTest = process.env.NODE_ENV === 'test';
+const isProduction = process.env.NODE_ENV === 'production';
 
 /**
  * Interface Logger pour maintenir compatibilité avec console

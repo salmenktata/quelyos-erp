@@ -55,6 +55,7 @@ services:
       PASSWORD: ${DB_PASSWORD:-odoo}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      QUELYOS_ENCRYPTION_KEY: ${QUELYOS_ENCRYPTION_KEY}
     volumes:
       - odoo_data:/var/lib/odoo
       - odoo_config:/etc/odoo

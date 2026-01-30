@@ -79,16 +79,29 @@ class QuelyosBackup(models.Model):
 
             file_path = os.path.join(backup_dir, self.filename)
 
-            # Exécuter pg_dump
+            # Récupérer les paramètres de connexion PostgreSQL depuis la config Odoo
+            db_host = self.env.cr._cnx.info.host or 'db'
+            db_port = self.env.cr._cnx.info.port or 5432
+            db_user = self.env.cr._cnx.info.user or 'odoo'
+
+            # Exécuter pg_dump avec paramètres de connexion réseau
             cmd = [
                 'pg_dump',
                 '-Fc',  # Format custom (compressé)
+                '-h', db_host,  # Host
+                '-p', str(db_port),  # Port
+                '-U', db_user,  # Username
                 '-f', file_path,
                 db_name,
             ]
 
+            # Ajouter le mot de passe via variable d'environnement
+            env = os.environ.copy()
+            env['PGPASSWORD'] = self.env.cr._cnx.info.password or 'odoo'
+
             result = subprocess.run(
                 cmd,
+                env=env,
                 capture_output=True,
                 text=True,
                 timeout=3600,  # 1h max
@@ -135,16 +148,29 @@ class QuelyosBackup(models.Model):
         try:
             db_name = self.env.cr.dbname
 
-            # Restaurer via pg_restore
+            # Récupérer les paramètres de connexion PostgreSQL
+            db_host = self.env.cr._cnx.info.host or 'db'
+            db_port = self.env.cr._cnx.info.port or 5432
+            db_user = self.env.cr._cnx.info.user or 'odoo'
+
+            # Restaurer via pg_restore avec paramètres de connexion réseau
             cmd = [
                 'pg_restore',
                 '-c',  # Clean (drop objects before creating)
+                '-h', db_host,
+                '-p', str(db_port),
+                '-U', db_user,
                 '-d', db_name,
                 self.file_path,
             ]
 
+            # Ajouter le mot de passe via variable d'environnement
+            env = os.environ.copy()
+            env['PGPASSWORD'] = self.env.cr._cnx.info.password or 'odoo'
+
             result = subprocess.run(
                 cmd,
+                env=env,
                 capture_output=True,
                 text=True,
                 timeout=7200,  # 2h max

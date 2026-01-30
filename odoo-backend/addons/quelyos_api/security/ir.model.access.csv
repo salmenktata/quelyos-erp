@@ -1,5 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_auth_refresh_token_system,auth.refresh.token system,model_auth_refresh_token,base.group_system,1,1,1,1
+access_ai_config_superadmin,quelyos.ai.config superadmin,model_quelyos_ai_config,base.group_system,1,1,1,1
 access_quelyos_subscription_plan_public,quelyos.subscription.plan public,model_quelyos_subscription_plan,,1,0,0,0
 access_quelyos_subscription_plan_user,quelyos.subscription.plan user,model_quelyos_subscription_plan,group_quelyos_finance_user,1,1,0,0
 access_quelyos_subscription_plan_manager,quelyos.subscription.plan manager,model_quelyos_subscription_plan,group_quelyos_finance_manager,1,1,1,1
@@ -164,3 +165,4 @@ access_quelyos_support_template_system,quelyos.support.template system,model_que
 access_quelyos_sla_policy_public,quelyos.sla.policy public,model_quelyos_sla_policy,base.group_public,1,0,0,0
 access_quelyos_sla_policy_user,quelyos.sla.policy user,model_quelyos_sla_policy,base.group_user,1,0,0,0
 access_quelyos_sla_policy_system,quelyos.sla.policy system,model_quelyos_sla_policy,base.group_system,1,1,1,1
+access_quelyos_ai_unanswered_system,quelyos.ai.unanswered system,model_quelyos_ai_unanswered,base.group_system,1,1,1,1

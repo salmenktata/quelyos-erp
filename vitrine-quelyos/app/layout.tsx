@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import ConditionalChatBot from "./components/ConditionalChatBot";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -76,6 +77,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {children}
+        <ConditionalChatBot />
       </body>
     </html>
   );

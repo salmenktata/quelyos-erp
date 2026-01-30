@@ -27,7 +27,8 @@
 **INTERDICTION ABSOLUE** : Ne JAMAIS modifier les ports des services
 - **vitrine-quelyos** : Port **3000** FIXE
 - **vitrine-client** : Port **3001** FIXE
-- **dashboard-client** : Port **5175** FIXE
+- **dashboard-client** : Port **5175** FIXE (Backoffice clients)
+- **super-admin-client** : Port **5176** FIXE (Panel super admin SaaS)
 - **odoo-backend** : Port **8069** FIXE
 - **PostgreSQL** : Port **5432** FIXE
 - **Redis** : Port **6379** FIXE
@@ -296,7 +297,8 @@ Lancer `/no-odoo` avant chaque commit pour vérifier conformité dans vitrine-cl
 **DevOps** : `/ship`, `/commit`, `/deploy`, `/test`, `/security`, `/perf`, `/db-sync`
 **Odoo** : `/upgrade-odoo`, `/restart-odoo`, `/restart-backoffice`, `/restart-vitrine`, `/restart-ecommerce`, `/restart-all`
 **Qualité** : `/polish`, `/parity`, `/coherence`, `/clean`, `/analyze-page`, `/docs`, `/uiux`
-**Architecture** : `/leverage` (capitalisation sur existant Odoo vs custom), `/no-odoo` (anonymisation)
+**Architecture** : `/architect` (analyse architecture), `/leverage` (capitalisation sur existant Odoo vs custom), `/no-odoo` (anonymisation)
+**Développement** : `/evolve` (analyse holistique + développement feature : réflexion, technique, contexte, perspective, amélioration)
 **E-commerce** : `/ecommerce` (audit exploitation Backoffice + roadmap évolutions 2026)
 
 ## Essentiels

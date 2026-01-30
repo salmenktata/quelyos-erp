@@ -15,11 +15,16 @@
 │         Catalogue, Panier, Commandes                     │
 └─────────────────────┬───────────────────────────────────┘
                       │
-┌─────────────────────┴───────────────────────────────────┐
-│         BACKOFFICE (dashboard-client)                    │
-│         React 19 + Vite - Port 5175                      │
-│         Gestion produits, commandes, finances            │
-└─────────────────────┬───────────────────────────────────┘
+      ┌───────────────┴───────────────┐
+      │                               │
+┌─────┴───────────────┐   ┌───────────┴─────────────────┐
+│ BACKOFFICE TENANTS  │   │  SUPER ADMIN GLOBAL         │
+│ (dashboard-client)  │   │  (super-admin-client)       │
+│ Port 5175           │   │  Port 5176                  │
+│ Multi-tenant        │   │  Admin SaaS                 │
+└─────┬───────────────┘   └───────────┬─────────────────┘
+      │                               │
+      └───────────────┬───────────────┘
                       │ API REST
 ┌─────────────────────┴───────────────────────────────────┐
 │         BACKEND (odoo-backend)                           │
@@ -99,6 +104,53 @@ Backend (8069) ─┐
 - **Le backend doit démarrer en premier** (les frontends en dépendent)
 - Les frontends peuvent démarrer en parallèle une fois le backend prêt
 - Temps de démarrage : Backend (~30s), Frontends (~5-10s chacun)
+
+## ⚠️ IMPORTANT : Dashboard-Client vs Super-Admin-Client
+
+**Il existe DEUX applications backoffice distinctes avec des rôles différents** :
+
+### 1. **Dashboard-Client** (Port 5175)
+- **Rôle** : Backoffice multi-tenant pour les clients Quelyos
+- **Utilisateurs** : Employés des entreprises clientes (comptables, vendeurs, managers)
+- **Authentification** : Via compte tenant spécifique
+- **Scope** : Données isolées par tenant (une entreprise voit uniquement ses données)
+- **Modules accessibles** :
+  - Finance (trésorerie, budgets, prévisions IA)
+  - Boutique (produits, commandes, clients)
+  - Stock (inventaire, mouvements, warehouses)
+  - CRM (pipeline, leads, customers)
+  - Marketing (campagnes, emails, SMS)
+  - HR (employés, congés, contrats)
+  - POS (ventes en magasin, sessions)
+  - Support (tickets clients)
+
+### 2. **Super-Admin-Client** (Port 5176)
+- **Rôle** : Panel d'administration SaaS global
+- **Utilisateurs** : Équipe Quelyos uniquement (administrateurs système)
+- **Authentification** : Via compte super admin dédié
+- **Scope** : Vue transversale sur TOUS les tenants
+- **Modules accessibles** :
+  - Dashboard global (métriques tous tenants)
+  - Tenants (création, gestion, suspension)
+  - Plans & Abonnements (tarification, quotas)
+  - Facturation (Stripe, revenus)
+  - Monitoring (santé système, performances)
+  - Sécurité (2FA, IP whitelist, audit logs)
+  - **Configuration IA** (providers Groq/Claude/OpenAI)
+  - Support global (tickets tous tenants)
+  - Backups & Sauvegardes
+
+### 🚨 Règle de Développement
+
+**Quand ajouter une page** :
+- ✅ **dashboard-client** : Fonctionnalité pour les clients (gestion produits, finances, etc.)
+- ✅ **super-admin-client** : Fonctionnalité pour l'équipe Quelyos (admin système, monitoring, config globale)
+
+**Exemples** :
+- Configuration IA → **super-admin-client** (config globale pour le chat assistant)
+- Gestion produits → **dashboard-client** (fonctionnalité métier pour les clients)
+- Liste tenants → **super-admin-client** (admin SaaS)
+- Tableau de bord finances → **dashboard-client** (fonctionnalité métier)
 
 ## Architecture Backend Odoo
 
