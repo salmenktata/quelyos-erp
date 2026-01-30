@@ -720,3 +720,137 @@ class MarketingCampaignController(BaseController):
             }
         except Exception as e:
             return {'success': False, 'error': 'Erreur serveur'}
+
+    # =========================================================================
+    # LINK TRACKER (Suivi des clics)
+    # =========================================================================
+
+    @http.route('/r/<string:token>', type='http', auth='public', csrf=False, methods=['GET'], cors='*')
+    def redirect_tracked_link(self, token, **kwargs):
+        """
+        Redirection publique depuis lien tracké dans email.
+        Enregistre le clic puis redirige vers URL cible.
+        """
+        try:
+            LinkTracker = request.env['quelyos.link.tracker'].sudo()
+            link = LinkTracker.search([('token', '=', token)], limit=1)
+
+            if not link:
+                return request.not_found()
+
+            # Extraire métadonnées du clic
+            ip_address = request.httprequest.remote_addr
+            user_agent = request.httprequest.headers.get('User-Agent', '')
+            referer = request.httprequest.headers.get('Referer', '')
+
+            # Enregistrer clic
+            link.register_click(
+                ip_address=ip_address,
+                user_agent=user_agent,
+                referer=referer
+            )
+
+            # Rediriger vers URL cible
+            return request.redirect(link.url, code=302)
+
+        except Exception as e:
+            return request.not_found()
+
+    @http.route('/api/marketing/campaigns/<int:campaign_id>/links', type='jsonrpc', auth='public', csrf=False, methods=['POST'])
+    def get_campaign_links(self, campaign_id, **kwargs):
+        """Liste des liens trackés d'une campagne avec statistiques"""
+        auth_error = self._auth_check()
+        if auth_error:
+            return auth_error
+
+        try:
+            LinkTracker = request.env['quelyos.link.tracker'].sudo()
+            links = LinkTracker.search([('campaign_id', '=', campaign_id)], order='click_count desc')
+
+            return {
+                'success': True,
+                'links': [link.to_dict() for link in links],
+                'total': len(links),
+            }
+        except Exception as e:
+            return {'success': False, 'error': 'Erreur serveur'}
+
+    @http.route('/api/marketing/links/<int:link_id>', type='jsonrpc', auth='public', csrf=False, methods=['POST'])
+    def get_link_detail(self, link_id, **kwargs):
+        """Détails d'un lien tracké avec historique des clics"""
+        auth_error = self._auth_check()
+        if auth_error:
+            return auth_error
+
+        try:
+            LinkTracker = request.env['quelyos.link.tracker'].sudo()
+            link = LinkTracker.browse(link_id)
+
+            if not link.exists():
+                return {
+                    'success': False,
+                    'error': f'Lien {link_id} introuvable'
+                }
+
+            # Récupérer les clics récents (derniers 100)
+            clicks = link.click_ids[:100]
+
+            return {
+                'success': True,
+                'link': link.to_dict(),
+                'clicks': [click.to_dict() for click in clicks],
+            }
+        except Exception as e:
+            return {'success': False, 'error': 'Erreur serveur'}
+
+    @http.route('/api/marketing/links/<int:link_id>/stats', type='jsonrpc', auth='public', csrf=False, methods=['POST'])
+    def get_link_stats(self, link_id, **kwargs):
+        """Statistiques détaillées d'un lien (par heure, pays, appareil)"""
+        auth_error = self._auth_check()
+        if auth_error:
+            return auth_error
+
+        try:
+            LinkTracker = request.env['quelyos.link.tracker'].sudo()
+            link = LinkTracker.browse(link_id)
+
+            if not link.exists():
+                return {
+                    'success': False,
+                    'error': f'Lien {link_id} introuvable'
+                }
+
+            # Statistiques par pays (top 5)
+            clicks_by_country = {}
+            for click in link.click_ids:
+                country = click.country_code or 'Unknown'
+                clicks_by_country[country] = clicks_by_country.get(country, 0) + 1
+
+            top_countries = sorted(clicks_by_country.items(), key=lambda x: x[1], reverse=True)[:5]
+
+            # Statistiques par jour (derniers 7 jours)
+            from datetime import datetime, timedelta
+            today = datetime.now()
+            clicks_by_day = {}
+            for i in range(7):
+                day = (today - timedelta(days=i)).strftime('%Y-%m-%d')
+                clicks_by_day[day] = 0
+
+            for click in link.click_ids:
+                if click.click_date:
+                    day = click.click_date.strftime('%Y-%m-%d')
+                    if day in clicks_by_day:
+                        clicks_by_day[day] += 1
+
+            return {
+                'success': True,
+                'link': link.to_dict(),
+                'stats': {
+                    'total_clicks': link.click_count,
+                    'unique_clicks': link.unique_click_count,
+                    'by_country': [{'country': c, 'clicks': n} for c, n in top_countries],
+                    'by_day': [{'day': d, 'clicks': n} for d, n in sorted(clicks_by_day.items())],
+                }
+            }
+        except Exception as e:
+            return {'success': False, 'error': 'Erreur serveur'}

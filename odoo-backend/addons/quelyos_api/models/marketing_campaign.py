@@ -180,8 +180,11 @@ class MarketingCampaign(models.Model):
             # Générer lien unsubscribe
             unsubscribe_url = f"{base_url}/unsubscribe/{blacklist_entry.token}"
 
+            # Remplacer toutes les URLs par des liens trackés
+            email_content = self._replace_urls_with_tracked_links(self.content, base_url)
+
             # Injecter footer unsubscribe dans le contenu
-            email_content = self._inject_unsubscribe_footer(self.content, unsubscribe_url)
+            email_content = self._inject_unsubscribe_footer(email_content, unsubscribe_url)
 
             # TODO: Intégrer envoi via email_config avec email_content
             # Pour l'instant, on simule l'envoi
@@ -211,6 +214,51 @@ class MarketingCampaign(models.Model):
             return html_content.replace('</body>', f'{footer_html}</body>')
         else:
             return html_content + footer_html
+
+    def _replace_urls_with_tracked_links(self, html_content, base_url):
+        """
+        Remplacer toutes les URLs dans le HTML par des liens trackés.
+        Parse le HTML et remplace href="http://example.com" par href="/r/<token>".
+        """
+        import re
+
+        if not html_content:
+            return html_content
+
+        LinkTracker = self.env['quelyos.link.tracker'].sudo()
+
+        # Pattern pour trouver tous les href="..." dans le HTML
+        # Capture : href="(URL)" ou href='(URL)'
+        pattern = r'href=["\']([^"\']+)["\']'
+
+        def replace_url(match):
+            original_url = match.group(1)
+
+            # Ignorer les ancres, mailto:, tel:, javascript:
+            if (original_url.startswith('#') or
+                original_url.startswith('mailto:') or
+                original_url.startswith('tel:') or
+                original_url.startswith('javascript:')):
+                return match.group(0)  # Garder tel quel
+
+            # Ignorer les URLs relatives (commençant par /)
+            if original_url.startswith('/'):
+                return match.group(0)
+
+            # Créer ou récupérer lien tracké
+            try:
+                link = LinkTracker.get_or_create_link(
+                    url=original_url,
+                    campaign_id=self.id
+                )
+                tracked_url = link.get_redirect_url(base_url)
+                return f'href="{tracked_url}"'
+            except Exception:
+                # En cas d'erreur, garder URL originale
+                return match.group(0)
+
+        # Remplacer toutes les URLs
+        return re.sub(pattern, replace_url, html_content)
 
     def _send_sms_campaign(self):
         """

@@ -36,6 +36,7 @@ from . import email_config
 from . import contact_list
 from . import marketing_campaign
 from . import marketing_blacklist
+from . import link_tracker
 from . import sms_template
 from . import email_builder
 # Store Extended Models
