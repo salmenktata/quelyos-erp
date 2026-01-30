@@ -12,13 +12,13 @@ import {
   Megaphone,
   ArrowRight,
   Sparkles,
-  Mail,
-  Zap,
   Shield,
-  Users,
   Server,
-  Database,
   Layers,
+  RefreshCw,
+  Code,
+  LayoutDashboard,
+  MapPin,
 } from "lucide-react";
 import Footer from "./Footer";
 import Container from "./Container";
@@ -26,11 +26,22 @@ import Header from "./Header";
 
 const modules = [
   {
+    id: "home",
+    name: "Dashboard",
+    tagline: "Vue unifiée",
+    description: "Tableau de bord consolidé avec KPIs temps réel de tous vos modules.",
+    features: ["KPIs consolidés", "Alertes", "Raccourcis", "Analytics global"],
+    status: "production",
+    color: "slate",
+    icon: LayoutDashboard,
+    href: "/modules",
+  },
+  {
     id: "finance",
     name: "Finance",
-    tagline: "Trésorerie & Prévisions IA",
-    description: "Pilotez votre trésorerie à 90 jours avec l'IA. Budgets, reporting, multi-comptes.",
-    features: ["Prévisions IA", "Budgets", "Rapports PDF", "Multi-comptes"],
+    tagline: "Trésorerie & Prévisions IA 90j",
+    description: "Pilotez votre trésorerie avec l'IA. Précision 85-90% sur 90 jours.",
+    features: ["Prévisions IA 85-90%", "Multi-comptes", "Rapports PDF", "Export FEC"],
     status: "production",
     color: "emerald",
     icon: Wallet,
@@ -39,9 +50,9 @@ const modules = [
   {
     id: "store",
     name: "Boutique",
-    tagline: "E-commerce complet",
-    description: "Gérez votre catalogue, commandes, promotions et avis clients.",
-    features: ["Catalogue produits", "Commandes", "Promos", "Avis clients"],
+    tagline: "E-commerce omnicanal",
+    description: "Catalogue, commandes, promotions. Synchronisation Stock automatique.",
+    features: ["Catalogue produits", "Commandes", "Promotions", "Sync Stock auto"],
     status: "production",
     color: "indigo",
     icon: Store,
@@ -50,9 +61,9 @@ const modules = [
   {
     id: "crm",
     name: "CRM",
-    tagline: "Clients & Pipeline",
-    description: "Suivez vos opportunités, gérez vos clients, facturez simplement.",
-    features: ["Pipeline ventes", "Fiches clients", "Facturation", "Paiements"],
+    tagline: "Pipeline & Facturation",
+    description: "Pipeline ventes, fiches 360°, devis → factures en un clic.",
+    features: ["Pipeline ventes", "Fiches 360°", "Devis → Factures", "Sync Finance"],
     status: "production",
     color: "violet",
     icon: UserCircle,
@@ -61,9 +72,9 @@ const modules = [
   {
     id: "stock",
     name: "Stock",
-    tagline: "Inventaire multi-sites",
-    description: "Mouvements, transferts, réapprovisionnement automatique.",
-    features: ["Multi-entrepôts", "Mouvements", "Valorisation", "Alertes"],
+    tagline: "Multi-entrepôts temps réel",
+    description: "Gestion multi-sites, alertes seuils, valorisation FIFO/LIFO.",
+    features: ["Multi-sites", "Alertes stock", "Valorisation", "Scan codes-barres"],
     status: "production",
     color: "orange",
     icon: Boxes,
@@ -72,9 +83,9 @@ const modules = [
   {
     id: "hr",
     name: "RH",
-    tagline: "Gestion du personnel",
-    description: "Employés, contrats, congés, présences, évaluations.",
-    features: ["Employés", "Congés", "Présences", "Évaluations"],
+    tagline: "SIRH complet",
+    description: "Gestion employés, congés, pointage, évaluations annuelles.",
+    features: ["Employés", "Congés", "Pointage", "Évaluations"],
     status: "production",
     color: "cyan",
     icon: UsersRound,
@@ -83,9 +94,9 @@ const modules = [
   {
     id: "pos",
     name: "Point de Vente",
-    tagline: "Caisse & Click & Collect",
-    description: "Terminal de caisse moderne, mode rush, écran cuisine.",
-    features: ["Terminal", "Click & Collect", "Sessions", "Analytics"],
+    tagline: "Caisse moderne",
+    description: "Terminal tactile, Click & Collect, mode rush, écran cuisine.",
+    features: ["Terminal tactile", "Click & Collect", "Mode Rush", "Écran cuisine"],
     status: "production",
     color: "teal",
     icon: Monitor,
@@ -94,10 +105,10 @@ const modules = [
   {
     id: "marketing",
     name: "Marketing",
-    tagline: "Campagnes Email & SMS",
-    description: "Créez et envoyez vos campagnes marketing facilement.",
-    features: ["Email", "SMS", "Templates", "Audiences"],
-    status: "beta",
+    tagline: "Email & SMS",
+    description: "Campagnes multicanal, templates, segmentation audiences.",
+    features: ["Campagnes", "Templates", "Audiences", "Analytics"],
+    status: "production",
     color: "pink",
     icon: Megaphone,
     href: "/marketing",
@@ -105,6 +116,7 @@ const modules = [
 ];
 
 const colorClasses: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
+  slate: { bg: "bg-slate-500/20", text: "text-slate-300", border: "border-slate-500/30", gradient: "from-slate-500 to-slate-600" },
   emerald: { bg: "bg-emerald-500/20", text: "text-emerald-400", border: "border-emerald-500/30", gradient: "from-emerald-500 to-emerald-600" },
   indigo: { bg: "bg-indigo-500/20", text: "text-indigo-400", border: "border-indigo-500/30", gradient: "from-indigo-500 to-indigo-600" },
   violet: { bg: "bg-violet-500/20", text: "text-violet-400", border: "border-violet-500/30", gradient: "from-violet-500 to-violet-600" },
@@ -113,6 +125,13 @@ const colorClasses: Record<string, { bg: string; text: string; border: string; g
   teal: { bg: "bg-teal-500/20", text: "text-teal-400", border: "border-teal-500/30", gradient: "from-teal-500 to-teal-600" },
   pink: { bg: "bg-pink-500/20", text: "text-pink-400", border: "border-pink-500/30", gradient: "from-pink-500 to-pink-600" },
 };
+
+const secteurs = [
+  { emoji: "🏪", name: "Commerce & Retail", desc: "Boutiques, e-commerce, click & collect", modules: ["Boutique", "Stock", "POS", "CRM"] },
+  { emoji: "🍽️", name: "Restauration", desc: "Restaurants, traiteurs, food trucks", modules: ["POS", "Stock", "Finance", "Marketing"] },
+  { emoji: "🔧", name: "Services B2B", desc: "Agences, conseil, prestataires", modules: ["CRM", "Finance", "Marketing", "RH"] },
+  { emoji: "🏭", name: "Artisans & Production", desc: "Ateliers, fabrication, BTP", modules: ["Stock", "CRM", "Finance", "RH"] },
+];
 
 export default function HomePageContent() {
   return (
@@ -130,33 +149,48 @@ export default function HomePageContent() {
               className="text-center"
             >
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-2 text-sm text-indigo-300">
-                <Sparkles className="h-4 w-4" />
-                Suite ERP complète pour PME
+                <MapPin className="h-4 w-4" />
+                Suite ERP française • 8 modules intégrés
               </div>
               <h1 className="mx-auto max-w-4xl text-5xl font-bold leading-tight text-white sm:text-6xl lg:text-7xl">
-                L&apos;ERP moderne qui{" "}
+                Pilotez toute votre entreprise{" "}
                 <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  simplifie votre gestion
+                  depuis une seule plateforme
                 </span>
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 sm:text-xl">
-                Finance, Commerce, CRM, Stock, RH, Point de vente — tous vos outils
-                métier réunis en une seule plateforme. Conçu en France. Pensé pour les PME.
+                IA intégrée pour vos prévisions, données synchronisées entre modules.
+                Finance, Commerce, CRM, Stock, RH, POS, Marketing — tout en un.
               </p>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-400">
+                <span className="flex items-center gap-1">
+                  <Layers className="h-4 w-4 text-indigo-400" />
+                  8 modules
+                </span>
+                <span className="text-slate-600">•</span>
+                <span className="flex items-center gap-1">
+                  <Sparkles className="h-4 w-4 text-purple-400" />
+                  +250 fonctionnalités
+                </span>
+                <span className="text-slate-600">•</span>
+                <span className="flex items-center gap-1">
+                  <Code className="h-4 w-4 text-emerald-400" />
+                  API REST complète
+                </span>
+              </div>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link
-                  href="/modules"
+                  href="/finance/register"
                   className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 px-8 py-4 text-lg font-medium text-white transition-all hover:from-indigo-600 hover:to-indigo-700"
                 >
-                  <Layers className="h-5 w-5" />
-                  Découvrir les modules
+                  Essai gratuit 30 jours
+                  <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link
-                  href="/finance/register"
+                  href="/tarifs"
                   className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-8 py-4 text-lg font-medium text-white transition-all hover:bg-white/10"
                 >
-                  Essai gratuit
-                  <ArrowRight className="h-5 w-5" />
+                  Voir les tarifs
                 </Link>
               </div>
             </m.div>
@@ -173,10 +207,10 @@ export default function HomePageContent() {
               className="mb-12 text-center"
             >
               <h2 className="text-3xl font-bold text-white sm:text-4xl">
-                Tous vos outils métier en un seul endroit
+                8 modules intégrés, données synchronisées
               </h2>
               <p className="mt-4 text-lg text-slate-400">
-                7 modules intégrés pour gérer l&apos;ensemble de votre activité
+                Une vente = stock mis à jour + revenu Finance + fiche client enrichie. Automatique.
               </p>
             </m.div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -235,7 +269,7 @@ export default function HomePageContent() {
           </Container>
         </section>
 
-        {/* Pourquoi Quelyos */}
+        {/* Différenciateurs */}
         <section className="relative py-20">
           <Container>
             <m.div
@@ -245,20 +279,20 @@ export default function HomePageContent() {
               className="mb-12 text-center"
             >
               <h2 className="text-3xl font-bold text-white sm:text-4xl">
-                Pourquoi choisir Quelyos ?
+                Ce qui nous différencie
               </h2>
               <p className="mt-4 text-lg text-slate-400">
-                Une suite pensée pour les TPE/PME qui veulent se concentrer sur leur métier
+                Une suite pensée pour les TPE/PME françaises
               </p>
             </m.div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {[
-                { icon: Layers, title: "Tout-en-un", desc: "Un seul outil au lieu de 5 abonnements séparés. Finance, vente, stock, RH, marketing.", color: "text-indigo-400" },
-                { icon: Zap, title: "Simple & rapide", desc: "Prise en main en 10 minutes, pas besoin de formation. Interface moderne.", color: "text-yellow-400" },
-                { icon: Shield, title: "Données sécurisées", desc: "Hébergement France, RGPD compliant, chiffrement bout-en-bout.", color: "text-emerald-400" },
-                { icon: Database, title: "Open Data", desc: "Vos données vous appartiennent. API REST ouverte, export illimité.", color: "text-cyan-400" },
-                { icon: Users, title: "Support humain", desc: "Accompagnement personnalisé pour chaque client. Pas de chatbot.", color: "text-blue-400" },
-                { icon: Server, title: "Multi-tenant SaaS", desc: "Architecture moderne, mises à jour automatiques, zéro maintenance.", color: "text-purple-400" },
+                { icon: Layers, title: "8 modules = 1 abonnement", desc: "Finance, Vente, Stock, CRM, RH, POS, Marketing — tout inclus sans frais cachés.", color: "text-indigo-400" },
+                { icon: Sparkles, title: "IA intégrée", desc: "Prévisions trésorerie 90j, détection anomalies, scoring leads. Machine Learning natif.", color: "text-purple-400" },
+                { icon: RefreshCw, title: "Données synchronisées", desc: "Une vente = stock mis à jour + revenu en Finance + fiche client enrichie. Automatique.", color: "text-emerald-400" },
+                { icon: Shield, title: "Made in France", desc: "Hébergement France, RGPD natif, support francophone. Pas de transfert US.", color: "text-blue-400" },
+                { icon: Code, title: "API REST complète", desc: "Intégrez Quelyos à vos outils. Export illimité, vos données vous appartiennent.", color: "text-cyan-400" },
+                { icon: Server, title: "SaaS multi-tenant", desc: "Zéro maintenance, mises à jour auto, accessible partout. Instance dédiée isolée.", color: "text-orange-400" },
               ].map((item, i) => (
                 <m.div
                   key={i}
@@ -277,15 +311,60 @@ export default function HomePageContent() {
           </Container>
         </section>
 
+        {/* Secteurs d'activité */}
+        <section className="relative py-20">
+          <Container>
+            <m.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12 text-center"
+            >
+              <h2 className="text-3xl font-bold text-white sm:text-4xl">
+                Adapté à votre secteur
+              </h2>
+              <p className="mt-4 text-lg text-slate-400">
+                Des modules recommandés selon votre activité
+              </p>
+            </m.div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {secteurs.map((secteur, i) => (
+                <m.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="group rounded-xl border border-white/10 bg-slate-900/50 p-6 backdrop-blur-sm transition-all hover:border-indigo-500/30 hover:bg-slate-900/70"
+                >
+                  <span className="mb-3 block text-4xl">{secteur.emoji}</span>
+                  <h3 className="mb-1 text-lg font-semibold text-white">{secteur.name}</h3>
+                  <p className="mb-4 text-sm text-slate-400">{secteur.desc}</p>
+                  <div className="flex flex-wrap gap-1">
+                    {secteur.modules.map((mod) => (
+                      <span
+                        key={mod}
+                        className="rounded-full bg-indigo-500/10 px-2 py-0.5 text-xs text-indigo-300"
+                      >
+                        {mod}
+                      </span>
+                    ))}
+                  </div>
+                </m.div>
+              ))}
+            </div>
+          </Container>
+        </section>
+
         {/* Stats */}
         <section className="relative border-y border-white/10 bg-slate-900/50 py-16">
           <Container>
             <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
               {[
                 { label: "Modules intégrés", value: "8", icon: Layers },
-                { label: "Fonctionnalités", value: "+200", icon: Sparkles },
-                { label: "API REST", value: "100%", icon: Server },
-                { label: "Multi-tenant", value: "SaaS", icon: Database },
+                { label: "Fonctionnalités", value: "+250", icon: Sparkles },
+                { label: "Prévisions IA", value: "90j", icon: RefreshCw },
+                { label: "Hébergement", value: "France", icon: MapPin },
               ].map((stat, i) => (
                 <m.div
                   key={i}
@@ -304,7 +383,7 @@ export default function HomePageContent() {
           </Container>
         </section>
 
-        {/* CTA Contact */}
+        {/* CTA final */}
         <section className="relative py-20">
           <Container narrow>
             <m.div
@@ -313,20 +392,20 @@ export default function HomePageContent() {
               viewport={{ once: true }}
               className="overflow-hidden rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/50 to-purple-950/50 p-8 text-center backdrop-blur-sm sm:p-12"
             >
-              <Mail className="mx-auto mb-6 h-12 w-12 text-indigo-400" />
+              <Sparkles className="mx-auto mb-6 h-12 w-12 text-indigo-400" />
               <h2 className="text-3xl font-bold text-white sm:text-4xl">
-                Prêt à simplifier votre gestion ?
+                Simplifiez votre gestion dès aujourd&apos;hui
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-lg text-slate-300">
-                Contactez-nous pour une démo gratuite ou commencez directement avec l&apos;essai gratuit.
+                30 jours d&apos;essai gratuit, sans engagement. Toutes les fonctionnalités incluses.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link
-                  href="/contact"
+                  href="/finance/register"
                   className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 font-medium text-white transition-all hover:from-indigo-600 hover:to-purple-700"
                 >
-                  <Mail className="h-5 w-5" />
-                  Nous contacter
+                  Essai gratuit 30 jours
+                  <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link
                   href="/tarifs"

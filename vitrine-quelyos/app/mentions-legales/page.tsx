@@ -54,7 +54,7 @@ export default function MentionsLegalesPage() {
             Document légal
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold">Mentions Légales</h1>
-          <p className="text-slate-400">Dernière mise à jour : Janvier 2025</p>
+          <p className="text-slate-400">Dernière mise à jour : Janvier 2026</p>
         </div>
 
         <div className="prose prose-invert prose-slate max-w-none">

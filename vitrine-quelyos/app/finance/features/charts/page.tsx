@@ -128,7 +128,7 @@ export default function ChartsPage() {
             </p>
           </div>
           <div className="flex min-h-[400px] items-center justify-center rounded-lg bg-white/5">
-            <p className="text-slate-400">Interactive charts coming soon...</p>
+            <p className="text-slate-400">Graphiques interactifs disponibles dans l&apos;application</p>
           </div>
         </div>
 

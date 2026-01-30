@@ -143,8 +143,8 @@ export default function MarketingPage() {
 
   const roadmapItems = [
     {
-      phase: "MVP Q1 2026",
-      status: "current",
+      phase: "V1 - Disponible",
+      status: "done",
       items: [
         "Connexion Meta OAuth",
         "Éditeur posts simplifié",
@@ -153,8 +153,8 @@ export default function MarketingPage() {
       ],
     },
     {
-      phase: "V1 Q2 2026",
-      status: "upcoming",
+      phase: "V1.5 - Q1 2026",
+      status: "current",
       items: [
         "Inbox unifiée",
         "Réponses IA suggérées",
@@ -163,8 +163,8 @@ export default function MarketingPage() {
       ],
     },
     {
-      phase: "V2 Q3 2026",
-      status: "future",
+      phase: "V2 - Q2 2026",
+      status: "upcoming",
       items: [
         "Calendrier éditorial avancé",
         "Multi-pages gestion",
@@ -173,7 +173,7 @@ export default function MarketingPage() {
       ],
     },
     {
-      phase: "V3 2027",
+      phase: "V3 - 2027",
       status: "future",
       items: [
         "LinkedIn intégration",
@@ -204,7 +204,7 @@ export default function MarketingPage() {
           >
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/10 px-4 py-2 text-sm text-pink-300">
               <Sparkles className="h-4 w-4" />
-              MVP en développement — Lancement Q1 2026
+              Marketing Social Media • Email & SMS
             </div>
             <h1 className="mx-auto max-w-4xl text-5xl font-bold leading-tight text-white sm:text-6xl lg:text-7xl">
               <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-orange-400 bg-clip-text text-transparent">
@@ -244,19 +244,18 @@ export default function MarketingPage() {
                 href={config.marketing.register}
                 className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 px-8 py-4 text-lg font-medium text-white shadow-lg shadow-pink-500/25 transition-all hover:from-pink-600 hover:to-purple-700 hover:shadow-pink-500/40"
               >
-                Rejoindre la waitlist (gratuit)
+                Essai gratuit 30 jours
                 <ArrowRight className="h-5 w-5" />
               </Link>
               <Link
-                href="/marketing/roadmap"
+                href="/tarifs"
                 className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-8 py-4 text-lg font-medium text-white transition-all hover:bg-white/10"
               >
-                Voir la roadmap
+                Voir les tarifs
               </Link>
             </div>
             <p className="mt-6 text-sm text-slate-500">
-              🎁 Les 100 premiers inscrits : 3 mois gratuits + onboarding
-              personnalisé
+              ✨ Sans engagement • Sans carte bancaire • Support inclus
             </p>
           </m.div>
         </Container>
@@ -584,7 +583,7 @@ export default function MarketingPage() {
         </Container>
       </section>
 
-      {/* Waitlist CTA */}
+      {/* CTA final */}
       <section className="relative py-20">
         <Container narrow>
           <m.div
@@ -602,26 +601,25 @@ export default function MarketingPage() {
                 Prêt à simplifier votre marketing ?
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-lg text-slate-300">
-                Rejoignez la waitlist maintenant. Les 100 premiers inscrits
-                bénéficient de 3 mois gratuits + un onboarding personnalisé au
-                lancement.
+                30 jours d&apos;essai gratuit, sans engagement. L&apos;IA gère vos
+                réseaux sociaux pendant que vous vous concentrez sur votre métier.
               </p>
 
               {/* Mini benefits */}
               <div className="mx-auto mt-6 grid max-w-2xl grid-cols-3 gap-4">
                 <div className="rounded-lg border border-pink-500/20 bg-slate-900/50 p-3">
-                  <div className="text-2xl font-bold text-pink-400">3 mois</div>
-                  <div className="text-xs text-slate-400">gratuits</div>
+                  <div className="text-2xl font-bold text-pink-400">30j</div>
+                  <div className="text-xs text-slate-400">essai gratuit</div>
                 </div>
                 <div className="rounded-lg border border-pink-500/20 bg-slate-900/50 p-3">
-                  <div className="text-2xl font-bold text-pink-400">0€</div>
-                  <div className="text-xs text-slate-400">pour tester</div>
+                  <div className="text-2xl font-bold text-pink-400">99€</div>
+                  <div className="text-xs text-slate-400">par mois</div>
                 </div>
                 <div className="rounded-lg border border-pink-500/20 bg-slate-900/50 p-3">
                   <div className="text-2xl font-bold text-pink-400">
-                    Q1 2026
+                    IA
                   </div>
-                  <div className="text-xs text-slate-400">lancement</div>
+                  <div className="text-xs text-slate-400">intégrée</div>
                 </div>
               </div>
 
@@ -630,12 +628,12 @@ export default function MarketingPage() {
                   href={config.marketing.register}
                   className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 px-8 py-4 text-lg font-medium text-white shadow-lg shadow-pink-500/25 transition-all hover:from-pink-600 hover:to-purple-700 hover:shadow-pink-500/40"
                 >
-                  Rejoindre la waitlist gratuitement
+                  Essai gratuit 30 jours
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </div>
               <p className="mt-6 text-sm text-slate-500">
-                ✨ Sans engagement • Sans carte bancaire • Accès prioritaire
+                ✨ Sans engagement • Sans carte bancaire • Annulation à tout moment
               </p>
             </div>
           </m.div>

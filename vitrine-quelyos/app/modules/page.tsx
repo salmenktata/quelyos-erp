@@ -111,7 +111,7 @@ const modules = [
     gradient: "from-pink-500 to-rose-500",
     bgGradient: "from-pink-500/10 to-rose-500/5",
     href: "/marketing",
-    status: "beta",
+    status: "production",
   },
   {
     id: "home",

@@ -59,7 +59,7 @@ export default function CGVPage() {
             Document légal
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold">Conditions Générales de Vente</h1>
-          <p className="text-slate-400">Dernière mise à jour : Janvier 2025</p>
+          <p className="text-slate-400">Dernière mise à jour : Janvier 2026</p>
         </div>
 
         <div className="mb-12 p-6 rounded-2xl bg-indigo-500/10 border border-indigo-500/30">

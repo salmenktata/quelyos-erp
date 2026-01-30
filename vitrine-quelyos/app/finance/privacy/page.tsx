@@ -63,7 +63,7 @@ export default function PrivacyPage() {
             Protection des données
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold">Privacy Policy</h1>
-          <p className="text-slate-400">Last updated: December 2025</p>
+          <p className="text-slate-400">Last updated: January 2026</p>
         </div>
         
         {/* Engagement */}

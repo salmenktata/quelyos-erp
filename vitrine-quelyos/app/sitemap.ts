@@ -18,9 +18,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages: Entry[] = [
     // Homepage & Global Pages
     { path: "/", changeFrequency: "weekly", priority: 1 },
-    { path: "/tarifs", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/modules", changeFrequency: "monthly", priority: 0.9 },
+    { path: "/tarifs", changeFrequency: "monthly", priority: 0.9 },
+    { path: "/secteurs", changeFrequency: "monthly", priority: 0.7 },
     { path: "/contact", changeFrequency: "monthly", priority: 0.7 },
-    { path: "/ecommerce", changeFrequency: "monthly", priority: 0.6 },
+
+    // Modules - Pages principales
+    { path: "/crm", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/stock", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/hr", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/pos", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/ecommerce", changeFrequency: "monthly", priority: 0.8 },
 
     // Finance App - Main Pages
     { path: "/finance", changeFrequency: "weekly", priority: 0.9 },

@@ -294,13 +294,13 @@ export default function FeaturesPage() {
             Prêt à simplifier votre marketing ?
           </h2>
           <p className="text-gray-400 mb-8">
-            Rejoignez la liste d&apos;attente pour un accès anticipé.
+            Testez toutes les fonctionnalités gratuitement pendant 30 jours.
           </p>
           <Link
-            href="/marketing"
+            href="/marketing/register"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-colors"
           >
-            <span>Rejoindre la waitlist</span>
+            <span>Essai gratuit 30 jours</span>
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

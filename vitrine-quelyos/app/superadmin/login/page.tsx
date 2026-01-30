@@ -280,7 +280,7 @@ function LoginForm() {
             Accès sécurisé - Toutes les connexions sont enregistrées
           </p>
           <p className="mt-2 text-center text-xs text-slate-700">
-            © 2025 Quelyos. Panneau d&apos;administration.
+            © 2026 Quelyos. Panneau d&apos;administration.
           </p>
         </div>
       </div>

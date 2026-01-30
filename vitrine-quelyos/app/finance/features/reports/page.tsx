@@ -49,9 +49,9 @@ const features = [
 ];
 
 const reports = [
-  { name: "Bilan mensuel", date: "Décembre 2025", status: "ready" },
+  { name: "Bilan mensuel", date: "Janvier 2026", status: "ready" },
   { name: "Compte de résultat", date: "T4 2025", status: "ready" },
-  { name: "Détail TVA", date: "Novembre 2025", status: "ready" },
+  { name: "Détail TVA", date: "Décembre 2025", status: "ready" },
   { name: "Prévisionnel", date: "2026", status: "generating" },
 ];
 

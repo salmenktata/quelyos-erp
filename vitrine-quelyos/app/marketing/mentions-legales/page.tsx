@@ -123,7 +123,7 @@ export default function MentionsLegalesPage() {
 
           <div className="mt-12 pt-8 border-t border-white/5">
             <p className="text-gray-500 text-sm">
-              Dernière mise à jour : Décembre 2025
+              Dernière mise à jour : Janvier 2026
             </p>
           </div>
         </div>

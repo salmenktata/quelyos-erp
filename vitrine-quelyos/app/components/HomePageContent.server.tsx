@@ -3,7 +3,110 @@ import * as Icons from "./Icons";
 import Footer from "./Footer";
 import Container from "./Container";
 import Header from "./Header";
-import config from "@/app/lib/config";
+
+const modules = [
+  {
+    id: "home",
+    name: "Dashboard",
+    tagline: "Vue unifiée",
+    description: "Tableau de bord consolidé avec KPIs temps réel de tous vos modules.",
+    features: ["KPIs consolidés", "Alertes", "Raccourcis", "Analytics global"],
+    status: "production",
+    color: "slate",
+  },
+  {
+    id: "finance",
+    name: "Finance",
+    tagline: "Trésorerie & Prévisions IA 90j",
+    description: "Pilotez votre trésorerie avec l'IA. Précision 85-90% sur 90 jours.",
+    features: ["Prévisions IA 85-90%", "Multi-comptes", "Rapports PDF", "Export FEC"],
+    status: "production",
+    color: "emerald",
+  },
+  {
+    id: "store",
+    name: "Boutique",
+    tagline: "E-commerce omnicanal",
+    description: "Catalogue, commandes, promotions. Synchronisation Stock automatique.",
+    features: ["Catalogue produits", "Commandes", "Promotions", "Sync Stock auto"],
+    status: "production",
+    color: "indigo",
+  },
+  {
+    id: "crm",
+    name: "CRM",
+    tagline: "Pipeline & Facturation",
+    description: "Pipeline ventes, fiches 360°, devis → factures en un clic.",
+    features: ["Pipeline ventes", "Fiches 360°", "Devis → Factures", "Sync Finance"],
+    status: "production",
+    color: "violet",
+  },
+  {
+    id: "stock",
+    name: "Stock",
+    tagline: "Multi-entrepôts temps réel",
+    description: "Gestion multi-sites, alertes seuils, valorisation FIFO/LIFO.",
+    features: ["Multi-sites", "Alertes stock", "Valorisation", "Scan codes-barres"],
+    status: "production",
+    color: "orange",
+  },
+  {
+    id: "hr",
+    name: "RH",
+    tagline: "SIRH complet",
+    description: "Gestion employés, congés, pointage, évaluations annuelles.",
+    features: ["Employés", "Congés", "Pointage", "Évaluations"],
+    status: "production",
+    color: "cyan",
+  },
+  {
+    id: "pos",
+    name: "Point de Vente",
+    tagline: "Caisse moderne",
+    description: "Terminal tactile, Click & Collect, mode rush, écran cuisine.",
+    features: ["Terminal tactile", "Click & Collect", "Mode Rush", "Écran cuisine"],
+    status: "production",
+    color: "teal",
+  },
+  {
+    id: "marketing",
+    name: "Marketing",
+    tagline: "Email & SMS",
+    description: "Campagnes multicanal, templates, segmentation audiences.",
+    features: ["Campagnes", "Templates", "Audiences", "Analytics"],
+    status: "production",
+    color: "pink",
+  },
+];
+
+const colorClasses: Record<string, { bg: string; text: string; border: string }> = {
+  slate: { bg: "bg-slate-500/20", text: "text-slate-300", border: "border-slate-500/30" },
+  emerald: { bg: "bg-emerald-500/20", text: "text-emerald-400", border: "border-emerald-500/30" },
+  indigo: { bg: "bg-indigo-500/20", text: "text-indigo-400", border: "border-indigo-500/30" },
+  violet: { bg: "bg-violet-500/20", text: "text-violet-400", border: "border-violet-500/30" },
+  orange: { bg: "bg-orange-500/20", text: "text-orange-400", border: "border-orange-500/30" },
+  cyan: { bg: "bg-cyan-500/20", text: "text-cyan-400", border: "border-cyan-500/30" },
+  teal: { bg: "bg-teal-500/20", text: "text-teal-400", border: "border-teal-500/30" },
+  pink: { bg: "bg-pink-500/20", text: "text-pink-400", border: "border-pink-500/30" },
+};
+
+const secteurs = [
+  { emoji: "🏪", name: "Commerce & Retail", desc: "Boutiques, e-commerce, click & collect", modules: ["Boutique", "Stock", "POS", "CRM"] },
+  { emoji: "🍽️", name: "Restauration", desc: "Restaurants, traiteurs, food trucks", modules: ["POS", "Stock", "Finance", "Marketing"] },
+  { emoji: "🔧", name: "Services B2B", desc: "Agences, conseil, prestataires", modules: ["CRM", "Finance", "Marketing", "RH"] },
+  { emoji: "🏭", name: "Artisans & Production", desc: "Ateliers, fabrication, BTP", modules: ["Stock", "CRM", "Finance", "RH"] },
+];
+
+const moduleHrefs: Record<string, string> = {
+  home: "/modules",
+  finance: "/finance",
+  store: "/ecommerce",
+  crm: "/crm",
+  stock: "/stock",
+  hr: "/hr",
+  pos: "/pos",
+  marketing: "/marketing",
+};
 
 // Server Component sans animations (hydratation immédiate)
 export default function HomePageContentServer() {
@@ -16,228 +119,136 @@ export default function HomePageContentServer() {
         <Container>
           <div className="text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-2 text-sm text-indigo-300">
-              <Icons.Sparkles className="h-4 w-4" />2 plateformes SaaS complémentaires
+              <Icons.MapPin className="h-4 w-4" />
+              Suite ERP française • 8 modules intégrés
             </div>
             <h1 className="mx-auto max-w-4xl text-5xl font-bold leading-tight text-white sm:text-6xl lg:text-7xl">
-              La Suite Quelyos pour{" "}
+              Pilotez toute votre entreprise{" "}
               <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                piloter votre TPE
+                depuis une seule plateforme
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 sm:text-xl">
-              Gérez votre trésorerie avec l&apos;IA et automatisez votre
-              marketing digital. Deux outils pensés pour les TPE/PME qui veulent
-              se concentrer sur leur métier.
+              IA intégrée pour vos prévisions, données synchronisées entre modules.
+              Finance, Commerce, CRM, Stock, RH, POS, Marketing — tout en un.
             </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-400">
+              <span className="flex items-center gap-1">
+                <Icons.Layers className="h-4 w-4 text-indigo-400" />
+                8 modules
+              </span>
+              <span className="text-slate-600">•</span>
+              <span className="flex items-center gap-1">
+                <Icons.Sparkles className="h-4 w-4 text-purple-400" />
+                +250 fonctionnalités
+              </span>
+              <span className="text-slate-600">•</span>
+              <span className="flex items-center gap-1">
+                <Icons.Code className="h-4 w-4 text-emerald-400" />
+                API REST complète
+              </span>
+            </div>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                href="/finance"
+                href="/finance/register"
                 className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 px-8 py-4 text-lg font-medium text-white transition-all hover:from-indigo-600 hover:to-indigo-700"
               >
-                <Icons.DollarSign className="h-5 w-5" />
-                Découvrir Finance
+                Essai gratuit 30 jours
+                <Icons.ArrowRight className="h-5 w-5" />
               </Link>
               <Link
-                href="/marketing"
-                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 px-8 py-4 text-lg font-medium text-white transition-all hover:from-pink-600 hover:to-purple-700"
+                href="/tarifs"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-8 py-4 text-lg font-medium text-white transition-all hover:bg-white/10"
               >
-                <Icons.Instagram className="h-5 w-5" />
-                Découvrir Marketing
+                Voir les tarifs
               </Link>
             </div>
           </div>
         </Container>
       </section>
 
-      {/* Plateformes */}
-      <section className="relative py-20">
+      {/* Modules */}
+      <section id="modules" className="relative py-20">
         <Container>
-          <div className="grid gap-8 lg:grid-cols-2">
-            {/* Finance */}
-            <div
-              id="finance"
-              className="group relative overflow-hidden rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/50 to-slate-900/50 p-8 backdrop-blur-sm transition-all hover:border-indigo-500/50 hover:shadow-2xl hover:shadow-indigo-500/20"
-            >
-              <div className="absolute right-0 top-0 h-64 w-64 bg-gradient-to-br from-indigo-500/20 to-transparent blur-3xl" />
-              <div className="relative">
-                <div className="mb-6 inline-flex rounded-xl bg-indigo-500/20 p-4">
-                  <Icons.DollarSign className="h-10 w-10 text-indigo-400" />
-                </div>
-                <h2 className="mb-3 text-3xl font-bold text-white">
-                  Quelyos Finance
-                </h2>
-                <p className="mb-2 text-lg font-medium text-indigo-300">
-                  Pilotage trésorerie & prévisions IA
-                </p>
-                <p className="mb-6 text-slate-400">
-                  &quot;Dormez tranquille : votre trésorerie TPE pilotée 90
-                  jours à l&apos;avance.&quot;
-                </p>
-                <ul className="mb-8 space-y-3">
-                  {[
-                    { icon: Icons.TrendingUp, text: "Prévisions IA fiables à 85-90%" },
-                    { icon: Icons.BarChart3, text: "Dashboard KPIs temps réel" },
-                    { icon: Icons.Calendar, text: "Import automatique transactions" },
-                    { icon: Icons.Shield, text: "Rapports & budgets intelligents" },
-                  ].map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3 text-slate-300">
-                      <feature.icon className="h-5 w-5 text-indigo-400" />
-                      <span>{feature.text}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Link
-                    href="/finance"
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 px-6 py-3 font-medium text-white transition-all hover:from-indigo-600 hover:to-indigo-700"
-                  >
-                    En savoir plus
-                    <Icons.ArrowRight className="h-5 w-5" />
-                  </Link>
-                  <Link
-                    href={config.finance.login}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-indigo-500/50 bg-indigo-500/10 px-6 py-3 font-medium text-indigo-300 transition-all hover:bg-indigo-500/20"
-                  >
-                    Accéder à l&apos;app
-                  </Link>
-                </div>
-                <div className="mt-4 flex items-center gap-2 text-sm text-slate-400">
-                  <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
-                  En production • 43 features
-                </div>
-              </div>
-            </div>
-
-            {/* Marketing */}
-            <div
-              id="marketing"
-              className="group relative overflow-hidden rounded-2xl border border-pink-500/30 bg-gradient-to-br from-pink-950/50 to-slate-900/50 p-8 backdrop-blur-sm transition-all hover:border-pink-500/50 hover:shadow-2xl hover:shadow-pink-500/20"
-            >
-              <div className="absolute right-0 top-0 h-64 w-64 bg-gradient-to-br from-pink-500/20 to-transparent blur-3xl" />
-              <div className="relative">
-                <div className="mb-6 inline-flex rounded-xl bg-pink-500/20 p-4">
-                  <Icons.Instagram className="h-10 w-10 text-pink-400" />
-                </div>
-                <h2 className="mb-3 text-3xl font-bold text-white">
-                  Quelyos Marketing
-                </h2>
-                <p className="mb-2 text-lg font-medium text-pink-300">
-                  Marketing social media automatisé
-                </p>
-                <p className="mb-6 text-slate-400">
-                  &quot;20 minutes par semaine, zéro expertise, des clients en
-                  plus.&quot;
-                </p>
-                <ul className="mb-8 space-y-3">
-                  {[
-                    { icon: Icons.Sparkles, text: "IA génération contenu secteur" },
-                    { icon: Icons.Calendar, text: "Publication automatique multi-réseaux" },
-                    { icon: Icons.MessageSquare, text: "Inbox unifiée + réponses IA" },
-                    { icon: Icons.BarChart3, text: "Analytics business & engagement" },
-                  ].map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3 text-slate-300">
-                      <feature.icon className="h-5 w-5 text-pink-400" />
-                      <span>{feature.text}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Link
-                    href="/marketing"
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3 font-medium text-white transition-all hover:from-pink-600 hover:to-purple-700"
-                  >
-                    En savoir plus
-                    <Icons.ArrowRight className="h-5 w-5" />
-                  </Link>
-                  <Link
-                    href={config.marketing.login}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-pink-500/50 bg-pink-500/10 px-6 py-3 font-medium text-pink-300 transition-all hover:bg-pink-500/20"
-                  >
-                    Rejoindre la waitlist
-                  </Link>
-                </div>
-                <div className="mt-4 flex items-center gap-2 text-sm text-slate-400">
-                  <span className="flex h-2 w-2 animate-pulse rounded-full bg-yellow-500" />
-                  MVP en développement • Lancement Q1 2026
-                </div>
-              </div>
-            </div>
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">
+              8 modules intégrés, données synchronisées
+            </h2>
+            <p className="mt-4 text-lg text-slate-400">
+              Une vente = stock mis à jour + revenu Finance + fiche client enrichie. Automatique.
+            </p>
           </div>
-
-          {/* E-Commerce Coming Soon */}
-          <div className="mt-8">
-            <div className="group relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/30 to-slate-900/50 p-8 backdrop-blur-sm transition-all hover:border-amber-500/50">
-              <div className="absolute right-0 top-0 h-64 w-64 bg-gradient-to-br from-amber-500/10 to-transparent blur-3xl" />
-              <div className="absolute top-4 right-4 rounded-full bg-amber-500/20 px-3 py-1 text-xs font-medium text-amber-300">
-                Coming Soon 2026
-              </div>
-              <div className="relative flex flex-col lg:flex-row lg:items-center lg:gap-12">
-                <div className="mb-6 lg:mb-0 lg:w-1/2">
-                  <div className="mb-4 inline-flex rounded-xl bg-amber-500/20 p-4">
-                    <Icons.ShoppingCart className="h-10 w-10 text-amber-400" />
-                  </div>
-                  <h2 className="mb-3 text-3xl font-bold text-white">
-                    Quelyos E-Commerce
-                  </h2>
-                  <p className="mb-2 text-lg font-medium text-amber-300">
-                    Order Hub Omnicanal pour TPE
-                  </p>
-                  <p className="mb-6 text-slate-400">
-                    &quot;Transformez chaque conversation en commande. Sans site
-                    web. Depuis tous vos canaux.&quot;
-                  </p>
-                  <p className="text-sm text-slate-500 mb-6">
-                    L&apos;anti-Shopify pour ceux qui vendent via WhatsApp,
-                    Instagram et Messenger. Centralisez vos commandes, facturez
-                    automatiquement, synchronisez votre trésorerie.
-                  </p>
-                  <Link
-                    href="/ecommerce"
-                    className="inline-flex items-center gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 px-6 py-3 font-medium text-amber-300 transition-all hover:bg-amber-500/20"
-                  >
-                    Rejoindre la waitlist
-                    <Icons.ArrowRight className="h-5 w-5" />
-                  </Link>
-                </div>
-                <div className="lg:w-1/2">
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { icon: Icons.Smartphone, text: "WhatsApp, Instagram, Messenger", desc: "Capture omnicanale" },
-                      { icon: Icons.Receipt, text: "Facturation auto", desc: "Devis & factures" },
-                      { icon: Icons.Package, text: "Gestion stock", desc: "Temps réel" },
-                      { icon: Icons.TrendingUp, text: "Sync Finance", desc: "Trésorerie à jour" },
-                    ].map((feature, i) => (
-                      <div key={i} className="rounded-xl bg-white/5 p-4">
-                        <feature.icon className="h-6 w-6 text-amber-400 mb-2" />
-                        <p className="text-sm font-medium text-white">{feature.text}</p>
-                        <p className="text-xs text-slate-400">{feature.desc}</p>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {modules.map((mod) => {
+              const colors = colorClasses[mod.color];
+              return (
+                <div
+                  key={mod.id}
+                  className={`group relative overflow-hidden rounded-xl border ${colors.border} bg-slate-900/50 p-6 backdrop-blur-sm transition-all hover:border-opacity-70 hover:shadow-lg`}
+                >
+                  <div className="relative">
+                    <div className={`mb-4 inline-flex rounded-xl ${colors.bg} p-3`}>
+                      <Icons.Layers className={`h-8 w-8 ${colors.text}`} />
+                    </div>
+                    <h3 className="mb-1 text-xl font-bold text-white">
+                      {mod.name}
+                    </h3>
+                    <p className={`mb-3 text-sm font-medium ${colors.text}`}>
+                      {mod.tagline}
+                    </p>
+                    <p className="mb-4 text-sm text-slate-400">
+                      {mod.description}
+                    </p>
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      {mod.features.map((feature) => (
+                        <span
+                          key={feature}
+                          className="rounded-full bg-white/5 px-2 py-1 text-xs text-slate-300"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Link
+                        href={moduleHrefs[mod.id] || "/modules"}
+                        className={`inline-flex items-center gap-1 text-sm font-medium ${colors.text} transition-all hover:underline`}
+                      >
+                        En savoir plus
+                        <Icons.ArrowRight className="h-4 w-4" />
+                      </Link>
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                        Disponible
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </Container>
       </section>
 
-      {/* Pourquoi Quelyos */}
+      {/* Différenciateurs */}
       <section className="relative py-20">
         <Container>
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              Pourquoi choisir Quelyos ?
+              Ce qui nous différencie
             </h2>
             <p className="mt-4 text-lg text-slate-400">
-              Une suite pensée pour les TPE/PME qui veulent se concentrer sur leur métier
+              Une suite pensée pour les TPE/PME françaises
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[
-              { icon: Icons.Zap, title: "Simple & rapide", desc: "Prise en main en 10 minutes, pas besoin de formation", color: "text-yellow-400" },
-              { icon: Icons.Shield, title: "Données sécurisées", desc: "Hébergement France, RGPD compliant, chiffrement", color: "text-emerald-400" },
-              { icon: Icons.Users, title: "Support humain", desc: "Accompagnement personnalisé pour chaque client", color: "text-blue-400" },
-              { icon: Icons.DollarSign, title: "Prix accessible", desc: "Tarifs adaptés TPE, pas d'engagement annuel", color: "text-purple-400" },
+              { icon: Icons.Layers, title: "8 modules = 1 abonnement", desc: "Finance, Vente, Stock, CRM, RH, POS, Marketing — tout inclus sans frais cachés.", color: "text-indigo-400" },
+              { icon: Icons.Sparkles, title: "IA intégrée", desc: "Prévisions trésorerie 90j, détection anomalies, scoring leads. Machine Learning natif.", color: "text-purple-400" },
+              { icon: Icons.RefreshCw, title: "Données synchronisées", desc: "Une vente = stock mis à jour + revenu en Finance + fiche client enrichie. Automatique.", color: "text-emerald-400" },
+              { icon: Icons.Shield, title: "Made in France", desc: "Hébergement France, RGPD natif, support francophone. Pas de transfert US.", color: "text-blue-400" },
+              { icon: Icons.Code, title: "API REST complète", desc: "Intégrez Quelyos à vos outils. Export illimité, vos données vous appartiennent.", color: "text-cyan-400" },
+              { icon: Icons.Server, title: "SaaS multi-tenant", desc: "Zéro maintenance, mises à jour auto, accessible partout. Instance dédiée isolée.", color: "text-orange-400" },
             ].map((item, i) => (
               <div
                 key={i}
@@ -252,15 +263,51 @@ export default function HomePageContentServer() {
         </Container>
       </section>
 
+      {/* Secteurs d'activité */}
+      <section className="relative py-20">
+        <Container>
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">
+              Adapté à votre secteur
+            </h2>
+            <p className="mt-4 text-lg text-slate-400">
+              Des modules recommandés selon votre activité
+            </p>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {secteurs.map((secteur, i) => (
+              <div
+                key={i}
+                className="group rounded-xl border border-white/10 bg-slate-900/50 p-6 backdrop-blur-sm transition-all hover:border-indigo-500/30 hover:bg-slate-900/70"
+              >
+                <span className="mb-3 block text-4xl">{secteur.emoji}</span>
+                <h3 className="mb-1 text-lg font-semibold text-white">{secteur.name}</h3>
+                <p className="mb-4 text-sm text-slate-400">{secteur.desc}</p>
+                <div className="flex flex-wrap gap-1">
+                  {secteur.modules.map((mod) => (
+                    <span
+                      key={mod}
+                      className="rounded-full bg-indigo-500/10 px-2 py-0.5 text-xs text-indigo-300"
+                    >
+                      {mod}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
       {/* Stats */}
       <section className="relative border-y border-white/10 bg-slate-900/50 py-16">
         <Container>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
             {[
-              { label: "Features Finance", value: "43", icon: Icons.TrendingUp },
-              { label: "Features Marketing", value: "8", icon: Icons.Instagram },
-              { label: "Marchés ciblés", value: "5", icon: Icons.DollarSign },
-              { label: "Objectif ARR 2026", value: "115k€", icon: Icons.Sparkles },
+              { label: "Modules intégrés", value: "8", icon: Icons.Layers },
+              { label: "Fonctionnalités", value: "+250", icon: Icons.Sparkles },
+              { label: "Prévisions IA", value: "90j", icon: Icons.RefreshCw },
+              { label: "Hébergement", value: "France", icon: Icons.MapPin },
             ].map((stat, i) => (
               <div
                 key={i}
@@ -275,26 +322,26 @@ export default function HomePageContentServer() {
         </Container>
       </section>
 
-      {/* CTA Contact */}
+      {/* CTA final */}
       <section className="relative py-20">
         <Container narrow>
           <div
             className="overflow-hidden rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/50 to-purple-950/50 p-8 text-center backdrop-blur-sm sm:p-12"
           >
-            <Icons.Mail className="mx-auto mb-6 h-12 w-12 text-indigo-400" />
+            <Icons.Sparkles className="mx-auto mb-6 h-12 w-12 text-indigo-400" />
             <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              Prêt à simplifier votre gestion ?
+              Simplifiez votre gestion dès aujourd&apos;hui
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-slate-300">
-              Contactez-nous pour une démo gratuite ou commencez directement avec l&apos;essai gratuit.
+              30 jours d&apos;essai gratuit, sans engagement. Toutes les fonctionnalités incluses.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                href="/contact"
+                href="/finance/register"
                 className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 font-medium text-white transition-all hover:from-indigo-600 hover:to-purple-700"
               >
-                <Icons.Mail className="h-5 w-5" />
-                Nous contacter
+                Essai gratuit 30 jours
+                <Icons.ArrowRight className="h-5 w-5" />
               </Link>
               <Link
                 href="/tarifs"

@@ -60,7 +60,7 @@ export default function ConfidentialitePage() {
             Protection des données
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold">Politique de Confidentialité</h1>
-          <p className="text-slate-400">Dernière mise à jour : Janvier 2025</p>
+          <p className="text-slate-400">Dernière mise à jour : Janvier 2026</p>
         </div>
 
         <div className="mb-12 p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">

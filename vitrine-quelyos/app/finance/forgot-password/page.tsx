@@ -166,7 +166,7 @@ export default function ForgotPasswordPage() {
               Confidentialité
             </Link>
           </div>
-          <p className="mt-4 text-center text-xs text-slate-600">© 2025 Quelyos. Tous droits réservés.</p>
+          <p className="mt-4 text-center text-xs text-slate-600">© 2026 Quelyos. Tous droits réservés.</p>
         </div>
       </div>
     </div>
