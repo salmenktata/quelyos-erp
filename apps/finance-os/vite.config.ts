@@ -45,6 +45,8 @@ export default defineConfig({
       '@quelyos/hooks': fileURLToPath(new URL('../../packages/hooks', import.meta.url)),
       '@quelyos/auth': fileURLToPath(new URL('../../packages/auth', import.meta.url)),
       '@quelyos/utils': fileURLToPath(new URL('../../packages/utils', import.meta.url)),
+      '@quelyos/logger': fileURLToPath(new URL('./src/lib/logger', import.meta.url)),
+      '@quelyos/types': fileURLToPath(new URL('./src/types', import.meta.url)),
     },
   },
   server: {
