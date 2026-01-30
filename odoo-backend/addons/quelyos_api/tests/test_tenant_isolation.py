@@ -159,15 +159,21 @@ class TestTenantIsolation(TransactionCase):
 
     def test_hero_slide_isolation_by_tenant(self):
         """Vérifie l'isolation des hero slides par tenant."""
-        # Créer un hero slide pour Tenant A
+        # Créer un hero slide pour Tenant A (champs obligatoires: title, cta_text, cta_link)
         slide_a = self.env['quelyos.hero.slide'].sudo().create({
             'name': 'Slide Tenant A',
+            'title': 'Slide A Title',
+            'cta_text': 'CTA A',
+            'cta_link': '/test-a',
             'tenant_id': self.tenant_a.id,
         })
 
         # Créer un hero slide pour Tenant B
         slide_b = self.env['quelyos.hero.slide'].sudo().create({
             'name': 'Slide Tenant B',
+            'title': 'Slide B Title',
+            'cta_text': 'CTA B',
+            'cta_link': '/test-b',
             'tenant_id': self.tenant_b.id,
         })
 
@@ -233,9 +239,12 @@ class TestTenantIsolation(TransactionCase):
 
     def test_shared_data_visible_to_all(self):
         """Vérifie que les données partagées (tenant_id=False) sont visibles par tous."""
-        # Créer un hero slide partagé (pas de tenant)
+        # Créer un hero slide partagé (pas de tenant, champs obligatoires)
         shared_slide = self.env['quelyos.hero.slide'].sudo().create({
             'name': 'Shared Slide',
+            'title': 'Shared Slide Title',
+            'cta_text': 'Shared CTA',
+            'cta_link': '/shared',
             'tenant_id': False,
         })
 
@@ -257,9 +266,12 @@ class TestTenantIsolation(TransactionCase):
 
     def test_cross_tenant_write_denied(self):
         """Vérifie qu'un utilisateur ne peut pas modifier les données d'un autre tenant."""
-        # Créer un hero slide pour Tenant B
+        # Créer un hero slide pour Tenant B (champs obligatoires)
         slide_b = self.env['quelyos.hero.slide'].sudo().create({
             'name': 'Slide Tenant B',
+            'title': 'Slide B Title',
+            'cta_text': 'CTA B',
+            'cta_link': '/test-b',
             'tenant_id': self.tenant_b.id,
         })
 
@@ -328,13 +340,19 @@ class TestSuperAdminAccess(TransactionCase):
 
     def test_superadmin_can_modify_any_tenant_data(self):
         """Vérifie que le super admin peut modifier les données de n'importe quel tenant."""
-        # Créer des données pour chaque tenant
+        # Créer des données pour chaque tenant (champs obligatoires)
         slide_a = self.env['quelyos.hero.slide'].sudo().create({
             'name': 'Slide A',
+            'title': 'Slide A Title',
+            'cta_text': 'CTA A',
+            'cta_link': '/test-a',
             'tenant_id': self.tenant_a.id,
         })
         slide_b = self.env['quelyos.hero.slide'].sudo().create({
             'name': 'Slide B',
+            'title': 'Slide B Title',
+            'cta_text': 'CTA B',
+            'cta_link': '/test-b',
             'tenant_id': self.tenant_b.id,
         })
 
