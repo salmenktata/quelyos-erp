@@ -171,3 +171,5 @@ access_quelyos_sitemap_healthcheck_public,quelyos.sitemap.healthcheck public,mod
 access_quelyos_sitemap_healthcheck_system,quelyos.sitemap.healthcheck system,model_quelyos_sitemap_healthcheck,base.group_system,1,1,1,1
 access_quelyos_sitemap_alert_public,quelyos.sitemap.alert public,model_quelyos_sitemap_alert,,1,0,0,0
 access_quelyos_sitemap_alert_system,quelyos.sitemap.alert system,model_quelyos_sitemap_alert,base.group_system,1,1,1,1
+access_quelyos_job_queue_public,quelyos.job.queue public,model_quelyos_job_queue,,1,0,0,0
+access_quelyos_job_queue_system,quelyos.job.queue system,model_quelyos_job_queue,base.group_system,1,1,1,1

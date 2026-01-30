@@ -3,6 +3,8 @@ from . import ir_http
 from . import auth_refresh_token
 from . import sitemap_healthcheck
 from . import sitemap_service
+from . import cache
+from . import job_queue
 from . import product_image
 from . import product_template
 from . import product_product

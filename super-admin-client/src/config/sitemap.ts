@@ -6,8 +6,8 @@ import { Globe, LayoutDashboard, ShieldCheck, ShoppingBag, type LucideIcon } fro
  * ⚠️  FICHIER GÉNÉRÉ AUTOMATIQUEMENT
  * Ne pas modifier manuellement - Utiliser `pnpm generate-sitemap`
  *
- * Total routes: 235
- * Généré le: 2026-01-30T16:48:10.665Z
+ * Total routes: 236
+ * Généré le: 2026-01-30T17:16:15.380Z
  */
 
 export interface AppRoute {
@@ -251,6 +251,7 @@ export const sitemapData: AppSection[] = [
       { path: '/backups', name: 'Backups', type: 'static' },
       { path: '/billing', name: 'Facturation', type: 'static' },
       { path: '/dashboard', name: 'Dashboard', type: 'static' },
+      { path: '/email-settings', name: 'Email (SMTP)', type: 'static' },
       { path: '/monitoring', name: 'Monitoring', type: 'static' },
       { path: '/plans', name: 'Plans', type: 'static' },
       { path: '/security', name: 'Sécurité', type: 'static' },

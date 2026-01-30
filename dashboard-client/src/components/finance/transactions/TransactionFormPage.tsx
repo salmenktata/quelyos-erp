@@ -1,15 +1,21 @@
 
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
-import { PaymentFlowSelector } from "@/components/PaymentFlowSelector";
-import { CategorySuggestionCard } from "./CategorySuggestionCard";
 import { DuplicateConfirmModal } from "./DuplicateConfirmModal";
+import { TransactionFormFields, TransactionListItem } from './TransactionFormPage/'
 import type { CreateTransactionRequest } from "@/types/api";
 import { logger } from '@quelyos/logger';
+import {
+  transactionFormReducer,
+  initialTransactionFormState,
+  type TransactionFormData,
+  type DuplicateMatch,
+} from './transactionFormReducer'
+import { validateTransactionForm, prepareTransactionPayload } from './transactionFormValidation'
 
 type Transaction = {
   id: number;
@@ -104,31 +110,15 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [newTx, setNewTx] = useState({
-    amount: "",
-    accountId: "",
-    paymentFlowId: null as number | null,
-    status: "CONFIRMED" as Transaction["status"],
-    occurredAt: new Date().toISOString().slice(0, 10),
-    scheduledFor: "",
-    tags: "",
-    description: "",
-    categoryId: "",
-  });
-  const [editingId, setEditingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  // Duplicate detection states
-  const [duplicateMatches, setDuplicateMatches] = useState<any[]>([]);
-  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
-  const [pendingTransaction, setPendingTransaction] = useState<any | null>(null);
+  // Consolidation des états du formulaire via useReducer
+  const [state, dispatch] = useReducer(transactionFormReducer, initialTransactionFormState);
 
   const fetchTransactions = useCallback(async () => {
     try {
-      setError(null);
-      setLoading(true);
+      dispatch({ type: 'SET_ERROR', payload: null });
+      dispatch({ type: 'SET_LOADING', payload: true });
       const data = await api("/transactions?archived=false");
       setTransactions(
         Array.isArray(data)
@@ -136,13 +126,12 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
           : []
       );
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Erreur de chargement des transactions."
-      );
+      dispatch({
+        type: 'SET_ERROR',
+        payload: err instanceof Error ? err.message : "Erreur de chargement des transactions.",
+      });
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, [config.type]);
 
@@ -151,9 +140,10 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
       const data = await api("/accounts");
       setAccounts(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Erreur de chargement des comptes."
-      );
+      dispatch({
+        type: 'SET_ERROR',
+        payload: err instanceof Error ? err.message : "Erreur de chargement des comptes.",
+      });
     }
   }, []);
 
@@ -162,44 +152,36 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
       const data = await api(`/categories?kind=${config.categoryKind}`);
       setCategories(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Erreur de chargement des catégories."
-      );
+      dispatch({
+        type: 'SET_ERROR',
+        payload: err instanceof Error ? err.message : "Erreur de chargement des catégories.",
+      });
     }
   }, [config.categoryKind]);
 
   async function addTransaction(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
+    dispatch({ type: 'SET_ERROR', payload: null });
+    dispatch({ type: 'SET_LOADING', payload: true });
 
     try {
-      const requiresSchedule = newTx.status === "PLANNED" || newTx.status === "SCHEDULED";
-      if (requiresSchedule && !newTx.scheduledFor) {
-        setError("La date planifiée est obligatoire pour un statut Prévu ou Programmé.");
-        setLoading(false);
+      // Validation
+      const validation = validateTransactionForm(state.formData);
+      if (!validation.isValid) {
+        dispatch({ type: 'SET_ERROR', payload: validation.error || 'Validation error' });
+        dispatch({ type: 'SET_LOADING', payload: false });
         return;
       }
 
-      const description = newTx.description.trim();
+      const description = state.formData.description.trim();
+      const basePayload = prepareTransactionPayload(state.formData);
       const payload = {
-        amount: Number(newTx.amount),
+        ...basePayload,
         type: config.type,
-        accountId: Number(newTx.accountId),
-        paymentFlowId: newTx.paymentFlowId || undefined,
-        status: newTx.status,
-        occurredAt: newTx.occurredAt,
-        scheduledFor: newTx.scheduledFor || undefined,
-        tags: newTx.tags
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean),
-        description: description === "" ? null : description,
-        categoryId: newTx.categoryId ? Number(newTx.categoryId) : null,
       };
 
-      if (editingId) {
-        await api(`/transactions/${editingId}`, {
+      if (state.editingId) {
+        await api(`/transactions/${state.editingId}`, {
           method: "PATCH",
           body: payload as unknown as Partial<CreateTransactionRequest>,
         });
@@ -215,14 +197,17 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
                 date: payload.occurredAt,
                 accountId: payload.accountId,
               },
-            }) as any;
+            }) as { is_likely_duplicate: boolean; matches: DuplicateMatch[] };
 
             // Si doublon détecté (similarité >= 75%), afficher modal
             if (duplicateCheck.is_likely_duplicate && duplicateCheck.matches.length > 0) {
-              setPendingTransaction(payload);
-              setDuplicateMatches(duplicateCheck.matches);
-              setShowDuplicateModal(true);
-              setLoading(false);
+              dispatch({
+                type: 'SHOW_DUPLICATE_MODAL',
+                payload: {
+                  matches: duplicateCheck.matches,
+                  pendingTransaction: payload,
+                },
+              });
               return; // Stopper ici, attendre user action
             }
           } catch (err) {
@@ -238,115 +223,96 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
         });
       }
 
-      setNewTx({
-        amount: "",
-        accountId: "",
-        paymentFlowId: null,
-        status: "CONFIRMED",
-        occurredAt: new Date().toISOString().slice(0, 10),
-        scheduledFor: "",
-        tags: "",
-        description: "",
-        categoryId: "",
-      });
-      setEditingId(null);
+      dispatch({ type: 'RESET_FORM_DATA' });
       fetchTransactions();
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Impossible d'ajouter la transaction."
-      );
+      dispatch({
+        type: 'SET_ERROR',
+        payload: err instanceof Error ? err.message : "Impossible d'ajouter la transaction.",
+      });
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   }
 
   function startEdit(tx: Transaction) {
-    setEditingId(tx.id);
-    setNewTx({
-      amount: String(tx.amount),
-      accountId: String(tx.accountId),
-      paymentFlowId: (tx as Transaction & { paymentFlowId?: number }).paymentFlowId || null,
-      status: (tx.status as Transaction["status"]) ?? "CONFIRMED",
-      occurredAt: tx.occurredAt?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
-      scheduledFor: tx.scheduledFor ? tx.scheduledFor.slice(0, 10) : "",
-      tags: tx.tags?.join(", ") ?? "",
-      description: tx.description ?? "",
-      categoryId: tx.category?.id ? String(tx.category.id) : "",
+    dispatch({
+      type: 'SET_FORM_FOR_EDIT',
+      payload: {
+        amount: String(tx.amount),
+        accountId: String(tx.accountId),
+        paymentFlowId: (tx as Transaction & { paymentFlowId?: number }).paymentFlowId || null,
+        status: (tx.status as TransactionFormData['status']) ?? "CONFIRMED",
+        occurredAt: tx.occurredAt?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
+        scheduledFor: tx.scheduledFor ? tx.scheduledFor.slice(0, 10) : "",
+        tags: tx.tags?.join(", ") ?? "",
+        description: tx.description ?? "",
+        categoryId: tx.category?.id ? String(tx.category.id) : "",
+        editingId: tx.id,
+      },
     });
   }
 
   function cancelEdit() {
-    setEditingId(null);
-    setNewTx({
-      amount: "",
-      accountId: "",
-      paymentFlowId: null,
-      status: "CONFIRMED",
-      occurredAt: new Date().toISOString().slice(0, 10),
-      scheduledFor: "",
-      tags: "",
-      description: "",
-      categoryId: "",
-    });
+    dispatch({ type: 'RESET_FORM_DATA' });
   }
 
   // Duplicate detection handlers
   async function handleConfirmDuplicate(matchId: number) {
-    if (!pendingTransaction) return;
+    if (!state.pendingTransaction) return;
 
     try {
+      const pending = state.pendingTransaction as {
+        description?: string
+        amount: number
+        occurredAt: string
+        accountId: number
+      };
+      const matches: DuplicateMatch[] = state.duplicateMatches;
+
       // Enregistrer que c'est un doublon confirmé
       await api(`/finance/duplicates/${matchId}/confirm`, {
         method: "POST",
         body: {
-          description: pendingTransaction.description,
-          amount: pendingTransaction.amount,
-          occurredAt: pendingTransaction.occurredAt,
-          accountId: pendingTransaction.accountId,
-          similarityScore: duplicateMatches[0]?.similarity_score || 1.0,
+          description: pending.description,
+          amount: pending.amount,
+          occurredAt: pending.occurredAt,
+          accountId: pending.accountId,
+          similarityScore: matches[0]?.similarity_score || 1.0,
         },
       });
 
-      // Fermer modal et réinitialiser formulaire
-      setShowDuplicateModal(false);
-      setPendingTransaction(null);
-      setDuplicateMatches([]);
-      setNewTx({
-        amount: "",
-        accountId: "",
-        paymentFlowId: null,
-        status: "CONFIRMED",
-        occurredAt: new Date().toISOString().slice(0, 10),
-        scheduledFor: "",
-        tags: "",
-        description: "",
-        categoryId: "",
-      });
+      dispatch({ type: 'CONFIRM_DUPLICATE' });
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Erreur lors de la confirmation du doublon."
-      );
+      dispatch({
+        type: 'SET_ERROR',
+        payload: err instanceof Error ? err.message : "Erreur lors de la confirmation du doublon.",
+      });
     }
   }
 
   async function handleIgnoreDuplicate() {
-    if (!pendingTransaction) return;
+    if (!state.pendingTransaction) return;
 
     try {
+      const pending = state.pendingTransaction as {
+        description?: string
+        amount: number
+        occurredAt: string
+        accountId: number
+      };
+      const matches: DuplicateMatch[] = state.duplicateMatches;
+
       // Enregistrer que l'alerte est ignorée
-      if (duplicateMatches.length > 0) {
-        await api(`/finance/duplicates/${duplicateMatches[0].transactionId}/ignore`, {
+      if (matches.length > 0) {
+        await api(`/finance/duplicates/${matches[0].transactionId}/ignore`, {
           method: "POST",
           body: {
-            description: pendingTransaction.description,
-            amount: pendingTransaction.amount,
-            occurredAt: pendingTransaction.occurredAt,
-            accountId: pendingTransaction.accountId,
-            similarityScore: duplicateMatches[0]?.similarity_score || 0.75,
+            description: pending.description,
+            amount: pending.amount,
+            occurredAt: pending.occurredAt,
+            accountId: pending.accountId,
+            similarityScore: matches[0]?.similarity_score || 0.75,
           },
         });
       }
@@ -354,39 +320,21 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
       // Créer la transaction quand même
       await api("/transactions", {
         method: "POST",
-        body: pendingTransaction as CreateTransactionRequest,
+        body: state.pendingTransaction as CreateTransactionRequest,
       });
 
-      // Fermer modal et réinitialiser
-      setShowDuplicateModal(false);
-      setPendingTransaction(null);
-      setDuplicateMatches([]);
-      setNewTx({
-        amount: "",
-        accountId: "",
-        paymentFlowId: null,
-        status: "CONFIRMED",
-        occurredAt: new Date().toISOString().slice(0, 10),
-        scheduledFor: "",
-        tags: "",
-        description: "",
-        categoryId: "",
-      });
-
+      dispatch({ type: 'IGNORE_DUPLICATE' });
       fetchTransactions();
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Impossible de créer la transaction."
-      );
+      dispatch({
+        type: 'SET_ERROR',
+        payload: err instanceof Error ? err.message : "Impossible de créer la transaction.",
+      });
     }
   }
 
   function handleCancelDuplicate() {
-    setShowDuplicateModal(false);
-    setPendingTransaction(null);
-    setDuplicateMatches([]);
+    dispatch({ type: 'HIDE_DUPLICATE_MODAL' });
   }
 
   async function deleteTx(id: number) {
@@ -394,12 +342,13 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
     setDeletingId(id);
     try {
       await api(`/transactions/${id}`, { method: "DELETE" });
-      if (editingId === id) cancelEdit();
+      if (state.editingId === id) cancelEdit();
       fetchTransactions();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Impossible de supprimer la transaction."
-      );
+      dispatch({
+        type: 'SET_ERROR',
+        payload: err instanceof Error ? err.message : "Impossible de supprimer la transaction.",
+      });
     } finally {
       setDeletingId(null);
     }
@@ -412,24 +361,13 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
   }, [fetchTransactions, fetchAccounts, fetchCategories]);
 
   useEffect(() => {
-    if (targetId && !editingId && transactions.length > 0) {
+    if (targetId && !state.editingId && transactions.length > 0) {
       const tx = transactions.find((t) => t.id === targetId);
       if (tx) {
-        setEditingId(tx.id);
-        setNewTx({
-          amount: String(tx.amount),
-          accountId: String(tx.accountId),
-          paymentFlowId: (tx as Transaction & { paymentFlowId?: number }).paymentFlowId || null,
-          status: (tx.status as Transaction["status"]) ?? "CONFIRMED",
-          occurredAt: tx.occurredAt?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
-          scheduledFor: tx.scheduledFor ? tx.scheduledFor.slice(0, 10) : "",
-          tags: tx.tags?.join(", ") ?? "",
-          description: tx.description ?? "",
-          categoryId: tx.category?.id ? String(tx.category.id) : "",
-        });
+        startEdit(tx);
       }
     }
-  }, [targetId, editingId, transactions]);
+  }, [targetId, state.editingId, transactions]);
 
   return (
     <div className="space-y-6 text-white">
@@ -448,222 +386,19 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
         </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
-        <form
+        <TransactionFormFields
+          formData={state.formData}
+          accounts={accounts}
+          categories={categories}
+          config={config}
+          statusOptions={statusOptions}
+          editingId={state.editingId}
+          loading={state.loading}
+          onFormChange={(data) => dispatch({ type: 'SET_FORM_DATA', payload: data })}
           onSubmit={addTransaction}
-          className="space-y-4 rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl shadow-xl"
-        >
-          <div className="space-y-2">
-            <h2 className="text-xl font-semibold">Détail</h2>
-            <p className="text-sm text-indigo-100/80">Montant, compte et statut opérationnel.</p>
-          </div>
-
-          {/* Ligne 1 : Montant / Compte */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm text-indigo-100" htmlFor="amount">Montant</label>
-              <input
-                id="amount"
-                type="number"
-                min="0"
-                step="0.01"
-                name="amount"
-                placeholder={config.amountPlaceholder}
-                value={newTx.amount}
-                onChange={(e) =>
-                  setNewTx({
-                    ...newTx,
-                    amount: e.target.value,
-                  })
-                }
-                className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-indigo-100/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm text-indigo-100" htmlFor="account">Compte</label>
-              <select
-                id="account"
-                name="accountId"
-                value={newTx.accountId}
-                onChange={(e) =>
-                  setNewTx({
-                    ...newTx,
-                    accountId: e.target.value,
-                    paymentFlowId: null, // Reset flux when account changes
-                  })
-                }
-                className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-                required
-              >
-                <option value="">Sélectionner un compte</option>
-                {accounts.map((acc) => (
-                  <option key={acc.id} value={acc.id}>
-                    {acc.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Flux de paiement */}
-          <div className="space-y-2">
-            <label className="text-sm text-indigo-100">Flux de paiement</label>
-            {newTx.accountId ? (
-              <PaymentFlowSelector
-                accountId={Number(newTx.accountId)}
-                value={newTx.paymentFlowId}
-                onChange={(flowId) => setNewTx({ ...newTx, paymentFlowId: flowId })}
-              />
-            ) : (
-              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-indigo-100/60">
-                Sélectionnez un compte pour choisir le flux
-              </div>
-            )}
-            <p className="text-xs text-indigo-100/70">{config.paymentFlowHint}</p>
-          </div>
-
-          {/* Ligne 2 : Catégorie / Statut */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm text-indigo-100" htmlFor="category">Catégorie</label>
-              <select
-                id="category"
-                name="categoryId"
-                value={newTx.categoryId}
-                onChange={(e) => setNewTx({ ...newTx, categoryId: e.target.value })}
-                className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-              >
-                <option value="">Aucune</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm text-indigo-100" htmlFor="status">Statut</label>
-              <select
-                id="status"
-                name="status"
-                value={newTx.status}
-                onChange={(e) =>
-                  setNewTx({
-                    ...newTx,
-                    status: e.target.value as typeof newTx.status,
-                  })
-                }
-                className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-              >
-                {statusOptions.map((s) => (
-                  <option key={s.value} value={s.value} className="text-slate-900">
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* ML Category Suggestion */}
-          {!editingId && newTx.description && newTx.amount && (
-            <CategorySuggestionCard
-              description={newTx.description}
-              amount={Number(newTx.amount)}
-              type={config.type}
-              currentCategoryId={newTx.categoryId}
-              onAccept={(categoryId, _categoryName) => {
-                setNewTx({ ...newTx, categoryId: String(categoryId) });
-              }}
-              onReject={() => {
-                // Just dismissed, no action needed
-              }}
-            />
-          )}
-
-          {/* Ligne 3 : Dates */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm text-indigo-100" htmlFor="occurredAt">Date effective</label>
-              <input
-                id="occurredAt"
-                type="date"
-                name="occurredAt"
-                value={newTx.occurredAt}
-                onChange={(e) => setNewTx({ ...newTx, occurredAt: e.target.value })}
-                className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm text-indigo-100" htmlFor="scheduledFor">Date planifiée</label>
-              <input
-                id="scheduledFor"
-                type="date"
-                name="scheduledFor"
-                value={newTx.scheduledFor}
-                onChange={(e) => setNewTx({ ...newTx, scheduledFor: e.target.value })}
-                className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-                required={newTx.status === "PLANNED" || newTx.status === "SCHEDULED"}
-              />
-            </div>
-          </div>
-
-          {/* Ligne 4 : Tags */}
-          <div className="space-y-2">
-            <label className="text-sm text-indigo-100" htmlFor="tags">Tags (séparés par des virgules)</label>
-            <input
-              id="tags"
-              type="text"
-              name="tags"
-              placeholder={config.tagsPlaceholder}
-              value={newTx.tags}
-              onChange={(e) => setNewTx({ ...newTx, tags: e.target.value })}
-              className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-indigo-100/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-            />
-            <p className="text-xs text-indigo-100/70">{config.tagsHint}</p>
-          </div>
-
-          {/* Ligne 5 : Description */}
-          <div className="space-y-2">
-            <label className="text-sm text-indigo-100" htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              rows={4}
-              placeholder={config.descriptionPlaceholder}
-              value={newTx.description}
-              onChange={(e) => setNewTx({ ...newTx, description: e.target.value })}
-              className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-indigo-100/60 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-            />
-            <p className="text-xs text-indigo-100/70">Facultatif : note de contexte affichée dans la liste.</p>
-          </div>
-
-          <button
-            type="submit"
-            className={`w-full rounded-xl bg-gradient-to-r ${config.buttonGradient} px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:${config.buttonGradientHover} disabled:opacity-60`}
-            disabled={loading}
-          >
-            {editingId ? (loading ? "Mise à jour..." : "Mettre à jour") : loading ? "Création..." : config.addButtonText}
-          </button>
-
-          {editingId && (
-            <button
-              type="button"
-              onClick={cancelEdit}
-              className="w-full rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-indigo-50 transition hover:border-white/40"
-              disabled={loading}
-            >
-              Annuler l'édition
-            </button>
-          )}
-
-          {error && (
-            <div className="rounded-lg border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-              {error}
-            </div>
-          )}
-        </form>
+          onCancelEdit={cancelEdit}
+          error={state.error}
+        />
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl shadow-xl">
           <div className="mb-4 flex items-center justify-between">
@@ -674,78 +409,27 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
           </div>
 
           <div className="space-y-3">
-            {loading && (
+            {state.loading && (
               <div className="rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-indigo-100/80">
                 {config.loadingText}
               </div>
             )}
 
-            {!loading &&
+            {!state.loading &&
               transactions.map((tx) => (
-                <div
+                <TransactionListItem
                   key={tx.id}
-                  className="flex items-start justify-between rounded-xl border border-white/5 bg-white/5 px-4 py-3"
-                >
-                  <div className="space-y-1">
-                    <div className="font-medium">
-                      {tx.account?.name || `Compte #${tx.accountId}`}
-                    </div>
-                    <div className="text-xs text-indigo-100/70">
-                      {new Date(tx.occurredAt).toLocaleDateString("fr-FR")}
-                    </div>
-                    {tx.scheduledFor && (
-                      <div className="text-xs text-indigo-100/70">Prévu le {new Date(tx.scheduledFor).toLocaleDateString("fr-FR")}</div>
-                    )}
-                    {tx.category && (
-                      <div className="text-[11px] inline-flex items-center rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-indigo-50">
-                        {tx.category.name}
-                      </div>
-                    )}
-                    {tx.status && (
-                      <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide">
-                        {statusOptions.find((s) => s.value === tx.status)?.label || tx.status}
-                      </span>
-                    )}
-                    {tx.tags && tx.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        {tx.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded-full bg-white/10 px-2 py-1 text-[11px] text-indigo-100"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {tx.description && (
-                      <p className="text-sm text-indigo-50/80 whitespace-pre-wrap">
-                        {tx.description}
-                      </p>
-                    )}
-                  </div>
-                  <div className={`${config.amountColor} font-semibold text-right`}>
-                    {config.amountPrefix}{tx.amount} {currency}
-                    <div className="mt-2 flex flex-wrap justify-end gap-2 text-xs">
-                      <button
-                        onClick={() => startEdit(tx)}
-                        className="rounded-lg border border-white/20 px-3 py-1 text-indigo-50 hover:border-white/40"
-                      >
-                        Modifier
-                      </button>
-                      <button
-                        onClick={() => deleteTx(tx.id)}
-                        className="rounded-lg border border-red-300/40 px-3 py-1 text-red-100 hover:border-red-300/70 disabled:opacity-60"
-                        disabled={deletingId === tx.id}
-                      >
-                        {deletingId === tx.id ? "Suppression..." : "Supprimer"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  transaction={tx}
+                  config={config}
+                  currency={currency}
+                  statusOptions={statusOptions}
+                  deletingId={deletingId}
+                  onEdit={startEdit}
+                  onDelete={deleteTx}
+                />
               ))}
 
-            {!loading && transactions.length === 0 && (
+            {!state.loading && transactions.length === 0 && (
               <div className="rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-indigo-100/80">
                 {config.emptyText}
               </div>
@@ -757,12 +441,12 @@ export function TransactionFormPage({ transactionType }: TransactionFormPageProp
 
       {/* Duplicate Confirmation Modal */}
       <DuplicateConfirmModal
-        isOpen={showDuplicateModal}
-        matches={duplicateMatches}
+        isOpen={state.showDuplicateModal}
+        matches={state.duplicateMatches}
         newTransaction={{
-          description: pendingTransaction?.description || "",
-          amount: pendingTransaction?.amount || 0,
-          date: pendingTransaction?.occurredAt || "",
+          description: (state.pendingTransaction as { description?: string })?.description || "",
+          amount: (state.pendingTransaction as { amount?: number })?.amount || 0,
+          date: (state.pendingTransaction as { occurredAt?: string })?.occurredAt || "",
         }}
         onConfirmDuplicate={handleConfirmDuplicate}
         onIgnore={handleIgnoreDuplicate}

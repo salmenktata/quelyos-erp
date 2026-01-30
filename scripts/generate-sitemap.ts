@@ -16,6 +16,7 @@ import { join } from 'path'
 
 const ROOT_DIR = join(__dirname, '..')
 const DRY_RUN = process.argv.includes('--dry-run')
+const JSON_ONLY = process.argv.includes('--json')
 
 interface RouteInfo {
   path: string
@@ -407,6 +408,34 @@ export const enrichedSitemapData = sitemapData.map(app => ({
 // ============================================================================
 
 async function main() {
+  // Mode JSON only: retourner JSON sur stdout et exit
+  if (JSON_ONLY) {
+    const appsData: Record<string, RouteInfo[]> = {
+      'vitrine-quelyos': scanVitrineQuelyos(),
+      'dashboard-client': scanDashboardClient(),
+      'super-admin-client': scanSuperAdminClient(),
+      'vitrine-client': scanVitrineClient(),
+    }
+
+    const totalRoutes = Object.values(appsData).reduce((acc, routes) => acc + routes.length, 0)
+
+    const jsonData = {
+      apps: APPS_CONFIG.map(appConfig => ({
+        id: appConfig.id,
+        name: appConfig.name,
+        baseUrl: appConfig.baseUrl,
+        port: appConfig.port,
+        routes: appsData[appConfig.id] || []
+      })),
+      totalRoutes,
+      lastGenerated: new Date().toISOString(),
+      version: '3.0.0'
+    }
+
+    console.log(JSON.stringify(jsonData))
+    return
+  }
+
   console.log('🚀 Sitemap Generator V2 (Fixed)\n')
 
   // Scanner toutes les apps
@@ -424,17 +453,36 @@ async function main() {
     console.log(`   - ${app}: ${routes.length} routes`)
   })
 
-  // Générer fichier
+  // Générer fichier TypeScript
   const content = generateSitemapFile(appsData)
   const outputPath = join(ROOT_DIR, 'super-admin-client', 'src', 'config', 'sitemap.ts')
+
+  // Générer fichier JSON pour backend
+  const jsonData = {
+    apps: APPS_CONFIG.map(appConfig => ({
+      id: appConfig.id,
+      name: appConfig.name,
+      baseUrl: appConfig.baseUrl,
+      port: appConfig.port,
+      routes: appsData[appConfig.id] || []
+    })),
+    totalRoutes,
+    lastGenerated: new Date().toISOString(),
+    version: '3.0.0'
+  }
+  const jsonOutputPath = join(ROOT_DIR, 'odoo-backend', 'addons', 'quelyos_api', 'data', 'sitemap.json')
 
   if (DRY_RUN) {
     console.log('\n🔍 DRY RUN - Preview (first 1000 chars):\n')
     console.log(content.slice(0, 1000) + '...\n')
     console.log(`Would write to: ${outputPath}`)
+    console.log(`Would write JSON to: ${jsonOutputPath}`)
   } else {
     writeFileSync(outputPath, content, 'utf-8')
     console.log(`\n✅ Generated: ${outputPath}`)
+
+    writeFileSync(jsonOutputPath, JSON.stringify(jsonData, null, 2), 'utf-8')
+    console.log(`✅ Generated JSON: ${jsonOutputPath}`)
   }
 
   console.log('\n✨ Done!')
