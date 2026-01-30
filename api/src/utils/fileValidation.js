@@ -1,6 +1,6 @@
 const { fileTypeFromBuffer } = require('file-type');
-// XLSX validation removed - using magic bytes only
 const { parse } = require('csv-parse/sync');
+const ExcelJS = require('exceljs');
 const logger = require('../../logger');
 
 /**
@@ -93,21 +93,48 @@ async function parseFile(buffer, mimetype) {
       });
 
     } else if (mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-      // Parsing XLSX
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
+      // Parsing XLSX avec exceljs
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(buffer);
 
-      // Prendre la première feuille
-      const sheetName = workbook.SheetNames[0];
-      if (!sheetName) {
+      if (workbook.worksheets.length === 0) {
         throw new Error('Fichier Excel vide (aucune feuille)');
       }
 
-      const sheet = workbook.Sheets[sheetName];
+      const worksheet = workbook.worksheets[0];
+      data = [];
+      let headers = [];
 
-      data = XLSX.utils.sheet_to_json(sheet, {
-        defval: '', // Valeur par défaut pour cellules vides
-        raw: false, // Convertir en string
-        dateNF: 'yyyy-mm-dd', // Format date normalisé
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) {
+          // Extraire les headers
+          row.eachCell((cell, colNumber) => {
+            headers[colNumber - 1] = String(cell.value || '');
+          });
+        } else {
+          // Extraire les données
+          const rowData = {};
+          row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            const header = headers[colNumber - 1] || `Column${colNumber}`;
+            let value = cell.value;
+
+            // Convertir en string (équivalent raw: false)
+            if (value instanceof Date) {
+              // Format date normalisé (équivalent dateNF: 'yyyy-mm-dd')
+              const year = value.getFullYear();
+              const month = String(value.getMonth() + 1).padStart(2, '0');
+              const day = String(value.getDate()).padStart(2, '0');
+              value = `${year}-${month}-${day}`;
+            } else if (value !== null && value !== undefined) {
+              value = String(value);
+            } else {
+              value = ''; // Valeur par défaut (équivalent defval: '')
+            }
+
+            rowData[header] = value;
+          });
+          data.push(rowData);
+        }
       });
 
     } else {
