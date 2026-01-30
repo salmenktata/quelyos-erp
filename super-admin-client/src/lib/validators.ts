@@ -25,23 +25,23 @@ export const TenantSchema = z.object({
   ]).optional(),
   plan_code: z.enum(['starter', 'pro', 'enterprise']).nullable().optional(),
   plan_name: z.string().nullable().optional(),
-  users_count: z.number().nonnegative(),
-  products_count: z.number().nonnegative(),
-  orders_count: z.number().nonnegative(),
-  max_users: z.number().nonnegative(), // 0 = illimité
-  max_products: z.number().nonnegative(), // 0 = illimité
-  max_orders_per_year: z.number().nonnegative(), // 0 = illimité
-  mrr: z.number().nonnegative(),
+  users_count: z.number().nonnegative().optional(),
+  products_count: z.number().nonnegative().optional(),
+  orders_count: z.number().nonnegative().optional(),
+  max_users: z.number().nonnegative().optional(), // 0 = illimité
+  max_products: z.number().nonnegative().optional(), // 0 = illimité
+  max_orders_per_year: z.number().nonnegative().optional(), // 0 = illimité
+  mrr: z.number().nonnegative().optional(),
   features: z.object({
     wishlist_enabled: z.boolean(),
     reviews_enabled: z.boolean(),
     newsletter_enabled: z.boolean(),
     product_comparison_enabled: z.boolean(),
     guest_checkout_enabled: z.boolean(),
-  }),
+  }).optional(),
   provisioning_job_id: z.number().nullable().optional(),
   provisioning_status: z.enum(['pending', 'running', 'completed', 'failed']).nullable().optional(),
-  created_at: z.string(),
+  created_at: z.string().optional(),
 })
 
 export const SubscriptionSchema = z.object({
@@ -322,7 +322,7 @@ export const BackupSchema = z.object({
   download_url: z.union([z.string(), z.literal(false)]).nullable(),
   error_message: z.union([z.string(), z.literal(false)]).nullable(),
   records_count: z.number().nonnegative().optional(),
-  data_models: z.string().optional(),
+  data_models: z.union([z.string(), z.literal(false)]).optional(),
 })
 
 export const BackupScheduleSchema = z.object({
