@@ -22,3 +22,5 @@ export type { SkeletonProps } from './Skeleton'
 
 export { Table } from './Table'
 export type { TableProps, Column, SortDirection } from './Table'
+
+export { ModuleGroupSelector } from './ModuleGroupSelector'
