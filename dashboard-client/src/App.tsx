@@ -54,6 +54,7 @@ const ProductImport = lazy(() => import('./pages/store/ProductImport'))
 const SupportTickets = lazy(() => import('./pages/support/Tickets'))
 const NewTicket = lazy(() => import('./pages/support/NewTicket'))
 const TicketDetail = lazy(() => import('./pages/support/TicketDetail'))
+const SatisfactionPublic = lazy(() => import('./pages/SatisfactionPublic'))
 
 // Lazy loaded pages - Store Themes
 const ThemesMarketplace = lazy(() => import('./pages/store/themes/marketplace'))
@@ -301,6 +302,8 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth-callback" element={<AuthCallback />} />
+              {/* Route publique satisfaction (sans authentification) */}
+              <Route path="/satisfaction/:token" element={<SatisfactionPublic />} />
               <Route
                 path="/dashboard"
                 element={
