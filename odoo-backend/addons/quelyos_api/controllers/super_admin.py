@@ -11,6 +11,8 @@ from odoo.exceptions import AccessDenied
 from datetime import datetime, timedelta
 import logging
 import json
+import csv
+import io
 
 from ..config import get_cors_headers
 
@@ -3932,6 +3934,122 @@ class SuperAdminController(http.Controller):
 
         except Exception as e:
             _logger.exception("Error saving ticket notes")
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=500
+            )
+
+    @http.route('/api/super-admin/tickets/export', type='http', auth='public',
+                methods=['GET', 'OPTIONS'], csrf=False)
+    def tickets_export_csv(self):
+        """Exporter les tickets en CSV"""
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
+        if not request.session.uid:
+            return request.make_json_response(
+                {'success': False, 'error': 'Non authentifié'},
+                headers=cors_headers, status=401
+            )
+
+        try:
+            self._check_super_admin()
+        except AccessDenied as e:
+            return request.make_json_response(
+                {'success': False, 'error': str(e)},
+                headers=cors_headers, status=403
+            )
+
+        try:
+            params = request.httprequest.args.to_dict()
+            domain = []
+
+            # Appliquer les mêmes filtres que la liste
+            if params.get('tenant_id'):
+                domain.append(('company_id', '=', int(params['tenant_id'])))
+            if params.get('state'):
+                domain.append(('state', '=', params['state']))
+            if params.get('priority'):
+                domain.append(('priority', '=', params['priority']))
+            if params.get('category'):
+                domain.append(('category', '=', params['category']))
+            if params.get('assigned_to'):
+                assigned_value = params['assigned_to']
+                if assigned_value == 'unassigned':
+                    domain.append(('assigned_to', '=', False))
+                else:
+                    domain.append(('assigned_to', '=', int(assigned_value)))
+
+            # Récupérer tous les tickets (pas de limit pour export)
+            tickets = request.env['quelyos.ticket'].sudo().search(
+                domain,
+                order='create_date desc',
+                limit=10000  # Limite sécurité
+            )
+
+            # Générer CSV
+            output = io.StringIO()
+            writer = csv.writer(output)
+
+            # Headers
+            writer.writerow([
+                'Référence',
+                'Tenant',
+                'Client',
+                'Email',
+                'Sujet',
+                'Catégorie',
+                'Priorité',
+                'Statut',
+                'Assigné à',
+                'Nb Messages',
+                'Temps Réponse (h)',
+                'Temps Résolution (h)',
+                'Satisfaction',
+                'Créé le',
+                'Mis à jour le',
+            ])
+
+            # Données
+            for ticket in tickets:
+                writer.writerow([
+                    ticket.name,
+                    ticket.company_id.name,
+                    ticket.partner_id.name,
+                    ticket.email or '',
+                    ticket.subject,
+                    dict(ticket._fields['category'].selection).get(ticket.category),
+                    dict(ticket._fields['priority'].selection).get(ticket.priority),
+                    dict(ticket._fields['state'].selection).get(ticket.state),
+                    ticket.assigned_to.name if ticket.assigned_to else 'Non assigné',
+                    ticket.message_count,
+                    ticket.response_time or 0,
+                    ticket.resolution_time or 0,
+                    dict(ticket._fields['satisfaction_rating'].selection).get(ticket.satisfaction_rating) if ticket.satisfaction_rating else '',
+                    ticket.create_date.strftime('%Y-%m-%d %H:%M:%S') if ticket.create_date else '',
+                    ticket.write_date.strftime('%Y-%m-%d %H:%M:%S') if ticket.write_date else '',
+                ])
+
+            csv_data = output.getvalue()
+            output.close()
+
+            # Retourner le CSV
+            headers = {
+                **cors_headers,
+                'Content-Type': 'text/csv; charset=utf-8',
+                'Content-Disposition': f'attachment; filename="tickets_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"',
+            }
+
+            response = request.make_response(csv_data.encode('utf-8-sig'), headers=list(headers.items()))
+            return response
+
+        except Exception as e:
+            _logger.exception("Error exporting tickets")
             return request.make_json_response(
                 {'success': False, 'error': str(e)},
                 headers=cors_headers, status=500

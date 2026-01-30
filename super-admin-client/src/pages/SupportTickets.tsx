@@ -27,6 +27,7 @@ import {
   Loader2,
   Eye,
   Save,
+  Download,
 } from 'lucide-react'
 import { api } from '@/lib/api/gateway'
 import { useToast } from '@/hooks/useToast'
@@ -250,6 +251,27 @@ export function SupportTickets() {
     setInternalNotes(ticket.internalNotes || '')
   }
 
+  // Export CSV
+  const handleExportCSV = async () => {
+    try {
+      const params = new URLSearchParams()
+      if (tenantFilter !== 'all') params.append('tenant_id', tenantFilter)
+      if (stateFilter !== 'all') params.append('state', stateFilter)
+      if (priorityFilter !== 'all') params.append('priority', priorityFilter)
+      if (categoryFilter !== 'all') params.append('category', categoryFilter)
+      if (assignedFilter !== 'all') params.append('assigned_to', assignedFilter)
+
+      const queryString = params.toString()
+      const url = `/api/super-admin/tickets/export${queryString ? `?${queryString}` : ''}`
+
+      // Ouvrir dans nouvelle fenêtre pour télécharger
+      window.open(`${import.meta.env.VITE_API_URL || ''}${url}`, '_blank')
+      toast.success('Export CSV lancé')
+    } catch {
+      toast.error('Erreur lors de l\'export CSV')
+    }
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -258,6 +280,13 @@ export function SupportTickets() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Support Tickets</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Gestion globale des tickets de tous les tenants</p>
         </div>
+        <button
+          onClick={handleExportCSV}
+          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-2"
+        >
+          <Download className="w-4 h-4" />
+          Export CSV
+        </button>
       </div>
 
       {/* Stats rapides */}
