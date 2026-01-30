@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { ArrowUp, ArrowDown } from 'lucide-react'
 import type { DataTableColumn, SortOrder } from '@/types'
 
@@ -11,7 +12,7 @@ interface DataTableHeaderProps<T> {
   onSelectAll?: () => void
 }
 
-export function DataTableHeader<T>({
+function DataTableHeaderInner<T>({
   columns,
   sortField,
   sortOrder,
@@ -104,3 +105,5 @@ export function DataTableHeader<T>({
     </thead>
   )
 }
+
+export const DataTableHeader = memo(DataTableHeaderInner) as typeof DataTableHeaderInner

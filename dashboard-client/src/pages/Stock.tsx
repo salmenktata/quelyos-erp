@@ -10,7 +10,7 @@
  * - Ajustements de stock manuels
  */
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import {
@@ -95,45 +95,45 @@ export default function Stock() {
   const _updateStockMutation = useUpdateProductStock()
 
   // Helpers
-  const formatPrice = (price: number) => {
+  const formatPrice = useCallback((price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR',
     }).format(price)
-  }
+  }, [])
 
-  const getAlertSeverity = (diff: number): 'error' | 'warning' => {
+  const getAlertSeverity = useCallback((diff: number): 'error' | 'warning' => {
     return diff > 5 ? 'warning' : 'error'
-  }
+  }, [])
 
-  const getStockBadgeVariant = (
+  const getStockBadgeVariant = useCallback((
     status: 'in_stock' | 'low_stock' | 'out_of_stock'
   ): 'success' | 'warning' | 'error' => {
     if (status === 'in_stock') return 'success'
     if (status === 'low_stock') return 'warning'
     return 'error'
-  }
+  }, [])
 
-  const getStockLabel = (status: 'in_stock' | 'low_stock' | 'out_of_stock') => {
+  const getStockLabel = useCallback((status: 'in_stock' | 'low_stock' | 'out_of_stock') => {
     if (status === 'in_stock') return 'En stock'
     if (status === 'low_stock') return 'Stock faible'
     return 'Rupture'
-  }
+  }, [])
 
   // Actions
-  const handleTabChange = (tab: TabType) => {
+  const handleTabChange = useCallback((tab: TabType) => {
     setActiveTab(tab)
-    setPage(0) // Reset pagination
-    setSearch('') // Reset search
+    setPage(0)
+    setSearch('')
     if (tab !== 'variants') {
       setSelectedProductForVariants(null)
     }
-  }
+  }, [])
 
-  const handleViewVariants = (product: StockProduct) => {
+  const handleViewVariants = useCallback((product: StockProduct) => {
     setSelectedProductForVariants({ id: product.id, name: product.name })
     setActiveTab('variants')
-  }
+  }, [])
 
   const handleExportCSV = async () => {
     try {
@@ -263,18 +263,18 @@ export default function Stock() {
   }
 
   // Data
-  const allProducts = (productsData?.data?.products as StockProduct[]) || []
+  const allProducts = useMemo(() => (productsData?.data?.products as StockProduct[]) || [], [productsData?.data?.products])
   const productsTotal = (productsData?.data?.total as number) || 0
 
   // Apply client-side filters
-  const products = allProducts.filter(p => {
+  const products = useMemo(() => allProducts.filter(p => {
     if (categoryFilter && p.category !== categoryFilter) return false
     if (statusFilter !== 'all' && p.stock_status !== statusFilter) return false
     return true
-  })
+  }), [allProducts, categoryFilter, statusFilter])
 
   // Get unique categories for filter
-  const uniqueCategories = Array.from(new Set(allProducts.map(p => p.category).filter(Boolean)))
+  const uniqueCategories = useMemo(() => Array.from(new Set(allProducts.map(p => p.category).filter(Boolean))), [allProducts])
 
   const alerts = alertsData?.data?.alerts || []
   const alertsTotal = alertsData?.data?.total || 0
@@ -283,13 +283,19 @@ export default function Stock() {
   const highAlertsTotal = highAlertsData?.data?.total || 0
 
   // Statistiques valorisation (use filtered products)
-  const stockValue = products.reduce((sum, p) => sum + (p.list_price || 0) * p.qty_available, 0)
-  const totalItems = products.reduce((sum, p) => sum + p.qty_available, 0)
-  const avgStockPerProduct = products.length > 0 ? totalItems / products.length : 0
-  const avgValuePerProduct = products.length > 0 ? stockValue / products.length : 0
+  const { stockValue, totalItems, avgStockPerProduct, avgValuePerProduct } = useMemo(() => {
+    const sv = products.reduce((sum, p) => sum + (p.list_price || 0) * p.qty_available, 0)
+    const ti = products.reduce((sum, p) => sum + p.qty_available, 0)
+    return {
+      stockValue: sv,
+      totalItems: ti,
+      avgStockPerProduct: products.length > 0 ? ti / products.length : 0,
+      avgValuePerProduct: products.length > 0 ? sv / products.length : 0,
+    }
+  }, [products])
 
   // Valorisation par catégorie
-  const valorisationByCategory = Object.entries(
+  const valorisationByCategory = useMemo(() => Object.entries(
     allProducts.reduce((acc, p) => {
       const cat = p.category || 'Sans catégorie'
       if (!acc[cat]) {
@@ -300,7 +306,7 @@ export default function Stock() {
       acc[cat].totalValue += (p.list_price || 0) * p.qty_available
       return acc
     }, {} as Record<string, { count: number; totalQty: number; totalValue: number }>)
-  ).sort((a, b) => b[1].totalValue - a[1].totalValue) // Sort by value desc
+  ).sort((a, b) => b[1].totalValue - a[1].totalValue), [allProducts])
 
   const isLoading = activeTab === 'products' ? isLoadingProducts : (isLoadingAlerts || isLoadingHighAlerts)
   const error = activeTab === 'products' ? errorProducts : errorAlerts

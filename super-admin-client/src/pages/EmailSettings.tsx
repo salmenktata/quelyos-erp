@@ -4,6 +4,7 @@
  * Fonctionnalités :
  * - Afficher serveurs SMTP configurés
  * - Créer/Éditer serveur SMTP (générique ou Brevo)
+ * - Activer/Désactiver serveur SMTP rapidement
  * - Tester envoi email
  * - Presets pour Gmail, Outlook, Brevo, SendGrid
  * - Supprimer serveur SMTP
@@ -23,6 +24,7 @@ import {
   EyeOff,
   Check,
   X,
+  Power,
 } from 'lucide-react'
 import { api } from '@/lib/api/gateway'
 import { EmailServerListSchema, EmailTestSchema, validateApiResponse } from '@/lib/validators'
@@ -99,14 +101,16 @@ export function EmailSettings() {
     sequence: 10,
   })
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error, isError } = useQuery({
     queryKey: ['email-servers'],
     queryFn: async () => {
-      const response = await api.request<EmailServer[]>({
+      const response = await api.request<{ success: boolean; data: EmailServer[] }>({
         method: 'GET',
         path: '/api/super-admin/settings/email',
       })
-      return validateApiResponse(EmailServerListSchema, response.data)
+      // L'API retourne { success: true, data: [...] }, on extrait data
+      const apiData = response.data as { success: boolean; data: EmailServer[] }
+      return validateApiResponse(EmailServerListSchema, apiData.data)
     },
   })
 
@@ -144,6 +148,29 @@ export function EmailSettings() {
     },
     onError: () => {
       toast.error('Erreur lors de la suppression')
+    },
+  })
+
+  const toggleServerActive = useMutation({
+    mutationFn: async ({ id, active }: { id: number; active: boolean }) => {
+      const server = servers.find((s) => s.id === id)
+      if (!server) throw new Error('Serveur introuvable')
+
+      return api.request({
+        method: 'POST',
+        path: '/api/super-admin/settings/email',
+        body: {
+          ...server,
+          active,
+        },
+      })
+    },
+    onSuccess: (_data, variables) => {
+      toast.success(variables.active ? 'Serveur activé' : 'Serveur désactivé')
+      queryClient.invalidateQueries({ queryKey: ['email-servers'] })
+    },
+    onError: () => {
+      toast.error('Erreur lors de la mise à jour')
     },
   })
 
@@ -280,6 +307,23 @@ export function EmailSettings() {
         <div className="flex justify-center py-12">
           <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
         </div>
+      ) : isError ? (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+          <div className="flex gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-red-900 dark:text-red-200 mb-1">
+                Erreur de chargement
+              </h3>
+              <p className="text-sm text-red-700 dark:text-red-300 mb-3">
+                {error instanceof Error ? error.message : 'Impossible de charger les serveurs SMTP'}
+              </p>
+              <p className="text-xs text-red-600 dark:text-red-400">
+                Vérifiez que vous êtes bien connecté en tant que super admin.
+              </p>
+            </div>
+          </div>
+        </div>
       ) : servers.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
           <Server className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -336,6 +380,22 @@ export function EmailSettings() {
                   </div>
                 </div>
                 <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      if (server.id) {
+                        toggleServerActive.mutate({ id: server.id, active: !server.active })
+                      }
+                    }}
+                    disabled={toggleServerActive.isPending}
+                    className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
+                      server.active
+                        ? 'text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20'
+                        : 'text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
+                    title={server.active ? 'Désactiver' : 'Activer'}
+                  >
+                    <Power className="w-5 h-5" />
+                  </button>
                   <button
                     onClick={() => handleEdit(server)}
                     className="p-2 text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"

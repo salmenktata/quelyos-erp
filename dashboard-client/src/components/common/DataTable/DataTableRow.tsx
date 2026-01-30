@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { DataTableColumn } from '@/types'
 
 interface DataTableRowProps<T> {
@@ -9,7 +10,7 @@ interface DataTableRowProps<T> {
   hasSelection?: boolean
 }
 
-export function DataTableRow<T>({
+function DataTableRowInner<T>({
   row,
   columns,
   rowKey,
@@ -60,3 +61,5 @@ export function DataTableRow<T>({
     </tr>
   )
 }
+
+export const DataTableRow = memo(DataTableRowInner) as typeof DataTableRowInner

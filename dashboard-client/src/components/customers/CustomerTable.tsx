@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { Badge } from '../common'
 import { Eye, ArrowUp, ArrowDown } from 'lucide-react'
@@ -23,7 +24,7 @@ function SortIcon({ field, sortField, sortOrder }: { field: SortField; sortField
   )
 }
 
-export function CustomerTable({ customers, sortField, sortOrder, onSort }: CustomerTableProps) {
+export const CustomerTable = memo(function CustomerTable({ customers, sortField, sortOrder, onSort }: CustomerTableProps) {
   const getSortAriaLabel = (field: SortField) => {
     const isCurrentSort = sortField === field
     const nextOrder = isCurrentSort && sortOrder === 'asc' ? 'descendant' : 'ascendant'
@@ -239,4 +240,4 @@ export function CustomerTable({ customers, sortField, sortOrder, onSort }: Custo
       </div>
     </>
   )
-}
+})

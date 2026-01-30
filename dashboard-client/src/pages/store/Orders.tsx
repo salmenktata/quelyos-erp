@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { Layout } from '../../components/Layout'
 import { useOrders } from '../../hooks/useOrders'
@@ -27,7 +27,7 @@ export default function Orders() {
     date_to: dateTo || undefined,
   })
 
-  const getStatusVariant = (
+  const getStatusVariant = useCallback((
     state: string
   ): 'success' | 'warning' | 'error' | 'info' | 'neutral' => {
     switch (state) {
@@ -43,9 +43,9 @@ export default function Orders() {
       default:
         return 'neutral'
     }
-  }
+  }, [])
 
-  const getStatusLabel = (state: string) => {
+  const getStatusLabel = useCallback((state: string) => {
     switch (state) {
       case 'draft':
         return 'Brouillon'
@@ -60,42 +60,42 @@ export default function Orders() {
       default:
         return state
     }
-  }
+  }, [])
 
-  const formatDate = (dateString: string | null) => {
+  const formatDate = useCallback((dateString: string | null) => {
     if (!dateString) return '-'
     return new Date(dateString).toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
     })
-  }
+  }, [])
 
-  const formatPrice = (price: number) => {
+  const formatPrice = useCallback((price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR',
     }).format(price)
-  }
+  }, [])
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     setSearch(searchInput)
     setPage(0)
-  }
+  }, [searchInput])
 
-  const handleResetFilters = () => {
+  const handleResetFilters = useCallback(() => {
     setStatusFilter('')
     setSearch('')
     setSearchInput('')
     setDateFrom('')
     setDateTo('')
     setPage(0)
-  }
+  }, [])
 
   const hasActiveFilters = statusFilter || search || dateFrom || dateTo
 
-  const orders = (data?.data?.orders || []) as Order[]
+  const orders = useMemo(() => (data?.data?.orders || []) as Order[], [data?.data?.orders])
   const total = (data?.data?.total || 0) as number
 
   return (

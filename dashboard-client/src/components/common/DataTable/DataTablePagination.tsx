@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Button } from '../Button'
 
 interface DataTablePaginationProps {
@@ -7,7 +8,7 @@ interface DataTablePaginationProps {
   onPageChange: (page: number) => void
 }
 
-export function DataTablePagination({
+export const DataTablePagination = memo(function DataTablePagination({
   currentPage,
   pageSize,
   totalItems,
@@ -94,4 +95,4 @@ export function DataTablePagination({
       </div>
     </div>
   )
-}
+})

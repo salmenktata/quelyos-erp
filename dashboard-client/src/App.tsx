@@ -8,6 +8,7 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { CurrencyProvider } from './lib/finance/CurrencyContext'
 import { FinanceErrorBoundary } from './components/finance/FinanceErrorBoundary'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
+import { ModuleErrorBoundary } from './components/common/ModuleErrorBoundary'
 import { Loader2 } from 'lucide-react'
 
 // Pages essentielles (chargées immédiatement)
@@ -290,6 +291,31 @@ function FinanceSettingsWrapper() {
   )
 }
 
+// Module Error Boundary Wrappers
+function StoreModule({ children }: { children: React.ReactNode }) {
+  return <ModuleErrorBoundary moduleName="Boutique" fallbackPath="/dashboard">{children}</ModuleErrorBoundary>
+}
+
+function StockModule({ children }: { children: React.ReactNode }) {
+  return <ModuleErrorBoundary moduleName="Stock" fallbackPath="/dashboard">{children}</ModuleErrorBoundary>
+}
+
+function CrmModule({ children }: { children: React.ReactNode }) {
+  return <ModuleErrorBoundary moduleName="CRM" fallbackPath="/dashboard">{children}</ModuleErrorBoundary>
+}
+
+function MarketingModule({ children }: { children: React.ReactNode }) {
+  return <ModuleErrorBoundary moduleName="Marketing" fallbackPath="/dashboard">{children}</ModuleErrorBoundary>
+}
+
+function HrModule({ children }: { children: React.ReactNode }) {
+  return <ModuleErrorBoundary moduleName="Ressources Humaines" fallbackPath="/dashboard">{children}</ModuleErrorBoundary>
+}
+
+function PosModule({ children }: { children: React.ReactNode }) {
+  return <ModuleErrorBoundary moduleName="Point de Vente" fallbackPath="/dashboard">{children}</ModuleErrorBoundary>
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -318,7 +344,7 @@ export default function App() {
                 path="/store"
                 element={
                   <ProtectedRoute>
-                    <StoreDashboard />
+                    <StoreModule><StoreDashboard /></StoreModule>
                   </ProtectedRoute>
                 }
               />
@@ -700,7 +726,7 @@ export default function App() {
                 path="/crm/customers"
                 element={
                   <ProtectedRoute>
-                    <Customers />
+                    <CrmModule><Customers /></CrmModule>
                   </ProtectedRoute>
                 }
               />
@@ -764,7 +790,7 @@ export default function App() {
                 path="/stock"
                 element={
                   <ProtectedRoute>
-                    <Stock />
+                    <StockModule><Stock /></StockModule>
                   </ProtectedRoute>
                 }
               />
@@ -1247,7 +1273,7 @@ export default function App() {
                 path="/marketing"
                 element={
                   <ProtectedRoute>
-                    <MarketingDashboard />
+                    <MarketingModule><MarketingDashboard /></MarketingModule>
                   </ProtectedRoute>
                 }
               />
@@ -1333,7 +1359,7 @@ export default function App() {
                 path="/hr"
                 element={
                   <ProtectedRoute>
-                    <HRDashboard />
+                    <HrModule><HRDashboard /></HrModule>
                   </ProtectedRoute>
                 }
               />
@@ -1470,7 +1496,7 @@ export default function App() {
                 path="/pos"
                 element={
                   <ProtectedRoute>
-                    <POSDashboard />
+                    <PosModule><POSDashboard /></PosModule>
                   </ProtectedRoute>
                 }
               />

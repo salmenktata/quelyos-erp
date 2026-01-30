@@ -4,7 +4,6 @@ from . import base
 from . import main
 # Domain Controllers (extracted from main.py)
 from . import products_ctrl
-from . import pricelists_ctrl
 from . import orders_ctrl
 from . import customers_ctrl
 from . import inventory_ctrl

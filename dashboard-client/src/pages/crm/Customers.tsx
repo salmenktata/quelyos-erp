@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { Layout } from '../../components/Layout'
 import { useCustomers } from '../../hooks/useCustomers'
 import { useExportCustomers } from '../../hooks/useExportCustomers'
@@ -36,14 +36,16 @@ export default function Customers() {
   const toast = useToast()
 
   // Gestion du tri
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-    } else {
-      setSortField(field)
+  const handleSort = useCallback((field: SortField) => {
+    setSortField((prev) => {
+      if (prev === field) {
+        setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'))
+        return prev
+      }
       setSortOrder('asc')
-    }
-  }
+      return field
+    })
+  }, [])
 
   // Tri côté client des données
   const sortedCustomers = useMemo(() => {
@@ -89,26 +91,26 @@ export default function Customers() {
   }, [data?.data])
 
   // Gestion de l'export CSV
-  const handleExportCSV = async () => {
+  const handleExportCSV = useCallback(async () => {
     const success = await exportCSV(search || undefined)
     if (success) {
       toast.success('Export CSV téléchargé avec succès')
     } else {
       toast.error(exportError || "Erreur lors de l'export CSV")
     }
-  }
+  }, [search, exportCSV, exportError, toast])
 
   // Gestion de la recherche
-  const handleSearch = (value: string) => {
+  const handleSearch = useCallback((value: string) => {
     setSearch(value)
-    setPage(0) // Réinitialiser à la première page lors d'une nouvelle recherche
-  }
+    setPage(0)
+  }, [])
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setSearch('')
     setSearchInput('')
     setPage(0)
-  }
+  }, [])
 
   // Raccourcis clavier
   useEffect(() => {
@@ -128,7 +130,7 @@ export default function Customers() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [search])
+  }, [search, handleExportCSV, handleReset])
 
   // Afficher erreur si API échoue
   useEffect(() => {
