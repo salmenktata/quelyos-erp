@@ -59,7 +59,8 @@ export function useAuth(): AuthContextType {
 
     try {
       const response = await api.getUserInfo()
-      const userData = response.data?.user
+      // CORRECTIF: response.user directement, pas response.data.user
+      const userData = (response as any).user
 
       if (response.success && userData) {
         setUser({

@@ -518,7 +518,7 @@ class AuthController(http.Controller):
             response_data = {'success': False, 'error': 'Erreur lors de la récupération des informations utilisateur'}
             return request.make_json_response(response_data, headers=cors_headers)
 
-    @http.route('/api/auth/me', type='http', auth='none', methods=['GET', 'OPTIONS'], csrf=False)
+    @http.route('/api/auth/me', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
     @require_jwt_auth
     def get_current_user(self, **kwargs):
         """
@@ -559,7 +559,7 @@ class AuthController(http.Controller):
                     'name': user.name,
                     'email': user.email or '',
                     'login': user.login,
-                    'groups': [g.name for g in user.groups_id] if user.groups_id else [],
+                    'groups': [g.name for g in user.group_ids] if user.group_ids else [],
                 },
                 'claims': {
                     'tenant_id': claims.get('tenant_id'),
