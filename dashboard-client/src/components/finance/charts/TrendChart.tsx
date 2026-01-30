@@ -5,7 +5,7 @@ import { GlassPanel } from "@/components/ui/glass";
 import { useState } from "react";
 
 type TrendChartProps = {
-  data: any[];
+  data: Record<string, unknown>[];
   lines: {
     dataKey: string;
     name: string;

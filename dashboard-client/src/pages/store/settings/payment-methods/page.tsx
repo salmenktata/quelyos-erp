@@ -69,7 +69,7 @@ export default function PaymentMethodsPage() {
     }
   };
 
-  const handleSaveConfig = async (provider: PaymentProvider, formData: any) => {
+  const handleSaveConfig = async (provider: PaymentProvider, formData: Record<string, string | boolean | number>) => {
     try {
       await updateProviderMutation.mutateAsync({
         provider_id: provider.id,
@@ -217,7 +217,7 @@ export default function PaymentMethodsPage() {
 interface ConfigModalProps {
   provider: PaymentProvider;
   onClose: () => void;
-  onSave: (provider: PaymentProvider, formData: any) => void;
+  onSave: (provider: PaymentProvider, formData: Record<string, string | boolean | number>) => void;
   showSecrets: Record<string, boolean>;
   toggleSecretVisibility: (key: string) => void;
   isSaving: boolean;
@@ -231,15 +231,15 @@ function ConfigModal({
   toggleSecretVisibility,
   isSaving,
 }: ConfigModalProps) {
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<Record<string, string | boolean | number>>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(provider, formData);
   };
 
-  const handleChange = (field: string, value: any) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
+  const handleChange = (field: string, value: string | boolean | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (

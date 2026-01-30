@@ -401,7 +401,7 @@ export default function ProductDetail() {
                     Taxes
                   </h2>
                   <ul className="space-y-2">
-                    {product.taxes.map((tax: any) => (
+                    {product.taxes.map((tax: { id: number; name: string; amount: number; amount_type: string }) => (
                       <li key={tax.id} className="flex items-center justify-between text-sm">
                         <span className="text-gray-900 dark:text-gray-100">{tax.name}</span>
                         <span className="text-gray-500 dark:text-gray-400">

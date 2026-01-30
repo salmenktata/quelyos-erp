@@ -5,7 +5,17 @@ import { useCoupons, useUpdateCoupon, useDeleteCoupon } from '../../hooks/useCou
 import { Button, Badge, Breadcrumbs, SkeletonTable, Modal, PageNotice } from '../../components/common'
 import { ecommerceNotices } from '@/lib/notices'
 import { useToast } from '../../hooks/useToast'
-import type { Coupon } from '@/types'
+import type { Coupon as BaseCoupon } from '@/types'
+
+interface CouponReward {
+  discount: number
+  discount_mode: string
+  discount_fixed_amount: number
+}
+
+type Coupon = BaseCoupon & {
+  reward?: CouponReward
+}
 
 interface EditFormData {
   name: string
@@ -33,7 +43,7 @@ export default function Coupons() {
 
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [selectedCoupon, setSelectedCoupon] = useState<any>(null)
+  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null)
   const [editForm, setEditForm] = useState<EditFormData>({
     name: '',
     active: true,
@@ -43,7 +53,7 @@ export default function Coupons() {
     discountvalue: 0,
   })
 
-  const formatDate = (dateString: string | null) => {
+  const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return '-'
     return new Date(dateString).toLocaleDateString('fr-FR', {
       day: '2-digit',
@@ -52,12 +62,12 @@ export default function Coupons() {
     })
   }
 
-  const formatDateForInput = (dateString: string | null) => {
+  const formatDateForInput = (dateString: string | null | undefined) => {
     if (!dateString) return ''
     return dateString.split('T')[0]
   }
 
-  const getDiscountLabel = (coupon: any) => {
+  const getDiscountLabel = (coupon: Coupon) => {
     if (!coupon.reward) return '-'
     const { discount, discount_mode, discount_fixed_amount } = coupon.reward
     if (discount_mode === 'percent') {
@@ -66,7 +76,7 @@ export default function Coupons() {
     return `${discount_fixed_amount || discount}€`
   }
 
-  const openEditModal = (coupon: any) => {
+  const openEditModal = (coupon: Coupon) => {
     setSelectedCoupon(coupon)
     setEditForm({
       name: coupon.name || '',
@@ -82,7 +92,7 @@ export default function Coupons() {
     setEditModalOpen(true)
   }
 
-  const openDeleteModal = (coupon: any) => {
+  const openDeleteModal = (coupon: Coupon) => {
     setSelectedCoupon(coupon)
     setDeleteModalOpen(true)
   }
@@ -122,7 +132,7 @@ export default function Coupons() {
     }
   }
 
-  const handleToggleActive = async (coupon: any) => {
+  const handleToggleActive = async (coupon: Coupon) => {
     try {
       await updateCoupon.mutateAsync({
         id: coupon.id,

@@ -115,9 +115,9 @@ export const QuickTransactionDialog = memo(function QuickTransactionDialog({
         }, 1500);
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       showToast(
-        error?.message || "Erreur lors de l'ajout de la transaction",
+        error.message || "Erreur lors de l'ajout de la transaction",
         "error"
       );
     },

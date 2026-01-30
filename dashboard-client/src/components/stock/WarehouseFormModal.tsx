@@ -123,14 +123,15 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess }: WarehouseForm
     }
 
     createWarehouse(createData, {
-      onSuccess: (data: any) => {
+      onSuccess: (data) => {
         logger.info('[WarehouseFormModal] Warehouse created:', data)
         onClose()
-        if (onSuccess && data?.id) {
-          onSuccess(data.id as number)
+        const result = data as { id?: number } | undefined
+        if (onSuccess && result?.id) {
+          onSuccess(result.id)
         }
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         logger.error('[WarehouseFormModal] Error:', error)
         // TODO: Afficher toast d'erreur
         alert(error.message)

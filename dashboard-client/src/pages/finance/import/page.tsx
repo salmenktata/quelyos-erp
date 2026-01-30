@@ -150,7 +150,7 @@ export default function ImportPage() {
             isAnalyzing={state.isAnalyzing}
             analysisResult={state.analysisResult}
             onFileSelect={handlers.handleFileSelect}
-            onError={(error) => dispatch({ type: "ANALYSIS_ERROR", payload: error })}
+            onError={(error) => dispatch({ type: "ANALYSIS_ERROR", payload: typeof error === 'string' ? error : error.message })}
           />
         )}
 

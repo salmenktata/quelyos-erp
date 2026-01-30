@@ -453,7 +453,7 @@ export default function ProductForm() {
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition-all"
                   >
                     <option value="">Sans catégorie</option>
-                    {categories.map((category: any) => (
+                    {categories.map((category: { id: number; name: string }) => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>
@@ -492,7 +492,7 @@ export default function ProductForm() {
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition-all"
                   >
                     <option value="">Aucun badge</option>
-                    {ribbons.map((ribbon: any) => (
+                    {ribbons.map((ribbon: { id: number; name: string }) => (
                       <option key={ribbon.id} value={ribbon.id}>
                         {ribbon.name}
                       </option>
@@ -772,7 +772,7 @@ export default function ProductForm() {
                         Aucune taxe disponible
                       </p>
                     ) : (
-                      taxes.map((tax: any) => (
+                      taxes.map((tax: { id: number; name: string; amount: number; amount_type?: string; price_include?: boolean }) => (
                         <label
                           key={tax.id}
                           className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded"

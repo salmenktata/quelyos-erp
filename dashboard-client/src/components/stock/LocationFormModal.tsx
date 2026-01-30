@@ -205,7 +205,7 @@ export function LocationFormModal({
             onClose()
             if (onSuccess) onSuccess()
           },
-          onError: (error: any) => {
+          onError: (error: Error) => {
             logger.error('[LocationFormModal] Create error:', error)
             alert(error.message || 'Erreur lors de la création')
           }
@@ -226,7 +226,7 @@ export function LocationFormModal({
             onClose()
             if (onSuccess) onSuccess()
           },
-          onError: (error: any) => {
+          onError: (error: Error) => {
             logger.error('[LocationFormModal] Update error:', error)
             alert(error.message || 'Erreur lors de la mise à jour')
           }

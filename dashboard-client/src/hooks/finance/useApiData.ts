@@ -25,7 +25,7 @@ export interface UseApiDataOptions<T> {
   /**
    * Dependencies that trigger a refetch when changed
    */
-  deps?: any[];
+  deps?: unknown[];
 
   /**
    * Callback when fetch succeeds
@@ -48,7 +48,7 @@ export interface UseApiDataReturn<T> {
 }
 
 // Simple in-memory cache
-const cache = new Map<string, { data: any; timestamp: number }>();
+const cache = new Map<string, { data: unknown; timestamp: number }>();
 
 /**
  * Generic hook for fetching and caching API data
@@ -92,7 +92,7 @@ export function useApiData<T>({
     if (cacheKey) {
       const cached = cache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < cacheTime) {
-        setData(cached.data);
+        setData(cached.data as T);
         setLoading(false);
         setError(null);
         return;

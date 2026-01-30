@@ -34,7 +34,7 @@ export interface PreviewResponse {
   previewRows: Array<{
     lineNumber: number
     error?: string
-    [key: string]: any
+    [key: string]: string | number | boolean | undefined
   }>
   error?: string
 }
@@ -135,7 +135,7 @@ export const IMPORT_FIELDS = TARGET_FIELDS
 // Additional component props
 export interface FileUploadZoneProps {
   onFileSelect: (file: File) => void | Promise<void>
-  onError?: (error: any) => void
+  onError?: (error: Error | string) => void
   isLoading?: boolean
   accept?: string
   maxSize?: number

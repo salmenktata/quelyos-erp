@@ -144,7 +144,7 @@ export type DashboardKPI = {
   value: number;
   trend: "up" | "down" | "stable";
   reliability: "high" | "medium" | "low";
-  data?: any;
+  data?: Record<string, unknown>;
 };
 
 export type DashboardKPIWithMargin = DashboardKPI & {

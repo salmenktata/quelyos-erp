@@ -10,6 +10,7 @@ import {
   useDeleteDeliveryMethod,
 } from "@/hooks/useDelivery";
 import { storeNotices } from "@/lib/notices";
+import type { DeliveryMethod } from "@/types";
 
 interface DeliveryFormData {
   name: string;
@@ -90,7 +91,7 @@ export default function ShippingSettingsPage() {
     setCreateModalOpen(true);
   };
 
-  const openEditModal = (method: any) => {
+  const openEditModal = (method: DeliveryMethod) => {
     setSelectedMethod(method);
     setForm({
       name: method.name || "",
@@ -101,7 +102,7 @@ export default function ShippingSettingsPage() {
     setEditModalOpen(true);
   };
 
-  const openDeleteModal = (method: any) => {
+  const openDeleteModal = (method: DeliveryMethod) => {
     setSelectedMethod(method);
     setDeleteModalOpen(true);
   };
@@ -155,7 +156,7 @@ export default function ShippingSettingsPage() {
     }
   };
 
-  const handleToggleActive = async (method: any) => {
+  const handleToggleActive = async (method: DeliveryMethod) => {
     try {
       await updateMethod.mutateAsync({
         id: method.id,
@@ -249,7 +250,7 @@ export default function ShippingSettingsPage() {
               </div>
             ) : methods.length > 0 ? (
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {methods.map((method: any) => (
+                {methods.map((method: DeliveryMethod) => (
                   <div
                     key={method.id}
                     className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"

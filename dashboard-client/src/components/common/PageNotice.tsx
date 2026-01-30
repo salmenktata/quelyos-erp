@@ -287,10 +287,10 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
                 })}
 
                 {/* Fallback for old format with features/actions */}
-                {!config.sections && (config as any).features && (
+                {!config.sections && (config as unknown as { features?: Array<{ text: string }> }).features && (
                   <div className="mt-3">
                     <ul className="space-y-1.5">
-                      {(config as any).features.map((feature: any, idx: number) => (
+                      {(config as unknown as { features: Array<{ text: string }> }).features.map((feature: { text: string }, idx: number) => (
                         <li key={idx} className={`text-xs ${colorConfig.textSecondary} flex items-start gap-2`}>
                           <span className={`${colorConfig.bullet} mt-0.5 flex-shrink-0`}>•</span>
                           <span>{feature.text}</span>

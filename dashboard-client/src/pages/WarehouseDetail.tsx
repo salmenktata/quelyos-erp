@@ -154,7 +154,7 @@ export default function WarehouseDetail() {
                         refetch()
                         alert('Entrepôt archivé avec succès')
                       },
-                      onError: (error: any) => {
+                      onError: (error: Error) => {
                         alert(error.message || 'Erreur lors de l\'archivage')
                       }
                     })

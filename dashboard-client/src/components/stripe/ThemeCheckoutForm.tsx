@@ -126,7 +126,7 @@ export function ThemeCheckoutForm({
     }
   };
 
-  const handleCardChange = (event: any) => {
+  const handleCardChange = (event: { complete: boolean; error?: { message: string } }) => {
     setCardComplete(event.complete);
     if (event.error) {
       setError(event.error.message);

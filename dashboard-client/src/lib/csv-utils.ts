@@ -8,7 +8,7 @@
  * @param headers - En-têtes des colonnes (optionnel, utilise les clés de l'objet par défaut)
  * @returns Chaîne CSV
  */
-export function generateCSV(data: any[], headers?: string[]): string {
+export function generateCSV(data: Record<string, unknown>[], headers?: string[]): string {
   if (!data || data.length === 0) {
     return ''
   }
@@ -70,7 +70,7 @@ export function downloadCSV(csvContent: string, filename = 'export.csv'): void {
  * @param filename - Nom du fichier
  * @param headers - En-têtes personnalisés (optionnel)
  */
-export function exportToCSV(data: any[], filename: string, headers?: string[]): void {
+export function exportToCSV(data: Record<string, unknown>[], filename: string, headers?: string[]): void {
   const csv = generateCSV(data, headers)
   downloadCSV(csv, filename)
 }

@@ -108,8 +108,8 @@ export default function OrderDetail() {
     try {
       const response = await createInvoice.mutateAsync(orderId)
       toast.success(`Facture ${response.data?.invoice?.name} créée avec succès`)
-    } catch (err: any) {
-      const errorMsg = err?.response?.data?.error || 'Erreur lors de la création de la facture'
+    } catch (_err: unknown) {
+      const errorMsg = 'Erreur lors de la création de la facture'
       toast.error(errorMsg)
     }
   }
@@ -120,8 +120,8 @@ export default function OrderDetail() {
     try {
       await unlockOrder.mutateAsync(orderId)
       toast.success('Commande remise en brouillon avec succès')
-    } catch (err: any) {
-      const errorMsg = err?.response?.data?.error || 'Erreur lors du déverrouillage de la commande'
+    } catch (_err: unknown) {
+      const errorMsg = 'Erreur lors du déverrouillage de la commande'
       toast.error(errorMsg)
     }
   }

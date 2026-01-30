@@ -14,6 +14,7 @@ import {
   useCreatePricelistItem,
   useUpdatePricelistItem,
   type PricelistItem,
+  type CreatePricelistItemParams,
 } from '../../hooks/usePricelists';
 import { useCategories } from '../../hooks/useCategories';
 import { SearchAutocomplete, type SearchSuggestion } from '../common/SearchAutocomplete';
@@ -159,7 +160,7 @@ export function PricelistItemFormModal({
       }
 
       // Préparer les paramètres
-      const params: any = {
+      const params: CreatePricelistItemParams = {
         applied_on: data.applied_on,
         compute_price: data.compute_price,
         min_quantity: data.min_quantity,

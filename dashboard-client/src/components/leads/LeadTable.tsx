@@ -27,8 +27,8 @@ export function LeadTable({ leads }: LeadTableProps) {
   const sortedLeads = [...leads].sort((a, b) => {
     if (!sortOrder) return 0
 
-    let aVal: any = a[sortField]
-    let bVal: any = b[sortField]
+    let aVal: string | number | null | undefined = a[sortField] as string | number | null | undefined
+    let bVal: string | number | null | undefined = b[sortField] as string | number | null | undefined
 
     if (aVal === null || aVal === undefined) return 1
     if (bVal === null || bVal === undefined) return -1

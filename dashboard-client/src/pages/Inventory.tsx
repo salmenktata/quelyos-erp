@@ -49,7 +49,7 @@ export default function Inventory() {
   // Étape 1 : Sélection du périmètre
   const handlePrepareInventory = async () => {
     try {
-      const params: any = {}
+      const params: { category_id?: number; search?: string } = {}
       if (categoryId) params.category_id = parseInt(categoryId)
       if (search) params.search = search
 
@@ -474,7 +474,7 @@ export default function Inventory() {
                   Erreurs détectées :
                 </h3>
                 <ul className="list-disc list-inside text-sm text-red-800 dark:text-red-200 space-y-1">
-                  {validationResult.errors.map((error: any, idx: number) => (
+                  {validationResult.errors.map((error: { product_id?: number; error: string }, idx: number) => (
                     <li key={idx}>
                       Produit #{error.product_id || '?'} : {error.error}
                     </li>

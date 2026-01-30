@@ -186,7 +186,15 @@ function DepartmentCard({ department }: { department: Department }) {
   )
 }
 
-function DepartmentTreeNode({ node, level }: { node: any; level: number }) {
+interface DepartmentNode {
+  id: number
+  name: string
+  total_employee: number
+  manager?: { id: number; name: string; job: string | null; image: string | null } | null
+  children?: DepartmentNode[]
+}
+
+function DepartmentTreeNode({ node, level }: { node: DepartmentNode; level: number }) {
   const [expanded, setExpanded] = useState(true)
   const hasChildren = node.children && node.children.length > 0
 
@@ -211,7 +219,7 @@ function DepartmentTreeNode({ node, level }: { node: any; level: number }) {
       </div>
       {expanded && hasChildren && (
         <div>
-          {node.children.map((child: any) => (
+          {node.children?.map((child: DepartmentNode) => (
             <DepartmentTreeNode key={child.id} node={child} level={level + 1} />
           ))}
         </div>

@@ -13,7 +13,7 @@ export interface UseFormStateReturn<T> {
   touched: Partial<Record<keyof T, boolean>>;
   isSubmitting: boolean;
   isDirty: boolean;
-  setFieldValue: (field: keyof T, value: any) => void;
+  setFieldValue: (field: keyof T, value: T[keyof T]) => void;
   setFieldTouched: (field: keyof T, isTouched?: boolean) => void;
   setFieldError: (field: keyof T, error: string) => void;
   handleChange: (field: keyof T) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
@@ -67,7 +67,7 @@ export function useFormState<T extends Record<string, any>>({
     setIsDirty(isChanged);
   }, [values, initialValues]);
 
-  const setFieldValue = useCallback((field: keyof T, value: any) => {
+  const setFieldValue = useCallback((field: keyof T, value: T[keyof T]) => {
     setValues((prev) => ({ ...prev, [field]: value }));
     // Clear error when field is modified
     setErrors((prev) => {
@@ -91,7 +91,7 @@ export function useFormState<T extends Record<string, any>>({
         const value = e.target.type === "checkbox"
           ? (e.target as HTMLInputElement).checked
           : e.target.value;
-        setFieldValue(field, value);
+        setFieldValue(field, value as T[keyof T]);
       },
     [setFieldValue]
   );

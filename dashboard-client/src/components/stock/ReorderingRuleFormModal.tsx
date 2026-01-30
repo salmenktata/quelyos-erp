@@ -116,7 +116,7 @@ export function ReorderingRuleFormModal({
             onClose()
             if (onSuccess) onSuccess()
           },
-          onError: (error: any) => {
+          onError: (error: Error) => {
             logger.error('[ReorderingRuleFormModal] Create error:', error)
             alert(error.message || 'Erreur lors de la création')
           }
@@ -136,7 +136,7 @@ export function ReorderingRuleFormModal({
             onClose()
             if (onSuccess) onSuccess()
           },
-          onError: (error: any) => {
+          onError: (error: Error) => {
             logger.error('[ReorderingRuleFormModal] Update error:', error)
             alert(error.message || 'Erreur lors de la mise à jour')
           }

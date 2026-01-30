@@ -1,6 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 
+interface CategoryTreeItem {
+  id: number
+  name: string
+  parent_id: number | null
+  complete_name: string
+  product_count: number
+  children: CategoryTreeItem[]
+}
+
+interface CategoriesTreeData {
+  data?: {
+    categories: CategoryTreeItem[]
+  }
+}
+
 export function useCategories(params?: {
   limit?: number
   offset?: number
@@ -42,7 +57,7 @@ export function useCreateCategory() {
       const previousCategories = queryClient.getQueryData(['categories', 'tree'])
 
       // Optimistically update to the new value
-      queryClient.setQueryData(['categories', 'tree'], (old: any) => {
+      queryClient.setQueryData(['categories', 'tree'], (old: CategoriesTreeData | undefined) => {
         if (!old?.data?.categories) return old
 
         // Create optimistic category with temporary ID
@@ -95,10 +110,10 @@ export function useUpdateCategory() {
       const previousCategories = queryClient.getQueryData(['categories', 'tree'])
 
       // Optimistically update
-      queryClient.setQueryData(['categories', 'tree'], (old: any) => {
+      queryClient.setQueryData(['categories', 'tree'], (old: CategoriesTreeData | undefined) => {
         if (!old?.data?.categories) return old
 
-        const updateCategoryInTree = (categories: any[]): any[] => {
+        const updateCategoryInTree = (categories: CategoryTreeItem[]): CategoryTreeItem[] => {
           return categories.map((cat) => {
             if (cat.id === id) {
               return {
@@ -151,10 +166,10 @@ export function useDeleteCategory() {
       const previousCategories = queryClient.getQueryData(['categories', 'tree'])
 
       // Optimistically remove category
-      queryClient.setQueryData(['categories', 'tree'], (old: any) => {
+      queryClient.setQueryData(['categories', 'tree'], (old: CategoriesTreeData | undefined) => {
         if (!old?.data?.categories) return old
 
-        const removeCategoryFromTree = (categories: any[]): any[] => {
+        const removeCategoryFromTree = (categories: CategoryTreeItem[]): CategoryTreeItem[] => {
           return categories
             .filter((cat) => cat.id !== id)
             .map((cat) => ({

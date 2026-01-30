@@ -87,7 +87,7 @@ export default function ScenarioComparison() {
             strategy: scenario.strategy,
             maxDailyAmount: scenario.maxDailyAmount,
             targetCashReserve: scenario.targetCashReserve,
-            invoiceIds: scenario.invoices?.map((inv: any) => inv.id) || [],
+            invoiceIds: scenario.invoices?.map((inv: { id: number }) => inv.id) || [],
           }),
         });
 

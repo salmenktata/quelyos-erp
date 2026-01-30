@@ -70,7 +70,7 @@ export function dateKey(date: Date): string {
 /**
  * Download array data as CSV
  */
-export function downloadCSV(data: any[][], filename: string): void {
+export function downloadCSV(data: (string | number | boolean | null | undefined)[][], filename: string): void {
   const csvContent = data.map(row => row.map(cell => {
     const value = cell == null ? '' : String(cell);
     return value.includes(',') || value.includes('"') || value.includes('\n')

@@ -9,9 +9,10 @@ import './index.css'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: (failureCount, error: any) => {
+      retry: (failureCount, error: Error) => {
         // Ne pas retry les erreurs 4xx (client errors)
-        if (error?.response?.status >= 400 && error?.response?.status < 500) {
+        const status = (error as Error & { response?: { status?: number } })?.response?.status
+        if (status && status >= 400 && status < 500) {
           return false
         }
         // Retry max 3 fois pour 5xx (server errors) et network errors

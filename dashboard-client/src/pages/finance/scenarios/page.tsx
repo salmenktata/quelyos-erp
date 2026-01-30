@@ -531,11 +531,10 @@ export default function ScenariosPage() {
                       border: "1px solid var(--tooltip-border, #e5e7eb)",
                       borderRadius: "8px",
                     }}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={((value: any, name: string) => [
+                    formatter={(value, name) => [
                       money.format(Number(value) || 0),
-                      scenarios.find((s) => s.id === name)?.name || name,
-                    ]) as any}
+                      scenarios.find((s) => s.id === name)?.name || String(name),
+                    ]}
                   />
                   <Legend wrapperStyle={{ paddingTop: "20px" }} formatter={(value) => scenarios.find((s) => s.id === value)?.name || value} />
                   <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="5 5" />

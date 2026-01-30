@@ -7,7 +7,7 @@ interface UploadStepProps {
   isAnalyzing: boolean;
   analysisResult: UploadAnalysisResponse | null;
   onFileSelect: (file: File) => void;
-  onError: (error: string) => void;
+  onError: (error: Error | string) => void;
 }
 
 export function UploadStep({

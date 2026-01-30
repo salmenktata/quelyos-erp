@@ -415,8 +415,8 @@ export default function Analytics() {
                           borderRadius: '8px',
                           color: '#F9FAFB',
                         }}
-                        formatter={(value?: number, _name?: string, props?: any) => [
-                          value && props ? `${value} (${props.payload.percentage}%)` : '-',
+                        formatter={(value) => [
+                          value ? `${value}` : '-',
                           'Nombre',
                         ]}
                       />

@@ -109,14 +109,14 @@ export function useUpdateLocation() {
       const previousLocations = queryClient.getQueryData(['stock', 'locations', 'tree'])
 
       // Optimistically update
-      queryClient.setQueryData(['stock', 'locations', 'tree'], (old: any) => {
+      queryClient.setQueryData(['stock', 'locations', 'tree'], (old: { data?: { locations: StockLocation[] } } | undefined) => {
         if (!old?.data?.locations) return old
 
         return {
           ...old,
           data: {
             ...old.data,
-            locations: old.data.locations.map((loc: StockLocation) =>
+            locations: old.data.locations.map((loc) =>
               loc.id === variables.id ? { ...loc, ...variables } : loc
             )
           }

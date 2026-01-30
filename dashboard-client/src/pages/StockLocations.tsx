@@ -70,7 +70,7 @@ export default function StockLocations() {
         refetch()
         logger.info('[StockLocations] Location archived')
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         alert(error.message || 'Erreur lors de l\'archivage')
       }
     })
@@ -84,7 +84,7 @@ export default function StockLocations() {
           refetch()
           logger.info('[StockLocations] Location moved')
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           alert(error.message || 'Erreur lors du déplacement')
         }
       }

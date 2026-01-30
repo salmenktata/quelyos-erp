@@ -7,7 +7,7 @@ export interface TableDataOptions<T> {
   /** Fonction de fetch des données */
   fetchFn: () => Promise<T[]>;
   /** Dépendances pour le refetch */
-  deps?: any[];
+  deps?: unknown[];
   /** Fonction de filtrage personnalisée */
   filterFn?: (item: T, query: string) => boolean;
   /** Fonction de tri personnalisée */
@@ -33,7 +33,7 @@ export interface TableDataState<T> {
 }
 
 // Cache simple pour éviter les refetch
-const tableCache = new Map<string, { data: any[]; timestamp: number }>();
+const tableCache = new Map<string, { data: unknown[]; timestamp: number }>();
 const CACHE_DURATION = 30000; // 30 secondes
 
 /**
@@ -87,7 +87,7 @@ export function useTableData<T = any>(
       if (enableCache && !force && cacheKey) {
         const cached = tableCache.get(cacheKey);
         if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-          setData(cached.data);
+          setData(cached.data as T[]);
           setLoading(false);
           return;
         }

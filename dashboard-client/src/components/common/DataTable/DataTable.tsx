@@ -40,7 +40,7 @@ import type { DataTableProps, SortOrder } from '@/types'
 export function DataTable<T>({
   data,
   columns,
-  keyExtractor = (item: any) => item.id,
+  keyExtractor = (item: T) => (item as T & { id: string | number }).id,
   isLoading = false,
   error = null,
   mobileConfig,

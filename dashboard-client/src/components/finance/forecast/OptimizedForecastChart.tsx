@@ -83,21 +83,21 @@ function OptimizedForecastChartComponent({
   };
 
   // Tooltip personnalisé
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: Record<string, string | number | null> }> }) => {
     if (!active || !payload || !payload.length) return null;
 
     const data = payload[0].payload;
 
     return (
       <div className="rounded-lg border border-white/10 bg-slate-900/95 p-3 shadow-xl backdrop-blur-sm">
-        <p className="mb-2 text-xs font-medium text-slate-400">{data.fullDate}</p>
+        <p className="mb-2 text-xs font-medium text-slate-400">{String(data.fullDate ?? '')}</p>
         <div className="space-y-1">
           {showScenarios && (
             <>
               <div className="flex items-center justify-between gap-4">
                 <span className="text-xs text-emerald-400">Optimiste</span>
                 <span className="text-xs font-semibold text-emerald-400">
-                  {formatCurrency(data.optimistic)}
+                  {formatCurrency(Number(data.optimistic ?? 0))}
                 </span>
               </div>
             </>
@@ -106,21 +106,21 @@ function OptimizedForecastChartComponent({
             <div className="flex items-center justify-between gap-4">
               <span className="text-xs text-indigo-400">Borne sup.</span>
               <span className="text-xs font-semibold text-indigo-400">
-                {formatCurrency(data.upperBound)}
+                {formatCurrency(Number(data.upperBound ?? 0))}
               </span>
             </div>
           )}
           <div className="flex items-center justify-between gap-4">
             <span className="text-xs text-white">Prévu</span>
             <span className="text-xs font-semibold text-white">
-              {formatCurrency(data.predicted)}
+              {formatCurrency(Number(data.predicted ?? 0))}
             </span>
           </div>
           {showConfidence && (
             <div className="flex items-center justify-between gap-4">
               <span className="text-xs text-indigo-400">Borne inf.</span>
               <span className="text-xs font-semibold text-indigo-400">
-                {formatCurrency(data.lowerBound)}
+                {formatCurrency(Number(data.lowerBound ?? 0))}
               </span>
             </div>
           )}
@@ -128,7 +128,7 @@ function OptimizedForecastChartComponent({
             <div className="flex items-center justify-between gap-4">
               <span className="text-xs text-red-400">Pessimiste</span>
               <span className="text-xs font-semibold text-red-400">
-                {formatCurrency(data.pessimistic)}
+                {formatCurrency(Number(data.pessimistic ?? 0))}
               </span>
             </div>
           )}
@@ -142,8 +142,8 @@ function OptimizedForecastChartComponent({
       <LineChart
         data={chartData}
         margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-        onMouseMove={(e: any) => {
-          if (e?.activeTooltipIndex !== undefined) {
+        onMouseMove={(e) => {
+          if (e?.activeTooltipIndex !== undefined && typeof e.activeTooltipIndex === 'number') {
             setActivePoint(e.activeTooltipIndex);
           }
         }}

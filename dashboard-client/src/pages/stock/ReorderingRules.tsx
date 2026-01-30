@@ -59,7 +59,7 @@ export default function ReorderingRules() {
           refetch()
           logger.info('[ReorderingRules] Rule toggled')
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           alert(error.message || 'Erreur lors de la modification')
         }
       }
@@ -76,7 +76,7 @@ export default function ReorderingRules() {
         refetch()
         logger.info('[ReorderingRules] Rule deleted')
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         alert(error.message || 'Erreur lors de la suppression')
       }
     })
