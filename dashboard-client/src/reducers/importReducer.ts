@@ -58,7 +58,7 @@ export function importReducer(state: ImportState, action: ImportAction): ImportS
         error: action.payload,
       };
 
-    case "UPDATE_MAPPING":
+    case "UPDATE_MAPPING": {
       const newMappings = { ...state.userMappings };
       if (action.payload.mapping === null) {
         delete newMappings[action.payload.field];
@@ -69,6 +69,7 @@ export function importReducer(state: ImportState, action: ImportAction): ImportS
         ...state,
         userMappings: newMappings,
       };
+    }
 
     case "RESET_MAPPINGS":
       return {
@@ -111,7 +112,7 @@ export function importReducer(state: ImportState, action: ImportAction): ImportS
         error: action.payload,
       };
 
-    case "NEXT_STEP":
+    case "NEXT_STEP": {
       const currentIndex = STEP_ORDER.indexOf(state.currentStep);
       return {
         ...state,
@@ -119,8 +120,9 @@ export function importReducer(state: ImportState, action: ImportAction): ImportS
           ? STEP_ORDER[currentIndex + 1]
           : state.currentStep,
       };
+    }
 
-    case "PREVIOUS_STEP":
+    case "PREVIOUS_STEP": {
       const currentIndexRev = STEP_ORDER.indexOf(state.currentStep);
       return {
         ...state,
@@ -128,6 +130,7 @@ export function importReducer(state: ImportState, action: ImportAction): ImportS
           ? STEP_ORDER[currentIndexRev - 1]
           : state.currentStep,
       };
+    }
 
     case "RESET_WIZARD":
       return initialState;

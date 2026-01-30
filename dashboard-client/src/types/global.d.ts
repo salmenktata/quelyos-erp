@@ -90,12 +90,12 @@ interface SpeechGrammar {
   weight: number
 }
 
-declare var SpeechRecognition: {
+declare let SpeechRecognition: {
   prototype: SpeechRecognition
   new (): SpeechRecognition
 }
 
-declare var webkitSpeechRecognition: {
+declare let webkitSpeechRecognition: {
   prototype: SpeechRecognition
   new (): SpeechRecognition
 }

@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-// @ts-ignore - Package @stripe/react-stripe-js sera installé après résolution npm
+// @ts-expect-error - Package @stripe/react-stripe-js sera installé après résolution npm
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '@/components/common';
 import { CreditCard, Lock, AlertCircle } from 'lucide-react';

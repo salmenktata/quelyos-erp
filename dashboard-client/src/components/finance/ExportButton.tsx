@@ -53,10 +53,11 @@ export function ExportButton({ accountId, className = "" }: ExportButtonProps) {
         case "month":
           fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
           break;
-        case "quarter":
+        case "quarter": {
           const quarterStart = Math.floor(now.getMonth() / 3) * 3;
           fromDate = new Date(now.getFullYear(), quarterStart, 1);
           break;
+        }
         case "year":
           fromDate = new Date(now.getFullYear(), 0, 1);
           break;

@@ -190,7 +190,7 @@ export const useFeatureFlags = create<FeatureFlagsStore>()(
         const flag = state.flags[key]
 
         if (!flag) {
-          console.warn(`Feature flag "${key}" not found`)
+          // Feature flag not found
           return false
         }
 
@@ -253,8 +253,8 @@ export const useFeatureFlags = create<FeatureFlagsStore>()(
               })
             }
           }
-        } catch (error) {
-          console.warn('Failed to sync feature flags from backend:', error)
+        } catch (_error) {
+          // Failed to sync feature flags from backend - silently continue
         }
       },
 

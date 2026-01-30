@@ -215,7 +215,7 @@ export default function BudgetsPage() {
       case 'percentageUsed':
         result.sort((a, b) => (a.percentageUsed || 0) - (b.percentageUsed || 0))
         break
-      case 'status':
+      case 'status': {
         const statusOrder = { ON_TRACK: 1, WARNING: 2, EXCEEDED: 3 }
         result.sort((a, b) => {
           const orderA = a.status ? statusOrder[a.status] : 999
@@ -223,6 +223,7 @@ export default function BudgetsPage() {
           return orderA - orderB
         })
         break
+      }
     }
 
     return sortDir === 'desc' ? result.reverse() : result

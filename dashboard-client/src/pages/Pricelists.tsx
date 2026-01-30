@@ -68,7 +68,7 @@ export default function Pricelists() {
     if (!pricelists) return [];
 
     // Filtrage par recherche
-    let filtered = pricelists.filter(
+    const filtered = pricelists.filter(
       (pricelist) =>
         pricelist.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
         pricelist.currency_name.toLowerCase().includes(debouncedSearchQuery.toLowerCase())

@@ -167,35 +167,31 @@ export default function AccountsPage() {
   }
 
   async function submitAccountFromModal(data: AccountFormData) {
-    try {
-      const body = {
-        name: data.name,
-        type: data.type,
-        currency: data.currency,
-        balance: data.balance,
-        institution: data.institution,
-        notes: data.notes,
-        status: data.status,
-        portfolioIds: data.selectedPortfolios,
-      }
-
-      if (editingId) {
-        await api(withCompanyParam(`/accounts/${editingId}`), {
-          method: 'PUT',
-          body: body as UpdateAccountRequest,
-        })
-      } else {
-        await api(withCompanyParam('/accounts'), {
-          method: 'POST',
-          body: body as CreateAccountRequest,
-        })
-      }
-
-      resetAccountForm()
-      await refetchAccounts()
-    } catch (err) {
-      throw err
+    const body = {
+      name: data.name,
+      type: data.type,
+      currency: data.currency,
+      balance: data.balance,
+      institution: data.institution,
+      notes: data.notes,
+      status: data.status,
+      portfolioIds: data.selectedPortfolios,
     }
+
+    if (editingId) {
+      await api(withCompanyParam(`/accounts/${editingId}`), {
+        method: 'PUT',
+        body: body as UpdateAccountRequest,
+      })
+    } else {
+      await api(withCompanyParam('/accounts'), {
+        method: 'POST',
+        body: body as CreateAccountRequest,
+      })
+    }
+
+    resetAccountForm()
+    await refetchAccounts()
   }
 
   function startEdit(acc: Account) {

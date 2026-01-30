@@ -76,8 +76,8 @@ export default function MarketplaceThemeDetailPage() {
       if (data.result?.success && data.result.theme) {
         setTheme(data.result.theme);
       }
-    } catch (error) {
-      console.error('Error loading theme:', error);
+    } catch (_error) {
+      // Error loading theme - silently fail
     } finally {
       setLoading(false);
     }
@@ -123,8 +123,8 @@ export default function MarketplaceThemeDetailPage() {
       } else {
         alert(data.result?.error || 'Erreur lors de l\'achat');
       }
-    } catch (error) {
-      console.error('Error purchasing theme:', error);
+    } catch (_error) {
+      // Error purchasing theme
       alert('Erreur lors de l\'achat. Réessayez.');
     } finally {
       setPurchasing(false);

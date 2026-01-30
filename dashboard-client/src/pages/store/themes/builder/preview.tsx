@@ -153,8 +153,8 @@ export default function ThemeBuilderPreview() {
         try {
           const state = JSON.parse(stored) as BuilderState;
           setThemeState(state);
-        } catch (error) {
-          console.error('Erreur parsing theme state:', error);
+        } catch (_error) {
+          // Error parsing theme state - ignore
         }
       }
     };
@@ -229,8 +229,8 @@ export default function ThemeBuilderPreview() {
       try {
         const state = JSON.parse(stored) as BuilderState;
         setThemeState(state);
-      } catch (error) {
-        console.error('Erreur parsing theme state:', error);
+      } catch (_error) {
+        // Error parsing theme state - ignore
       }
     }
   };

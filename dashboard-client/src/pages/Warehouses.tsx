@@ -56,7 +56,7 @@ export default function Warehouses() {
     if (!warehouses) return [];
 
     // Filtrage par recherche
-    let filtered = warehouses.filter(
+    const filtered = warehouses.filter(
       (warehouse) =>
         warehouse.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
         warehouse.code.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||

@@ -178,6 +178,36 @@ export function useRateTicket(ticketId: number) {
   })
 }
 
+export interface Template {
+  id: number
+  name: string
+  content: string
+  category: string
+  sequence: number
+  active: boolean
+  created_at: string
+}
+
+export function useTemplates() {
+  return useQuery({
+    queryKey: ['ticket-templates'],
+    queryFn: async () => {
+      const response = await fetch(`${API_URL}/api/tickets/templates`, {
+        method: 'GET',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      return data as { success: boolean; templates: Template[] }
+    },
+  })
+}
+
 export interface Attachment {
   id: number
   name: string
