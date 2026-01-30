@@ -11,6 +11,7 @@
 
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router'
 import {
   Database,
   Download,
@@ -250,17 +251,13 @@ export function Backups() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowSchedulePanel(!showSchedulePanel)}
-            className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition ${
-              showSchedulePanel
-                ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300'
-                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-teal-500'
-            }`}
+          <Link
+            to="/backup-schedules"
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition"
           >
             <Calendar className="w-4 h-4" />
-            Programmer
-          </button>
+            Planifications Auto
+          </Link>
           <select
             value={selectedTenant || ''}
             onChange={(e) => setSelectedTenant(e.target.value ? Number(e.target.value) : null)}

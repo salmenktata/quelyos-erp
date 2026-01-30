@@ -12,6 +12,7 @@ import { Subscriptions } from '@/pages/Subscriptions'
 import { Billing } from '@/pages/Billing'
 import { Monitoring } from '@/pages/Monitoring'
 import { Backups } from '@/pages/Backups'
+import { BackupSchedules } from '@/pages/BackupSchedules'
 import { Security } from '@/pages/Security'
 import { AiConfig } from '@/pages/AiConfig'
 import { SupportTickets } from '@/pages/SupportTickets'
@@ -19,6 +20,7 @@ import { SupportTemplates } from '@/pages/SupportTemplates'
 import { CustomerTicketHistory } from '@/pages/CustomerTicketHistory'
 import { AuditLogs } from '@/pages/AuditLogs'
 import { Settings } from '@/pages/Settings'
+import { Sitemap } from '@/pages/Sitemap'
 import { InactivityWarning } from './InactivityWarning'
 import { useInactivityLogout } from '@/hooks/useInactivityLogout'
 import { useAuth } from '@/hooks/useAuth'
@@ -46,7 +48,9 @@ function PageViewTracker() {
       '/support-templates': 'Support Templates',
       '/audit-logs': 'Audit Logs',
       '/backups': 'Backups',
+      '/backup-schedules': 'Backup Schedules',
       '/settings': 'Settings',
+      '/sitemap': 'Sitemap',
     }
 
     // Gérer les routes dynamiques (ex: /customers/:id/tickets)
@@ -104,7 +108,9 @@ export function AuthenticatedApp() {
           <Route path="customers/:customerId/tickets" element={<CustomerTicketHistory />} />
           <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="backups" element={<Backups />} />
+          <Route path="backup-schedules" element={<BackupSchedules />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="sitemap" element={<Sitemap />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>
