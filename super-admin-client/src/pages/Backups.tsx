@@ -9,7 +9,7 @@
  * - Statut backup auto
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Database,
@@ -52,6 +52,9 @@ export function Backups() {
   const [backupType, setBackupType] = useState<'full' | 'incremental'>('full')
   const [showSchedulePanel, setShowSchedulePanel] = useState(false)
   const [schedule, setSchedule] = useState<BackupSchedule>(DEFAULT_SCHEDULE)
+  const [restoreStartTime, setRestoreStartTime] = useState<number | null>(null)
+  const [elapsedTime, setElapsedTime] = useState(0)
+  const [isRestoringActive, setIsRestoringActive] = useState(false)
 
   const { data, isLoading } = useQuery({
     queryKey: ['super-admin-backups'],
@@ -69,6 +72,26 @@ export function Backups() {
     },
     refetchInterval: 3000, // Rafraîchir toutes les 3s pour voir la progression
   })
+
+  const backups = data?.data || []
+  const isRestoring = isRestoringActive
+
+  // Timer pour afficher le temps écoulé pendant la restauration
+  useEffect(() => {
+    if (isRestoring && !restoreStartTime) {
+      setRestoreStartTime(Date.now())
+    } else if (!isRestoring && restoreStartTime) {
+      setRestoreStartTime(null)
+      setElapsedTime(0)
+    }
+
+    if (isRestoring && restoreStartTime) {
+      const interval = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - restoreStartTime) / 1000))
+      }, 1000)
+      return () => clearInterval(interval)
+    }
+  }, [isRestoring, restoreStartTime])
 
   const triggerBackup = useMutation({
     mutationFn: async (type: 'full' | 'incremental') => {
@@ -96,13 +119,16 @@ export function Backups() {
       })
     },
     onSuccess: async () => {
-      toast.success('Restauration lancée avec succès')
+      toast.success('Restauration lancée - Suivi en temps réel activé')
       setRestoreTarget(null)
-      // Refetch immédiat
-      await queryClient.refetchQueries({ queryKey: ['super-admin-backups'] })
+      // Activer l'indicateur de restauration
+      setIsRestoringActive(true)
+      // Désactiver automatiquement après 20 minutes (sécurité)
+      setTimeout(() => setIsRestoringActive(false), 20 * 60 * 1000)
     },
     onError: () => {
       toast.error('Erreur lors de la restauration')
+      setIsRestoringActive(false)
     },
   })
 
@@ -145,8 +171,6 @@ export function Backups() {
       toast.error('Erreur lors de la sauvegarde')
     },
   })
-
-  const backups = data?.data || []
 
   const getStatusIcon = (status: Backup['status']) => {
     switch (status) {
@@ -397,6 +421,43 @@ export function Backups() {
               )}
               Sauvegarder
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Restore in Progress Alert */}
+      {isRestoring && (
+        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-6">
+          <div className="flex items-start gap-4">
+            <Loader2 className="w-8 h-8 text-orange-600 dark:text-orange-400 animate-spin flex-shrink-0" />
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-3">
+                <p className="font-bold text-orange-900 dark:text-orange-100 text-xl">
+                  ⚠️ Restauration en cours
+                </p>
+                <span className="text-orange-700 dark:text-orange-300 font-mono text-lg">
+                  {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
+                </span>
+              </div>
+
+              {/* Barre de progression animée */}
+              <div className="relative h-3 bg-orange-200 dark:bg-orange-900/40 rounded-full overflow-hidden mb-3">
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 animate-pulse">
+                  <div className="h-full w-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+                </div>
+              </div>
+
+              <p className="text-sm text-orange-800 dark:text-orange-200">
+                La base de données est en cours de restauration. <strong>Les applications sont
+                temporairement indisponibles.</strong>
+              </p>
+              <p className="text-sm text-orange-700 dark:text-orange-300 mt-2">
+                📊 Durée estimée : 5-15 minutes • 🔄 Actualisation automatique toutes les 3s
+              </p>
+              <p className="text-xs text-orange-600 dark:text-orange-400 mt-2 font-mono">
+                Étapes : Nettoyage tables → Restauration schéma → Restauration données
+              </p>
+            </div>
           </div>
         </div>
       )}
