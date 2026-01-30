@@ -189,7 +189,7 @@ export default function Menus() {
         <PageNotice config={storeNotices.menus} className="mb-6" />
 
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-800 dark:text-red-300">
+          <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-800 dark:text-red-300" role="alert">
             Erreur lors du chargement des menus
           </div>
         )}

@@ -273,7 +273,7 @@ export default function ForgotPassword() {
               </div>
 
               {error && (
-                <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300" role="alert">
                   <div className="h-2 w-2 animate-pulse rounded-full bg-red-400" />
                   {error}
                 </div>

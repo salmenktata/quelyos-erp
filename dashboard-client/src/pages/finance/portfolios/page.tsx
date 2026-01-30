@@ -225,9 +225,11 @@ export default function PortfoliosPage() {
         </div>
 
         {error && (
-          <GlassCard className="border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-            {error}
-          </GlassCard>
+          <div role="alert">
+            <GlassCard className="border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+              {error}
+            </GlassCard>
+          </div>
         )}
 
       {/* Form Modal */}

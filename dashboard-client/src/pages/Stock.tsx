@@ -20,22 +20,21 @@ import {
   useUpdateProductStock,
   useProductVariants,
 } from '../hooks/useStock'
-import { Badge, Button, Breadcrumbs, SkeletonTable, Input, PageNotice } from '../components/common'
+import { Badge, Button, Breadcrumbs, SkeletonTable, PageNotice } from '../components/common'
 import { useToast } from '../contexts/ToastContext'
 import { api } from '../lib/api'
 import { logger } from '@quelyos/logger'
 import { ExportStockModal } from '../components/stock/ExportStockModal'
 import { StockAdjustmentModal } from '../components/stock/StockAdjustmentModal'
-import { VariantStockTable } from '../components/stock/VariantStockTable'
+import { StockProductsTab } from '../components/stock/StockProductsTab'
+import { StockAlertsTab } from '../components/stock/StockAlertsTab'
+import { StockVariantsTab } from '../components/stock/StockVariantsTab'
 import {
   AlertTriangle,
-  ShoppingBag,
   Package,
   Check,
   Download,
   LayoutGrid,
-  ArrowLeft,
-  X,
 } from 'lucide-react'
 import type { StockProduct } from '@/types'
 import { stockNotices } from '@/lib/notices'
@@ -135,22 +134,35 @@ export default function Stock() {
     setActiveTab('variants')
   }, [])
 
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value)
+    setPage(0)
+  }, [])
+
+  const handleCategoryFilterChange = useCallback((value: string) => {
+    setCategoryFilter(value)
+    setPage(0)
+  }, [])
+
+  const handleStatusFilterChange = useCallback((value: 'all' | 'in_stock' | 'low_stock' | 'out_of_stock') => {
+    setStatusFilter(value)
+    setPage(0)
+  }, [])
+
   const handleExportCSV = async () => {
     try {
       toast.info('Génération du fichier CSV en cours...')
 
-      // Récupérer toutes les données (limite élevée)
       const response = await api.getStockProducts({ limit: 10000, offset: 0 })
-      const allProducts = (response?.data?.products as StockProduct[]) || []
+      const allProds = (response?.data?.products as StockProduct[]) || []
 
-      if (allProducts.length === 0) {
+      if (allProds.length === 0) {
         toast.warning('Aucune donnée à exporter')
         return
       }
 
-      // Générer le CSV
       const headers = ['Nom', 'SKU', 'Catégorie', 'Stock Disponible', 'Stock Virtuel', 'Entrant', 'Sortant', 'Prix (€)', 'Statut']
-      const rows = allProducts.map(p => [
+      const rows = allProds.map(p => [
         p.name,
         p.sku || '',
         p.category || '',
@@ -167,7 +179,6 @@ export default function Stock() {
         ...rows.map(row => row.join(';'))
       ].join('\n')
 
-      // Télécharger le fichier
       const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
       const url = URL.createObjectURL(blob)
@@ -178,10 +189,10 @@ export default function Stock() {
       link.click()
       document.body.removeChild(link)
 
-      toast.success(`${allProducts.length} produits exportés avec succès`)
+      toast.success(`${allProds.length} produits exportés avec succès`)
     } catch (error) {
       logger.error('Export CSV error:', error)
-      toast.error('Erreur lors de l\'export CSV')
+      toast.error("Erreur lors de l'export CSV")
     }
   }
 
@@ -190,17 +201,15 @@ export default function Stock() {
       toast.info('Génération du rapport de valorisation...')
 
       const response = await api.getStockProducts({ limit: 10000, offset: 0 })
-      const allProducts = (response?.data?.products as StockProduct[]) || []
+      const allProds = (response?.data?.products as StockProduct[]) || []
 
-      if (allProducts.length === 0) {
+      if (allProds.length === 0) {
         toast.warning('Aucune donnée à exporter')
         return
       }
 
-      // Group by category
       const byCategory: Record<string, { count: number; totalQty: number; totalValue: number }> = {}
-
-      allProducts.forEach(p => {
+      allProds.forEach(p => {
         const cat = p.category || 'Sans catégorie'
         if (!byCategory[cat]) {
           byCategory[cat] = { count: 0, totalQty: 0, totalValue: 0 }
@@ -210,10 +219,9 @@ export default function Stock() {
         byCategory[cat].totalValue += (p.list_price || 0) * p.qty_available
       })
 
-      // Generate CSV
       const headers = ['Catégorie', 'Nombre Produits', 'Total Unités', 'Valorisation (€)', 'Valeur Moyenne/Produit (€)']
       const rows = Object.entries(byCategory)
-        .sort((a, b) => b[1].totalValue - a[1].totalValue) // Sort by value desc
+        .sort((a, b) => b[1].totalValue - a[1].totalValue)
         .map(([cat, data]) => [
           cat,
           data.count.toString(),
@@ -222,7 +230,6 @@ export default function Stock() {
           (data.totalValue / data.count).toFixed(2),
         ])
 
-      // Add totals row
       const totals = Object.values(byCategory).reduce(
         (acc, d) => ({
           count: acc.count + d.count,
@@ -258,31 +265,27 @@ export default function Stock() {
       toast.success('Rapport de valorisation exporté avec succès')
     } catch (error) {
       logger.error('Export valorisation error:', error)
-      toast.error('Erreur lors de l\'export du rapport')
+      toast.error("Erreur lors de l'export du rapport")
     }
   }
 
-  // Data
+  // Computed data
   const allProducts = useMemo(() => (productsData?.data?.products as StockProduct[]) || [], [productsData?.data?.products])
   const productsTotal = (productsData?.data?.total as number) || 0
 
-  // Apply client-side filters
   const products = useMemo(() => allProducts.filter(p => {
     if (categoryFilter && p.category !== categoryFilter) return false
     if (statusFilter !== 'all' && p.stock_status !== statusFilter) return false
     return true
   }), [allProducts, categoryFilter, statusFilter])
 
-  // Get unique categories for filter
   const uniqueCategories = useMemo(() => Array.from(new Set(allProducts.map(p => p.category).filter(Boolean))), [allProducts])
 
   const alerts = alertsData?.data?.alerts || []
   const alertsTotal = alertsData?.data?.total || 0
-
   const highAlerts = highAlertsData?.data?.alerts || []
   const highAlertsTotal = highAlertsData?.data?.total || 0
 
-  // Statistiques valorisation (use filtered products)
   const { stockValue, totalItems, avgStockPerProduct, avgValuePerProduct } = useMemo(() => {
     const sv = products.reduce((sum, p) => sum + (p.list_price || 0) * p.qty_available, 0)
     const ti = products.reduce((sum, p) => sum + p.qty_available, 0)
@@ -294,7 +297,6 @@ export default function Stock() {
     }
   }, [products])
 
-  // Valorisation par catégorie
   const valorisationByCategory = useMemo(() => Object.entries(
     allProducts.reduce((acc, p) => {
       const cat = p.category || 'Sans catégorie'
@@ -339,7 +341,7 @@ export default function Stock() {
             </Button>
             <Link to="/stock/moves">
               <Button variant="secondary" className="flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                 </svg>
                 Voir les mouvements
@@ -356,819 +358,118 @@ export default function Stock() {
             <nav className="-mb-px flex space-x-8">
               <button
                 onClick={() => handleTabChange('products')}
-                className={`
-                  group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                  ${
-                    activeTab === 'products'
-                      ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                  }
-                `}
+                className={`group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'products'
+                    ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
               >
-                <Package className="h-5 w-5" />
+                <Package className="h-5 w-5" aria-hidden="true" />
                 Tous les Produits
                 {productsTotal > 0 && (
-                  <Badge variant="info" className="ml-2">
-                    {productsTotal}
-                  </Badge>
+                  <Badge variant="info" className="ml-2">{productsTotal}</Badge>
                 )}
               </button>
 
               <button
                 onClick={() => handleTabChange('alerts')}
-                className={`
-                  group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                  ${
-                    activeTab === 'alerts'
-                      ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                  }
-                `}
+                className={`group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'alerts'
+                    ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
               >
-                <AlertTriangle className="h-5 w-5" />
+                <AlertTriangle className="h-5 w-5" aria-hidden="true" />
                 Alertes Stock Bas
                 {alertsTotal > 0 && (
-                  <Badge variant="error" className="ml-2">
-                    {alertsTotal}
-                  </Badge>
+                  <Badge variant="error" className="ml-2">{alertsTotal}</Badge>
                 )}
               </button>
 
               <button
                 onClick={() => handleTabChange('variants')}
-                className={`
-                  group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                  ${
-                    activeTab === 'variants'
-                      ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                  }
-                `}
+                className={`group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'variants'
+                    ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
               >
-                <LayoutGrid className="h-5 w-5" />
+                <LayoutGrid className="h-5 w-5" aria-hidden="true" />
                 Variantes
                 {selectedProductForVariants && (
-                  <Badge variant="info" className="ml-2">
-                    1 produit
-                  </Badge>
+                  <Badge variant="info" className="ml-2">1 produit</Badge>
                 )}
               </button>
             </nav>
           </div>
         </div>
 
-        {/* Statistics Cards (Products tab only) */}
-        {activeTab === 'products' && !isLoading && products.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Valorisation Totale
-              </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatPrice(stockValue)}
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {productsTotal} produits
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Total Unités en Stock
-              </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {totalItems.toLocaleString('fr-FR')}
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Toutes catégories
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Stock Moyen / Produit
-              </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {avgStockPerProduct.toFixed(1)}
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                unités
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Valeur Moyenne / Produit
-              </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatPrice(avgValuePerProduct)}
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                prix × quantité
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Valorisation by Category */}
-        {activeTab === 'products' && !isLoading && products.length > 0 && valorisationByCategory.length > 0 && (
-          <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                📊 Valorisation par Catégorie
-              </h3>
-              <Button
-                variant="secondary"
-                onClick={handleExportValorisation}
-                className="flex items-center gap-2"
-                size="sm"
-              >
-                <Download className="h-4 w-4" />
-                Exporter CSV
-              </Button>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-900">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Catégorie
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Produits
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Unités
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Valorisation
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      % Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {valorisationByCategory.slice(0, 10).map(([category, data]) => (
-                    <tr key={category} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                      <td className="px-6 py-4">
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {category}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <span className="text-sm text-gray-900 dark:text-white">
-                          {data.count}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <span className="text-sm text-gray-900 dark:text-white">
-                          {data.totalQty.toLocaleString('fr-FR')}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {formatPrice(data.totalValue)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {((data.totalValue / stockValue) * 100).toFixed(1)}%
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {valorisationByCategory.length > 10 && (
-              <div className="px-6 py-3 bg-gray-50 dark:bg-gray-900 text-sm text-gray-600 dark:text-gray-400 text-center">
-                +{valorisationByCategory.length - 10} autres catégories (voir export CSV complet)
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Search bar & Actions (Products tab only) */}
-        {activeTab === 'products' && (
-          <>
-            <div className="mb-4 flex items-center gap-4 flex-wrap">
-              <Input
-                type="text"
-                placeholder="Rechercher un produit (nom ou SKU)..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value)
-                  setPage(0)
-                }}
-                className="flex-1 min-w-[250px]"
-              />
-              <select
-                value={categoryFilter}
-                onChange={(e) => {
-                  setCategoryFilter(e.target.value)
-                  setPage(0)
-                }}
-                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="">Toutes catégories</option>
-                {uniqueCategories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-              <select
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value as any)
-                  setPage(0)
-                }}
-                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="all">Tous statuts</option>
-                <option value="in_stock">En stock</option>
-                <option value="low_stock">Stock faible</option>
-                <option value="out_of_stock">Rupture</option>
-              </select>
-              <Button
-                variant="secondary"
-                onClick={handleExportCSV}
-                className="flex items-center gap-2"
-              >
-                <Download className="h-5 w-5" />
-                Exporter CSV
-              </Button>
-            </div>
-            {(categoryFilter || statusFilter !== 'all') && (
-              <div className="mb-4 flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Filtres actifs:
-                </span>
-                {categoryFilter && (
-                  <Badge variant="info" className="flex items-center gap-1">
-                    Catégorie: {categoryFilter}
-                    <button
-                      onClick={() => setCategoryFilter('')}
-                      className="ml-1 hover:text-red-600"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-                {statusFilter !== 'all' && (
-                  <Badge variant="info" className="flex items-center gap-1">
-                    Statut: {getStockLabel(statusFilter as any)}
-                    <button
-                      onClick={() => setStatusFilter('all')}
-                      className="ml-1 hover:text-red-600"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Alert banner (Alerts tab only) */}
-        {activeTab === 'alerts' && !isLoading && alertsTotal > 0 && (
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-6 mb-6">
-            <div className="flex items-start gap-4">
-              <div className="shrink-0">
-                <AlertTriangle className="h-12 w-12 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
-                  {alertsTotal} produit{alertsTotal > 1 ? 's' : ''} en stock bas
-                </h3>
-                <p className="text-sm text-amber-800 dark:text-amber-200 mt-1">
-                  Ces produits sont sous le seuil d'alerte et nécessitent un réapprovisionnement.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Content */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {isLoading ? (
             <SkeletonTable rows={10} columns={activeTab === 'products' ? 7 : 6} />
           ) : error ? (
-            <div className="p-8 text-center text-red-600 dark:text-red-400">
+            <div className="p-8 text-center text-red-600 dark:text-red-400" role="alert">
               Erreur lors du chargement des données
             </div>
           ) : activeTab === 'products' && products.length > 0 ? (
-            <>
-              {/* Products Table */}
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Produit
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Référence
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Catégorie
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Stock
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Statut
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Prix
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {products.map((product) => (
-                      <tr
-                        key={product.id}
-                        className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            {product.image_url ? (
-                              <img
-                                src={product.image_url}
-                                alt={product.name}
-                                className="w-12 h-12 rounded object-cover"
-                              />
-                            ) : (
-                              <div className="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <ShoppingBag className="h-6 w-6 text-gray-400" />
-                              </div>
-                            )}
-                            <div>
-                              <Link
-                                to={`/products/${product.id}`}
-                                className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
-                              >
-                                {product.name}
-                              </Link>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900 dark:text-white font-mono">
-                            {product.sku || '-'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {product.category || '-'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {product.qty_available} unités
-                            </span>
-                            {product.incoming_qty > 0 || product.outgoing_qty > 0 ? (
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {product.incoming_qty > 0 && `+${product.incoming_qty} entrant`}
-                                {product.incoming_qty > 0 && product.outgoing_qty > 0 && ' / '}
-                                {product.outgoing_qty > 0 && `-${product.outgoing_qty} sortant`}
-                              </span>
-                            ) : null}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge variant={getStockBadgeVariant(product.stock_status)}>
-                            {getStockLabel(product.stock_status)}
-                          </Badge>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {formatPrice(product.list_price || 0)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => setAdjustmentModalProduct(product)}
-                              className="px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
-                              title="Ajuster le stock"
-                            >
-                              Ajuster
-                            </button>
-                            <button
-                              onClick={() => handleViewVariants(product)}
-                              className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
-                              title="Voir les variantes"
-                            >
-                              <LayoutGrid className="h-5 w-5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              {productsTotal > limit && (
-                <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
-                  <div className="text-sm text-gray-700 dark:text-gray-300">
-                    Affichage {page * limit + 1} à {Math.min((page + 1) * limit, productsTotal)}{' '}
-                    sur {productsTotal}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setPage(Math.max(0, page - 1))}
-                      disabled={page === 0}
-                    >
-                      Précédent
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setPage(page + 1)}
-                      disabled={(page + 1) * limit >= productsTotal}
-                    >
-                      Suivant
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : activeTab === 'alerts' && alerts.length > 0 ? (
-            <>
-              {/* Alerts Table */}
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Produit
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Référence
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Catégorie
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Stock actuel
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Seuil
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Prix
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {alerts.map((alert) => (
-                      <tr
-                        key={alert.id}
-                        className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            {alert.image_url ? (
-                              <img
-                                src={alert.image_url}
-                                alt={alert.name}
-                                className="w-12 h-12 rounded object-cover"
-                              />
-                            ) : (
-                              <div className="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <ShoppingBag className="h-6 w-6 text-gray-400" />
-                              </div>
-                            )}
-                            <div>
-                              <Link
-                                to={`/products/${alert.id}`}
-                                className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
-                              >
-                                {alert.name}
-                              </Link>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900 dark:text-white font-mono">
-                            {alert.sku || '-'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {alert.category || '-'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge variant={getAlertSeverity(alert.diff)}>
-                            {alert.current_stock} unités
-                          </Badge>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900 dark:text-white">
-                            {alert.threshold} unités
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {formatPrice(alert.list_price)}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              {alertsTotal > limit && (
-                <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
-                  <div className="text-sm text-gray-700 dark:text-gray-300">
-                    Affichage {page * limit + 1} à {Math.min((page + 1) * limit, alertsTotal)} sur{' '}
-                    {alertsTotal}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setPage(Math.max(0, page - 1))}
-                      disabled={page === 0}
-                    >
-                      Précédent
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setPage(page + 1)}
-                      disabled={(page + 1) * limit >= alertsTotal}
-                    >
-                      Suivant
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* High Stock Alerts Section */}
-              {highAlerts.length > 0 && (
-                <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-6">
-                    📈 Alertes Surstock ({highAlertsTotal})
-                  </h3>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                      <thead className="bg-gray-50 dark:bg-gray-900">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Produit
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Référence
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Catégorie
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Stock actuel
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Seuil max
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Prix
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                        {highAlerts.map((alert) => (
-                          <tr
-                            key={alert.id}
-                            className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                          >
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-3">
-                                {alert.image_url ? (
-                                  <img
-                                    src={alert.image_url}
-                                    alt={alert.name}
-                                    className="w-12 h-12 rounded object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                    <ShoppingBag className="h-6 w-6 text-gray-400" />
-                                  </div>
-                                )}
-                                <div>
-                                  <Link
-                                    to={`/products/${alert.id}`}
-                                    className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
-                                  >
-                                    {alert.name}
-                                  </Link>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="text-sm text-gray-900 dark:text-white font-mono">
-                                {alert.sku || '-'}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="text-sm text-gray-600 dark:text-gray-400">
-                                {alert.category || '-'}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <Badge variant="warning">
-                                {alert.current_stock} unités
-                              </Badge>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="text-sm text-gray-900 dark:text-white">
-                                {alert.threshold} unités
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                {formatPrice(alert.list_price)}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : activeTab === 'alerts' && highAlerts.length > 0 ? (
-            <>
-              {/* Only High Stock Alerts if no low stock */}
-              <div className="px-6 py-8">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  📈 Alertes Surstock ({highAlertsTotal})
-                </h3>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-900">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Produit
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Référence
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Catégorie
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Stock actuel
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Seuil max
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Prix
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                      {highAlerts.map((alert) => (
-                        <tr
-                          key={alert.id}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                        >
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              {alert.image_url ? (
-                                <img
-                                  src={alert.image_url}
-                                  alt={alert.name}
-                                  className="w-12 h-12 rounded object-cover"
-                                />
-                              ) : (
-                                <div className="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                  <ShoppingBag className="h-6 w-6 text-gray-400" />
-                                </div>
-                              )}
-                              <div>
-                                <Link
-                                  to={`/products/${alert.id}`}
-                                  className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
-                                >
-                                  {alert.name}
-                                </Link>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm text-gray-900 dark:text-white font-mono">
-                              {alert.sku || '-'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              {alert.category || '-'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <Badge variant="warning">
-                              {alert.current_stock} unités
-                            </Badge>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm text-gray-900 dark:text-white">
-                              {alert.threshold} unités
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {formatPrice(alert.list_price)}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </>
+            <StockProductsTab
+              products={products}
+              productsTotal={productsTotal}
+              page={page}
+              limit={limit}
+              search={search}
+              categoryFilter={categoryFilter}
+              statusFilter={statusFilter}
+              uniqueCategories={uniqueCategories as string[]}
+              stockValue={stockValue}
+              totalItems={totalItems}
+              avgStockPerProduct={avgStockPerProduct}
+              avgValuePerProduct={avgValuePerProduct}
+              valorisationByCategory={valorisationByCategory}
+              isLoading={isLoadingProducts}
+              formatPrice={formatPrice}
+              getStockBadgeVariant={getStockBadgeVariant}
+              getStockLabel={getStockLabel}
+              onSearchChange={handleSearchChange}
+              onCategoryFilterChange={handleCategoryFilterChange}
+              onStatusFilterChange={handleStatusFilterChange}
+              onPageChange={setPage}
+              onAdjustStock={setAdjustmentModalProduct}
+              onViewVariants={handleViewVariants}
+              onExportCSV={handleExportCSV}
+              onExportValorisation={handleExportValorisation}
+            />
+          ) : activeTab === 'alerts' && (alerts.length > 0 || highAlerts.length > 0) ? (
+            <StockAlertsTab
+              alerts={alerts}
+              alertsTotal={alertsTotal}
+              highAlerts={highAlerts}
+              highAlertsTotal={highAlertsTotal}
+              page={page}
+              limit={limit}
+              isLoading={isLoadingAlerts || isLoadingHighAlerts}
+              formatPrice={formatPrice}
+              getAlertSeverity={getAlertSeverity}
+              onPageChange={setPage}
+            />
           ) : activeTab === 'variants' ? (
-            <div className="space-y-6">
-              {selectedProductForVariants ? (
-                <>
-                  {/* Header avec retour */}
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => {
-                          setSelectedProductForVariants(null)
-                          setActiveTab('products')
-                        }}
-                        className="inline-flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                      >
-                        <ArrowLeft className="h-5 w-5" />
-                        Retour aux produits
-                      </button>
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Variantes de : {selectedProductForVariants.name}
-                      </h2>
-                    </div>
-                  </div>
-
-                  {/* Tableau des variantes */}
-                  {isLoadingVariants ? (
-                    <SkeletonTable rows={5} columns={7} />
-                  ) : variantsData?.data?.variants && variantsData.data.variants.length > 0 ? (
-                    <VariantStockTable
-                      productId={selectedProductForVariants.id}
-                      variants={variantsData.data.variants}
-                      onStockUpdated={() => refetchVariants()}
-                    />
-                  ) : (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-                      <LayoutGrid className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                        Aucune variante
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-400">
-                        Ce produit n'a pas de variantes configurées.
-                      </p>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-                  <LayoutGrid className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    Sélectionnez un produit
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
-                    Revenez à l'onglet "Tous les Produits" et cliquez sur "Voir variantes" pour un produit.
-                  </p>
-                  <button
-                    onClick={() => setActiveTab('products')}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
-                  >
-                    <Package className="h-5 w-5" />
-                    Aller aux produits
-                  </button>
-                </div>
-              )}
-            </div>
+            <StockVariantsTab
+              selectedProduct={selectedProductForVariants}
+              variantsData={variantsData}
+              isLoadingVariants={isLoadingVariants}
+              onBack={() => {
+                setSelectedProductForVariants(null)
+                setActiveTab('products')
+              }}
+              onRefetchVariants={() => refetchVariants()}
+              onGoToProducts={() => setActiveTab('products')}
+            />
           ) : (
             <div className="p-12 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                  <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
+                  <Check className="w-8 h-8 text-green-600 dark:text-green-400" aria-hidden="true" />
                 </div>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">

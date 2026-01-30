@@ -244,8 +244,8 @@ export default function NotificationsPage() {
             </button>
 
             {error && (
-              <div className="flex items-center gap-2 text-sm text-amber-300">
-                <AlertCircle className="h-4 w-4" />
+              <div className="flex items-center gap-2 text-sm text-amber-300" role="alert">
+                <AlertCircle className="h-4 w-4" aria-hidden="true" />
                 {error}
               </div>
             )}

@@ -198,10 +198,11 @@ export default function BFRReportPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="mb-6"
+            role="alert"
           >
             <GlassCard className="border-red-400/40 bg-red-500/10 p-4">
               <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-red-400" />
+                <AlertCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
                 <div className="flex-1">
                   <p className="font-semibold text-red-100">{error}</p>
                 </div>

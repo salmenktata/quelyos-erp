@@ -333,8 +333,8 @@ function CreateAppraisalModal({
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Nouvelle évaluation
           </h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Fermer">
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 

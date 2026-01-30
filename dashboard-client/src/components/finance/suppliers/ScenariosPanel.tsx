@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { fetchApi } from "@/lib/api-base";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -96,11 +97,8 @@ export default function ScenariosPanel() {
   const fetchScenarios = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/ecommerce/payment-planning/scenarios");
-      if (response.ok) {
-        const data = await response.json();
-        setScenarios(data.scenarios || []);
-      }
+      const data = await fetchApi<{ scenarios: Scenario[] }>("/api/ecommerce/payment-planning/scenarios", { method: "GET", credentials: "include" });
+      setScenarios(data.scenarios || []);
     } catch (error) {
       logger.error("Erreur lors du chargement des scénarios:", error);
     } finally {
@@ -110,11 +108,8 @@ export default function ScenariosPanel() {
 
   const fetchAvailableInvoices = async () => {
     try {
-      const response = await fetch("/api/ecommerce/supplier-invoices/upcoming?days=90");
-      if (response.ok) {
-        const data = await response.json();
-        setAvailableInvoices(data.invoices || []);
-      }
+      const data = await fetchApi<{ invoices: Record<string, unknown>[] }>("/api/ecommerce/supplier-invoices/upcoming?days=90", { method: "GET", credentials: "include" });
+      setAvailableInvoices(data.invoices || []);
     } catch (error) {
       logger.error("Erreur lors du chargement des factures:", error);
     }
@@ -130,9 +125,9 @@ export default function ScenariosPanel() {
     setError(null);
 
     try {
-      const response = await fetch("/api/ecommerce/payment-planning/scenarios", {
+      await fetchApi("/api/ecommerce/payment-planning/scenarios", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           name: formData.name,
           description: formData.description || null,
@@ -142,10 +137,6 @@ export default function ScenariosPanel() {
           invoices: formData.invoices,
         }),
       });
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la création du scénario");
-      }
 
       await fetchScenarios();
       setShowCreateDialog(false);
@@ -159,14 +150,10 @@ export default function ScenariosPanel() {
 
   const handleActivateScenario = async (scenarioId: string) => {
     try {
-      const response = await fetch(
-        `/api/ecommerce/payment-planning/scenarios/${scenarioId}/activate`,
-        { method: "PUT" }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de l'activation du scénario");
-      }
+      await fetchApi(`/api/ecommerce/payment-planning/scenarios/${scenarioId}/activate`, {
+        method: "PUT",
+        credentials: "include",
+      });
 
       await fetchScenarios();
     } catch (error) {
@@ -180,13 +167,10 @@ export default function ScenariosPanel() {
     }
 
     try {
-      const response = await fetch(`/api/ecommerce/payment-planning/scenarios/${scenarioId}`, {
+      await fetchApi(`/api/ecommerce/payment-planning/scenarios/${scenarioId}`, {
         method: "DELETE",
+        credentials: "include",
       });
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la suppression du scénario");
-      }
 
       await fetchScenarios();
       if (selectedScenario?.id === scenarioId) {

@@ -204,8 +204,8 @@ export function PaymentModal({
               Multi-paiement
             </button>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-            <X className="h-5 w-5 text-gray-500" />
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" aria-label="Fermer">
+            <X className="h-5 w-5 text-gray-500" aria-hidden="true" />
           </button>
         </div>
 

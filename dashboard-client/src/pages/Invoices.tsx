@@ -296,7 +296,7 @@ export default function Invoices() {
         {/* Tableau */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {error && (
-            <div className="p-6 text-center">
+            <div className="p-6 text-center" role="alert">
               <p className="text-red-600 dark:text-red-400">
                 Erreur lors du chargement des factures
               </p>

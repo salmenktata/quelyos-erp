@@ -485,8 +485,8 @@ function OrderDetailModal({
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">{order.orderNumber}</h2>
               <p className="text-gray-500 dark:text-gray-400">{order.customerName}</p>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-              <X className="h-5 w-5 text-gray-500" />
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" aria-label="Fermer">
+              <X className="h-5 w-5 text-gray-500" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -609,8 +609,8 @@ function QRScannerModal({
               <QrCode className="h-6 w-6 text-teal-600" />
               Scanner QR Code
             </h2>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-              <X className="h-5 w-5 text-gray-500" />
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" aria-label="Fermer">
+              <X className="h-5 w-5 text-gray-500" aria-hidden="true" />
             </button>
           </div>
         </div>

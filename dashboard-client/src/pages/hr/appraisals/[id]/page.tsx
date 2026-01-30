@@ -404,10 +404,10 @@ function GoalsTab({ appraisal, goals, onAction, onAddGoal }: { appraisal: Apprai
                 </div>
                 <div className="flex items-center gap-2">
                   {goal.state === 'draft' && (
-                    <button onClick={() => onAction({ id: goal.id, action: 'start' })} className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded" title="Démarrer"><Play className="w-4 h-4" /></button>
+                    <button onClick={() => onAction({ id: goal.id, action: 'start' })} className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded" title="Démarrer" aria-label="Démarrer l'objectif"><Play className="w-4 h-4" aria-hidden="true" /></button>
                   )}
                   {goal.state === 'in_progress' && (
-                    <button onClick={() => onAction({ id: goal.id, action: 'complete' })} className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded" title="Marquer atteint"><CheckCircle2 className="w-4 h-4" /></button>
+                    <button onClick={() => onAction({ id: goal.id, action: 'complete' })} className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded" title="Marquer atteint" aria-label="Marquer l'objectif atteint"><CheckCircle2 className="w-4 h-4" aria-hidden="true" /></button>
                   )}
                 </div>
               </div>
@@ -501,7 +501,7 @@ function AddGoalModal({ employeeId, appraisalId, onClose }: { employeeId: number
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-xl">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Nouvel objectif</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600" aria-label="Fermer"><X className="w-5 h-5" aria-hidden="true" /></button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

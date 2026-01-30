@@ -216,8 +216,8 @@ export default function ScoringSettingsPage() {
                 }`}>
                   +{rule.points} pts
                 </span>
-                <button className="p-1.5 text-gray-400 hover:text-red-500 transition">
-                  <Trash2 className="h-4 w-4" />
+                <button className="p-1.5 text-gray-400 hover:text-red-500 transition" aria-label="Supprimer la règle">
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>
             </div>

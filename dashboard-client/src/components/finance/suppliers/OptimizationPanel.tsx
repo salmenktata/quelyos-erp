@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import PaymentPlanChart from "./PaymentPlanChart";
 import { logger } from '@quelyos/logger';
+import { fetchApi } from "@/lib/api-base";
 
 interface OptimizationResult {
   plan: PaymentPlanItem[];
@@ -109,9 +110,9 @@ export default function OptimizationPanel() {
     setError(null);
 
     try {
-      const response = await fetch("/api/ecommerce/payment-planning/optimize", {
+      const data = await fetchApi<OptimizationResult>("/api/ecommerce/payment-planning/optimize", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           strategy,
           maxDailyAmount: maxDailyAmount ? parseFloat(maxDailyAmount) : undefined,
@@ -119,11 +120,6 @@ export default function OptimizationPanel() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Erreur lors de l'optimisation");
-      }
-
-      const data = await response.json();
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue");
@@ -171,8 +167,7 @@ export default function OptimizationPanel() {
   useEffect(() => {
     const loadAccounts = async () => {
       try {
-        const response = await fetch("/api/ecommerce/accounts");
-        const data = await response.json();
+        const data = await fetchApi<{ accounts: { id: number; name: string }[] }>("/api/ecommerce/accounts", { method: "GET", credentials: "include" });
         setAccounts(data.accounts || []);
         if (data.accounts && data.accounts.length > 0) {
           setSelectedAccountId(data.accounts[0].id.toString());
@@ -243,17 +238,11 @@ export default function OptimizationPanel() {
           paymentMethod: "VIREMENT",
         }));
 
-      const response = await fetch("/api/ecommerce/payment-planning/execute-batch", {
+      const data = await fetchApi<{ successful: number; failed: number }>("/api/ecommerce/payment-planning/execute-batch", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ payments: scheduledPayments }),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Erreur lors de l'exécution des paiements");
-      }
 
       setExecutionResult(data);
       alert(`Succès: ${data.successful} paiements exécutés, ${data.failed} échecs`);

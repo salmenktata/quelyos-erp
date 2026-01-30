@@ -137,12 +137,12 @@ export default function PricelistsSettingsPage() {
                 >
                   <ExternalLink className="h-4 w-4" />
                 </Link>
-                <button className="p-1.5 text-gray-400 hover:text-violet-600 transition">
-                  <Edit2 className="h-4 w-4" />
+                <button className="p-1.5 text-gray-400 hover:text-violet-600 transition" aria-label={`Modifier ${pricelist.name}`}>
+                  <Edit2 className="h-4 w-4" aria-hidden="true" />
                 </button>
                 {pricelist.customerCount === 0 && (
-                  <button className="p-1.5 text-gray-400 hover:text-red-500 transition">
-                    <Trash2 className="h-4 w-4" />
+                  <button className="p-1.5 text-gray-400 hover:text-red-500 transition" aria-label={`Supprimer ${pricelist.name}`}>
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
                 )}
               </div>

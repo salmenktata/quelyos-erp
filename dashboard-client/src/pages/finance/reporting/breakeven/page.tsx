@@ -204,6 +204,7 @@ export default function BreakEvenReportPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="mb-6"
+            role="alert"
           >
             <Card className="border-red-400/40 bg-red-500/10 p-4">
               <div className="flex items-center gap-3">

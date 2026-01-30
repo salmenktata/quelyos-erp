@@ -330,8 +330,8 @@ export default function LiveEvents() {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {isCreating ? 'Nouvel événement' : 'Modifier'}
                 </h2>
-                <button onClick={handleCancel} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                  <X className="h-5 w-5 text-gray-500" />
+                <button onClick={handleCancel} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" aria-label="Fermer">
+                  <X className="h-5 w-5 text-gray-500" aria-hidden="true" />
                 </button>
               </div>
 

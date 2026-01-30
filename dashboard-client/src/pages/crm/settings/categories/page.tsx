@@ -103,12 +103,12 @@ export default function CategoriesSettingsPage() {
                 </h3>
               </div>
               <div className="flex gap-1">
-                <button className="p-1 text-gray-400 hover:text-violet-600 transition">
-                  <Edit2 className="h-4 w-4" />
+                <button className="p-1 text-gray-400 hover:text-violet-600 transition" aria-label={`Modifier ${category.name}`}>
+                  <Edit2 className="h-4 w-4" aria-hidden="true" />
                 </button>
                 {category.customerCount === 0 && (
-                  <button className="p-1 text-gray-400 hover:text-red-500 transition">
-                    <Trash2 className="h-4 w-4" />
+                  <button className="p-1 text-gray-400 hover:text-red-500 transition" aria-label={`Supprimer ${category.name}`}>
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
                 )}
               </div>

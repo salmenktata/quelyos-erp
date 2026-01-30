@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Button } from './common'
 import { Link } from 'react-router-dom'
-import { logger } from '@quelyos/logger';
+import { logger } from '@quelyos/logger'
+import { fetchApi } from '@/lib/api-base'
 
 interface UnsplashImage {
   id: string
@@ -59,12 +60,10 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
   useEffect(() => {
     const fetchApiKeys = async () => {
       try {
-        const response = await fetch('/api/settings/images', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({})
-        })
-        const data = await response.json()
+        const data = await fetchApi<{ success: boolean; settings: { unsplash_key?: string; pexels_key?: string } }>(
+          '/api/settings/images',
+          { method: 'POST', body: JSON.stringify({}) }
+        )
         if (data.success) {
           setApiKeys({
             unsplash: data.settings.unsplash_key || import.meta.env.VITE_UNSPLASH_ACCESS_KEY || '',
@@ -332,7 +331,7 @@ export function ImageSearcher({ onSelectImage, currentImageUrl }: ImageSearcherP
 
       {/* Message d'erreur */}
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg" role="alert">
           <p className="text-sm text-red-800 dark:text-red-200 mb-3">
             {error}
           </p>

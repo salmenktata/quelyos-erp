@@ -286,7 +286,7 @@ export function StockAdjustmentModal({
               className={error ? 'border-red-300 dark:border-red-700' : ''}
             />
             {error && (
-              <p id="quantity-error" className="mt-1 text-sm text-red-600 dark:text-red-400">
+              <p id="quantity-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
                 {error}
               </p>
             )}

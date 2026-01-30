@@ -102,8 +102,8 @@ export default function StagesSettingsPage() {
               key={stage.id}
               className="grid grid-cols-[auto_1fr_100px_80px_80px] gap-4 p-4 items-center hover:bg-gray-50 dark:hover:bg-gray-700/50"
             >
-              <button className="cursor-grab text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                <GripVertical className="h-5 w-5" />
+              <button className="cursor-grab text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-label="Réordonner">
+                <GripVertical className="h-5 w-5" aria-hidden="true" />
               </button>
               <div className="flex items-center gap-3">
                 <div
@@ -132,12 +132,12 @@ export default function StagesSettingsPage() {
                 )}
               </div>
               <div className="flex justify-end gap-1">
-                <button className="p-1.5 text-gray-400 hover:text-violet-600 transition">
-                  <Edit2 className="h-4 w-4" />
+                <button className="p-1.5 text-gray-400 hover:text-violet-600 transition" aria-label={`Modifier ${stage.name}`}>
+                  <Edit2 className="h-4 w-4" aria-hidden="true" />
                 </button>
                 {!stage.isWon && !stage.isLost && (
-                  <button className="p-1.5 text-gray-400 hover:text-red-500 transition">
-                    <Trash2 className="h-4 w-4" />
+                  <button className="p-1.5 text-gray-400 hover:text-red-500 transition" aria-label={`Supprimer ${stage.name}`}>
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
                 )}
               </div>

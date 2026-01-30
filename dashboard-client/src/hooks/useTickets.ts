@@ -1,21 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { fetchApi, buildQueryString } from '@/lib/api-base'
 import { tokenService } from '@/lib/tokenService'
 import type { Ticket, CreateTicketData, TicketMessage } from '@/types/support'
-
-const API_URL = import.meta.env.VITE_API_URL || ''
-
-function getAuthHeaders(): HeadersInit {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  }
-
-  const accessToken = tokenService.getAccessToken()
-  if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`
-  }
-
-  return headers
-}
 
 interface TicketsFilters {
   state?: string
@@ -28,27 +14,16 @@ export function useTickets(filters?: TicketsFilters) {
   return useQuery({
     queryKey: ['tickets', filters],
     queryFn: async () => {
-      const params = new URLSearchParams()
-      if (filters?.state) params.append('state', filters.state)
-      if (filters?.priority) params.append('priority', filters.priority)
-      if (filters?.category) params.append('category', filters.category)
-      if (filters?.search) params.append('search', filters.search)
-
-      const queryString = params.toString()
-      const endpoint = queryString ? `/api/tickets?${queryString}` : '/api/tickets'
-
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        method: 'GET',
-        headers: getAuthHeaders(),
-        credentials: 'include',
+      const qs = buildQueryString({
+        state: filters?.state,
+        priority: filters?.priority,
+        category: filters?.category,
+        search: filters?.search,
       })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
-      return data as { success: boolean; tickets: Ticket[]; total: number }
+      return fetchApi<{ success: boolean; tickets: Ticket[]; total: number }>(
+        `/api/tickets${qs}`,
+        { method: 'GET', credentials: 'include' }
+      )
     },
   })
 }
@@ -58,19 +33,10 @@ export function useTicketDetail(ticketId: number | null) {
     queryKey: ['ticket', ticketId],
     queryFn: async () => {
       if (!ticketId) return null
-
-      const response = await fetch(`${API_URL}/api/tickets/${ticketId}`, {
-        method: 'GET',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
-      return data as { success: boolean; ticket: Ticket; messages: TicketMessage[] }
+      return fetchApi<{ success: boolean; ticket: Ticket; messages: TicketMessage[] }>(
+        `/api/tickets/${ticketId}`,
+        { method: 'GET', credentials: 'include' }
+      )
     },
     enabled: !!ticketId,
   })
@@ -81,19 +47,10 @@ export function useCreateTicket() {
 
   return useMutation({
     mutationFn: async (data: CreateTicketData) => {
-      const response = await fetch(`${API_URL}/api/tickets`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
-      return result as { success: boolean; ticket: Ticket }
+      return fetchApi<{ success: boolean; ticket: Ticket }>(
+        '/api/tickets',
+        { method: 'POST', credentials: 'include', body: JSON.stringify(data) }
+      )
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] })
@@ -106,19 +63,10 @@ export function useReplyTicket(ticketId: number) {
 
   return useMutation({
     mutationFn: async (content: string) => {
-      const response = await fetch(`${API_URL}/api/tickets/${ticketId}/reply`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-        body: JSON.stringify({ content }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
-      return result as { success: boolean; message: TicketMessage }
+      return fetchApi<{ success: boolean; message: TicketMessage }>(
+        `/api/tickets/${ticketId}/reply`,
+        { method: 'POST', credentials: 'include', body: JSON.stringify({ content }) }
+      )
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] })
@@ -132,18 +80,10 @@ export function useCloseTicket(ticketId: number) {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch(`${API_URL}/api/tickets/${ticketId}/close`, {
-        method: 'PATCH',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
-      return result as { success: boolean; ticket: Ticket }
+      return fetchApi<{ success: boolean; ticket: Ticket }>(
+        `/api/tickets/${ticketId}/close`,
+        { method: 'PATCH', credentials: 'include' }
+      )
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] })
@@ -157,19 +97,10 @@ export function useRateTicket(ticketId: number) {
 
   return useMutation({
     mutationFn: async (data: { rating: string; comment?: string }) => {
-      const response = await fetch(`${API_URL}/api/tickets/${ticketId}/rate`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
-      return result as { success: boolean; ticket: Ticket }
+      return fetchApi<{ success: boolean; ticket: Ticket }>(
+        `/api/tickets/${ticketId}/rate`,
+        { method: 'POST', credentials: 'include', body: JSON.stringify(data) }
+      )
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ticket', ticketId] })
@@ -192,18 +123,10 @@ export function useTemplates() {
   return useQuery({
     queryKey: ['ticket-templates'],
     queryFn: async () => {
-      const response = await fetch(`${API_URL}/api/tickets/templates`, {
-        method: 'GET',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
-      return data as { success: boolean; templates: Template[] }
+      return fetchApi<{ success: boolean; templates: Template[] }>(
+        '/api/tickets/templates',
+        { method: 'GET', credentials: 'include' }
+      )
     },
   })
 }
@@ -222,19 +145,10 @@ export function useTicketAttachments(ticketId: number | null) {
     queryKey: ['ticket-attachments', ticketId],
     queryFn: async () => {
       if (!ticketId) return null
-
-      const response = await fetch(`${API_URL}/api/tickets/${ticketId}/attachments`, {
-        method: 'GET',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
-      return data as { success: boolean; attachments: Attachment[] }
+      return fetchApi<{ success: boolean; attachments: Attachment[] }>(
+        `/api/tickets/${ticketId}/attachments`,
+        { method: 'GET', credentials: 'include' }
+      )
     },
     enabled: !!ticketId,
   })
@@ -254,7 +168,9 @@ export function useUploadAttachment(ticketId: number) {
         headers['Authorization'] = `Bearer ${accessToken}`
       }
 
-      const response = await fetch(`${API_URL}/api/tickets/${ticketId}/attachments`, {
+      // FormData upload — use raw fetch (fetchApi forces Content-Type: application/json)
+      const { API_BASE_URL } = await import('@/lib/api-base')
+      const response = await fetch(`${API_BASE_URL}/api/tickets/${ticketId}/attachments`, {
         method: 'POST',
         headers,
         credentials: 'include',
@@ -266,8 +182,7 @@ export function useUploadAttachment(ticketId: number) {
         throw new Error(error.error || `HTTP error! status: ${response.status}`)
       }
 
-      const result = await response.json()
-      return result as { success: boolean; attachment: Attachment }
+      return response.json() as Promise<{ success: boolean; attachment: Attachment }>
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ticket-attachments', ticketId] })
@@ -280,18 +195,10 @@ export function useDeleteAttachment(ticketId: number) {
 
   return useMutation({
     mutationFn: async (attachmentId: number) => {
-      const response = await fetch(`${API_URL}/api/attachments/${attachmentId}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
-      return result as { success: boolean }
+      return fetchApi<{ success: boolean }>(
+        `/api/attachments/${attachmentId}`,
+        { method: 'DELETE', credentials: 'include' }
+      )
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ticket-attachments', ticketId] })
