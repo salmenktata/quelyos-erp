@@ -14,6 +14,10 @@ _logger = logging.getLogger(__name__)
 _SEED_RATE_LIMIT = {}  # {tenant_id: last_generation_time}
 _MAX_CONCURRENT_JOBS = 3
 
+# Mode DEV : Désactiver rate limiting pour localhost
+import os
+_DEV_MODE = os.environ.get('ODOO_DEV_MODE', 'true').lower() == 'true'
+
 
 class AdminSeedController(SuperAdminController):
     """Contrôleur super-admin pour génération de données seed"""
@@ -101,33 +105,38 @@ class AdminSeedController(SuperAdminController):
                     status=400
                 )
 
-            # Rate limiting : 1 génération / 5 minutes par tenant
-            now = datetime.now()
-            if tenant_id in _SEED_RATE_LIMIT:
-                last_time = _SEED_RATE_LIMIT[tenant_id]
-                if (now - last_time) < timedelta(minutes=5):
-                    remaining = 300 - (now - last_time).total_seconds()
+            # Rate limiting : 1 génération / 5 minutes par tenant (DÉSACTIVÉ EN DEV)
+            is_dev_tenant = tenant.domain in ['localhost', '127.0.0.1'] or _DEV_MODE
+
+            if not is_dev_tenant:
+                now = datetime.now()
+                if tenant_id in _SEED_RATE_LIMIT:
+                    last_time = _SEED_RATE_LIMIT[tenant_id]
+                    if (now - last_time) < timedelta(minutes=5):
+                        remaining = 300 - (now - last_time).total_seconds()
+                        return request.make_json_response(
+                            {
+                                'success': False,
+                                'error': f'Veuillez attendre {int(remaining)}s avant de relancer une génération'
+                            },
+                            headers=cors_headers,
+                            status=429
+                        )
+
+                # Vérifier jobs concurrents globaux
+                SeedJob = request.env['quelyos.seed.job'].sudo()
+                running_count = SeedJob.search_count([('status', 'in', ['pending', 'running'])])
+                if running_count >= _MAX_CONCURRENT_JOBS:
                     return request.make_json_response(
                         {
                             'success': False,
-                            'error': f'Veuillez attendre {int(remaining)}s avant de relancer une génération'
+                            'error': f'Trop de jobs seed en cours ({running_count}/{_MAX_CONCURRENT_JOBS}). Réessayez plus tard.'
                         },
                         headers=cors_headers,
-                        status=429
+                        status=503
                     )
-
-            # Vérifier jobs concurrents globaux
-            SeedJob = request.env['quelyos.seed.job'].sudo()
-            running_count = SeedJob.search_count([('status', 'in', ['pending', 'running'])])
-            if running_count >= _MAX_CONCURRENT_JOBS:
-                return request.make_json_response(
-                    {
-                        'success': False,
-                        'error': f'Trop de jobs seed en cours ({running_count}/{_MAX_CONCURRENT_JOBS}). Réessayez plus tard.'
-                    },
-                    headers=cors_headers,
-                    status=503
-                )
+            else:
+                _logger.info(f"[DEV MODE] Rate limiting désactivé pour tenant {tenant.name} (domain: {tenant.domain})")
 
             # Construire config
             config = {
@@ -148,8 +157,9 @@ class AdminSeedController(SuperAdminController):
                 daemon=True
             ).start()
 
-            # Mettre à jour rate limit
-            _SEED_RATE_LIMIT[tenant_id] = now
+            # Mettre à jour rate limit (sauf en DEV)
+            if not is_dev_tenant:
+                _SEED_RATE_LIMIT[tenant_id] = datetime.now()
 
             # Audit log
             request.env['quelyos.audit.log'].sudo().create({
