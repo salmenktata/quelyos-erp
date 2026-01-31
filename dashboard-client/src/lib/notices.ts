@@ -90,3 +90,6 @@ export const marketingNotices = {
     },
   ],
 }
+
+// Export notices Stock depuis fichier dédié
+export { stockNotices } from './notices/stock-notices'

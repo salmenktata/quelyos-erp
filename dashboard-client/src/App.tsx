@@ -859,6 +859,22 @@ export default function App() {
                 }
               />
               <Route
+                path="/stock/inventory-groups"
+                element={
+                  <ProtectedRoute>
+                    <InventoryGroups />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/stock/warehouse-calendars"
+                element={
+                  <ProtectedRoute>
+                    <WarehouseCalendars />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/warehouses"
                 element={
                   <ProtectedRoute>

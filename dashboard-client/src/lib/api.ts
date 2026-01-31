@@ -1988,3 +1988,4 @@ class ApiClient {
 }
 
 export const api = new ApiClient(API_URL)
+export const apiClient = api

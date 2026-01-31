@@ -29,6 +29,7 @@ import {
   ReferenceLine,
 } from "recharts"
 import {
+import { logger } from '@quelyos/logger';
   Save,
   Trash2,
   Plus,

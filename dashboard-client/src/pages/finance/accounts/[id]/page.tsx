@@ -9,6 +9,7 @@ import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { GlassCard, GlassPanel } from "@/components/ui/glass";
 import { PaymentFlowManager } from "@/components/PaymentFlowManager";
 import {
+import { logger } from '@quelyos/logger';
   ArrowLeft,
   Building2,
   Wallet,
