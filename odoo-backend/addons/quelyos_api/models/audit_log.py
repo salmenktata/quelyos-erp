@@ -332,71 +332,70 @@ class AuditLog(models.Model):
 
     @api.model
     def get_statistics(self, days=7):
-        """Statistiques des logs sur N jours"""
+        """Statistiques des logs sur N jours - VERSION ORM"""
         from datetime import datetime, timedelta
 
         date_from = datetime.now() - timedelta(days=days)
+        domain = [('create_date', '>=', date_from)]
 
-        # Total par catégorie
-        self.env.cr.execute("""
-            SELECT category, COUNT(*) as count
-            FROM quelyos_audit_log
-            WHERE create_date >= %s
-            GROUP BY category
-            ORDER BY count DESC
-        """, [date_from])
-        by_category = dict(self.env.cr.fetchall())
+        # 1. Total par catégorie (ORM read_group)
+        by_category_data = self.read_group(
+            domain=domain,
+            fields=['category'],
+            groupby=['category'],
+            orderby='category_count desc'
+        )
+        by_category = {item['category']: item['category_count'] for item in by_category_data}
 
-        # Total par sévérité
-        self.env.cr.execute("""
-            SELECT severity, COUNT(*) as count
-            FROM quelyos_audit_log
-            WHERE create_date >= %s
-            GROUP BY severity
-        """, [date_from])
-        by_severity = dict(self.env.cr.fetchall())
+        # 2. Total par sévérité
+        by_severity_data = self.read_group(
+            domain=domain,
+            fields=['severity'],
+            groupby=['severity']
+        )
+        by_severity = {item['severity']: item['severity_count'] for item in by_severity_data}
 
-        # Succès vs échecs
-        self.env.cr.execute("""
-            SELECT success, COUNT(*) as count
-            FROM quelyos_audit_log
-            WHERE create_date >= %s
-            GROUP BY success
-        """, [date_from])
-        by_success = {str(r[0]): r[1] for r in self.env.cr.fetchall()}
+        # 3. Succès vs échecs
+        by_success_data = self.read_group(
+            domain=domain,
+            fields=['success'],
+            groupby=['success']
+        )
+        by_success = {str(item['success']): item['success_count'] for item in by_success_data}
 
-        # Top utilisateurs
-        self.env.cr.execute("""
-            SELECT COALESCE(u.name, l.user_login, 'Système'), COUNT(*) as count
-            FROM quelyos_audit_log l
-            LEFT JOIN res_users u ON l.user_id = u.id
-            WHERE l.create_date >= %s
-            GROUP BY COALESCE(u.name, l.user_login, 'Système')
-            ORDER BY count DESC
-            LIMIT 10
-        """, [date_from])
-        top_users = [{'name': r[0], 'count': r[1]} for r in self.env.cr.fetchall()]
+        # 4. Top utilisateurs (ORM avec iteration)
+        logs = self.search(domain, order='user_id')
+        user_counts = {}
+        for log in logs:
+            user_name = log.user_id.name if log.user_id else (log.user_login or 'Système')
+            user_counts[user_name] = user_counts.get(user_name, 0) + 1
 
-        # Top actions
-        self.env.cr.execute("""
-            SELECT action, COUNT(*) as count
-            FROM quelyos_audit_log
-            WHERE create_date >= %s
-            GROUP BY action
-            ORDER BY count DESC
-            LIMIT 10
-        """, [date_from])
-        top_actions = [{'action': r[0], 'count': r[1]} for r in self.env.cr.fetchall()]
+        top_users = [
+            {'name': name, 'count': count}
+            for name, count in sorted(user_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+        ]
 
-        # Timeline par jour
-        self.env.cr.execute("""
-            SELECT DATE(create_date) as day, COUNT(*) as count
-            FROM quelyos_audit_log
-            WHERE create_date >= %s
-            GROUP BY DATE(create_date)
-            ORDER BY day
-        """, [date_from])
-        timeline = [{'date': str(r[0]), 'count': r[1]} for r in self.env.cr.fetchall()]
+        # 5. Top actions
+        by_action_data = self.read_group(
+            domain=domain,
+            fields=['action'],
+            groupby=['action'],
+            orderby='action_count desc',
+            limit=10
+        )
+        top_actions = [{'action': item['action'], 'count': item['action_count']} for item in by_action_data]
+
+        # 6. Timeline par jour (ORM groupby date)
+        by_date_data = self.read_group(
+            domain=domain,
+            fields=['create_date:day'],
+            groupby=['create_date:day'],
+            orderby='create_date:day'
+        )
+        timeline = [
+            {'date': item['create_date:day'], 'count': item['create_date_count']}
+            for item in by_date_data
+        ]
 
         return {
             'period_days': days,

@@ -333,48 +333,77 @@ class WAFLog(models.Model):
 
     @api.model
     def get_statistics(self, days=7):
-        """Statistiques WAF sur N jours"""
+        """Statistiques WAF sur N jours - VERSION ORM"""
         date_from = datetime.now() - timedelta(days=days)
+        domain = [('timestamp', '>=', date_from)]
 
-        self.env.cr.execute("""
-            SELECT r.name, COUNT(*) as count
-            FROM quelyos_waf_log l
-            JOIN quelyos_waf_rule r ON l.rule_id = r.id
-            WHERE l.timestamp >= %s
-            GROUP BY r.name
-            ORDER BY count DESC
-            LIMIT 10
-        """, [date_from])
-        by_rule = [{'rule': r[0], 'count': r[1]} for r in self.env.cr.fetchall()]
+        WafLog = self.env['quelyos.waf.log']
 
-        self.env.cr.execute("""
-            SELECT action_taken, COUNT(*) as count
-            FROM quelyos_waf_log
-            WHERE timestamp >= %s
-            GROUP BY action_taken
-        """, [date_from])
-        by_action = dict(self.env.cr.fetchall())
+        # 1. Stats par règle (ORM read_group au lieu de JOIN SQL)
+        by_rule_data = WafLog.read_group(
+            domain=domain,
+            fields=['rule_id'],
+            groupby=['rule_id'],
+            orderby='rule_id_count desc',
+            limit=10
+        )
+        by_rule = [
+            {
+                'rule': item['rule_id'][1] if item['rule_id'] else 'Unknown',
+                'count': item['rule_id_count']
+            }
+            for item in by_rule_data if item['rule_id']
+        ]
 
-        self.env.cr.execute("""
-            SELECT ip_address, COUNT(*) as count
-            FROM quelyos_waf_log
-            WHERE timestamp >= %s AND action_taken = 'block'
-            GROUP BY ip_address
-            ORDER BY count DESC
-            LIMIT 10
-        """, [date_from])
-        top_blocked_ips = [{'ip': r[0], 'count': r[1]} for r in self.env.cr.fetchall()]
+        # 2. Stats par action
+        by_action_data = WafLog.read_group(
+            domain=domain,
+            fields=['action_taken'],
+            groupby=['action_taken']
+        )
+        by_action = {item['action_taken']: item['action_taken_count'] for item in by_action_data}
 
-        self.env.cr.execute("""
-            SELECT DATE(timestamp) as day,
-                   COUNT(*) FILTER (WHERE action_taken = 'block') as blocked,
-                   COUNT(*) FILTER (WHERE action_taken = 'log') as logged
-            FROM quelyos_waf_log
-            WHERE timestamp >= %s
-            GROUP BY DATE(timestamp)
-            ORDER BY day
-        """, [date_from])
-        timeline = [{'date': str(r[0]), 'blocked': r[1], 'logged': r[2]} for r in self.env.cr.fetchall()]
+        # 3. Top IPs bloquées
+        block_domain = domain + [('action_taken', '=', 'block')]
+        top_ips_data = WafLog.read_group(
+            domain=block_domain,
+            fields=['ip_address'],
+            groupby=['ip_address'],
+            orderby='ip_address_count desc',
+            limit=10
+        )
+        top_blocked_ips = [
+            {'ip': item['ip_address'], 'count': item['ip_address_count']}
+            for item in top_ips_data
+        ]
+
+        # 4. Timeline par jour (2 read_group séparés au lieu de FILTER PostgreSQL)
+        blocked_data = WafLog.read_group(
+            domain=domain + [('action_taken', '=', 'block')],
+            fields=['timestamp:day'],
+            groupby=['timestamp:day'],
+            orderby='timestamp:day'
+        )
+        blocked_dict = {item['timestamp:day']: item['timestamp_count'] for item in blocked_data}
+
+        logged_data = WafLog.read_group(
+            domain=domain + [('action_taken', '=', 'log')],
+            fields=['timestamp:day'],
+            groupby=['timestamp:day'],
+            orderby='timestamp:day'
+        )
+        logged_dict = {item['timestamp:day']: item['timestamp_count'] for item in logged_data}
+
+        # Merge timeline
+        all_dates = set(blocked_dict.keys()) | set(logged_dict.keys())
+        timeline = [
+            {
+                'date': date,
+                'blocked': blocked_dict.get(date, 0),
+                'logged': logged_dict.get(date, 0),
+            }
+            for date in sorted(all_dates)
+        ]
 
         return {
             'period_days': days,
