@@ -1,7 +1,7 @@
 {
-  "name": "@quelyos/odoo",
+  "name": "@quelyos/backend",
   "version": "1.0.0",
-  "description": "Unified Odoo client for Quelyos Suite (Next.js SSR, Client, Vite)",
+  "description": "Unified backend client for Quelyos Suite (Next.js SSR, Client, Vite)",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {

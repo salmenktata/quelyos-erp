@@ -1,23 +1,23 @@
 /**
- * @quelyos/odoo - Unified Odoo client for Quelyos Suite
+ * @quelyos/backend - Unified backend client for Quelyos Suite
  *
  * Features:
  * - Automatic environment detection (Next.js SSR, Client, Vite)
  * - 60+ business methods (Auth, Products, Cart, Checkout, Orders, etc.)
  * - Low-level ORM methods (search, read, create, write, unlink)
- * - TypeScript types for all Odoo models
+ * - TypeScript types for all backend models
  * - Session management
  * - Error handling
  *
  * Usage:
  * ```typescript
- * import { odooClient } from '@quelyos/odoo';
+ * import { odooClient } from '@quelyos/backend';
  *
  * // High-level API
  * const products = await odooClient.getProducts({ limit: 10 });
  *
  * // Low-level ORM
- * import { odooRpc } from '@quelyos/odoo';
+ * import { odooRpc } from '@quelyos/backend';
  * const records = await odooRpc.search('product.product', [['sale_ok', '=', true]]);
  * ```
  */

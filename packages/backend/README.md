@@ -1,4 +1,4 @@
-# @quelyos/odoo
+# @quelyos/backend
 
 Unified Odoo client for Quelyos Suite monorepo.
 
@@ -23,7 +23,7 @@ npm install
 ### High-level API (Recommended)
 
 ```typescript
-import { odooClient } from '@quelyos/odoo';
+import { odooClient } from '@quelyos/backend';
 
 // Products
 const products = await odooClient.getProducts({
@@ -49,7 +49,7 @@ const result = await odooClient.login('user@example.com', 'password');
 ### Low-level ORM
 
 ```typescript
-import { odooRpc } from '@quelyos/odoo';
+import { odooRpc } from '@quelyos/backend';
 
 // Search products
 const products = await odooRpc.search('product.product', [
@@ -79,7 +79,7 @@ await odooRpc.unlink('res.partner', [id]);
 ### Environment Detection
 
 ```typescript
-import { detectEnvironment, getOdooConfig } from '@quelyos/odoo';
+import { detectEnvironment, getOdooConfig } from '@quelyos/backend';
 
 const env = detectEnvironment(); // 'server' | 'client' | 'vite'
 const config = getOdooConfig();
@@ -95,7 +95,7 @@ import type {
   OdooCategory,
   OdooSaleOrder,
   OdooResponse
-} from '@quelyos/odoo';
+} from '@quelyos/backend';
 
 const product: OdooProduct = {
   id: 1,
@@ -185,7 +185,7 @@ VITE_ODOO_DATABASE=quelyos
 ## Architecture
 
 ```
-@quelyos/odoo
+@quelyos/backend
 ├── src/
 │   ├── client.ts      # High-level business API (60+ methods)
 │   ├── rpc.ts         # Low-level JSON-RPC client + ORM

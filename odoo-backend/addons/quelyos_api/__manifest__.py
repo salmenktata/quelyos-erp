@@ -65,8 +65,8 @@
         'data/ticket_sequence.xml',
         'data/sla_policies.xml',
         # 'data/email_template_satisfaction_request.xml',  # Créé via hooks.py (workaround validation XML)
-        'data/pos_demo_data.xml',
-        'data/store_demo_data.xml',
+        # 'data/pos_demo_data.xml',  # TEMPORAIREMENT DÉSACTIVÉ (debug installation)
+        # 'data/store_demo_data.xml',  # TEMPORAIREMENT DÉSACTIVÉ (erreur ligne 196)
         'data/theme_data.xml',
         'views/subscription_views.xml',
         'views/subscription_plan_views.xml',
@@ -81,7 +81,7 @@
         'views/ai_unanswered_views.xml',
     ],
     'pre_init_hook': 'pre_init_hook',
-    'post_init_hook': 'post_init_hook',
+    # 'post_init_hook': 'post_init_hook',  # TEMPORAIREMENT DÉSACTIVÉ (fonction manquante)
     'installable': True,
     'application': True,
     'auto_install': False,

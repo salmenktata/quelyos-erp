@@ -5,7 +5,7 @@
  */
 
 const { PrismaClient } = require('@prisma/client');
-const { OdooRPC } = require('@quelyos/odoo');
+const { OdooRPC } = require('@quelyos/backend');
 
 const prisma = new PrismaClient();
 
