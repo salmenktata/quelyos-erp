@@ -4,8 +4,8 @@ import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Badge, Skeleton, ConfirmModal } from '@/components/common';
 import { useMarketingCampaigns, useDeleteCampaign, useDuplicateCampaign } from '@/hooks/useMarketingCampaigns';
 import { useToast } from '@/contexts/ToastContext';
-import {
 import { logger } from '@quelyos/logger';
+import {
   Plus,
   Mail,
   MessageSquare,

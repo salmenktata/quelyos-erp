@@ -7,8 +7,8 @@ import { useCreateCampaign } from '@/hooks/useMarketingCampaigns';
 import { useContactLists } from '@/hooks/useContactLists';
 import { useEmailTemplates, TEMPLATE_CATEGORIES, type TemplateCategory } from '@/hooks/useEmailTemplates';
 import { useToast } from '@/contexts/ToastContext';
-import {
 import { logger } from '@quelyos/logger';
+import {
   Mail,
   MessageSquare,
   ArrowRight,

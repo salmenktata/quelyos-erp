@@ -10,8 +10,8 @@ import {
 } from '@/hooks/useContactLists';
 import { useToast } from '@/contexts/ToastContext';
 import { contactsReducer, initialContactsState } from './contactsReducer';
-import {
 import { logger } from '@quelyos/logger';
+import {
   Plus,
   Users,
   Filter,

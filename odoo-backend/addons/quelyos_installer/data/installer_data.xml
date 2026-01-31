@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Configuration Quelyos Suite après installation -->
+        <record id="quelyos_suite_config" model="ir.config_parameter">
+            <field name="key">quelyos.suite_installed</field>
+            <field name="value">True</field>
+        </record>
+        
+        <record id="quelyos_suite_version" model="ir.config_parameter">
+            <field name="key">quelyos.suite_version</field>
+            <field name="value">19.0.1.0.0</field>
+        </record>
+        
+        <record id="quelyos_suite_install_date" model="ir.config_parameter">
+            <field name="key">quelyos.suite_install_date</field>
+            <field name="value" eval="datetime.datetime.now().isoformat()"/>
+        </record>
+        
+    </data>
+</odoo>

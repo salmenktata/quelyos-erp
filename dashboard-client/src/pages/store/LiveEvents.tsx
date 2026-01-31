@@ -9,6 +9,7 @@
  * - Statistiques viewers
  */
 import { useState } from 'react'
+import { logger } from '@quelyos/logger';
 import {
   Plus,
   Trash2,
@@ -26,8 +27,8 @@ import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common'
 import { storeNotices } from '@/lib/notices'
 import { useToast } from '@/hooks/useToast'
-import {
 import { logger } from '@quelyos/logger';
+import {
   useLiveEvents,
   useCreateLiveEvent,
   useUpdateLiveEvent,

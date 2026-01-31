@@ -5,8 +5,8 @@ import { Breadcrumbs, Badge, Skeleton, ConfirmModal } from '@/components/common'
 import { useCampaign, useSendCampaign, useDeleteCampaign } from '@/hooks/useMarketingCampaigns';
 import { useToast } from '@/contexts/ToastContext';
 import { useState } from 'react';
-import {
 import { logger } from '@quelyos/logger';
+import {
   Mail,
   MessageSquare,
   Send,

@@ -3,14 +3,14 @@
  *
  * Fonctionnalités :
  * - Navigation modulaire par 7 modules (Home, Finance, Boutique, Stock, CRM, Marketing, RH)
- * - Menu latéral adaptatif avec sous-menus dépliables
+ * - Menu latéral adaptatif avec sous-menus toujours dépliés
  * - Détection automatique du module actif selon l'URL
  * - App Launcher pour accès rapide aux applications
  * - Quick access navbar pour 5 modules principaux
  * - Gestion des permissions utilisateur (filtrage modules)
  * - Support dark/light mode complet
  * - Responsive mobile avec sidebar escamotable
- * - Auto-ouverture des sous-menus contenant la page active
+ * - Tous les menus et sections toujours visibles (mode déplié permanent)
  * - Bouton "Voir mon site" vers e-commerce
  * - Gestion des badges et séparateurs dans les sous-menus
  * - Persistance du module actif lors de la navigation
@@ -40,7 +40,7 @@ import { CommandPalette } from './navigation/CommandPalette'
 import { MODULES, type Module, type ModuleId } from '@/config/modules'
 
 // Icons
-import { X, LogOut, ChevronsLeft, ChevronsRight, ChevronDown, ChevronRight, Minimize2, Maximize2 } from 'lucide-react'
+import { X, LogOut, ChevronsLeft, ChevronsRight, Minimize2, Maximize2 } from 'lucide-react'
 
 // Constants
 const SIDEBAR_COLLAPSED_KEY = 'sidebar_collapsed'
@@ -106,8 +106,8 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
   const detectedModule = useDetectModule(accessibleModules, location.pathname)
   const [currentModule, setCurrentModule] = useState<Module>(detectedModule)
 
-  // State for collapsable sections
-  const { openSections, toggleSection, isOpenSection } = useSectionState(
+  // State for sections (toujours ouvertes)
+  const { openSections: _openSections, toggleSection: _toggleSection, isOpenSection: _isOpenSection } = useSectionState(
     currentModule.id,
     currentModule.sections
   )
@@ -217,42 +217,32 @@ export function ModularLayout({ children }: { children: React.ReactNode }) {
 
               {currentModule.sections.map((section) => (
                 <div key={section.title}>
-                  {/* Header cliquable (masqué en mode collapsed) */}
+                  {/* Header (masqué en mode collapsed) */}
                   {!isSidebarCollapsed && (
-                    <button
-                      onClick={() => toggleSection(section.title)}
-                      className={`w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded group sticky top-0 z-10 bg-white dark:bg-gray-800 ${isCompactMode ? 'mb-1' : 'mb-2'}`}
-                      aria-expanded={isOpenSection(section.title)}
-                      aria-controls={`section-${section.title}`}
+                    <div
+                      className={`w-full flex items-center px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400 sticky top-0 z-10 bg-white dark:bg-gray-800 ${isCompactMode ? 'mb-1' : 'mb-2'}`}
                     >
                       <span>{section.title}</span>
-                      {isOpenSection(section.title) ? (
-                        <ChevronDown className="w-3 h-3 opacity-60 group-hover:opacity-100" />
-                      ) : (
-                        <ChevronRight className="w-3 h-3 opacity-60 group-hover:opacity-100" />
-                      )}
-                    </button>
-                  )}
-
-                  {/* Items (affichés si section ouverte OU mode collapsed) */}
-                  {(isSidebarCollapsed || isOpenSection(section.title)) && (
-                    <div id={`section-${section.title}`} className="space-y-0.5">
-                      {section.items.map((item) => (
-                        <SidebarMenuItem
-                          key={item.name}
-                          item={item}
-                          isActive={isActive}
-                          moduleColor={currentModule.color}
-                          openMenus={openMenus}
-                          onToggleMenu={toggleMenu}
-                          isCollapsed={isSidebarCollapsed}
-                          isCompact={isCompactMode}
-                          isFavorite={item.path ? isFavorite(item.path) : false}
-                          onToggleFavorite={item.path ? () => toggleFavorite(item.path!) : undefined}
-                        />
-                      ))}
                     </div>
                   )}
+
+                  {/* Items (toujours affichés) */}
+                  <div id={`section-${section.title}`} className="space-y-0.5">
+                    {section.items.map((item) => (
+                      <SidebarMenuItem
+                        key={item.name}
+                        item={item}
+                        isActive={isActive}
+                        moduleColor={currentModule.color}
+                        openMenus={openMenus}
+                        onToggleMenu={toggleMenu}
+                        isCollapsed={isSidebarCollapsed}
+                        isCompact={isCompactMode}
+                        isFavorite={item.path ? isFavorite(item.path) : false}
+                        onToggleFavorite={item.path ? () => toggleFavorite(item.path!) : undefined}
+                      />
+                    ))}
+                  </div>
                 </div>
               ))}
             </nav>

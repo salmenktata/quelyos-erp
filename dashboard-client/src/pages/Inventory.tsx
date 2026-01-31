@@ -15,8 +15,8 @@ import { usePrepareInventory, useValidateInventory } from '../hooks/useStock'
 import { Badge, Button, Breadcrumbs, Input, PageNotice } from '../components/common'
 import { stockNotices } from '@/lib/notices'
 import { useToast } from '../contexts/ToastContext'
-import {
 import { logger } from '@quelyos/logger';
+import {
   ClipboardList,
   CheckCircle2,
   ArrowLeft,

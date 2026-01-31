@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, ChevronRight, Star } from 'lucide-react'
+import { Star } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 
@@ -23,7 +23,7 @@ interface SidebarMenuItemProps {
   isActive: (path: string) => boolean
   moduleColor: string
   openMenus: Set<string>
-  onToggleMenu: (name: string) => void
+  onToggleMenu: (name: string) => void // Non utilisé mais gardé pour compatibilité
   isCollapsed?: boolean
   isCompact?: boolean
   isFavorite?: boolean
@@ -39,8 +39,8 @@ export function SidebarMenuItem({
   item,
   isActive,
   moduleColor,
-  openMenus,
-  onToggleMenu,
+  openMenus: _openMenus,
+  onToggleMenu: _onToggleMenu,
   isCollapsed = false,
   isCompact = false,
   isFavorite = false,
@@ -51,7 +51,6 @@ export function SidebarMenuItem({
   const itemRef = useRef<HTMLDivElement>(null)
 
   const hasSubItems = item.subItems && item.subItems.length > 0
-  const isOpen = openMenus.has(item.name)
   const ItemIcon = item.icon
 
   // Pour les items SANS sous-items : correspondance exacte seulement
@@ -201,29 +200,23 @@ export function SidebarMenuItem({
     )
   }
 
-  // Mode normal : item avec sous-items (menu déroulant)
+  // Mode normal : item avec sous-items (toujours déplié)
   return (
     <div>
-      <button
-        onClick={() => onToggleMenu(item.name)}
+      <div
         className={cn(
           'group flex w-full items-center rounded-lg font-medium transition-all',
           isCompact ? 'gap-2 px-2 py-1 text-xs' : 'gap-3 px-3 py-2 text-sm',
           isCurrentlyActive
             ? `bg-gray-100 dark:bg-gray-700 ${moduleColor}`
-            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            : 'text-gray-600 dark:text-gray-400'
         )}
       >
         <ItemIcon className={cn(isCompact ? 'h-4 w-4' : 'h-5 w-5')} />
         <span className="flex-1 text-left">{item.name}</span>
-        {isOpen ? (
-          <ChevronDown className={cn(isCompact ? 'h-3 w-3' : 'h-4 w-4')} />
-        ) : (
-          <ChevronRight className={cn(isCompact ? 'h-3 w-3' : 'h-4 w-4')} />
-        )}
-      </button>
+      </div>
 
-      {isOpen && item.subItems && (
+      {item.subItems && (
         <div className={cn('border-l-2 border-gray-200 dark:border-gray-600', isCompact ? 'ml-3 mt-0.5 pl-2' : 'ml-4 mt-1 pl-3')}>
           {item.subItems.map((subItem, idx) => {
             if (subItem.separator) {
