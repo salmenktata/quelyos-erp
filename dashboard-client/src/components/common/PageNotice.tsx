@@ -26,6 +26,12 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
   const [feedbackGiven, setFeedbackGiven] = useState(false);
   const [feedbackValue, setFeedbackValue] = useState<boolean | null>(null);
 
+  // Protection défensive : si config est undefined, ne rien afficher
+  if (!config) {
+    logger.warn('[PageNotice] config is undefined, skipping render');
+    return null;
+  }
+
   const Icon = config.icon || Info;
   const colorConfig = MODULE_COLOR_CONFIGS[config.moduleColor || 'gray'];
   const storageKey = `quelyos_page_notice_collapsed_${config.pageId}`;

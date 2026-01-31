@@ -18,7 +18,6 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import { logger } from '@quelyos/logger';
 
 type Account = {
   id: number;

@@ -27,7 +27,6 @@ import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common'
 import { storeNotices } from '@/lib/notices'
 import { useToast } from '@/hooks/useToast'
-import { logger } from '@quelyos/logger';
 import {
   useLiveEvents,
   useCreateLiveEvent,
