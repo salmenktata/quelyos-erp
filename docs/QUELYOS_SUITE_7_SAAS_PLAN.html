@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quelyos Suite — Plan Strat&eacute;gique 7 SaaS</title>
+  <style>
+    :root {
+      --finance: #059669;
+      --store: #7C3AED;
+      --copilote: #EA580C;
+      --sales: #2563EB;
+      --retail: #DC2626;
+      --team: #0891B2;
+      --support: #9333EA;
+      --bg: #0f172a;
+      --bg2: #1e293b;
+      --bg3: #334155;
+      --text: #f1f5f9;
+      --text2: #94a3b8;
+      --border: #475569;
+      --accent: #818cf8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+    /* Header */
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e1b4b 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #818cf8, #c084fc, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    .hero .subtitle {
+      font-size: 1.25rem;
+      color: var(--text2);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat .number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .hero-stat .label {
+      font-size: 0.875rem;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .nav a {
+      color: var(--text2);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav a:hover {
+      background: var(--bg3);
+      color: var(--text);
+    }
+
+    /* Sections */
+    section {
+      padding: 3rem 0;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+    }
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.75rem;
+      color: var(--accent);
+    }
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      color: var(--text2);
+    }
+
+    /* Architecture Diagram */
+    .arch-diagram {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .arch-backend {
+      background: linear-gradient(135deg, #1e1b4b, #312e81);
+      border: 2px solid #4338ca;
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .arch-backend h3 {
+      color: #a5b4fc;
+      margin: 0 0 0.5rem;
+    }
+    .arch-backend p {
+      color: #c7d2fe;
+      font-size: 0.875rem;
+    }
+    .arch-arrow {
+      font-size: 2rem;
+      color: var(--border);
+      margin: 1rem 0;
+    }
+    .arch-apps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+    }
+    .arch-app {
+      border-radius: 0.75rem;
+      padding: 1rem;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: 2px solid;
+      transition: transform 0.2s;
+    }
+    .arch-app:hover { transform: translateY(-4px); }
+    .arch-app .price {
+      font-size: 0.75rem;
+      font-weight: 400;
+      opacity: 0.8;
+      margin-top: 0.25rem;
+    }
+
+    /* SaaS Cards */
+    .saas-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      margin: 2rem 0;
+      border-left: 4px solid;
+    }
+    .saas-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .saas-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+    .saas-meta {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .saas-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(255,255,255,0.1);
+    }
+    .saas-tagline {
+      font-size: 1.1rem;
+      color: var(--text2);
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+    .saas-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .saas-info-item {
+      background: var(--bg3);
+      border-radius: 0.5rem;
+      padding: 1rem;
+    }
+    .saas-info-item .label {
+      font-size: 0.75rem;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .saas-info-item .value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+    }
+
+    /* Feature Lists */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 1rem 0;
+    }
+    @media (max-width: 768px) {
+      .feature-grid { grid-template-columns: 1fr; }
+    }
+    .feature-list {
+      list-style: none;
+    }
+    .feature-list li {
+      padding: 0.4rem 0;
+      padding-left: 1.75rem;
+      position: relative;
+      font-size: 0.9rem;
+    }
+    .feature-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.65rem;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+    }
+    .feature-list.existing li::before {
+      background: #22c55e;
+    }
+    .feature-list.todo li::before {
+      background: transparent;
+      border: 2px solid #f59e0b;
+    }
+
+    /* Roadmap */
+    .roadmap-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.75rem 0;
+    }
+    .roadmap-sprint {
+      background: var(--bg3);
+      border-radius: 0.375rem;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      white-space: nowrap;
+      min-width: 90px;
+      text-align: center;
+    }
+
+    /* Files */
+    .files-list {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      font-family: 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.8;
+    }
+    .files-list code {
+      color: #86efac;
+    }
+    .files-list .dim { color: var(--text2); }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    th {
+      background: var(--bg3);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+    }
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+    }
+    tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .pricing-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .pricing-card h4 {
+      font-size: 1.25rem;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .pricing-card .desc {
+      font-size: 0.85rem;
+      color: var(--text2);
+      margin-bottom: 1rem;
+    }
+    .pricing-card .price-tag {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .pricing-card .saving {
+      font-size: 0.8rem;
+      color: #22c55e;
+      margin-top: 0.25rem;
+    }
+
+    /* Monorepo */
+    .tree {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      font-family: 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+    .tree .folder { color: #93c5fd; font-weight: 600; }
+    .tree .file { color: #86efac; }
+    .tree .comment { color: #64748b; }
+    .tree .new { color: #fbbf24; }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.5rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .timeline-item {
+      position: relative;
+      padding: 1.5rem 0;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -1.65rem;
+      top: 1.75rem;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 3px solid var(--bg);
+    }
+    .timeline-phase {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+    .timeline-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .timeline-items {
+      list-style: none;
+      margin-left: 1rem;
+    }
+    .timeline-items li {
+      padding: 0.2rem 0;
+      font-size: 0.9rem;
+      color: var(--text2);
+    }
+    .timeline-items li::before {
+      content: '  ';
+      margin-right: 0.5rem;
+    }
+
+    /* Risk */
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .risk-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+    }
+    .risk-card .risk-title {
+      font-weight: 600;
+      color: #fbbf24;
+      margin-bottom: 0.5rem;
+    }
+    .risk-card .risk-mitigation {
+      font-size: 0.875rem;
+      color: var(--text2);
+    }
+
+    /* Code Block */
+    .code-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      font-family: 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .code-block .kw { color: #c084fc; }
+    .code-block .str { color: #86efac; }
+    .code-block .cls { color: #93c5fd; }
+    .code-block .cmt { color: #64748b; }
+    .code-block .fn { color: #fbbf24; }
+
+    /* Branding */
+    .branding-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .branding-item {
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      text-align: center;
+      border: 2px solid;
+    }
+    .branding-item .swatch {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin: 0 auto 0.75rem;
+    }
+    .branding-item .name {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .branding-item .domain {
+      font-size: 0.7rem;
+      color: var(--text2);
+      margin-top: 0.25rem;
+    }
+
+    /* Summary */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .summary-card {
+      background: linear-gradient(135deg, var(--bg2), var(--bg3));
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .summary-card .val {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .summary-card .lbl {
+      font-size: 0.85rem;
+      color: var(--text2);
+      margin-top: 0.25rem;
+    }
+
+    /* Print */
+    @media print {
+      body { background: white; color: #1e293b; }
+      .nav { display: none; }
+      .saas-card, .arch-diagram, .pricing-card, .risk-card, .code-block, .tree, .files-list {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        color: #1e293b;
+      }
+      .hero { background: #f1f5f9; }
+      .hero h1 { -webkit-text-fill-color: #4338ca; }
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--text2);
+      font-size: 0.85rem;
+    }
+    footer strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <h1>Quelyos Suite</h1>
+  <p class="subtitle">Plan strat&eacute;gique pour transformer Quelyos ERP en suite de 7 SaaS sp&eacute;cialis&eacute;s partageant un backend unique Odoo 19</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="number">7</div><div class="label">SaaS Apps</div></div>
+    <div class="hero-stat"><div class="number">1</div><div class="label">Backend Unique</div></div>
+    <div class="hero-stat"><div class="number">101</div><div class="label">Mod&egrave;les Odoo</div></div>
+    <div class="hero-stat"><div class="number">764</div><div class="label">Endpoints API</div></div>
+    <div class="hero-stat"><div class="number">72%</div><div class="label">R&eacute;utilisation</div></div>
+    <div class="hero-stat"><div class="number">18</div><div class="label">Mois Roadmap</div></div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#architecture">Architecture</a>
+  <a href="#inventaire">Inventaire</a>
+  <a href="#finance-os">Quelyos Finance</a>
+  <a href="#store-os">Quelyos Store</a>
+  <a href="#copilote-ops">Quelyos Copilote</a>
+  <a href="#sales-os">Quelyos Sales</a>
+  <a href="#retail-os">Quelyos Retail</a>
+  <a href="#team-os">Quelyos Team</a>
+  <a href="#support-os">Quelyos Support</a>
+  <a href="#monorepo">Monorepo</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#branding">Branding</a>
+  <a href="#roadmap">Roadmap</a>
+  <a href="#backend">Backend</a>
+  <a href="#risques">Risques</a>
+</nav>
+
+<div class="container">
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <h2>Architecture Globale</h2>
+  <div class="arch-diagram">
+    <div class="arch-backend">
+      <h3>Backend Unique — Odoo 19 + PostgreSQL + Redis</h3>
+      <p>101 mod&egrave;les &middot; 764 endpoints API &middot; Multi-tenant &middot; Isolation company_id &middot; JWT Auth &middot; TOTP 2FA</p>
+      <p style="margin-top:0.5rem;font-size:0.8rem;color:#a5b4fc;">quelyos_api + quelyos_finance + quelyos_stock_advanced + quelyos_core + quelyos_sms_tn + quelyos_debrand</p>
+    </div>
+    <div class="arch-arrow">&darr; REST API &darr;</div>
+    <div class="arch-apps">
+      <div class="arch-app" style="background:rgba(5,150,105,0.15);border-color:var(--finance);color:var(--finance);">Quelyos Finance<div class="price">&euro;49-99/mois</div></div>
+      <div class="arch-app" style="background:rgba(124,58,237,0.15);border-color:var(--store);color:var(--store);">Quelyos Store<div class="price">&euro;79-149/mois</div></div>
+      <div class="arch-app" style="background:rgba(234,88,12,0.15);border-color:var(--copilote);color:var(--copilote);">Quelyos Copilote<div class="price">&euro;99-199/mois</div></div>
+      <div class="arch-app" style="background:rgba(37,99,235,0.15);border-color:var(--sales);color:var(--sales);">Quelyos Sales<div class="price">&euro;59-129/mois</div></div>
+      <div class="arch-app" style="background:rgba(220,38,38,0.15);border-color:var(--retail);color:var(--retail);">Quelyos Retail<div class="price">&euro;129-249/mois</div></div>
+      <div class="arch-app" style="background:rgba(8,145,178,0.15);border-color:var(--team);color:var(--team);">Quelyos Team<div class="price">&euro;39-79/mois</div></div>
+      <div class="arch-app" style="background:rgba(147,51,234,0.15);border-color:var(--support);color:var(--support);">Quelyos Support<div class="price">&euro;29-69/mois</div></div>
+    </div>
+    <p style="margin-top:1.5rem;font-size:0.85rem;color:var(--text2);">@quelyos/ui-kit &middot; @quelyos/api-client &middot; @quelyos/utils &middot; @quelyos/logger</p>
+  </div>
+</section>
+
+<!-- INVENTAIRE -->
+<section id="inventaire">
+  <h2>Inventaire Existant R&eacute;utilisable</h2>
+
+  <h3>Backend Odoo — 88 mod&egrave;les, 53 controllers</h3>
+  <table>
+    <thead><tr><th>Domaine</th><th>Mod&egrave;les cl&eacute;s</th><th>Endpoints</th><th>Statut</th></tr></thead>
+    <tbody>
+      <tr><td>Finance</td><td>budget, portfolio, category, payment_flow, cash_alert, account_move, dunning</td><td>60+</td><td style="color:#22c55e;">Production</td></tr>
+      <tr><td>E-commerce</td><td>product_template, product_product, sale_order, cart, collection, bundle, flash_sale</td><td>45+</td><td style="color:#22c55e;">Production</td></tr>
+      <tr><td>Stock</td><td>stock_quant, stock_location, stock_reservation, stock_scrap, cycle_count</td><td>83+</td><td style="color:#22c55e;">Production</td></tr>
+      <tr><td>CRM</td><td>crm_lead, res_partner, customer_category</td><td>16+</td><td style="color:#22c55e;">Production</td></tr>
+      <tr><td>Marketing</td><td>marketing_campaign, email_builder, sms_template, marketing_popup, link_tracker</td><td>10+</td><td style="color:#f59e0b;">Partiel</td></tr>
+      <tr><td>HR</td><td>hr_employee, hr_department, hr_job, hr_contract, hr_leave, hr_attendance, hr_appraisal, hr_skill</td><td>40+</td><td style="color:#22c55e;">Production</td></tr>
+      <tr><td>POS</td><td>pos_config, pos_order, pos_session, pos_payment_method</td><td>22+</td><td style="color:#22c55e;">Production</td></tr>
+      <tr><td>Support</td><td>ticket, support_template, sla_policy</td><td>12+</td><td style="color:#22c55e;">Production</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Frontend — 209 pages, 30+ composants communs</h3>
+  <table>
+    <thead><tr><th>Module</th><th>Pages</th><th>Composants cl&eacute;s</th></tr></thead>
+    <tbody>
+      <tr><td>Finance</td><td>16</td><td>9 rapports (Cashflow, DSO, EBITDA, BFR, Break-even, Profitability), Budgets, Sc&eacute;narios, Alertes</td></tr>
+      <tr><td>Store</td><td>25+</td><td>Produits, Commandes, Promotions, Avis, Fid&eacute;lit&eacute;, Blog, CMS, Th&egrave;mes</td></tr>
+      <tr><td>CRM</td><td>6+</td><td>Pipeline Kanban, Leads, Clients, Cat&eacute;gories, Pricelists</td></tr>
+      <tr><td>Stock</td><td>7</td><td>Inventaire, Mouvements, Transferts, Entrep&ocirc;ts, R&eacute;approvisionnement</td></tr>
+      <tr><td>HR</td><td>12</td><td>Employ&eacute;s, Contrats, Cong&eacute;s, Pr&eacute;sences, &Eacute;valuations, Comp&eacute;tences</td></tr>
+      <tr><td>POS</td><td>16</td><td>Terminal, Rush, Kiosk, Mobile, KDS, Click&amp;Collect, Sessions</td></tr>
+      <tr><td>Support</td><td>2</td><td>Tickets, FAQ</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ======== 7 SAAS CARDS ======== -->
+
+<!-- 1. FINANCE OS -->
+<section id="finance-os">
+  <div class="saas-card" style="border-left-color: var(--finance);">
+    <div class="saas-header">
+      <div>
+        <div class="saas-title" style="color: var(--finance);">1. Quelyos Finance</div>
+        <div class="saas-tagline">&laquo; Pilotez votre tr&eacute;sorerie en temps r&eacute;el &raquo;</div>
+      </div>
+      <div class="saas-meta">
+        <span class="saas-badge" style="border:1px solid var(--finance);color:var(--finance);">&euro;49-99/mois</span>
+        <span class="saas-badge" style="border:1px solid #22c55e;color:#22c55e;">85% r&eacute;utilisation</span>
+      </div>
+    </div>
+    <div class="saas-info-grid">
+      <div class="saas-info-item"><div class="label">Cible</div><div class="value">TPE/PME, DAF, Comptables</div></div>
+      <div class="saas-info-item"><div class="label">Modules Odoo</div><div class="value">finance</div></div>
+      <div class="saas-info-item"><div class="label">Priority</div><div class="value" style="color:var(--finance);">#1</div></div>
+    </div>
+
+    <div class="feature-grid">
+      <div>
+        <h4>Fonctionnalit&eacute;s existantes</h4>
+        <ul class="feature-list existing">
+          <li>Dashboard tr&eacute;sorerie avec KPI</li>
+          <li>9 rapports : Cashflow, Forecast 30/60/90/180j, DSO, EBITDA, BFR, Break-even, Profitabilit&eacute;</li>
+          <li>Budgets multi-p&eacute;riodes</li>
+          <li>Sc&eacute;narios what-if (7 variantes)</li>
+          <li>Alertes tr&eacute;sorerie (4 types)</li>
+          <li>Portefeuilles de comptes</li>
+          <li>Cat&eacute;gories d&eacute;penses/revenus</li>
+          <li>Flux paiement (7 types)</li>
+          <li>Import bancaire CSV</li>
+          <li>Payment planning fournisseurs</li>
+        </ul>
+      </div>
+      <div>
+        <h4>&Agrave; d&eacute;velopper (15%)</h4>
+        <ul class="feature-list todo">
+          <li>Connexions bancaires Plaid/Open Banking</li>
+          <li>Recouvrement &eacute;tendu (invoices/AR)</li>
+          <li>Scoring risque client (0-100)</li>
+          <li>ML Forecasting (Prophet/LSTM)</li>
+          <li>Sc&eacute;narios probabilistes (Monte Carlo)</li>
+          <li>Workflows automation relances</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>Fichiers cl&eacute;s</h4>
+    <div class="files-list">
+      <span class="dim">Backend:</span> <code>quelyos_finance/models/</code> (budget.py, portfolio.py, category.py, payment_flow.py, cash_alert.py)<br>
+      <span class="dim">Backend:</span> <code>quelyos_api/models/dunning.py</code>, <code>quelyos_api/controllers/finance_ctrl.py</code><br>
+      <span class="dim">Frontend:</span> <code>dashboard-client/src/pages/finance/</code> (16 pages)
+    </div>
+
+    <h4>Roadmap</h4>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 1-2</span> Setup frontend d&eacute;di&eacute; + copie pages Finance</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 3-4</span> Bank connections (Plaid API)</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 5-6</span> AR/Recovery &eacute;tendu + Scoring risque</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 7-8</span> Automation workflows</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 9+</span> ML Forecasting, Monte Carlo</div>
+  </div>
+</section>
+
+<!-- 2. STORE OS -->
+<section id="store-os">
+  <div class="saas-card" style="border-left-color: var(--store);">
+    <div class="saas-header">
+      <div>
+        <div class="saas-title" style="color: var(--store);">2. Quelyos Store</div>
+        <div class="saas-tagline">&laquo; Cr&eacute;ez votre boutique en ligne en 1h &raquo;</div>
+      </div>
+      <div class="saas-meta">
+        <span class="saas-badge" style="border:1px solid var(--store);color:var(--store);">&euro;79-149/mois</span>
+        <span class="saas-badge" style="border:1px solid #22c55e;color:#22c55e;">80% r&eacute;utilisation</span>
+      </div>
+    </div>
+    <div class="saas-info-grid">
+      <div class="saas-info-item"><div class="label">Cible</div><div class="value">E-commer&ccedil;ants, Cr&eacute;ateurs, D2C</div></div>
+      <div class="saas-info-item"><div class="label">Modules Odoo</div><div class="value">store + marketing</div></div>
+      <div class="saas-info-item"><div class="label">Priority</div><div class="value" style="color:var(--store);">#2</div></div>
+    </div>
+    <div class="feature-grid">
+      <div>
+        <h4>Fonctionnalit&eacute;s existantes</h4>
+        <ul class="feature-list existing">
+          <li>Catalogue produits complet (variantes, attributs, images)</li>
+          <li>Cat&eacute;gories, Collections, Bundles</li>
+          <li>Panier + Checkout</li>
+          <li>Commandes (cr&eacute;ation, suivi, fulfillment)</li>
+          <li>Paiement multi-provider (Stripe, Flouci, Konnect)</li>
+          <li>Promotions (codes promo, flash sales)</li>
+          <li>Avis clients + fid&eacute;lit&eacute; + Wishlist</li>
+          <li>FAQ + Blog + Pages statiques + Th&egrave;mes</li>
+          <li>SMS + Email builder + Newsletter</li>
+          <li>SEO metadata + Sitemap + Link tracker</li>
+        </ul>
+      </div>
+      <div>
+        <h4>&Agrave; d&eacute;velopper (20%)</h4>
+        <ul class="feature-list todo">
+          <li>Paniers abandonn&eacute;s + r&eacute;cup&eacute;ration</li>
+          <li>Email campaigns compl&egrave;tes</li>
+          <li>Listes dynamiques (segmentation)</li>
+          <li>Analytics e-commerce (funnel, AOV, LTV)</li>
+          <li>Int&eacute;grations marketplace</li>
+          <li>Shipping avanc&eacute; (multi-carrier)</li>
+        </ul>
+      </div>
+    </div>
+    <h4>Roadmap</h4>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 1-2</span> Setup frontend admin d&eacute;di&eacute; + copie pages Store</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 3-4</span> Paniers abandonn&eacute;s + Analytics e-commerce</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 5-6</span> Email campaigns compl&egrave;tes</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 7-8</span> Marketplace connectors</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 9+</span> Shipping avanc&eacute;, A/B testing</div>
+  </div>
+</section>
+
+<!-- 3. COPILOTE OPS -->
+<section id="copilote-ops">
+  <div class="saas-card" style="border-left-color: var(--copilote);">
+    <div class="saas-header">
+      <div>
+        <div class="saas-title" style="color: var(--copilote);">3. Quelyos Copilote</div>
+        <div class="saas-tagline">&laquo; R&eacute;duisez vos arr&ecirc;ts de 30% avec la maintenance intelligente &raquo;</div>
+      </div>
+      <div class="saas-meta">
+        <span class="saas-badge" style="border:1px solid var(--copilote);color:var(--copilote);">&euro;99-199/mois</span>
+        <span class="saas-badge" style="border:1px solid #f59e0b;color:#f59e0b;">40% r&eacute;utilisation</span>
+      </div>
+    </div>
+    <div class="saas-info-grid">
+      <div class="saas-info-item"><div class="label">Cible</div><div class="value">PME industrielles, Maintenance</div></div>
+      <div class="saas-info-item"><div class="label">Modules Odoo</div><div class="value">stock + GMAO + hr</div></div>
+      <div class="saas-info-item"><div class="label">Priority</div><div class="value" style="color:var(--copilote);">#3</div></div>
+    </div>
+    <div class="feature-grid">
+      <div>
+        <h4>Fonctionnalit&eacute;s existantes</h4>
+        <ul class="feature-list existing">
+          <li>Stock pi&egrave;ces : tra&ccedil;abilit&eacute; lot/SN, r&eacute;servations auto</li>
+          <li>Inventaires physiques (workflow complet)</li>
+          <li>Entrep&ocirc;ts multi-locations</li>
+          <li>R&egrave;gles r&eacute;approvisionnement</li>
+          <li>Valorisation stock + rotation</li>
+          <li>RH techniciens (employ&eacute;s, comp&eacute;tences)</li>
+          <li>Tickets support (workflow SLA)</li>
+        </ul>
+      </div>
+      <div>
+        <h4>&Agrave; d&eacute;velopper (60%)</h4>
+        <ul class="feature-list todo">
+          <li>Gestion &eacute;quipements (arborescence, QR)</li>
+          <li>Interventions (correctif/pr&eacute;ventif)</li>
+          <li>Planning pr&eacute;ventif (gammes, cron)</li>
+          <li>Ordres de travail (affectation, signature)</li>
+          <li>App mobile PWA terrain (offline)</li>
+          <li>Checklists param&eacute;trables</li>
+          <li>KPI : MTBF, MTTR, disponibilit&eacute;</li>
+          <li>Notifications (Push, SMS, WhatsApp)</li>
+          <li>G&eacute;olocalisation techniciens</li>
+        </ul>
+      </div>
+    </div>
+    <h4>Roadmap</h4>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 1-4</span> Mod&egrave;les GMAO backend (&eacute;quipements, interventions, OT)</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 5-8</span> Frontend dashboard GMAO (pages, KPI, planning)</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 9-12</span> App mobile PWA terrain (offline, photos, signature)</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 13-16</span> Maintenance pr&eacute;ventive + Analytics MTBF/MTTR</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 17+</span> IoT sensors, pr&eacute;dictif, g&eacute;olocalisation</div>
+  </div>
+</section>
+
+<!-- 4. SALES OS -->
+<section id="sales-os">
+  <div class="saas-card" style="border-left-color: var(--sales);">
+    <div class="saas-header">
+      <div>
+        <div class="saas-title" style="color: var(--sales);">4. Quelyos Sales</div>
+        <div class="saas-tagline">&laquo; Transformez vos prospects en clients &raquo;</div>
+      </div>
+      <div class="saas-meta">
+        <span class="saas-badge" style="border:1px solid var(--sales);color:var(--sales);">&euro;59-129/mois</span>
+        <span class="saas-badge" style="border:1px solid #22c55e;color:#22c55e;">70% r&eacute;utilisation</span>
+      </div>
+    </div>
+    <div class="saas-info-grid">
+      <div class="saas-info-item"><div class="label">Cible</div><div class="value">&Eacute;quipes commerciales, Agences</div></div>
+      <div class="saas-info-item"><div class="label">Modules Odoo</div><div class="value">crm + marketing</div></div>
+      <div class="saas-info-item"><div class="label">Priority</div><div class="value" style="color:var(--sales);">#4</div></div>
+    </div>
+    <div class="feature-grid">
+      <div>
+        <h4>Fonctionnalit&eacute;s existantes</h4>
+        <ul class="feature-list existing">
+          <li>Pipeline Kanban (stages configurables)</li>
+          <li>Leads/Opportunit&eacute;s (scoring)</li>
+          <li>Gestion clients (cat&eacute;gories, historique)</li>
+          <li>Listes de prix (lecture)</li>
+          <li>SMS + Email builder</li>
+          <li>Marketing campaigns + Link tracker</li>
+          <li>Contact lists + Factures</li>
+        </ul>
+      </div>
+      <div>
+        <h4>&Agrave; d&eacute;velopper (30%)</h4>
+        <ul class="feature-list todo">
+          <li>Pricelists CRUD complet</li>
+          <li>Scoring leads ML automatique</li>
+          <li>S&eacute;quences email (drip campaigns)</li>
+          <li>Automation workflows (triggers)</li>
+          <li>Pr&eacute;vision ventes (forecast)</li>
+          <li>Activit&eacute;s/T&acirc;ches (calendar)</li>
+          <li>Reporting commercial</li>
+          <li>Int&eacute;gration t&eacute;l&eacute;phonie</li>
+        </ul>
+      </div>
+    </div>
+    <h4>Roadmap</h4>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 1-2</span> Setup frontend + copie pages CRM + Marketing</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 3-4</span> Pricelists CRUD + Scoring leads</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 5-6</span> S&eacute;quences email + Automation</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 7-8</span> Forecast ventes + Reporting</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 9+</span> T&eacute;l&eacute;phonie, AI assistant commercial</div>
+  </div>
+</section>
+
+<!-- 5. RETAIL OS -->
+<section id="retail-os">
+  <div class="saas-card" style="border-left-color: var(--retail);">
+    <div class="saas-header">
+      <div>
+        <div class="saas-title" style="color: var(--retail);">5. Quelyos Retail</div>
+        <div class="saas-tagline">&laquo; Boutique physique + en ligne synchronis&eacute;es &raquo;</div>
+      </div>
+      <div class="saas-meta">
+        <span class="saas-badge" style="border:1px solid var(--retail);color:var(--retail);">&euro;129-249/mois</span>
+        <span class="saas-badge" style="border:1px solid #22c55e;color:#22c55e;">75% r&eacute;utilisation</span>
+      </div>
+    </div>
+    <div class="saas-info-grid">
+      <div class="saas-info-item"><div class="label">Cible</div><div class="value">Retailers, Franchises, Resto</div></div>
+      <div class="saas-info-item"><div class="label">Modules Odoo</div><div class="value">pos + store + stock</div></div>
+      <div class="saas-info-item"><div class="label">Priority</div><div class="value" style="color:var(--retail);">#5</div></div>
+    </div>
+    <div class="feature-grid">
+      <div>
+        <h4>Fonctionnalit&eacute;s existantes</h4>
+        <ul class="feature-list existing">
+          <li>Terminal POS (caisse tactile)</li>
+          <li>Mode Rush / Kiosk / Mobile POS</li>
+          <li>Kitchen Display System</li>
+          <li>Sessions caisse (ouverture/cl&ocirc;ture)</li>
+          <li>Click &amp; Collect</li>
+          <li>Stock temps r&eacute;el multi-entrep&ocirc;ts</li>
+          <li>Catalogue produits + variantes</li>
+          <li>Multi-payment methods</li>
+        </ul>
+      </div>
+      <div>
+        <h4>&Agrave; d&eacute;velopper (25%)</h4>
+        <ul class="feature-list todo">
+          <li>Sync omnicanal temps r&eacute;el (WebSocket)</li>
+          <li>Multi-magasin dashboard consolid&eacute;</li>
+          <li>Fid&eacute;lit&eacute; omnicanale</li>
+          <li>Barcode scanning (cam&eacute;ra mobile)</li>
+          <li>Gestion tables (restaurant)</li>
+          <li>Rapports consolid&eacute;s par magasin</li>
+          <li>Inventaire magasin par scan</li>
+        </ul>
+      </div>
+    </div>
+    <h4>Roadmap</h4>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 1-2</span> Setup frontend + fusion POS + Store pages</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 3-4</span> Sync omnicanal WebSocket</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 5-6</span> Multi-magasin dashboard</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 7-8</span> Barcode scanning + Inventaire mobile</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 9+</span> Gestion tables restaurant</div>
+  </div>
+</section>
+
+<!-- 6. TEAM OS -->
+<section id="team-os">
+  <div class="saas-card" style="border-left-color: var(--team);">
+    <div class="saas-header">
+      <div>
+        <div class="saas-title" style="color: var(--team);">6. Quelyos Team</div>
+        <div class="saas-tagline">&laquo; G&eacute;rez vos &eacute;quipes sans paperasse &raquo;</div>
+      </div>
+      <div class="saas-meta">
+        <span class="saas-badge" style="border:1px solid var(--team);color:var(--team);">&euro;39-79/mois</span>
+        <span class="saas-badge" style="border:1px solid #22c55e;color:#22c55e;">90% r&eacute;utilisation</span>
+      </div>
+    </div>
+    <div class="saas-info-grid">
+      <div class="saas-info-item"><div class="label">Cible</div><div class="value">PME, Startups, RH</div></div>
+      <div class="saas-info-item"><div class="label">Modules Odoo</div><div class="value">hr</div></div>
+      <div class="saas-info-item"><div class="label">Priority</div><div class="value" style="color:var(--team);">#6</div></div>
+    </div>
+    <div class="feature-grid">
+      <div>
+        <h4>Fonctionnalit&eacute;s existantes</h4>
+        <ul class="feature-list existing">
+          <li>Employ&eacute;s (CRUD complet)</li>
+          <li>D&eacute;partements + Organigramme</li>
+          <li>Postes de travail</li>
+          <li>Contrats (type, dates, salaire)</li>
+          <li>Pr&eacute;sences / Pointage</li>
+          <li>Cong&eacute;s (demandes, validations, calendrier)</li>
+          <li>&Eacute;valuations annuelles</li>
+          <li>Comp&eacute;tences + Objectifs</li>
+        </ul>
+      </div>
+      <div>
+        <h4>&Agrave; d&eacute;velopper (10%)</h4>
+        <ul class="feature-list todo">
+          <li>Self-service employ&eacute; (portail)</li>
+          <li>Onboarding workflow (checklist)</li>
+          <li>Offboarding (checklist d&eacute;part)</li>
+          <li>Planning/Shifts (horaires)</li>
+          <li>Notes de frais</li>
+          <li>Documents RH (GED s&eacute;curis&eacute;e)</li>
+          <li>Rapports RH (turnover, absent&eacute;isme)</li>
+        </ul>
+      </div>
+    </div>
+    <h4>Roadmap</h4>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 1-2</span> Setup frontend + copie pages HR</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 3-4</span> Portail self-service employ&eacute;</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 5-6</span> Onboarding/Offboarding workflows</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 7-8</span> Planning/Shifts + Notes de frais</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 9+</span> GED, rapports avanc&eacute;s, paie basique</div>
+  </div>
+</section>
+
+<!-- 7. SUPPORT OS -->
+<section id="support-os">
+  <div class="saas-card" style="border-left-color: var(--support);">
+    <div class="saas-header">
+      <div>
+        <div class="saas-title" style="color: var(--support);">7. Quelyos Support</div>
+        <div class="saas-tagline">&laquo; Support client professionnel en 5 minutes &raquo;</div>
+      </div>
+      <div class="saas-meta">
+        <span class="saas-badge" style="border:1px solid var(--support);color:var(--support);">&euro;29-69/mois</span>
+        <span class="saas-badge" style="border:1px solid #22c55e;color:#22c55e;">65% r&eacute;utilisation</span>
+      </div>
+    </div>
+    <div class="saas-info-grid">
+      <div class="saas-info-item"><div class="label">Cible</div><div class="value">SaaS, E-commerce, Helpdesk</div></div>
+      <div class="saas-info-item"><div class="label">Modules Odoo</div><div class="value">support + crm</div></div>
+      <div class="saas-info-item"><div class="label">Priority</div><div class="value" style="color:var(--support);">#7</div></div>
+    </div>
+    <div class="feature-grid">
+      <div>
+        <h4>Fonctionnalit&eacute;s existantes</h4>
+        <ul class="feature-list existing">
+          <li>Tickets (cr&eacute;ation, assignation, statuts)</li>
+          <li>SLA policies (deadlines)</li>
+          <li>Templates de r&eacute;ponse</li>
+          <li>FAQ int&eacute;gr&eacute;e</li>
+          <li>Conversation/messages sur tickets</li>
+          <li>Satisfaction client</li>
+        </ul>
+      </div>
+      <div>
+        <h4>&Agrave; d&eacute;velopper (35%)</h4>
+        <ul class="feature-list todo">
+          <li>Widget chat int&eacute;grable (JS)</li>
+          <li>Knowledge base publique</li>
+          <li>Macros/Automations</li>
+          <li>Multi-canal (email, chat, WhatsApp)</li>
+          <li>Rapports support (SLA compliance)</li>
+          <li>Customer portal</li>
+          <li>Canned responses</li>
+          <li>Collision detection</li>
+          <li>AI suggestions</li>
+        </ul>
+      </div>
+    </div>
+    <h4>Roadmap</h4>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 1-2</span> Setup frontend + enrichir pages support</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 3-4</span> Widget chat + Knowledge base</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 5-6</span> Multi-canal inbox unifi&eacute;e</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 7-8</span> Automations + Customer portal</div>
+    <div class="roadmap-item"><span class="roadmap-sprint">Sprint 9+</span> AI suggestions, analytics avanc&eacute;s</div>
+  </div>
+</section>
+
+<!-- MONOREPO -->
+<section id="monorepo">
+  <h2>Architecture Monorepo</h2>
+  <div class="tree">
+<span class="folder">quelyos-suite/</span>
+<span class="folder">+-- packages/</span>
+|   <span class="folder">+-- ui-kit/</span>                  <span class="comment"># @quelyos/ui-kit</span>
+|   |   <span class="file">Button, Table, DataTable, Modal, Toast, Skeleton, Badge, Input</span>
+|   |   <span class="file">Layout, Breadcrumbs, PageNotice, BackendImage, ImageGallery</span>
+|   |   <span class="file">DateRangePicker, SearchAutocomplete, ErrorBoundary</span>
+|   <span class="folder">+-- api-client/</span>              <span class="comment"># @quelyos/api-client</span>
+|   |   <span class="file">client.ts, auth.ts, finance.ts, store.ts, stock.ts</span>
+|   |   <span class="file">crm.ts, hr.ts, pos.ts, support.ts</span>
+|   <span class="folder">+-- utils/</span>                   <span class="comment"># @quelyos/utils</span>
+|   |   <span class="file">dates.ts, format.ts, currency.ts, validation.ts</span>
+|   <span class="folder">+-- logger/</span>                  <span class="comment"># @quelyos/logger (existant)</span>
+|
+<span class="folder">+-- apps/</span>
+|   <span class="folder">+-- dashboard-client/</span>        <span class="comment"># ERP complet (port 5175)</span>
+|   <span class="folder">+-- vitrine-quelyos/</span>         <span class="comment"># Site marketing (port 3000)</span>
+|   <span class="folder">+-- vitrine-client/</span>          <span class="comment"># E-commerce (port 3001)</span>
+|   <span class="folder">+-- super-admin-client/</span>      <span class="comment"># Admin SaaS (port 9000)</span>
+|   |
+|   <span class="new">+-- finance-os/</span>              <span class="comment"># Finance SaaS (port 3010)</span>
+|   <span class="new">+-- store-os/</span>                <span class="comment"># Store SaaS (port 3011)</span>
+|   <span class="new">+-- copilote-ops/</span>            <span class="comment"># GMAO SaaS (port 3012)</span>
+|   <span class="new">+-- sales-os/</span>                <span class="comment"># CRM SaaS (port 3013)</span>
+|   <span class="new">+-- retail-os/</span>               <span class="comment"># Retail SaaS (port 3014)</span>
+|   <span class="new">+-- team-os/</span>                 <span class="comment"># RH SaaS (port 3015)</span>
+|   <span class="new">+-- support-os/</span>              <span class="comment"># Support SaaS (port 3016)</span>
+|
+<span class="folder">+-- odoo-backend/</span>                <span class="comment"># Backend Odoo (port 8069)</span>
+<span class="file">+-- turbo.json</span>                   <span class="comment"># Turborepo config</span>
+<span class="file">+-- pnpm-workspace.yaml</span>          <span class="comment"># Workspace config</span>
+  </div>
+  <p style="margin-top:1rem;color:var(--text2);font-size:0.9rem;"><strong style="color:#fbbf24;">Jaune</strong> = Nouveaux dossiers &agrave; cr&eacute;er. Tout le reste est existant.</p>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <h2>Strat&eacute;gie Pricing</h2>
+
+  <h3>Pricing Individuel</h3>
+  <table>
+    <thead><tr><th>SaaS</th><th>Starter</th><th>Pro</th><th>Business</th></tr></thead>
+    <tbody>
+      <tr><td style="color:var(--support);">Quelyos Support</td><td>&euro;29/mois</td><td>&euro;49/mois</td><td>&euro;69/mois</td></tr>
+      <tr><td style="color:var(--team);">Quelyos Team</td><td>&euro;39/mois</td><td>&euro;59/mois</td><td>&euro;79/mois</td></tr>
+      <tr><td style="color:var(--finance);">Quelyos Finance</td><td>&euro;49/mois</td><td>&euro;79/mois</td><td>&euro;99/mois</td></tr>
+      <tr><td style="color:var(--sales);">Quelyos Sales</td><td>&euro;59/mois</td><td>&euro;99/mois</td><td>&euro;129/mois</td></tr>
+      <tr><td style="color:var(--store);">Quelyos Store</td><td>&euro;79/mois</td><td>&euro;119/mois</td><td>&euro;149/mois</td></tr>
+      <tr><td style="color:var(--copilote);">Quelyos Copilote</td><td>&euro;99/mois</td><td>&euro;149/mois</td><td>&euro;199/mois</td></tr>
+      <tr><td style="color:var(--retail);">Quelyos Retail</td><td>&euro;129/mois</td><td>&euro;199/mois</td><td>&euro;249/mois</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Bundles</h3>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <h4>Starter Pack</h4>
+      <div class="desc">Quelyos Team + Quelyos Finance</div>
+      <div class="price-tag">&euro;79/mois</div>
+      <div class="saving">-10% vs s&eacute;par&eacute;</div>
+    </div>
+    <div class="pricing-card">
+      <h4>Growth Pack</h4>
+      <div class="desc">Finance + Sales + Quelyos Store</div>
+      <div class="price-tag">&euro;199/mois</div>
+      <div class="saving">-12% vs s&eacute;par&eacute;</div>
+    </div>
+    <div class="pricing-card">
+      <h4>Industry Pack</h4>
+      <div class="desc">Quelyos Copilote + Finance + Quelyos Team</div>
+      <div class="price-tag">&euro;179/mois</div>
+      <div class="saving">-15% vs s&eacute;par&eacute;</div>
+    </div>
+    <div class="pricing-card">
+      <h4>Retail Pack</h4>
+      <div class="desc">Quelyos Retail + Quelyos Finance</div>
+      <div class="price-tag">&euro;159/mois</div>
+      <div class="saving">-12% vs s&eacute;par&eacute;</div>
+    </div>
+    <div class="pricing-card" style="border-color: var(--accent);">
+      <h4>Full Suite</h4>
+      <div class="desc">Tous les 7 modules</div>
+      <div class="price-tag">&euro;399/mois</div>
+      <div class="saving">-22% vs s&eacute;par&eacute;</div>
+    </div>
+  </div>
+</section>
+
+<!-- BRANDING -->
+<section id="branding">
+  <h2>Branding &amp; Design System</h2>
+  <div class="branding-grid">
+    <div class="branding-item" style="border-color:var(--finance);background:rgba(5,150,105,0.08);">
+      <div class="swatch" style="background:var(--finance);"></div>
+      <div class="name">Quelyos Finance</div>
+      <div class="domain">finance-os.quelyos.com</div>
+    </div>
+    <div class="branding-item" style="border-color:var(--store);background:rgba(124,58,237,0.08);">
+      <div class="swatch" style="background:var(--store);"></div>
+      <div class="name">Quelyos Store</div>
+      <div class="domain">store-os.quelyos.com</div>
+    </div>
+    <div class="branding-item" style="border-color:var(--copilote);background:rgba(234,88,12,0.08);">
+      <div class="swatch" style="background:var(--copilote);"></div>
+      <div class="name">Quelyos Copilote</div>
+      <div class="domain">copilote-ops.quelyos.com</div>
+    </div>
+    <div class="branding-item" style="border-color:var(--sales);background:rgba(37,99,235,0.08);">
+      <div class="swatch" style="background:var(--sales);"></div>
+      <div class="name">Quelyos Sales</div>
+      <div class="domain">sales-os.quelyos.com</div>
+    </div>
+    <div class="branding-item" style="border-color:var(--retail);background:rgba(220,38,38,0.08);">
+      <div class="swatch" style="background:var(--retail);"></div>
+      <div class="name">Quelyos Retail</div>
+      <div class="domain">retail-os.quelyos.com</div>
+    </div>
+    <div class="branding-item" style="border-color:var(--team);background:rgba(8,145,178,0.08);">
+      <div class="swatch" style="background:var(--team);"></div>
+      <div class="name">Quelyos Team</div>
+      <div class="domain">team-os.quelyos.com</div>
+    </div>
+    <div class="branding-item" style="border-color:var(--support);background:rgba(147,51,234,0.08);">
+      <div class="swatch" style="background:var(--support);"></div>
+      <div class="name">Quelyos Support</div>
+      <div class="domain">support-os.quelyos.com</div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP GLOBALE -->
+<section id="roadmap">
+  <h2>Roadmap Globale — 18 Mois</h2>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 0 — Semaines 1-4</div>
+      <div class="timeline-title">Infrastructure Monorepo</div>
+      <ul class="timeline-items">
+        <li>Setup Turborepo + pnpm workspace</li>
+        <li>Extraction @quelyos/ui-kit depuis dashboard-client</li>
+        <li>Extraction @quelyos/api-client</li>
+        <li>Template app SaaS (Vite + React 19 + Tailwind + Zustand)</li>
+        <li>CI/CD pipeline par app (GitHub Actions)</li>
+        <li>Domaines et certificats SSL</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase" style="color:var(--finance);">Phase 1 — Semaines 5-14</div>
+      <div class="timeline-title" style="color:var(--finance);">Quelyos Finance</div>
+      <ul class="timeline-items">
+        <li>Frontend Quelyos Finance (pages copi&eacute;es/adapt&eacute;es)</li>
+        <li>Branding + Onboarding simplifi&eacute;</li>
+        <li>Bank connections (Plaid/Open Banking)</li>
+        <li>Recouvrement &eacute;tendu + Scoring risque</li>
+        <li>Landing page + Pilotes (3-5 entreprises)</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase" style="color:var(--store);">Phase 2 — Semaines 10-18</div>
+      <div class="timeline-title" style="color:var(--store);">Quelyos Store</div>
+      <ul class="timeline-items">
+        <li>Frontend Quelyos Store (pages Store + Marketing)</li>
+        <li>Paniers abandonn&eacute;s + R&eacute;cup&eacute;ration</li>
+        <li>Email campaigns compl&egrave;tes</li>
+        <li>Analytics e-commerce (funnel, AOV, LTV)</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase" style="color:var(--copilote);">Phase 3 — Semaines 12-24</div>
+      <div class="timeline-title" style="color:var(--copilote);">Quelyos Copilote</div>
+      <ul class="timeline-items">
+        <li>Mod&egrave;les GMAO Odoo (equipment, intervention, work_order)</li>
+        <li>API endpoints GMAO</li>
+        <li>Frontend dashboard GMAO + KPI</li>
+        <li>App mobile PWA terrain</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase" style="color:var(--sales);">Phase 4 — Semaines 20-28</div>
+      <div class="timeline-title">Quelyos Sales + Quelyos Team</div>
+      <ul class="timeline-items">
+        <li>Quelyos Sales frontend (CRM + Marketing)</li>
+        <li>Scoring leads + Automation workflows</li>
+        <li>Quelyos Team frontend (HR)</li>
+        <li>Self-service employ&eacute; + Onboarding</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase" style="color:var(--retail);">Phase 5 — Semaines 26-36</div>
+      <div class="timeline-title">Quelyos Retail + Quelyos Support</div>
+      <ul class="timeline-items">
+        <li>Quelyos Retail frontend (POS + Store + Stock)</li>
+        <li>Sync omnicanal WebSocket</li>
+        <li>Quelyos Support frontend (Tickets + KB)</li>
+        <li>Widget chat int&eacute;grable + Multi-canal inbox</li>
+      </ul>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 6 — Semaines 34-40</div>
+      <div class="timeline-title">Optimisations</div>
+      <ul class="timeline-items">
+        <li>Performance audit toutes apps</li>
+        <li>A/B testing pricing</li>
+        <li>Analytics cross-app</li>
+        <li>Documentation d&eacute;veloppeur (API)</li>
+        <li>Marketplace int&eacute;grations</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- BACKEND -->
+<section id="backend">
+  <h2>Backend — Nouveaux Mod&egrave;les Odoo</h2>
+
+  <h3>Quelyos Finance</h3>
+  <div class="code-block">
+<span class="kw">class</span> <span class="cls">BankConnection</span>(models.Model):
+    <span class="str">_name</span> = <span class="str">'quelyos.bank.connection'</span>
+    provider = fields.Selection([(<span class="str">'plaid'</span>, <span class="str">'Plaid'</span>), (<span class="str">'open_banking'</span>, <span class="str">'Open Banking'</span>), (<span class="str">'csv'</span>, <span class="str">'CSV Import'</span>)])
+    institution_name = fields.Char()
+    credentials = fields.Text()  <span class="cmt"># encrypted</span>
+    last_sync = fields.Datetime()
+    sync_status = fields.Selection([(<span class="str">'active'</span>, <span class="str">'Active'</span>), (<span class="str">'error'</span>, <span class="str">'Error'</span>), (<span class="str">'expired'</span>, <span class="str">'Expired'</span>)])
+
+<span class="kw">class</span> <span class="cls">ClientRiskScore</span>(models.Model):
+    <span class="str">_name</span> = <span class="str">'quelyos.client.risk.score'</span>
+    partner_id = fields.Many2one(<span class="str">'res.partner'</span>)
+    score = fields.Integer()  <span class="cmt"># 0-100</span>
+    risk_level = fields.Selection([(<span class="str">'low'</span>, <span class="str">'Low'</span>), (<span class="str">'medium'</span>, <span class="str">'Medium'</span>), (<span class="str">'high'</span>, <span class="str">'High'</span>)])
+    factors = fields.Text()  <span class="cmt"># JSON</span>
+    recommendations = fields.Text()  <span class="cmt"># JSON</span>
+  </div>
+
+  <h3>Quelyos Copilote</h3>
+  <div class="code-block">
+<span class="kw">class</span> <span class="cls">Equipment</span>(models.Model):
+    <span class="str">_name</span> = <span class="str">'gmao.equipment'</span>
+    name = fields.Char(required=<span class="kw">True</span>)
+    code = fields.Char()  <span class="cmt"># QR/Barcode</span>
+    category_id = fields.Many2one(<span class="str">'gmao.equipment.category'</span>)
+    parent_id = fields.Many2one(<span class="str">'gmao.equipment'</span>)  <span class="cmt"># arborescence</span>
+    location = fields.Char()
+    criticality = fields.Selection([(<span class="str">'low'</span>), (<span class="str">'medium'</span>), (<span class="str">'high'</span>), (<span class="str">'critical'</span>)])
+    status = fields.Selection([(<span class="str">'operational'</span>), (<span class="str">'maintenance'</span>), (<span class="str">'broken'</span>), (<span class="str">'decommissioned'</span>)])
+    installation_date = fields.Date()
+    last_maintenance = fields.Datetime()
+    next_maintenance = fields.Datetime()
+    technical_doc = fields.Binary()
+
+<span class="kw">class</span> <span class="cls">Intervention</span>(models.Model):
+    <span class="str">_name</span> = <span class="str">'gmao.intervention'</span>
+    equipment_id = fields.Many2one(<span class="str">'gmao.equipment'</span>, required=<span class="kw">True</span>)
+    type = fields.Selection([(<span class="str">'corrective'</span>), (<span class="str">'preventive'</span>), (<span class="str">'inspection'</span>)])
+    priority = fields.Selection([(<span class="str">'low'</span>), (<span class="str">'medium'</span>), (<span class="str">'high'</span>), (<span class="str">'urgent'</span>)])
+    state = fields.Selection([(<span class="str">'draft'</span>), (<span class="str">'planned'</span>), (<span class="str">'in_progress'</span>), (<span class="str">'done'</span>), (<span class="str">'cancelled'</span>)])
+    technician_id = fields.Many2one(<span class="str">'hr.employee'</span>)
+    planned_date = fields.Datetime()
+    actual_start = fields.Datetime()
+    actual_end = fields.Datetime()
+    duration = fields.Float(compute=<span class="str">'_compute_duration'</span>)
+    checklist_ids = fields.One2many(<span class="str">'gmao.checklist.item'</span>, <span class="str">'intervention_id'</span>)
+    parts_consumed = fields.One2many(<span class="str">'gmao.part.consumption'</span>, <span class="str">'intervention_id'</span>)
+    photos = fields.Many2many(<span class="str">'ir.attachment'</span>)
+    signature = fields.Binary()
+
+<span class="kw">class</span> <span class="cls">MaintenancePlan</span>(models.Model):
+    <span class="str">_name</span> = <span class="str">'gmao.maintenance.plan'</span>
+    equipment_id = fields.Many2one(<span class="str">'gmao.equipment'</span>)
+    name = fields.Char()
+    frequency = fields.Selection([(<span class="str">'daily'</span>), (<span class="str">'weekly'</span>), (<span class="str">'monthly'</span>), (<span class="str">'quarterly'</span>), (<span class="str">'yearly'</span>)])
+    interval = fields.Integer(default=1)
+    next_execution = fields.Datetime()
+    active = fields.Boolean(default=<span class="kw">True</span>)
+  </div>
+</section>
+
+<!-- RISQUES -->
+<section id="risques">
+  <h2>Risques &amp; Mitigation</h2>
+  <div class="risk-grid">
+    <div class="risk-card">
+      <div class="risk-title">Duplication code entre apps</div>
+      <div class="risk-mitigation">Monorepo strict + @quelyos/ui-kit + @quelyos/api-client. Tout composant partag&eacute; = package.</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Confusion branding (7 marques)</div>
+      <div class="risk-mitigation">Sous-marques &laquo; by Quelyos &raquo; + landing page unifi&eacute;e quelyos.com avec navigation vers chaque SaaS.</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Effort d&eacute;veloppement sous-estim&eacute;</div>
+      <div class="risk-mitigation">MVP ultra-minimal par app. It&eacute;rer avec pilotes. Ne jamais lancer 2 SaaS en parall&egrave;le sans &eacute;quipe d&eacute;di&eacute;e.</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Cannibalisation ERP complet</div>
+      <div class="risk-mitigation">Pricing bundles attractifs (-10 &agrave; -22%). Upsell naturel SaaS &rarr; Full Suite. ERP = offre premium.</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Complexit&eacute; infrastructure</div>
+      <div class="risk-mitigation">1 backend unique (Odoo 19). CI/CD automatis&eacute; par app. Monitoring centralis&eacute; (super-admin).</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Support client multi-app</div>
+      <div class="risk-mitigation">Knowledge base commune. Chatbot AI. Quelyos Support utilis&eacute; en interne. Documentation unifi&eacute;e.</div>
+    </div>
+  </div>
+</section>
+
+<!-- RESUME -->
+<section>
+  <h2>R&eacute;sum&eacute; Ex&eacute;cutif</h2>
+  <div class="summary-grid">
+    <div class="summary-card"><div class="val">7</div><div class="lbl">SaaS Apps</div></div>
+    <div class="summary-card"><div class="val">1</div><div class="lbl">Backend Unique</div></div>
+    <div class="summary-card"><div class="val">72%</div><div class="lbl">R&eacute;utilisation Moyenne</div></div>
+    <div class="summary-card"><div class="val">18</div><div class="lbl">Mois Roadmap</div></div>
+    <div class="summary-card"><div class="val">&euro;29-399</div><div class="lbl">Revenue/Client/Mois</div></div>
+  </div>
+
+  <h3>Ordre de priorit&eacute;</h3>
+  <table>
+    <thead><tr><th>#</th><th>SaaS</th><th>R&eacute;utilisation</th><th>Phase</th><th>Semaines</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td style="color:var(--finance);">Quelyos Finance</td><td>85%</td><td>Phase 1</td><td>S5-S14</td></tr>
+      <tr><td>2</td><td style="color:var(--store);">Quelyos Store</td><td>80%</td><td>Phase 2</td><td>S10-S18</td></tr>
+      <tr><td>3</td><td style="color:var(--copilote);">Quelyos Copilote</td><td>40%</td><td>Phase 3</td><td>S12-S24</td></tr>
+      <tr><td>4</td><td style="color:var(--sales);">Quelyos Sales</td><td>70%</td><td>Phase 4</td><td>S20-S28</td></tr>
+      <tr><td>5</td><td style="color:var(--team);">Quelyos Team</td><td>90%</td><td>Phase 4</td><td>S20-S28</td></tr>
+      <tr><td>6</td><td style="color:var(--retail);">Quelyos Retail</td><td>75%</td><td>Phase 5</td><td>S26-S36</td></tr>
+      <tr><td>7</td><td style="color:var(--support);">Quelyos Support</td><td>65%</td><td>Phase 5</td><td>S26-S36</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</div>
+
+<footer>
+  <p><strong>Quelyos Suite</strong> &mdash; Plan Strat&eacute;gique 7 SaaS</p>
+  <p>G&eacute;n&eacute;r&eacute; le 30 janvier 2026 &middot; Architecture bas&eacute;e sur Quelyos ERP v1.x (Odoo 19 Community)</p>
+  <p style="margin-top:0.5rem;">1 backend &middot; 7 SaaS &middot; 101 mod&egrave;les &middot; 764 endpoints &middot; 72% r&eacute;utilisation</p>
+</footer>
+
+</body>
+</html>

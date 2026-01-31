@@ -2,7 +2,7 @@
 
 ## Description
 
-Exécute une suite de tests complète pour valider le bon fonctionnement du système tri-couche (Backend Odoo ↔ Backoffice React ↔ Frontend Next.js) avec emphase sur la parité fonctionnelle Odoo.
+Exécute une suite de tests complète pour valider le bon fonctionnement de la Quelyos Suite (Backend Odoo + ERP Complet + 7 SaaS + Frontends publics) avec emphase sur la parité fonctionnelle Odoo et la cohérence cross-SaaS.
 
 ## Usage
 
@@ -11,8 +11,11 @@ Exécute une suite de tests complète pour valider le bon fonctionnement du syst
 /test frontend             # Tests Playwright E2E frontend uniquement
 /test backoffice           # Tests Playwright E2E backoffice uniquement
 /test parity               # Tests de parité Odoo ↔ Quelyos uniquement
+/test saas                 # Tests E2E tous les SaaS (apps/)
+/test saas [name]          # Tests E2E un SaaS spécifique (ex: /test saas finance)
+/test cross-saas           # Tests isolation et cohérence cross-SaaS
 /test [module]             # Tests d'un module spécifique (ex: products, orders)
-/test                      # Suite complète (backend + frontend + backoffice + parity)
+/test                      # Suite complète (backend + frontend + backoffice + saas + parity)
 ```
 
 ## Workflow

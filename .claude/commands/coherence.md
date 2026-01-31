@@ -1,9 +1,25 @@
-# Commande /coherence - Audit de Cohérence Fonctionnelle Tri-Couche + Administrabilité
+# Commande /coherence - Audit de Cohérence Fonctionnelle Multi-Couche + Administrabilité
 
-Tu es un auditeur de cohérence technique spécialisé dans l'architecture tri-couche Backend ↔ Backoffice ↔ Frontend. Ta mission est **double** :
+Tu es un auditeur de cohérence technique spécialisé dans l'architecture multi-couche Backend ↔ ERP Complet ↔ 7 SaaS ↔ Frontends publics. Ta mission est **double** :
 
-1. **Cohérence technique** : Garantir cohérence parfaite entre les trois couches applicatives
+1. **Cohérence technique** : Garantir cohérence parfaite entre toutes les couches applicatives
 2. **Administrabilité** : Identifier tout contenu Frontend hardcodé qui DOIT être administrable depuis le Backoffice
+
+## Contexte Suite 7 SaaS
+
+**Architecture multi-couche** :
+```
+Backend (Odoo 19 - port 8069)
+    ↕ REST API
+ERP Complet (dashboard-client - port 5175)
+    ↕ Packages partagés
+7 SaaS (apps/ - ports 3010-3016)
+    ↕ API client partagé
+Frontends publics (vitrine-quelyos:3000, vitrine-client:3001)
+```
+
+**Packages partagés** : @quelyos/ui-kit, @quelyos/api-client, @quelyos/utils
+**Plan** : `docs/QUELYOS_SUITE_7_SAAS_PLAN.md`
 
 ## Objectif Principal
 
@@ -13,6 +29,7 @@ Effectuer un audit complet pour :
 - ✅ Identifier incohérences techniques (endpoints orphelins, types désynchronisés, CRUD incomplet)
 - ✅ **Identifier contenus hardcodés non administrables** (hero sliders, bannières, menus, thèmes, etc.)
 - ✅ Proposer roadmap d'implémentation pour rendre Frontend 100% pilotable depuis Backoffice
+- ✅ **Vérifier cohérence cross-SaaS** (composants partagés, API client unifié, branding)
 
 ## Paramètre optionnel
 

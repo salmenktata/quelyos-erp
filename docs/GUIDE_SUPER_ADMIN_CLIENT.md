@@ -1,16 +1,20 @@
-# Guide pratique — Super Admin Client
+# Guide pratique — Super Admin Client (Gestion Cross-SaaS & Suite)
 
-Ce guide explique **l’usage fonctionnel** et **le démarrage rapide** de `super-admin-client/`.  
+Ce guide explique **l'usage fonctionnel** et **le démarrage rapide** de `super-admin-client/`.
 Public visé : informaticien non‑expert souhaitant un aperçu clair et opérationnel.
 
 ---
 
-## 1) Vue d’ensemble
+## 1) Vue d'ensemble
 
-Le super‑admin est une **interface SaaS** pour piloter la plateforme (tenants, abonnements, facturation, monitoring).
+Le super‑admin est une **interface de gestion cross-SaaS et Suite** pour piloter la plateforme (tenants, abonnements, facturation, monitoring, gestion des 7 SaaS Quelyos).
+
+**Rôle dans l'architecture Suite** : Gérer les plateformes clients, les abonnements aux 7 SaaS (Quelyos Finance, Store, Copilote, Sales, Retail, Team, Support), la facturation, le monitoring cross-SaaS et les bundles (Starter Pack, Growth Pack, Full Suite).
 
 ```
-Navigateur ──> super-admin-client (5176) ──> /api/super-admin/* ──> odoo-backend (8069)
+Navigateur ──> super-admin-client (9000) ──> /api/super-admin/* ──> odoo-backend (8069)
+                                                                        ↑
+ERP Complet (5175) + 7 SaaS (3010-3016) ──────────────────────────────┘
 ```
 
 ---

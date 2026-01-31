@@ -67,8 +67,8 @@ Une phrase simple expliquant l’objectif.
 
 ### Bonnes pratiques
 - Utiliser **pnpm** (standard du repo).
-- Respecter les **ports fixes** : 3000/3001/5175/5176/8069.
-- Référencer les **bons dossiers** (`vitrine-*`, `dashboard-client`, `super-admin-client`, `odoo-backend`).
+- Respecter les **ports fixes** : 3000/3001/5175/9000/8069 + SaaS 3010-3016.
+- Référencer les **bons dossiers** (`vitrine-*`, `dashboard-client`, `super-admin-client`, `odoo-backend`, `apps/*`, `packages/*`).
 - Éviter les commandes destructives sans confirmation.
 - Mettre à jour ce guide si une nouvelle commande est ajoutée.
 
@@ -123,10 +123,17 @@ Commandes spécifiques à la gestion du backend Odoo.
 | `/fresh-install` | Réinstallation Odoo 19 (base vierge) | 8069 |
 | `/upgrade-odoo` | Upgrader module après modifications | 8069 |
 | `/restart-odoo` | Redémarrer serveur Odoo | 8069 |
-| `/restart-backoffice` | Redémarrer dashboard React | 5175 |
+| `/restart-backoffice` | Redémarrer dashboard React (ERP Complet) | 5175 |
 | `/restart-vitrine` | Redémarrer site vitrine | 3000 |
 | `/restart-ecommerce` | Redémarrer e-commerce | 3001 |
 | `/restart-all` | Redémarrer tous les services | - |
+| `/restart-finance` | Redémarrer Quelyos Finance | 3010 |
+| `/restart-store` | Redémarrer Quelyos Store | 3011 |
+| `/restart-copilote` | Redémarrer Quelyos Copilote | 3012 |
+| `/restart-sales` | Redémarrer Quelyos Sales | 3013 |
+| `/restart-retail` | Redémarrer Quelyos Retail | 3014 |
+| `/restart-team` | Redémarrer Quelyos Team | 3015 |
+| `/restart-support` | Redémarrer Quelyos Support | 3016 |
 
 ### `/upgrade-odoo` - Upgrade Module
 
@@ -156,8 +163,11 @@ Redémarre un service spécifique sans toucher aux autres.
 **Ports fixes (NE JAMAIS MODIFIER)** :
 - Vitrine : 3000
 - E-commerce : 3001
-- Dashboard : 5175
-- Odoo : 8069
+- ERP Complet (Dashboard) : 5175
+- Super Admin : 9000
+- Odoo Backend : 8069
+- Quelyos Finance : 3010 | Quelyos Store : 3011 | Quelyos Copilote : 3012
+- Quelyos Sales : 3013 | Quelyos Retail : 3014 | Quelyos Team : 3015 | Quelyos Support : 3016
 
 ---
 
@@ -171,10 +181,13 @@ Commandes pour assurer la qualité du code et de l'interface.
 | `/uiux` | Audit UI/UX complet d'une page | /140 |
 | `/coherence` | Audit cohérence tri-couche | /100 |
 | `/parity` | Parité Odoo ↔ Quelyos | - |
+| `/saas-parity` | Parité cross-SaaS (ERP ↔ SaaS) | - |
 | `/polish` | Refactoring complet | - |
 | `/clean` | Nettoyage fichiers/imports | - |
 | `/docs` | Sync documentation | - |
 | `/analyze-page` | Analyse page + plan admin | - |
+| `/no-odoo` | Anonymisation Odoo (CRITIQUE) | - |
+| `/architect` | Analyse architecture Suite | - |
 
 ### `/uiux` - Audit UI/UX
 

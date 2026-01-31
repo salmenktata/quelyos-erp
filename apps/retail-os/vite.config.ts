@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 
-const port = parseInt(process.env.VITE_PORT || '3010', 10)
+const port = parseInt(process.env.VITE_PORT || '3014', 10)
 
 export default defineConfig({
   plugins: [react()],
@@ -17,7 +17,7 @@ export default defineConfig({
       },
     },
     sourcemap: false,
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         entryFileNames: 'assets/[name]-[hash].js',
@@ -32,6 +32,7 @@ export default defineConfig({
           if (id.includes('lucide-react')) return 'vendor-icons'
           if (id.includes('zod')) return 'vendor-validation'
           if (id.includes('framer-motion')) return 'vendor-motion'
+          if (id.includes('recharts')) return 'vendor-charts'
           if (id.includes('node_modules')) return 'vendor-common'
         },
       },
@@ -45,6 +46,8 @@ export default defineConfig({
       '@quelyos/hooks': fileURLToPath(new URL('../../packages/hooks', import.meta.url)),
       '@quelyos/auth': fileURLToPath(new URL('../../packages/auth', import.meta.url)),
       '@quelyos/utils': fileURLToPath(new URL('../../packages/utils', import.meta.url)),
+      '@quelyos/logger': fileURLToPath(new URL('./src/lib/logger', import.meta.url)),
+      '@quelyos/types': fileURLToPath(new URL('./src/types', import.meta.url)),
     },
   },
   server: {

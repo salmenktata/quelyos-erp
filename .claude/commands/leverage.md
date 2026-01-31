@@ -4,6 +4,22 @@
 
 Commande de réflexion architecturale AVANT toute implémentation. Vérifie systématiquement ce qu'Odoo offre nativement pour éviter de réinventer la roue.
 
+## Contexte Suite 7 SaaS
+
+**Backend unique** : Odoo 19 (101 modèles, 764 endpoints, multi-tenant)
+**7 SaaS** partagent ce backend → toute extension Odoo bénéficie potentiellement à plusieurs SaaS :
+
+| Domaine Odoo | SaaS Bénéficiaires |
+|---|---|
+| `finance` | Quelyos Finance, Quelyos Retail |
+| `stock` | Quelyos Copilote, Quelyos Retail |
+| `hr` | Quelyos Team, Quelyos Copilote |
+| `crm` + `marketing` | Quelyos Sales, Quelyos Support |
+| `pos` + `store` | Quelyos Retail, Quelyos Store |
+| `support` | Quelyos Support |
+
+**Plan détaillé** : `docs/QUELYOS_SUITE_7_SAAS_PLAN.md`
+
 ## Objectif
 
 **Question centrale** : "Est-ce qu'Odoo offre déjà cette fonctionnalité nativement ?"
@@ -12,6 +28,7 @@ Cette commande force une analyse avant de coder pour :
 1. **Identifier** les modules/modèles Odoo natifs pertinents
 2. **Évaluer** si hériter/étendre est préférable à créer from scratch
 3. **Décider** la meilleure approche (natif, héritage, ou custom)
+4. **Identifier** quels SaaS bénéficient de l'extension
 
 ---
 

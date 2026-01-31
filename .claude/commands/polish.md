@@ -14,6 +14,8 @@ Analyse et améliore une page/composant en appliquant les standards UX/UI modern
 - `/polish backoffice/src/pages/Categories.tsx`
 - `/polish CategoryTree component`
 - `/polish useProducts hook`
+- `/polish apps/finance-os/src/pages/Dashboard.tsx` (SaaS page)
+- `/polish packages/ui-kit/src/Button.tsx` (shared component)
 
 ## Workflow de la commande
 

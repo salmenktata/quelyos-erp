@@ -25,7 +25,8 @@
   },
   "scripts": {
     "lint": "echo 'Skipping lint for ui package'",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "build": "echo 'No build step'"
   },
   "peerDependencies": {
     "react": "^18.3.0",

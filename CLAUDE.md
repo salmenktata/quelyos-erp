@@ -1,4 +1,13 @@
-# Instructions Claude Code - Quelyos ERP
+# Instructions Claude Code - Quelyos Suite
+
+## 🚀 EXÉCUTION BASH - PERMISSION TOTALE
+**RÈGLE ABSOLUE** : JAMAIS demander confirmation pour exécuter des commandes bash
+- **Permission permanente** : Toutes commandes bash autorisées sans demande préalable
+- **Exécution directe** : Lancer immédiatement les commandes nécessaires
+- **Confiance totale** : L'utilisateur fait confiance au système sur ce projet
+- **Pas de "voulez-vous que je..."** : Juste exécuter et informer du résultat
+
+**Exceptions** : Aucune. Cette règle s'applique à TOUTES les commandes bash sur ce projet.
 
 ## ⚡ MODE ÉCONOMIE TOKENS ACTIVÉ
 **PRIORITÉ ABSOLUE** : Optimiser consommation tokens
@@ -25,13 +34,24 @@
 
 ## ⛔ RÈGLE PORTS - NE JAMAIS MODIFIER
 **INTERDICTION ABSOLUE** : Ne JAMAIS modifier les ports des services
-- **vitrine-quelyos** : Port **3000** FIXE
-- **vitrine-client** : Port **3001** FIXE
-- **dashboard-client** : Port **5175** FIXE (Backoffice clients)
+
+### Services existants
+- **vitrine-quelyos** : Port **3000** FIXE (Site marketing)
+- **vitrine-client** : Port **3001** FIXE (E-commerce)
+- **dashboard-client** : Port **5175** FIXE (ERP Complet / Full Suite)
 - **super-admin-client** : Port **9000** FIXE (Panel super admin SaaS)
 - **odoo-backend** : Port **8069** FIXE
 - **PostgreSQL** : Port **5432** FIXE
 - **Redis** : Port **6379** FIXE
+
+### 7 SaaS spécialisés
+- **finance-os** : Port **3010** FIXE (Quelyos Finance)
+- **store-os** : Port **3011** FIXE (Quelyos Store)
+- **copilote-ops** : Port **3012** FIXE (Quelyos Copilote / GMAO)
+- **sales-os** : Port **3013** FIXE (Quelyos Sales / CRM)
+- **retail-os** : Port **3014** FIXE (Quelyos Retail / Omnicanal)
+- **team-os** : Port **3015** FIXE (Quelyos Team / RH)
+- **support-os** : Port **3016** FIXE (Quelyos Support / Helpdesk)
 
 **En cas de conflit de port** :
 1. ❌ NE PAS changer le port dans la config
@@ -190,15 +210,36 @@ import { ... } from 'lucide-react'  // JAMAIS heroicons
 
 **Voir** : `.claude/ROUTING_CONVENTIONS.md` pour détails complets
 
-**7 modules** : `home`, `finance`, `store`, `stock`, `crm`, `marketing`, `hr`
+**8 modules** : `home`, `finance`, `store`, `stock`, `crm`, `marketing`, `hr`, `pos`
 
 ## Architecture
+
+### Backend unique
+- `odoo-backend/addons/quelyos_api/` : Odoo 19 (API : 8069) — 101 modèles, 764 endpoints
+
+### Frontends existants
 - `vitrine-quelyos/` : Next.js 14 (site vitrine : 3000)
 - `vitrine-client/` : Next.js 16 (e-commerce : 3001)
-- `dashboard-client/` : React + Vite (backoffice : 5175)
-- `odoo-backend/addons/quelyos_api/` : Odoo 19 (API : 8069)
+- `dashboard-client/` : React + Vite (ERP Complet / Full Suite : 5175)
+- `super-admin-client/` : React + Vite (Admin SaaS : 9000)
 
-Voir [ARCHITECTURE.md](ARCHITECTURE.md) pour détails services et ports.
+### 7 SaaS spécialisés (frontends dédiés)
+- `apps/finance-os/` : Quelyos Finance (:3010) — module `finance`
+- `apps/store-os/` : Quelyos Store (:3011) — modules `store` + `marketing`
+- `apps/copilote-ops/` : Quelyos Copilote (:3012) — modules `stock` + GMAO + `hr`
+- `apps/sales-os/` : Quelyos Sales (:3013) — modules `crm` + `marketing`
+- `apps/retail-os/` : Quelyos Retail (:3014) — modules `pos` + `store` + `stock`
+- `apps/team-os/` : Quelyos Team (:3015) — module `hr`
+- `apps/support-os/` : Quelyos Support (:3016) — modules `support` + `crm`
+
+### Packages partagés (monorepo Turborepo)
+- `packages/ui-kit/` : @quelyos/ui-kit (composants React partagés)
+- `packages/api-client/` : @quelyos/api-client (client API partagé)
+- `packages/utils/` : @quelyos/utils (helpers)
+- `packages/logger/` : @quelyos/logger (existant)
+
+Voir [ARCHITECTURE.md](ARCHITECTURE.md) pour détails complets.
+Voir [docs/QUELYOS_SUITE_7_SAAS_PLAN.md](docs/QUELYOS_SUITE_7_SAAS_PLAN.md) pour le plan stratégique 7 SaaS.
 
 ## Guides détaillés
 Voir `.claude/reference/` pour conventions TS/Python, anti-patterns, UX/UI, parité Odoo.
@@ -217,8 +258,12 @@ Voir `.claude/reference/` pour conventions TS/Python, anti-patterns, UX/UI, pari
 
 Alerter AVANT : schéma DB, modèles Odoo, endpoints API
 
-## 🔒 ANONYMISATION ODOO - RÈGLES STRICTES
-**Objectif** : Masquer toute trace d'Odoo dans TOUS les frontends (vitrine-client, dashboard-client ET vitrine-quelyos)
+## 🔒🔒🔒 ANONYMISATION ODOO - PRIORITÉ MAXIMALE
+**OBJECTIF CRITIQUE** : Masquer **TOUTE** trace d'Odoo dans **TOUS** les frontends et SaaS. AUCUN utilisateur final ne doit jamais savoir que le backend est Odoo.
+
+**Périmètre** : vitrine-client, dashboard-client, vitrine-quelyos, super-admin-client, **ET TOUS les 7 SaaS** (apps/finance-os, apps/store-os, apps/copilote-ops, apps/sales-os, apps/retail-os, apps/team-os, apps/support-os)
+
+**Raison stratégique** : Les 7 SaaS Quelyos sont vendus comme des solutions propriétaires. Toute fuite "Odoo" dans l'UI, le code client, les URLs ou les messages d'erreur compromettrait le positionnement commercial.
 
 ### ⚠️ RÈGLE ABSOLUE - À RESPECTER LORS DE L'ÉCRITURE DU CODE
 **JAMAIS écrire "Odoo" ou "odoo" dans** :
@@ -290,22 +335,44 @@ Alerter AVANT : schéma DB, modèles Odoo, endpoints API
 - ❌ `"basé sur Odoo"` → ✅ `"infrastructure ERP"`
 - ❌ `"technologie Odoo"` → ✅ `"technologie open-source"`
 
+### Packages partagés (@quelyos/*)
+**Critique** : Les packages partagés sont utilisés par TOUS les SaaS. Toute référence Odoo dans un package se propage à 7+ apps.
+- ❌ `packages/api-client/src/odoo.ts` → ✅ `packages/api-client/src/client.ts`
+- ❌ `OdooApiClient` → ✅ `ApiClient`
+- ❌ Commentaire `// Odoo XML-RPC` → ✅ `// Backend API`
+
 ### Vérification
-Lancer `/no-odoo` avant chaque commit pour vérifier conformité dans vitrine-client, dashboard-client ET vitrine-quelyos.
+**OBLIGATOIRE** : Lancer `/no-odoo` **AVANT chaque commit** pour vérifier conformité dans :
+- vitrine-client, dashboard-client, vitrine-quelyos, super-admin-client
+- **Tous les 7 SaaS** : apps/finance-os, apps/store-os, apps/copilote-ops, apps/sales-os, apps/retail-os, apps/team-os, apps/support-os
+- **Packages partagés** : packages/ui-kit, packages/api-client, packages/utils
+
+**Tolérance ZÉRO** : Tout mot "Odoo"/"odoo"/"OCA"/"OpenERP" dans le code client = bug CRITIQUE à corriger immédiatement.
 
 ## Commandes disponibles
 **DevOps** : `/ship`, `/commit`, `/deploy`, `/test`, `/security`, `/perf`, `/db-sync`
 **Odoo** : `/upgrade-odoo`, `/restart-odoo`, `/restart-backoffice`, `/restart-vitrine`, `/restart-ecommerce`, `/restart-all`
-**Qualité** : `/polish`, `/parity`, `/coherence`, `/clean`, `/analyze-page`, `/docs`, `/uiux`
+**SaaS** : `/restart-finance`, `/restart-store`, `/restart-copilote`, `/restart-sales`, `/restart-retail`, `/restart-team`, `/restart-support`
+**Qualité** : `/polish`, `/parity`, `/coherence`, `/clean`, `/analyze-page`, `/docs`, `/uiux`, `/saas-parity`
 **Architecture** : `/architect` (analyse architecture), `/leverage` (capitalisation sur existant Odoo vs custom), `/no-odoo` (anonymisation)
 **Développement** : `/evolve` (analyse holistique + développement feature : réflexion, technique, contexte, perspective, amélioration)
 **E-commerce** : `/ecommerce` (audit exploitation Backoffice + roadmap évolutions 2026)
 
+## 🧩 CRÉATION PAGES SAAS - RÈGLES SPÉCIFIQUES
+**Quand on crée/modifie une page dans un SaaS (apps/*)** :
+1. **Toujours** importer depuis `@quelyos/ui-kit` (pas de copie locale)
+2. **Toujours** importer depuis `@quelyos/api-client` (pas de client API local)
+3. **Respecter** le branding du SaaS (`src/config/branding.ts`)
+4. **Vérifier** que la page existe dans `dashboard-client` (source de vérité)
+5. **Ne jamais** ajouter de fonctionnalité à un SaaS qui n'existe pas dans le ERP complet
+
 ## Essentiels
 1. Lire [README.md](README.md), [ARCHITECTURE.md](ARCHITECTURE.md) et [LOGME.md](docs/LOGME.md) en début de session
-2. Utiliser scripts `./scripts/dev-start.sh all` et `./scripts/dev-stop.sh all`
-3. Lire code avant modification
-4. Modifications minimales
-5. Alerter avant modif structurelle Odoo
-6. Logger sécurisé (`@quelyos/logger` au lieu de `console.log`)
-7. Tailwind + Zod uniquement
+2. Lire [docs/QUELYOS_SUITE_7_SAAS_PLAN.md](docs/QUELYOS_SUITE_7_SAAS_PLAN.md) pour le contexte stratégique
+3. Utiliser scripts `./scripts/dev-start.sh all` et `./scripts/dev-stop.sh all`
+4. Lire code avant modification
+5. Modifications minimales
+6. Alerter avant modif structurelle Odoo
+7. Logger sécurisé (`@quelyos/logger` au lieu de `console.log`)
+8. Tailwind + Zod uniquement
+9. Composants partagés via `@quelyos/ui-kit` (pas de duplication entre SaaS)

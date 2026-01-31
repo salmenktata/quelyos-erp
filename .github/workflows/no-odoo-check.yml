@@ -7,6 +7,9 @@ on:
       - 'vitrine-client/src/**'
       - 'dashboard-client/src/**'
       - 'vitrine-quelyos/src/**'
+      - 'super-admin-client/src/**'
+      - 'apps/*/src/**'
+      - 'packages/*/src/**'
 
 jobs:
   check-odoo-references:
@@ -34,6 +37,9 @@ jobs:
             MATCHES=$(grep -rl "$pattern" \
               vitrine-client/src \
               dashboard-client/src \
+              super-admin-client/src \
+              apps/*/src \
+              packages/*/src \
               --include="*.ts" --include="*.tsx" 2>/dev/null \
               | grep -vE "$EXCLUSIONS" || true)
 
@@ -69,6 +75,9 @@ jobs:
             MATCHES=$(grep -rlE "$term" \
               vitrine-client/src \
               dashboard-client/src \
+              super-admin-client/src \
+              apps/*/src \
+              packages/*/src \
               --include="*.ts" --include="*.tsx" 2>/dev/null \
               | grep -vE "$EXCLUSIONS" || true)
 
@@ -108,6 +117,10 @@ jobs:
           for field in "list_price" "default_code" "qty_available" "attribute_lines"; do
             MATCHES=$(grep -rln "\b${field}\b" \
               vitrine-client/src \
+              dashboard-client/src \
+              super-admin-client/src \
+              apps/*/src \
+              packages/*/src \
               --include="*.ts" --include="*.tsx" 2>/dev/null \
               | grep -vE "$EXCLUSIONS" || true)
 

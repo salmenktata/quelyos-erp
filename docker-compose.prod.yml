@@ -112,6 +112,36 @@ services:
       timeout: 3s
       retries: 3
 
+  # ==========================================================================
+  # 7 SaaS Apps (à activer quand les Dockerfiles seront créés)
+  # Ports : finance-os:3010, store-os:3011, copilote-ops:3012,
+  #          sales-os:3013, retail-os:3014, team-os:3015, support-os:3016
+  # ==========================================================================
+  # finance-os:
+  #   build:
+  #     context: ./apps/finance-os
+  #     dockerfile: Dockerfile
+  #   container_name: quelyos-finance-os-prod
+  #   restart: always
+  #   environment:
+  #     NODE_ENV: production
+  #     BACKEND_URL: http://odoo:8069
+  #   networks:
+  #     - quelyos-network
+  #   depends_on:
+  #     - odoo
+
+  # super-admin:
+  #   build:
+  #     context: ./super-admin-client
+  #     dockerfile: Dockerfile
+  #   container_name: quelyos-super-admin-prod
+  #   restart: always
+  #   networks:
+  #     - quelyos-network
+  #   depends_on:
+  #     - odoo
+
   # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine

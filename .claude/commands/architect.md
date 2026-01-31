@@ -1,7 +1,14 @@
 # Commande /architect - Analyse et Optimisation Architecture
 
 ## Description
-Analyse l'architecture technique de Quelyos Suite et propose des améliorations basées sur les patterns enterprise-grade déjà implémentés.
+Analyse l'architecture technique de Quelyos Suite (7 SaaS + ERP complet + backend unique) et propose des améliorations basées sur les patterns enterprise-grade.
+
+## Contexte Architecture
+- **Backend unique** : Odoo 19 (101 modèles, 764 endpoints, multi-tenant)
+- **ERP Complet** : dashboard-client (port 5175) = Full Suite (8 modules)
+- **7 SaaS** : Quelyos Finance (3010), Quelyos Store (3011), Quelyos Copilote (3012), Quelyos Sales (3013), Quelyos Retail (3014), Quelyos Team (3015), Quelyos Support (3016)
+- **Monorepo** : Turborepo + @quelyos/ui-kit + @quelyos/api-client + @quelyos/utils
+- **Plan détaillé** : `docs/QUELYOS_SUITE_7_SAAS_PLAN.md`
 
 ## Utilisation
 ```
@@ -10,13 +17,14 @@ Analyse l'architecture technique de Quelyos Suite et propose des améliorations 
 
 ## Options
 - `status` - Affiche l'état actuel des modules d'architecture
-- `audit` - Audit complet de l'architecture
+- `audit` - Audit complet de l'architecture (inclut cross-SaaS)
 - `optimize` - Propose des optimisations
 - `security` - Focus sur la sécurité
 - `performance` - Focus sur les performances
 - `scalability` - Focus sur la scalabilité
 - `refactor` - Analyse factorisation, simplification et robustesse du code
 - `tenant-isolation` - Analyse isolation et sécurité multi-tenant
+- `saas-architecture` - Analyse architecture monorepo, packages partagés, cohérence cross-SaaS
 
 ## Instructions
 

@@ -1,7 +1,7 @@
 # Commande /restart-all - Relancer Tous les Services
 
 ## Description
-Relance l'intégralité des services du projet Quelyos ERP : Backend Odoo (8069), Backoffice (5175), Site Vitrine (3000) et E-commerce (3001).
+Relance l'intégralité des services du projet Quelyos Suite : Backend Odoo (8069), ERP Complet (5175), Site Vitrine (3000), E-commerce (3001), Super Admin (9000), et les 7 SaaS spécialisés (3010-3016) si leurs dossiers existent.
 
 **Alternative recommandée** : Utiliser `./scripts/dev-start.sh all` pour un contrôle plus granulaire.
 
@@ -16,9 +16,11 @@ Relance l'intégralité des services du projet Quelyos ERP : Backend Odoo (8069)
 ### Étape 1 : Arrêter tous les services existants
 1. Arrêter le Site Vitrine (port 3000)
 2. Arrêter le E-commerce (port 3001)
-3. Arrêter le Backoffice (port 5175)
-4. Arrêter les conteneurs Docker Odoo (port 8069)
-5. Vérifier que tous les ports sont libérés
+3. Arrêter le ERP Complet (port 5175)
+4. Arrêter le Super Admin (port 9000)
+5. Arrêter les 7 SaaS si actifs (ports 3010-3016)
+6. Arrêter les conteneurs Docker Odoo (port 8069)
+7. Vérifier que tous les ports sont libérés
 
 ### Étape 2 : Relancer Backend Odoo
 1. Se placer dans `odoo-odoo-backend/`
@@ -54,25 +56,38 @@ Relance l'intégralité des services du projet Quelyos ERP : Backend Odoo (8069)
 ./scripts/dev-start.sh all
 
 # Ou manuellement :
-# 1. Arrêter tous les processus
+# 1. Arrêter tous les processus (existants + SaaS)
 lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 lsof -ti:3001 | xargs kill -9 2>/dev/null || true
 lsof -ti:5175 | xargs kill -9 2>/dev/null || true
+lsof -ti:9000 | xargs kill -9 2>/dev/null || true
+# SaaS (si actifs)
+for port in 3010 3011 3012 3013 3014 3015 3016; do
+  lsof -ti:$port | xargs kill -9 2>/dev/null || true
+done
 cd odoo-backend && docker-compose down
 
 # 2. Relancer Backend Odoo
 cd odoo-backend && docker-compose up -d
 
-# 3. Relancer Backoffice
-cd dashboard-client && npm run dev &
+# 3. Relancer ERP Complet (Full Suite)
+cd dashboard-client && pnpm dev &
 
 # 4. Nettoyer cache + Relancer Site Vitrine
 rm -rf vitrine-quelyos/.next
-cd vitrine-quelyos && npm run dev &
+cd vitrine-quelyos && pnpm dev &
 
 # 5. Nettoyer cache + Relancer E-commerce
 rm -rf vitrine-client/.next
-cd vitrine-client && npm run dev &
+cd vitrine-client && pnpm dev &
+
+# 6. Relancer Super Admin
+cd super-admin-client && pnpm dev &
+
+# 7. Relancer les SaaS disponibles (si dossier existe)
+for saas in finance-os store-os copilote-ops sales-os retail-os team-os support-os; do
+  [ -d "apps/$saas" ] && (cd "apps/$saas" && pnpm dev &)
+done
 ```
 
 ## Messages de sortie attendus
@@ -97,11 +112,20 @@ cd vitrine-client && npm run dev &
 ✅ Tous les services sont opérationnels !
 
 📋 Services actifs :
-   • Site Vitrine : http://localhost:3000 (marketing, finance, superadmin)
-   • E-commerce   : http://localhost:3001 (boutique en ligne)
-   • Backoffice   : http://localhost:5175 (administration)
-   • API Odoo     : http://localhost:8069/api/ecommerce/*
-   • Interface    : http://localhost:8069 (admin/admin)
+   • Site Vitrine  : http://localhost:3000 (marketing)
+   • E-commerce    : http://localhost:3001 (boutique en ligne)
+   • ERP Complet   : http://localhost:5175 (Full Suite)
+   • Super Admin   : http://localhost:9000 (admin SaaS)
+   • API Backend   : http://localhost:8069/api/*
+
+📋 SaaS actifs :
+   • Quelyos Finance    : http://localhost:3010
+   • Quelyos Store      : http://localhost:3011
+   • Quelyos Copilote  : http://localhost:3012
+   • Quelyos Sales      : http://localhost:3013
+   • Quelyos Retail     : http://localhost:3014
+   • Quelyos Team       : http://localhost:3015
+   • Quelyos Support    : http://localhost:3016
 ```
 
 ### Erreur

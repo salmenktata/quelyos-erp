@@ -75,6 +75,27 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # ==========================================================================
+      # BUILD & PUSH - 7 SaaS Apps (only if directory exists)
+      # ==========================================================================
+      - name: Build and push SaaS Apps
+        run: |
+          SAAS_APPS="finance-os store-os copilote-ops sales-os retail-os team-os support-os"
+          for app in $SAAS_APPS; do
+            if [ -d "apps/$app" ] && [ -f "apps/$app/Dockerfile" ]; then
+              echo "Building $app..."
+              docker buildx build \
+                --platform linux/amd64 \
+                -t ghcr.io/${{ github.repository }}/$app:${{ github.sha }} \
+                -t ghcr.io/${{ github.repository }}/$app:latest \
+                -f apps/$app/Dockerfile \
+                --push \
+                apps/$app
+            else
+              echo "Skipping $app (no directory or Dockerfile)"
+            fi
+          done
+
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:

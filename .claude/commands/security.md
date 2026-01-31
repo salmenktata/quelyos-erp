@@ -2,7 +2,7 @@
 
 ## Description
 
-Effectue un audit de sécurité complet du système tri-couche (Backend Odoo ↔ Backoffice React ↔ Frontend Next.js) en détectant les vulnérabilités OWASP Top 10, les secrets exposés, les logs non sécurisés, et les mauvaises pratiques de sécurité.
+Effectue un audit de sécurité complet de la Quelyos Suite (Backend Odoo + ERP Complet + 7 SaaS + Frontends publics) en détectant les vulnérabilités OWASP Top 10, les secrets exposés, les logs non sécurisés, et les mauvaises pratiques de sécurité.
 
 ## Usage
 
@@ -12,7 +12,9 @@ Effectue un audit de sécurité complet du système tri-couche (Backend Odoo ↔
 /security backend          # Audit backend (SQL injection, sudo() abusif, validation)
 /security deps             # Audit dépendances (npm audit + safety Python)
 /security api              # Audit API (auth, rate limiting, CORS)
-/security                  # Audit complet (tous les scopes)
+/security saas             # Audit sécurité des 7 SaaS (isolation tenant, secrets, auth)
+/security tenant           # Audit isolation multi-tenant (cross-tenant access, RLS)
+/security                  # Audit complet (tous les scopes incluant SaaS)
 ```
 
 ## Workflow

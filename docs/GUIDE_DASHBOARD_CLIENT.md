@@ -1,16 +1,20 @@
-# Guide pratique — Dashboard Client (Backoffice)
+# Guide pratique — Dashboard Client (ERP Complet / Full Suite)
 
-Ce guide présente **l’usage fonctionnel** et **le démarrage rapide** du backoffice `dashboard-client/`.  
-Public visé : informaticien non‑expert qui souhaite comprendre l’outil et l’utiliser efficacement.
+Ce guide présente **l'usage fonctionnel** et **le démarrage rapide** du backoffice `dashboard-client/`.
+Public visé : informaticien non‑expert qui souhaite comprendre l'outil et l'utiliser efficacement.
 
 ---
 
-## 1) Vue d’ensemble (simplifiée)
+## 1) Vue d'ensemble (simplifiée)
 
-Le backoffice est une application **React + Vite** qui consomme l’API d’Odoo.
+Le backoffice est une application **React + Vite** qui consomme l'API d'Odoo. Il constitue le **ERP Complet (Full Suite)** regroupant les 8 modules : Finance, Store, Stock, CRM, Marketing, HR, POS, Support.
+
+Les **7 SaaS Quelyos** (Quelyos Finance, Store, Copilote, Sales, Retail, Team, Support) sont des frontends dédiés qui exposent 1 à 3 modules chacun, tandis que le dashboard-client offre l'ensemble.
 
 ```
 Navigateur ──> dashboard-client (5175) ──> /api/* ──> odoo-backend (8069) ──> PostgreSQL/Redis
+                                                          ↑
+7 SaaS (ports 3010-3016) ──> /api/* ─────────────────────┘
 ```
 
 ---

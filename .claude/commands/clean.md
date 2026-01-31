@@ -6,12 +6,14 @@ Analyse, nettoie et organise les fichiers du projet en identifiant les élément
 ## Usage
 
 ```bash
-/clean              # Analyse complète du projet
+/clean              # Analyse complète du projet (tous services)
 /clean --dry-run    # Analyse sans suppression (rapport seulement)
 /clean vitrine      # Nettoyer site vitrine (vitrine-quelyos)
 /clean ecommerce    # Nettoyer e-commerce (vitrine-client)
 /clean backoffice   # Nettoyer backoffice (dashboard-client)
 /clean backend      # Nettoyer backend (odoo-backend)
+/clean saas         # Nettoyer tous les 7 SaaS (apps/)
+/clean packages     # Nettoyer packages partagés (packages/)
 ```
 
 **Exemples** :

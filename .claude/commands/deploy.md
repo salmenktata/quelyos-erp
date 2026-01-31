@@ -2,7 +2,19 @@
 
 ## Description
 
-Prépare et valide le déploiement du système tri-couche (Backend Odoo ↔ Backoffice React ↔ Frontend Next.js) en production ou staging, avec checklist stricte garantissant 0 régression et 100% de parité fonctionnelle.
+Prépare et valide le déploiement de la Quelyos Suite complète (Backend Odoo + ERP Complet + 7 SaaS + Frontends publics) en production ou staging, avec checklist stricte garantissant 0 régression et 100% de parité fonctionnelle.
+
+## Contexte Suite 7 SaaS
+
+**Services à déployer** :
+- Backend Odoo (port 8069) - PostgreSQL + Redis
+- ERP Complet (dashboard-client, port 5175)
+- Site Vitrine (vitrine-quelyos, port 3000)
+- E-commerce (vitrine-client, port 3001)
+- Super Admin (super-admin-client, port 9000)
+- 7 SaaS : Quelyos Finance (3010), Quelyos Store (3011), Quelyos Copilote (3012), Quelyos Sales (3013), Quelyos Retail (3014), Quelyos Team (3015), Quelyos Support (3016)
+
+**Packages partagés** : @quelyos/ui-kit, @quelyos/api-client, @quelyos/utils (build avant les apps)
 
 ## Usage
 
@@ -10,6 +22,7 @@ Prépare et valide le déploiement du système tri-couche (Backend Odoo ↔ Back
 /deploy staging            # Prépare déploiement staging (checklist allégée)
 /deploy production         # Prépare déploiement production (checklist stricte)
 /deploy                    # Alias pour production
+/deploy saas [name]        # Déployer un SaaS spécifique (ex: /deploy saas finance)
 ```
 
 ## Workflow

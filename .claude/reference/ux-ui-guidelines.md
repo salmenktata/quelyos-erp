@@ -24,6 +24,21 @@
 - Mode clair : shadow-sm (repos), shadow-md (hover), shadow-lg (modals)
 - Mode sombre : pas d'ombre, utiliser border subtile
 
+## Branding SaaS (7 identités)
+
+Chaque SaaS a sa couleur primaire distincte :
+| SaaS | Couleur Primaire | Hex |
+|------|-----------------|-----|
+| Quelyos Finance | Emerald 600 | `#059669` |
+| Quelyos Store | Violet 600 | `#7C3AED` |
+| Quelyos Copilote | Orange 600 | `#EA580C` |
+| Quelyos Sales | Blue 600 | `#2563EB` |
+| Quelyos Retail | Red 600 | `#DC2626` |
+| Quelyos Team | Cyan 600 | `#0891B2` |
+| Quelyos Support | Purple 600 | `#9333EA` |
+
+**Règle** : Chaque app SaaS utilise sa couleur comme `primaryColor` dans Tailwind. Le sous-titre "by Quelyos" apparait partout.
+
 ## Patterns Backoffice
 - Sidebar 240-280px avec icônes + labels
 - Tableaux : dense mais lisible, skeleton loading, filtres, recherche debounce 300ms

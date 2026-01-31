@@ -1,45 +1,56 @@
-# Quelyos
+# Quelyos Suite
 
-Frontend e-commerce + Backoffice admin modernes pour Odoo 19 Community.
+Suite de **7 SaaS spécialisés** partageant un backend unique Odoo 19 Community.
 
 ## Vision
 
-Remplacer les interfaces Odoo (site e-commerce, gestion produits) par des vues modernes tout en gardant le cœur Odoo (modèles, ORM, base de données).
+Transformer un ERP monolithique en **suite de SaaS ciblés** : chaque SaaS = package transparent de 1-3 modules avec frontend dédié, branding propre et pricing indépendant. Le tout propulsé par un backend unique (101 modèles, 764 endpoints API).
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│              FRONTEND (Next.js)                          │
-│              Boutique e-commerce                         │
-└─────────────────────┬───────────────────────────────────┘
-                      │
-┌─────────────────────┴───────────────────────────────────┐
-│              BACKOFFICE (React)                          │
-│              Gestion produits, commandes                 │
-└─────────────────────┬───────────────────────────────────┘
-                      │ API REST
-┌─────────────────────┴───────────────────────────────────┐
-│              ODOO 19 Community                           │
-│              Modèles, ORM, Base de données               │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│   1 BACKEND UNIQUE (Odoo 19 + PostgreSQL + Redis)            │
+│   101 modèles · 764 endpoints API · Multi-tenant             │
+└──────────────────────────┬───────────────────────────────────┘
+                           │ REST API
+    ┌──────┬──────┬────────┼────────┬──────┬──────┬──────┐
+    │      │      │        │        │      │      │      │
+  Finance Store Copilote Sales  Retail  Team Support  ERP
+   OS      OS    Ops      OS     OS     OS    OS    Complet
+  :3010  :3011  :3012   :3013  :3014  :3015 :3016  :5175
 ```
 
 ## Structure
 
 ```
-vitrine-quelyos/   → Next.js 14 (site vitrine : marketing, finance, superadmin)
-vitrine-client/    → Next.js 16 (boutique e-commerce)
-dashboard-client/  → React 19 + Vite (backoffice admin)
-odoo-backend/
-  ├── addons/
-  │   └── quelyos_api/  → Module Odoo (API REST)
-  ├── docker-compose.yml
-  └── reset.sh          → Script reset installation
-scripts/           → Scripts de gestion (dev-start.sh, dev-stop.sh)
-config/            → Configuration Odoo
-nginx/             → Config production
+vitrine-quelyos/       → Next.js 14 (site marketing : 3000)
+vitrine-client/        → Next.js 16 (boutique e-commerce : 3001)
+dashboard-client/      → React 19 + Vite (ERP Complet / Full Suite : 5175)
+super-admin-client/    → React + Vite (Admin SaaS : 9000)
+
+apps/                  → 7 SaaS spécialisés (frontends dédiés)
+  ├── finance-os/      → Quelyos Finance (:3010)
+  ├── store-os/        → Quelyos Store (:3011)
+  ├── copilote-ops/    → Quelyos Copilote (:3012)
+  ├── sales-os/        → Quelyos Sales (:3013)
+  ├── retail-os/       → Quelyos Retail (:3014)
+  ├── team-os/         → Quelyos Team (:3015)
+  └── support-os/      → Quelyos Support (:3016)
+
+packages/              → Packages partagés (monorepo Turborepo)
+  ├── ui-kit/          → @quelyos/ui-kit (composants React)
+  ├── api-client/      → @quelyos/api-client (client API)
+  ├── utils/           → @quelyos/utils (helpers)
+  └── logger/          → @quelyos/logger
+
+odoo-backend/          → Backend Odoo 19 (API REST : 8069)
+  ├── addons/          → 6 modules Quelyos natifs
+  └── docker-compose.yml
+
+scripts/               → Scripts de gestion (dev-start.sh, dev-stop.sh)
 ```
 
-**Voir [ARCHITECTURE.md](ARCHITECTURE.md)** pour la documentation complète des services et ports.
+**Voir [ARCHITECTURE.md](ARCHITECTURE.md)** pour la documentation complète.
+**Voir [docs/QUELYOS_SUITE_7_SAAS_PLAN.md](docs/QUELYOS_SUITE_7_SAAS_PLAN.md)** pour le plan stratégique 7 SaaS.
 
 ## Stack
 

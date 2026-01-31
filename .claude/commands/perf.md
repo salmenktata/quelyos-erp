@@ -7,17 +7,22 @@ Analyse les performances du système tri-couche (Backend Odoo ↔ Backoffice Rea
 **Services analysés** :
 - Site Vitrine (vitrine-quelyos : 3000)
 - E-commerce (vitrine-client : 3001)
-- Backoffice (dashboard-client : 5175)
+- ERP Complet (dashboard-client : 5175)
+- Super Admin (super-admin-client : 9000)
+- 7 SaaS : Quelyos Finance (3010), Quelyos Store (3011), Quelyos Copilote (3012), Quelyos Sales (3013), Quelyos Retail (3014), Quelyos Team (3015), Quelyos Support (3016)
 
 ## Usage
 
 ```bash
 /perf vitrine              # Analyse Lighthouse + bundle site vitrine (3000)
 /perf ecommerce            # Analyse Lighthouse + bundle e-commerce (3001)
-/perf backoffice           # Analyse Lighthouse + bundle backoffice React
+/perf backoffice           # Analyse Lighthouse + bundle backoffice React (5175)
 /perf api                  # Profiling endpoints API Odoo (> 1s)
 /perf images               # Analyse optimisation images (WebP, lazy loading)
-/perf                      # Analyse complète (tous services + API + images)
+/perf saas                 # Analyse Lighthouse + bundle de tous les SaaS (3010-3016)
+/perf saas [name]          # Analyse un SaaS spécifique (ex: /perf saas finance)
+/perf packages             # Analyse taille des packages partagés (@quelyos/ui-kit, etc.)
+/perf                      # Analyse complète (tous services + API + images + SaaS)
 ```
 
 ## Standards de Performance (UX 2026)

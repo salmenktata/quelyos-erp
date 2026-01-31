@@ -6,9 +6,22 @@ Commande d'analyse et développement holistique pour créer, compléter ou faire
 
 1. **🧠 Réflexion** - Analyse approfondie avant action
 2. **⚙️ Technique & Fonctionnelle** - Aspects tech + métier
-3. **🌍 Contexte** - Écosystème et dépendances existantes
+3. **🌍 Contexte** - Écosystème et dépendances existantes (ERP + 7 SaaS)
 4. **🔭 Perspective** - Vision court/moyen/long terme
 5. **✨ Amélioration** - Optimisation continue et qualité
+
+## Contexte Suite 7 SaaS
+
+**Architecture** : Backend unique Odoo 19 + ERP Complet (port 5175) + 7 SaaS spécialisés (ports 3010-3016)
+**Monorepo** : Turborepo + @quelyos/ui-kit + @quelyos/api-client + @quelyos/utils
+
+**Impact cross-SaaS** : Toute évolution doit évaluer son impact sur :
+- Le backend partagé (bénéficie à tous)
+- Le ERP Complet (dashboard-client)
+- Les SaaS concernés (Quelyos Finance, Quelyos Store, Quelyos Copilote, Quelyos Sales, Quelyos Retail, Quelyos Team, Quelyos Support)
+- Les packages partagés (@quelyos/ui-kit, @quelyos/api-client)
+
+**Plan détaillé** : `docs/QUELYOS_SUITE_7_SAAS_PLAN.md`
 
 ---
 

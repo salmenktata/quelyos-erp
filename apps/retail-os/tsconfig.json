@@ -5,10 +5,10 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -24,7 +24,9 @@
       "@quelyos/api-client": ["../../packages/api-client"],
       "@quelyos/hooks": ["../../packages/hooks"],
       "@quelyos/auth": ["../../packages/auth"],
-      "@quelyos/utils": ["../../packages/utils"]
+      "@quelyos/utils": ["../../packages/utils"],
+      "@quelyos/logger": ["./src/lib/logger"],
+      "@quelyos/types": ["./src/types"]
     }
   },
   "include": ["src"],

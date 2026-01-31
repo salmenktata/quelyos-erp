@@ -1,9 +1,13 @@
 # Commande /no-odoo - Détection Références Odoo UI
 
 ## Description
-Audit et correction des mentions "Odoo" visibles par utilisateurs finaux dans les interfaces frontend et backoffice.
+**PRIORITÉ MAXIMALE** : Audit et correction de TOUTE mention "Odoo" visible dans les interfaces utilisateur. Aucun utilisateur final des 7 SaaS Quelyos ou du ERP Complet ne doit savoir que le backend est Odoo.
 
-**Exception** : `frontend/src/app/legal/page.tsx` préservée pour conformité licence LGPL-3.0.
+**Périmètre complet** : vitrine-client, dashboard-client, vitrine-quelyos, super-admin-client, **tous les 7 SaaS** (apps/*), **packages partagés** (packages/*)
+
+**Exception unique** : `vitrine-client/src/app/legal/page.tsx` préservée pour conformité licence LGPL-3.0.
+
+**Raison** : Les SaaS Quelyos sont vendus comme solutions propriétaires. Toute fuite "Odoo" compromet le positionnement commercial.
 
 ## Usage
 ```bash
@@ -14,7 +18,7 @@ Audit et correction des mentions "Odoo" visibles par utilisateurs finaux dans le
 ## Workflow
 
 ### Étape 1 : Détection Code Source
-**Cibles** : `vitrine-client/src/`, `dashboard-client/src/`, `vitrine-quelyos/`
+**Cibles** : `vitrine-client/src/`, `dashboard-client/src/`, `vitrine-quelyos/`, `super-admin-client/src/`, `apps/*/src/`, `packages/*/src/`
 
 **Exclusions** :
 - `lib/odoo/`, `lib/backend/` - Code API interne
@@ -24,7 +28,7 @@ Audit et correction des mentions "Odoo" visibles par utilisateurs finaux dans le
 
 **Commande Grep** :
 ```bash
-grep -rE "Odoo|odoo" vitrine-client/src dashboard-client/src vitrine-quelyos \
+grep -rE "Odoo|odoo" vitrine-client/src dashboard-client/src vitrine-quelyos super-admin-client/src apps/*/src packages/*/src 2>/dev/null \
   --include="*.tsx" --include="*.ts" \
   | grep -vE "legal/|api-anonymizer|\.test\.|lib/backend/"
 ```
