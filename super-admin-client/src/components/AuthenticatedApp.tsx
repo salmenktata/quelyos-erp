@@ -23,6 +23,7 @@ import { Settings } from '@/pages/Settings'
 import { EmailSettings } from '@/pages/EmailSettings'
 import { Sitemap } from '@/pages/Sitemap'
 import { SeedData } from '@/pages/SeedData'
+import { InstallWizardPage } from '@/pages/InstallWizardPage'
 import { InactivityWarning } from './InactivityWarning'
 import { useInactivityLogout } from '@/hooks/useInactivityLogout'
 import { useAuth } from '@/hooks/useAuth'
@@ -55,6 +56,7 @@ function PageViewTracker() {
       '/email-settings': 'Email Settings',
       '/sitemap': 'Sitemap',
       '/seed-data': 'Seed Data',
+      '/tenants/install': 'Install Wizard',
     }
 
     // Gérer les routes dynamiques (ex: /customers/:id/tickets)
@@ -101,6 +103,7 @@ export function AuthenticatedApp() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="tenants" element={<Tenants />} />
+          <Route path="tenants/install" element={<InstallWizardPage />} />
           <Route path="plans" element={<Plans />} />
           <Route path="subscriptions" element={<Subscriptions />} />
           <Route path="billing" element={<Billing />} />

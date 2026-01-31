@@ -12,7 +12,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Search, Eye, Plus, Loader2, X, Pause, Play, ArrowUpDown, AlertTriangle, History } from 'lucide-react'
+import { Search, Eye, Plus, Loader2, X, Pause, Play, ArrowUpDown, AlertTriangle, History, Sparkles } from 'lucide-react'
 import { api } from '@/lib/api/gateway'
 import { TenantsResponseSchema, PlansResponseSchema, validateApiResponse } from '@/lib/validators'
 import type { Tenant, Plan } from '@/lib/validators'
@@ -157,13 +157,22 @@ export function Tenants() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestion des Tenants</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">{total} tenants au total</p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition"
-        >
-          <Plus className="w-4 h-4" />
-          Créer Tenant
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/tenants/install')}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 dark:from-teal-500 dark:to-emerald-500 dark:hover:from-teal-600 dark:hover:to-emerald-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg"
+          >
+            <Sparkles className="w-4 h-4" />
+            Installation Guidée
+          </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 text-white rounded-lg transition"
+          >
+            <Plus className="w-4 h-4" />
+            Créer Tenant
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
