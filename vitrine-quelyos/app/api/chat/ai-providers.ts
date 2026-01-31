@@ -29,7 +29,7 @@ interface AIResponse {
 const SYSTEM_PROMPT = `Tu es l'assistant virtuel de Quelyos Suite, une plateforme ERP française pour TPE/PME.
 
 🏢 CONTEXTE ENTREPRISE :
-- 8 modules intégrés : Finance (IA prévisions 90j), Boutique, CRM, Stock, RH, POS, Marketing, Dashboard
+- 9 modules intégrés : Finance (IA prévisions 90j), Store, CRM, Stock, RH, POS, Marketing, Support, Home
 - Toutes les données synchronisées automatiquement entre modules
 - IA de prévision trésorerie : précision 85-90% sur 90 jours
 - Hébergement 100% France, certifié ISO 27001
@@ -38,7 +38,7 @@ const SYSTEM_PROMPT = `Tu es l'assistant virtuel de Quelyos Suite, une plateform
 
 💰 TARIFS :
 - Starter : 19€/mois (3 users, Finance + 2 modules au choix, IA 12 mois)
-- Business : 49€/mois (10 users, tous les 8 modules, IA 24 mois, API complète) ⭐ Meilleur rapport
+- Business : 49€/mois (10 users, tous les 9 modules, IA 24 mois, API complète) ⭐ Meilleur rapport
 - Enterprise : Sur devis (users illimités, SLA 99.9%, account manager dédié)
 - 🎁 30 jours d'essai gratuit SANS carte bancaire sur tous les plans
 
@@ -276,7 +276,7 @@ function extractSuggestionsFromText(text: string): string[] {
   }
 
   if (text.toLowerCase().includes('module') || text.toLowerCase().includes('fonctionnalité')) {
-    suggestions.push('Découvrir les 8 modules', 'Voir des démos');
+    suggestions.push('Découvrir les 9 modules', 'Voir des démos');
   }
 
   if (text.toLowerCase().includes('essai') || text.toLowerCase().includes('gratuit')) {

@@ -52,7 +52,7 @@ const knowledgeBase = {
     keywords: ['prix', 'tarif', 'coût', 'combien', 'abonnement', 'payer', 'gratuit', 'essai'],
     responses: [
       {
-        text: "Quelyos Suite propose 3 formules :\n\n**Starter (19€/mois)** : 3 utilisateurs, Finance + 2 modules au choix, prévisions IA 12 mois\n\n**Business (49€/mois)** : 10 utilisateurs, tous les 8 modules, prévisions IA 24 mois, API complète\n\n**Enterprise (sur devis)** : Utilisateurs illimités, SLA 99.9%, support dédié\n\n✨ 30 jours d'essai gratuit sans carte bancaire sur tous les plans !",
+        text: "Quelyos Suite propose 3 formules :\n\n**Starter (19€/mois)** : 3 utilisateurs, Finance + 2 modules au choix, prévisions IA 12 mois\n\n**Business (49€/mois)** : 10 utilisateurs, tous les 9 modules, prévisions IA 24 mois, API complète\n\n**Enterprise (sur devis)** : Utilisateurs illimités, SLA 99.9%, support dédié\n\n✨ 30 jours d'essai gratuit sans carte bancaire sur tous les plans !",
         confidence: 0.95,
         suggestions: ['Voir le comparatif détaillé', 'Démarrer l\'essai gratuit', 'Contacter un commercial']
       }
@@ -63,7 +63,7 @@ const knowledgeBase = {
     keywords: ['module', 'fonctionnalité', 'fonction', 'finance', 'stock', 'crm', 'boutique', 'rh', 'pos', 'marketing', 'dashboard'],
     responses: [
       {
-        text: "Quelyos Suite intègre 8 modules synchronisés automatiquement :\n\n💰 **Finance** : Trésorerie, prévisions IA 90j, budgets\n🛍️ **Boutique** : E-commerce, catalogue, commandes\n👥 **CRM** : Clients, pipeline, devis et factures\n📦 **Stock** : Multi-sites, alertes, valorisation\n👔 **RH** : Employés, congés, pointage\n💳 **Point de Vente** : Caisse tactile, Click & Collect\n📧 **Marketing** : Campagnes email/SMS, audiences\n📊 **Dashboard** : KPIs consolidés temps réel\n\nTous les modules partagent les mêmes données pour une gestion unifiée.",
+        text: "Quelyos Suite intègre 9 modules synchronisés automatiquement :\n\n💰 **Finance** : Trésorerie, prévisions IA 90j, budgets\n🛍️ **Store** : E-commerce, catalogue, commandes\n👥 **CRM** : Clients, pipeline, devis et factures\n📦 **Stock** : Multi-sites, alertes, valorisation\n👔 **RH** : Employés, congés, pointage\n💳 **POS** : Caisse tactile, Click & Collect\n📧 **Marketing** : Campagnes email/SMS, audiences\n🎧 **Support** : Tickets, helpdesk\n🏠 **Home** : Dashboard KPIs temps réel\n\nTous les modules partagent les mêmes données pour une gestion unifiée.",
         confidence: 0.92,
         suggestions: ['Voir les détails des modules', 'Demander une démo', 'Comparer avec la concurrence']
       }
@@ -74,7 +74,7 @@ const knowledgeBase = {
     keywords: ['inscription', 'inscri', 'créer', 'compte', 'commencer', 'démarrer', 'enregistrer', 'register'],
     responses: [
       {
-        text: "Pour créer votre compte Quelyos Suite, c'est très simple :\n\n1️⃣ Cliquez sur **'Essai gratuit'** en haut de la page\n2️⃣ Renseignez vos informations (email, nom d'entreprise, mot de passe)\n3️⃣ Validez votre email\n4️⃣ Configurez vos premiers modules\n\n⏱️ Installation en **5 minutes** • 🎁 **30 jours gratuits** • 💳 **Sans CB**\n\nVous avez accès immédiat aux 8 modules !",
+        text: "Pour créer votre compte Quelyos Suite, c'est très simple :\n\n1️⃣ Cliquez sur **'Essai gratuit'** en haut de la page\n2️⃣ Renseignez vos informations (email, nom d'entreprise, mot de passe)\n3️⃣ Validez votre email\n4️⃣ Configurez vos premiers modules\n\n⏱️ Installation en **5 minutes** • 🎁 **30 jours gratuits** • 💳 **Sans CB**\n\nVous avez accès immédiat aux 9 modules !",
         confidence: 0.93,
         suggestions: ['Créer mon compte maintenant', 'Voir la vidéo démo', 'Questions fréquentes']
       }
@@ -224,7 +224,7 @@ function detectIntent(message: string, history?: ChatMessage[]): ChatResponse {
   // Réponse par défaut si aucune correspondance
   return {
     response: "Je n'ai pas bien compris votre question. 🤔\n\nPouvez-vous reformuler ou choisir parmi ces sujets populaires ?\n\nVous pouvez aussi contacter directement notre support à support@quelyos.com pour une réponse personnalisée.",
-    suggestions: ['Tarifs et plans', 'Les 8 modules', 'Créer un compte', 'Support technique', 'Sécurité RGPD'],
+    suggestions: ['Tarifs et plans', 'Les 9 modules', 'Créer un compte', 'Support technique', 'Sécurité RGPD'],
     confidence: 0.3,
     intent: 'unknown',
     requiresHuman: true

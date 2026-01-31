@@ -41,7 +41,7 @@ On a 3 formules pensées pour chaque étape de ta croissance :
 
 **🟢 Essentiel - 49€/mois**
 Parfait pour démarrer !
-→ Les 8 modules complets
+→ Les 9 modules complets
 → 5 utilisateurs inclus
 → 10 Go de stockage
 → Support par email
@@ -75,13 +75,16 @@ Détails complets : https://quelyos.com/tarifs"""
 
 Quelyos, c'est **LA suite ERP française** qui simplifie la vie des TPE/PME. Imagine pouvoir gérer toute ton entreprise depuis une seule plateforme moderne et intuitive !
 
-🎯 **Nos 8 modules qui travaillent ensemble** :
+🎯 **Nos 9 modules qui travaillent ensemble** :
 - 💰 **Finance** → Trésorerie IA, factures, compta
 - 👥 **CRM** → Clients, opportunités, suivi commercial
 - 📦 **Stock** → Inventaire temps réel, alertes auto
-- 🏪 **E-commerce** → Ta boutique en ligne en 30 min
+- 🏪 **Store** → Ta boutique en ligne en 30 min
 - 👔 **RH** → Congés, absences, contrats
 - 📍 **Point de Vente** → Caisse tactile pro
+- 📢 **Marketing** → Campagnes email/SMS, automation
+- 🎧 **Support** → Tickets, helpdesk
+- 🏠 **Home** → Dashboard KPIs
 - 📢 **Marketing** → Campagnes email/SMS
 - 🧠 **IA native** → Prévisions et analyses intelligentes
 
@@ -98,7 +101,7 @@ Tu veux en savoir plus sur un module en particulier ?"""
     {
         "keywords": ["modules", "fonctionnalités", "features", "options", "que faire"],
         "question": "Quels modules propose Quelyos ?",
-        "answer": """Quelyos intègre **8 modules professionnels** :
+        "answer": """Quelyos intègre **9 modules professionnels** :
 
 **💰 Quelyos Finance**
 Trésorerie IA, factures, devis, comptabilité, rapprochement bancaire
@@ -132,7 +135,7 @@ Tous les modules sont **inclus dans chaque abonnement** !"""
         "answer": """Oui ! Quelyos propose un **essai gratuit de 14 jours** :
 
 ✅ **Sans carte bancaire** (pas de paiement automatique)
-✅ **Accès complet** aux 8 modules
+✅ **Accès complet** aux 9 modules
 ✅ **Données de démo** pour explorer
 ✅ **Support inclus** pour vos questions
 ✅ **Migration facile** de vos données

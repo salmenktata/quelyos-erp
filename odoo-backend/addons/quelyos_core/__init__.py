@@ -109,7 +109,7 @@ def _configure_super_admin(env):
 
     Cette fonction garantit que l'utilisateur admin a :
     1. Mot de passe par défaut sécurisé (6187)
-    2. Tous les groupes Quelyos Manager (8 modules)
+    2. Tous les groupes Quelyos Manager (9 modules)
     3. Groupe Role/Administrator pour accès complet Odoo
     4. Accès multi-tenant à toutes les companies
 
