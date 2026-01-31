@@ -37,8 +37,8 @@ export default function PaymentScheduleCalendar() {
     setIsLoading(true);
     try {
       const [upcomingRes, overdueRes] = await Promise.all([
-        fetch("/api/finance/supplier-invoices/upcoming?days=60"),
-        fetch("/api/finance/supplier-invoices/overdue"),
+        fetch("/api/ecommerce/supplier-invoices/upcoming?days=60"),
+        fetch("/api/ecommerce/supplier-invoices/overdue"),
       ]);
 
       if (upcomingRes.ok) {

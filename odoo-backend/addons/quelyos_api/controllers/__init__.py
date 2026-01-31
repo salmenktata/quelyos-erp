@@ -91,3 +91,6 @@ from . import warehouse_calendar_ctrl
 from . import hr_oca
 from . import marketing_campaigns_ctrl
 from . import marketing_lists_ctrl
+# Planification Paiements Fournisseurs
+from . import supplier_invoices_ctrl
+from . import payment_planning_ctrl

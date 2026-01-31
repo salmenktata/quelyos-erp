@@ -24,7 +24,8 @@ class QuelyosFECExport(models.TransientModel):
     _description = 'Export FEC Quelyos'
     
     tenant_id = fields.Many2one('quelyos.tenant', string='Tenant', required=True)
-    fiscal_year_id = fields.Many2one('quelyos.finance.fiscal_year', string='Exercice fiscal', required=True)
+    date_from = fields.Date(string='Date début', required=True)
+    date_to = fields.Date(string='Date fin', required=True)
     date_from = fields.Date(string='Date début', required=True)
     date_to = fields.Date(string='Date fin', required=True)
     export_type = fields.Selection([
