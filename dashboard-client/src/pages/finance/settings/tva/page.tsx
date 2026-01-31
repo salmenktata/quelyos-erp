@@ -35,7 +35,7 @@ const DEFAULT_SNAPSHOT: VatSnapshot = {
 };
 
 export default function TvaPage() {
-  const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+  const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
   const [stripe, setStripe] = useState<Stripe | null>(null);
   const [snapshot, setSnapshot] = useState<VatSnapshot>(DEFAULT_SNAPSHOT);
   const [loading, setLoading] = useState(false);

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos API',
-    'version': '19.0.1.59.0',
+    'version': '19.0.1.60.0',
     'category': 'Quelyos/API',
     'summary': 'API REST pour frontend e-commerce et backoffice',
     'author': 'Quelyos',
@@ -39,6 +39,7 @@
         'security/ir.rule.xml',
         'security/ticket_rules.xml',
         'security/ir.model.access.csv',
+        'data/installer_data.xml',
         'data/subscription_sequence.xml',
         'data/cycle_count_sequence.xml',
         'data/stock_scrap_sequence.xml',
@@ -83,7 +84,8 @@
         'views/ai_unanswered_views.xml',
     ],
     'pre_init_hook': 'pre_init_hook',
-    # 'post_init_hook': 'post_init_hook',  # TEMPORAIREMENT DÉSACTIVÉ (fonction manquante)
+    'post_init_hook': 'post_init_hook',
+    'uninstall_hook': 'uninstall_hook',
     'installable': True,
     'application': True,
     'auto_install': False,

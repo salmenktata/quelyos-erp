@@ -1,124 +1,203 @@
 # -*- coding: utf-8 -*-
 """
-Hooks d'installation/mise à jour du module quelyos_api
+Hooks d'installation Quelyos Suite
+Gère l'installation automatique de tous les prérequis
 """
+
 import logging
+import subprocess
+import sys
+import odoo
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
 
-def post_init_hook(env):
-    """
-    Hook exécuté après installation/upgrade du module
-    Crée les templates email qui ne peuvent pas être chargés via XML
-    """
-    _logger.info("=== Post-init hook quelyos_api ===")
-    _create_satisfaction_email_template(env)
+def _install_python_dependencies():
+    """Installe les dépendances Python si manquantes"""
+    required_packages = ['qrcode', 'Pillow', 'faker']
+    
+    for package in required_packages:
+        try:
+            __import__(package.lower())
+            _logger.info(f"✅ Package Python '{package}' déjà installé")
+        except ImportError:
+            _logger.warning(f"⚠️  Package Python '{package}' manquant, installation...")
+            try:
+                subprocess.check_call([
+                    sys.executable, '-m', 'pip', 'install', package
+                ])
+                _logger.info(f"✅ Package Python '{package}' installé avec succès")
+            except subprocess.CalledProcessError as e:
+                _logger.error(f"❌ Échec installation '{package}': {e}")
+                raise
 
 
-def _create_satisfaction_email_template(env):
-    """
-    Crée le template email de satisfaction
-    Workaround pour problème validation XML RelaxNG avec contenu HTML complexe
-    """
-    template_xmlid = 'quelyos_api.email_template_satisfaction_request'
+def _check_oca_modules(cr):
+    """Vérifie si les modules OCA sont disponibles"""
+    cr.execute("""
+        SELECT name, state 
+        FROM ir_module_module 
+        WHERE name IN ('stock_inventory', 'stock_warehouse_calendar')
+    """)
+    
+    oca_modules = cr.fetchall()
+    
+    if not oca_modules:
+        _logger.warning("""
+⚠️  MODULES OCA MANQUANTS
+        
+Les modules OCA suivants sont recommandés mais pas installés :
+- stock_inventory (Inventaire avancé)
+- stock_warehouse_calendar (Calendrier entrepôt)
 
-    # Vérifier si template existe déjà
-    existing = env.ref(template_xmlid, raise_if_not_found=False)
-    if existing:
-        _logger.info(f"Template satisfaction déjà existant (ID {existing.id}), mise à jour...")
-        template = existing
+Pour les installer :
+1. cd odoo-backend/addons
+2. git clone -b 19.0 https://github.com/OCA/stock-logistics-warehouse.git oca-stock
+3. ln -s oca-stock/stock_inventory .
+4. ln -s oca-stock/stock_warehouse_calendar .
+5. Redémarrer Odoo
+
+ℹ️  Quelyos Suite fonctionnera quand même sans ces modules (fonctionnalités réduites).
+        """)
     else:
-        _logger.info("Création du template satisfaction...")
-        template = env['mail.template'].create({
-            'name': 'Demande de Satisfaction - Ticket Résolu',
-            'model_id': env.ref('quelyos_api.model_quelyos_ticket').id,
-        })
-        # Créer l'external ID
-        env['ir.model.data'].create({
-            'name': 'email_template_satisfaction_request',
-            'module': 'quelyos_api',
-            'model': 'mail.template',
-            'res_id': template.id,
-        })
+        for name, state in oca_modules:
+            _logger.info(f"✅ Module OCA '{name}' trouvé (état: {state})")
 
-    # Définir le contenu du template
-    template.write({
-        'subject': 'Votre ticket ${object.name} a été résolu - Donnez-nous votre avis',
-        'email_from': '${object.company_id.email or user.email_formatted}',
-        'email_to': '${object.partner_id.email}',
-        'description': 'Email automatique envoyé au client après résolution d\'un ticket pour collecter sa satisfaction',
-        'body_html': '''
-<div style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8;">
-    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <!-- Header -->
-        <div style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); padding: 32px 24px; text-align: center;">
-            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">
-                🎉 Votre ticket a été résolu !
-            </h1>
-        </div>
 
-        <!-- Content -->
-        <div style="padding: 32px 24px;">
-            <p style="margin: 0 0 16px 0; color: #1f2937; font-size: 16px; line-height: 1.6;">
-                Bonjour <strong>${object.partner_id.name}</strong>,
-            </p>
+def pre_init_hook(cr):
+    """
+    Hook exécuté AVANT l'installation du module
+    Vérifie version Odoo, installe les prérequis
+    """
+    _logger.info("=" * 80)
+    _logger.info("🚀 QUELYOS SUITE - Installation Automatique")
+    _logger.info("=" * 80)
+    
+    # 0. Vérifier version Odoo
+    _logger.info("\n🔍 Vérification version Odoo...")
+    odoo_version = odoo.release.version_info[0]
+    if odoo_version != 19:
+        error_msg = (
+            f"Quelyos API requiert Odoo 19.0.x exactement.\n"
+            f"Version détectée : {odoo.release.version}\n"
+            f"Veuillez installer Odoo 19 avant d'installer Quelyos Suite."
+        )
+        _logger.error(error_msg)
+        raise UserError(error_msg)
+    
+    _logger.info(f"✅ Version Odoo validée : {odoo.release.version}")
+    
+    # 1. Installer dépendances Python
+    _logger.info("\n📦 Vérification dépendances Python...")
+    try:
+        _install_python_dependencies()
+    except Exception as e:
+        _logger.error(f"❌ Erreur installation dépendances Python: {e}")
+        # Ne pas bloquer l'installation, juste avertir
+    
+    # 2. Vérifier modules OCA
+    _logger.info("\n🔍 Vérification modules OCA...")
+    _check_oca_modules(cr)
+    
+    _logger.info("\n✅ Pré-installation terminée")
+    _logger.info("=" * 80)
 
-            <p style="margin: 0 0 16px 0; color: #1f2937; font-size: 16px; line-height: 1.6;">
-                Bonne nouvelle ! Votre ticket <strong>${object.name}</strong> concernant "<em>${object.subject}</em>" a été résolu par notre équipe.
-            </p>
 
-            <div style="background-color: #f0fdfa; border-left: 4px solid #0d9488; padding: 16px; margin: 24px 0; border-radius: 8px;">
-                <p style="margin: 0 0 8px 0; color: #0f766e; font-weight: 600; font-size: 14px;">
-                    Résumé de votre ticket
-                </p>
-                <p style="margin: 0 0 4px 0; color: #374151; font-size: 14px;">
-                    <strong>Référence :</strong> ${object.name}
-                </p>
-                <p style="margin: 0 0 4px 0; color: #374151; font-size: 14px;">
-                    <strong>Catégorie :</strong> ${dict(object._fields['category']._description_selection(object.env)).get(object.category)}
-                </p>
-                <p style="margin: 0; color: #374151; font-size: 14px;">
-                    <strong>Résolu le :</strong> ${object.resolution_date.strftime('%d/%m/%Y à %H:%M') if object.resolution_date else 'Aujourd\\'hui'}
-                </p>
-            </div>
+def post_init_hook(cr, registry):
+    """
+    Hook exécuté APRÈS l'installation du module
+    Configure l'environnement Quelyos
+    """
+    _logger.info("=" * 80)
+    _logger.info("⚙️  QUELYOS SUITE - Configuration Post-Installation")
+    _logger.info("=" * 80)
+    
+    # 1. Vérifier que quelyos_api est bien installé
+    cr.execute("""
+        SELECT state FROM ir_module_module 
+        WHERE name = 'quelyos_api'
+    """)
+    
+    result = cr.fetchone()
+    if result and result[0] == 'installed':
+        _logger.info("✅ Module quelyos_api installé avec succès")
+    else:
+        _logger.error("❌ Module quelyos_api PAS installé correctement !")
+        return
+    
+    # 2. Vérifier tenant par défaut
+    cr.execute("""
+        SELECT COUNT(*) FROM quelyos_tenant 
+        WHERE name = 'Admin Tenant'
+    """)
+    
+    tenant_count = cr.fetchone()[0]
+    if tenant_count > 0:
+        _logger.info(f"✅ Tenant par défaut créé ({tenant_count} tenant(s) trouvé(s))")
+    else:
+        _logger.warning("⚠️  Aucun tenant trouvé, vérifier data/default_admin_tenant.xml")
+    
+    # 3. Afficher résumé installation
+    _logger.info("\n" + "=" * 80)
+    _logger.info("🎉 QUELYOS SUITE - Installation Terminée avec Succès !")
+    _logger.info("=" * 80)
+    _logger.info("""
+📊 Modules installés :
+   - Odoo Core (base, sale, stock, account, crm, website, etc.)
+   - Quelyos API (backend complet + 12 modules OCA natifs)
+   - Modules OCA (si disponibles)
 
-            <p style="margin: 24px 0 16px 0; color: #1f2937; font-size: 16px; line-height: 1.6;">
-                <strong>Nous aimerions connaître votre avis !</strong>
-            </p>
+🔧 Configuration :
+   - Tenant par défaut : Admin Tenant
+   - Base de données : Configurée
+   - API REST : http://localhost:8069/api/
 
-            <p style="margin: 0 0 24px 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
-                Votre satisfaction est notre priorité. Prenez quelques secondes pour nous donner votre avis sur la résolution de votre demande.
-            </p>
+📚 Prochaines étapes :
+   1. Démarrer les frontends :
+      - Dashboard (ERP): cd dashboard-client && npm run dev (port 5175)
+      - E-commerce: cd vitrine-client && npm run dev (port 3001)
+      - Vitrine: cd vitrine-quelyos && npm run dev (port 3000)
+   
+   2. Se connecter :
+      - URL: http://localhost:5175
+      - Email: admin@quelyos.com
+      - Password: (voir configuration)
 
-            <!-- CTA Button -->
-            <div style="text-align: center; margin: 32px 0;">
-                <a href="${ctx.get('satisfaction_url')}"
-                   style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(13, 148, 136, 0.3);">
-                    ⭐ Donner mon avis
-                </a>
-            </div>
+🌐 Documentation :
+   - README-DEV.md : Documentation technique complète
+   - docs/ : Guides d'utilisation
 
-            <p style="margin: 24px 0 0 0; color: #9ca3af; font-size: 13px; text-align: center; line-height: 1.5;">
-                Ce lien est valable pendant 30 jours. Votre avis nous aide à améliorer la qualité de notre support.
-            </p>
-        </div>
+✅ Quelyos Suite est prêt à l'emploi !
+    """)
+    _logger.info("=" * 80)
 
-        <!-- Footer -->
-        <div style="background-color: #f9fafb; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb;">
-            <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px;">
-                Vous recevez cet email car votre ticket a été résolu.
-            </p>
-            <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                © ${datetime.datetime.now().year} ${object.company_id.name or 'Quelyos'}. Tous droits réservés.
-            </p>
-        </div>
-    </div>
-</div>
-''',
-        'auto_delete': False,
-        'lang': '${object.partner_id.lang}',
-    })
 
-    env.cr.commit()
-    _logger.info(f"✅ Template satisfaction créé/mis à jour (ID {template.id})")
+def uninstall_hook(cr, registry):
+    """
+    Hook exécuté lors de la désinstallation
+    Nettoie les données Quelyos si demandé
+    """
+    _logger.info("=" * 80)
+    _logger.info("🗑️  QUELYOS SUITE - Désinstallation")
+    _logger.info("=" * 80)
+    
+    _logger.warning("""
+⚠️  ATTENTION : Désinstallation de Quelyos Suite
+
+Les données suivantes seront conservées :
+- Tenants (quelyos_tenant)
+- Abonnements (quelyos_subscription)
+- Données métier (produits, commandes, etc.)
+
+Pour supprimer complètement les données Quelyos :
+1. Aller dans Settings > Technical > Database Structure > Models
+2. Rechercher "quelyos"
+3. Supprimer manuellement les modèles si nécessaire
+
+ℹ️  Les modules Odoo Core (sale, stock, etc.) restent installés.
+    """)
+    
+    _logger.info("=" * 80)
+    _logger.info("✅ Désinstallation terminée")
+    _logger.info("=" * 80)

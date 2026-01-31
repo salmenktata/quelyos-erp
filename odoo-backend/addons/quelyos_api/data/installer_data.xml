@@ -10,7 +10,7 @@
         
         <record id="quelyos_suite_version" model="ir.config_parameter">
             <field name="key">quelyos.suite_version</field>
-            <field name="value">19.0.1.0.0</field>
+            <field name="value">19.0.1.60.0</field>
         </record>
         
         <record id="quelyos_suite_install_date" model="ir.config_parameter">
