@@ -3,6 +3,7 @@ import { Breadcrumbs } from "@/components/common";
 import { Button } from "@/components/common/Button";
 import { useToast } from "@/contexts/ToastContext";
 import { Share2, Save, Loader2, Facebook, Instagram, Twitter, Youtube, Linkedin, Info } from "lucide-react";
+import { logger } from '@quelyos/logger';
 import { useSiteConfig, useUpdateSiteConfig } from "@/hooks/useSiteConfig";
 
 // TikTok icon component (not available in lucide-react)
@@ -53,6 +54,7 @@ export default function SocialSettingsPage() {
       await updateMutation.mutateAsync(socialConfig as any);
       toast.success("Réseaux sociaux mis à jour");
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error("Erreur lors de la mise à jour");
     }
   };

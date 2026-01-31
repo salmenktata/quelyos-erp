@@ -34,6 +34,7 @@ import { FontSelector } from '@/components/theme-builder/FontSelector';
 import { getValidationErrors } from '@/lib/theme-validation';
 import { toast } from 'sonner';
 import { Download, Upload, Save, RotateCcw, Layers, Palette as PaletteIcon, Eye } from 'lucide-react';
+import { logger } from '@quelyos/logger';
 
 /**
  * Toolbar d'actions (Export/Import/Save/Reset)
@@ -124,6 +125,7 @@ function ActionsToolbar() {
         toast.error(errorMsg);
       }
     } catch (_error) {
+      logger.error("Erreur:", _error);
       const errorMsg = 'Erreur lors de la sauvegarde du thème';
       setSaveError(errorMsg);
       toast.error(errorMsg);

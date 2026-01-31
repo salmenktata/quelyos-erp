@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Breadcrumbs, Badge, Button, Modal, SkeletonTable, PageNotice } from "@/components/common";
 import { useToast } from "@/contexts/ToastContext";
 import { Truck, Save, Loader2, Clock, Gift, Info, Plus, Package } from "lucide-react";
+import { logger } from '@quelyos/logger';
 import { useSiteConfig, useUpdateSiteConfig } from "@/hooks/useSiteConfig";
 import {
   useDeliveryMethods,
@@ -66,6 +67,7 @@ export default function ShippingSettingsPage() {
       await updateConfigMutation.mutateAsync(shippingConfig);
       toast.success("Configuration livraison mise à jour");
     } catch {
+      logger.error("Erreur attrapée");
       toast.error("Erreur lors de la mise à jour");
     }
   };
@@ -119,6 +121,7 @@ export default function ShippingSettingsPage() {
       setCreateModalOpen(false);
       resetForm();
     } catch {
+      logger.error("Erreur attrapée");
       toast.error("Erreur lors de la création");
     }
   };
@@ -140,6 +143,7 @@ export default function ShippingSettingsPage() {
       toast.success("Méthode de livraison mise à jour");
       setEditModalOpen(false);
     } catch {
+      logger.error("Erreur attrapée");
       toast.error("Erreur lors de la mise à jour");
     }
   };
@@ -152,6 +156,7 @@ export default function ShippingSettingsPage() {
       toast.success("Méthode de livraison supprimée");
       setDeleteModalOpen(false);
     } catch {
+      logger.error("Erreur attrapée");
       toast.error("Erreur lors de la suppression");
     }
   };
@@ -164,6 +169,7 @@ export default function ShippingSettingsPage() {
       });
       toast.success(method.active ? "Méthode désactivée" : "Méthode activée");
     } catch {
+      logger.error("Erreur attrapée");
       toast.error("Erreur lors de la mise à jour");
     }
   };

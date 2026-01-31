@@ -25,6 +25,7 @@ import { PageNotice, Breadcrumbs } from '../../components/common'
 import { storeNotices } from '@/lib/notices'
 import { Badge, Button, SkeletonTable } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
+import { logger } from '@quelyos/logger';
 
 export default function Menus() {
   const [editingMenu, setEditingMenu] = useState<MenuItem | null>(null)
@@ -96,6 +97,7 @@ export default function Menus() {
       }
       handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la sauvegarde')
     }
   }
@@ -107,6 +109,7 @@ export default function Menus() {
       toast.success('Menu supprimé')
       if (editingMenu?.id === id) handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la suppression')
     }
   }
@@ -149,6 +152,7 @@ export default function Menus() {
         await reorderMutation.mutateAsync(newOrder)
         toast.success('Ordre mis à jour')
       } catch {
+      logger.error("Erreur attrapée");
         toast.error("Erreur lors de la mise à jour de l'ordre")
       }
     },

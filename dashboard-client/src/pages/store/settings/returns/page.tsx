@@ -3,6 +3,7 @@ import { Breadcrumbs } from "@/components/common";
 import { Button } from "@/components/common/Button";
 import { useToast } from "@/contexts/ToastContext";
 import { RotateCcw, Save, Loader2, Clock, Shield , Info } from "lucide-react";
+import { logger } from '@quelyos/logger';
 import { useSiteConfig, useUpdateSiteConfig } from "@/hooks/useSiteConfig";
 
 export default function ReturnsSettingsPage() {
@@ -31,6 +32,7 @@ export default function ReturnsSettingsPage() {
       await updateMutation.mutateAsync(returnsConfig);
       toast.success("Politique de retours mise à jour");
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error("Erreur lors de la mise à jour");
     }
   };

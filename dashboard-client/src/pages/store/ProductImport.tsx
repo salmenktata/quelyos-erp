@@ -14,6 +14,7 @@ import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { apiFetchJson } from '@/lib/apiFetch';
+import { logger } from '@quelyos/logger';
 
 interface ImportResult {
   created: number;
@@ -63,6 +64,7 @@ export default function ProductImport() {
         URL.revokeObjectURL(url);
       }
     } catch {
+      logger.error("Erreur attrapée");
       // Error handled silently
     } finally {
       setExporting(false);
@@ -129,6 +131,7 @@ export default function ProductImport() {
         setResult(data.result);
       }
     } catch {
+      logger.error("Erreur attrapée");
       setResult({ created: 0, updated: 0, errors: ['Erreur lors de l\'import'] });
     } finally {
       setImporting(false);

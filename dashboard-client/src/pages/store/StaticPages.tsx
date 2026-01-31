@@ -17,6 +17,7 @@ import { useStaticPages, useCreateStaticPage, useUpdateStaticPage, useDeleteStat
 import { Button, SkeletonTable, PageNotice, Breadcrumbs } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
 import { storeNotices } from '@/lib/notices'
+import { logger } from '@quelyos/logger';
 
 export default function StaticPagesPage() {
   const [editingPage, setEditingPage] = useState<StaticPage | null>(null)
@@ -116,6 +117,7 @@ export default function StaticPagesPage() {
       }
       handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la sauvegarde')
     }
   }
@@ -127,6 +129,7 @@ export default function StaticPagesPage() {
       toast.success('Page supprimée')
       if (editingPage?.id === id) handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la suppression')
     }
   }

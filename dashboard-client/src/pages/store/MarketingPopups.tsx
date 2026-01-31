@@ -15,6 +15,7 @@ import { useMarketingPopups, useCreateMarketingPopup, useUpdateMarketingPopup, u
 import { Button, SkeletonTable, PageNotice, Breadcrumbs } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
 import { marketingNotices } from '@/lib/notices'
+import { logger } from '@quelyos/logger';
 
 export default function MarketingPopupsPage() {
   const [editingPopup, setEditingPopup] = useState<MarketingPopup | null>(null)
@@ -139,6 +140,7 @@ export default function MarketingPopupsPage() {
       }
       handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la sauvegarde')
     }
   }
@@ -150,6 +152,7 @@ export default function MarketingPopupsPage() {
       toast.success('Popup supprimée')
       if (editingPopup?.id === id) handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la suppression')
     }
   }

@@ -15,6 +15,7 @@ import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { apiFetchJson } from '@/lib/apiFetch';
+import { logger } from '@quelyos/logger';
 
 interface Ticket {
   id: number;
@@ -74,6 +75,7 @@ export default function Tickets() {
         setError('Erreur lors du chargement des tickets');
       }
     } catch {
+      logger.error("Erreur attrapée");
       setError('Erreur de connexion au serveur');
     } finally {
       setLoading(false);
@@ -93,6 +95,7 @@ export default function Tickets() {
         setMessages(data.result.ticket.messages || []);
       }
     } catch {
+      logger.error("Erreur attrapée");
       // Detail fetch error silenced
     }
   };
@@ -112,6 +115,7 @@ export default function Tickets() {
         fetchTickets();
       }
     } catch {
+      logger.error("Erreur attrapée");
       // Reply error silenced
     }
   };
@@ -130,6 +134,7 @@ export default function Tickets() {
         fetchTickets();
       }
     } catch {
+      logger.error("Erreur attrapée");
       // Status update error silenced
     }
   };

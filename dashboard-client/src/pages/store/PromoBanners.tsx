@@ -19,6 +19,7 @@ import { useToast } from '../../hooks/useToast'
 import { BannerFormInputs } from '../../components/store/promo-banners/BannerFormInputs'
 import { BannerTableRow } from '../../components/store/promo-banners/BannerTableRow'
 import { BannerPreview } from '../../components/store/promo-banners/BannerPreview'
+import { logger } from '@quelyos/logger';
 
 export default function PromoBanners() {
   const [editingBanner, setEditingBanner] = useState<PromoBanner | null>(null)
@@ -80,6 +81,7 @@ export default function PromoBanners() {
       }
       handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la sauvegarde')
     }
   }
@@ -91,6 +93,7 @@ export default function PromoBanners() {
       toast.success('Bannière supprimée')
       if (editingBanner?.id === id) handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la suppression')
     }
   }

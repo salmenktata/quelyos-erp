@@ -16,6 +16,7 @@ import {
   Settings,
   List,
 } from "lucide-react";
+import { logger } from '@quelyos/logger';
 import { useSiteConfig, useUpdateSiteConfig } from "@/hooks/useSiteConfig";
 import {
   useSeoMetadataList,
@@ -86,6 +87,7 @@ export default function SeoSettingsPage() {
       await updateConfigMutation.mutateAsync(seoConfig as any);
       toast.success("Paramètres SEO globaux mis à jour");
     } catch {
+      logger.error("Erreur attrapée");
       toast.error("Erreur lors de la mise à jour");
     }
   };
@@ -135,6 +137,7 @@ export default function SeoSettingsPage() {
       }
       handleCancel();
     } catch {
+      logger.error("Erreur attrapée");
       toast.error("Erreur lors de la sauvegarde");
     }
   };
@@ -146,6 +149,7 @@ export default function SeoSettingsPage() {
       toast.success("Metadata supprimée");
       if (editingMetadata?.id === id) handleCancel();
     } catch {
+      logger.error("Erreur attrapée");
       toast.error("Erreur lors de la suppression");
     }
   };

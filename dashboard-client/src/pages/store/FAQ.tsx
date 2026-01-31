@@ -15,6 +15,7 @@ import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { apiFetchJson } from '@/lib/apiFetch';
+import { logger } from '@quelyos/logger';
 
 interface FAQCategory {
   id: number;
@@ -66,6 +67,7 @@ export default function FAQPage() {
         setCategories(data.result.categories || []);
       }
     } catch {
+      logger.error("Erreur attrapée");
       // Categories fetch error silenced
     }
   };
@@ -90,6 +92,7 @@ export default function FAQPage() {
         setError('Erreur lors du chargement des FAQ');
       }
     } catch {
+      logger.error("Erreur attrapée");
       setError('Erreur de connexion au serveur');
     } finally {
       setLoading(false);
@@ -111,6 +114,7 @@ export default function FAQPage() {
         fetchCategories();
       }
     } catch {
+      logger.error("Erreur attrapée");
       // Save error silenced
     }
   };
@@ -131,6 +135,7 @@ export default function FAQPage() {
         fetchCategories();
       }
     } catch {
+      logger.error("Erreur attrapée");
       // Save error silenced
     }
   };
@@ -150,6 +155,7 @@ export default function FAQPage() {
         fetchCategories();
       }
     } catch {
+      logger.error("Erreur attrapée");
       // Delete error silenced
     }
   };

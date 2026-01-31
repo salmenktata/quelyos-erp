@@ -27,6 +27,7 @@ import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/com
 import { storeNotices } from '@/lib/notices'
 import { useToast } from '@/hooks/useToast'
 import {
+import { logger } from '@quelyos/logger';
   useLiveEvents,
   useCreateLiveEvent,
   useUpdateLiveEvent,
@@ -127,6 +128,7 @@ export default function LiveEvents() {
       }
       handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la sauvegarde')
     }
   }
@@ -138,6 +140,7 @@ export default function LiveEvents() {
       toast.success('Événement supprimé')
       if (editing?.id === id) handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la suppression')
     }
   }
@@ -147,6 +150,7 @@ export default function LiveEvents() {
       await goLiveMutation.mutateAsync(id)
       toast.success('Live démarré !')
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur')
     }
   }
@@ -156,6 +160,7 @@ export default function LiveEvents() {
       await endLiveMutation.mutateAsync(id)
       toast.success('Live terminé')
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur')
     }
   }
@@ -165,6 +170,7 @@ export default function LiveEvents() {
       await scheduleMutation.mutateAsync(id)
       toast.success('Événement planifié')
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur')
     }
   }

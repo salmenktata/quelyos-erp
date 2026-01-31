@@ -6,6 +6,7 @@ import { Button, Badge, Breadcrumbs, SkeletonTable, Modal, PageNotice } from '..
 import { ecommerceNotices } from '@/lib/notices'
 import { useToast } from '../../hooks/useToast'
 import type { Coupon as BaseCoupon } from '@/types'
+import { logger } from '@quelyos/logger';
 
 interface CouponReward {
   discount: number
@@ -116,6 +117,7 @@ export default function Coupons() {
       addToast('success', 'Coupon mis à jour avec succès')
       setEditModalOpen(false)
     } catch {
+      logger.error("Erreur attrapée");
       addToast('error', 'Erreur lors de la mise à jour')
     }
   }
@@ -128,6 +130,7 @@ export default function Coupons() {
       addToast('success', 'Coupon supprimé avec succès')
       setDeleteModalOpen(false)
     } catch {
+      logger.error("Erreur attrapée");
       addToast('error', 'Erreur lors de la suppression')
     }
   }
@@ -140,6 +143,7 @@ export default function Coupons() {
       })
       addToast('success', coupon.active ? 'Coupon désactivé' : 'Coupon activé')
     } catch {
+      logger.error("Erreur attrapée");
       addToast('error', 'Erreur lors de la mise à jour')
     }
   }

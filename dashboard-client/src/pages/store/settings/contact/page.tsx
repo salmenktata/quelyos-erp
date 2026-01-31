@@ -3,6 +3,7 @@ import { Breadcrumbs } from "@/components/common";
 import { Button } from "@/components/common/Button";
 import { useToast } from "@/contexts/ToastContext";
 import { Phone, Save, Loader2, Mail, MessageCircle, Info } from "lucide-react";
+import { logger } from '@quelyos/logger';
 import { useSiteConfig, useUpdateSiteConfig } from "@/hooks/useSiteConfig";
 import { z } from "zod";
 
@@ -40,6 +41,7 @@ export default function ContactSettingsPage() {
       setErrors({});
       return true;
     } catch (error) {
+      logger.error("Erreur:", error);
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
         error.issues.forEach((err) => {
@@ -63,6 +65,7 @@ export default function ContactSettingsPage() {
       await updateMutation.mutateAsync(contactConfig);
       toast.success("Informations de contact mises à jour");
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error("Erreur lors de la mise à jour");
     }
   };

@@ -18,6 +18,7 @@ import { useToast } from '../../hooks/useToast'
 import { storeNotices } from '@/lib/notices'
 import { HeroSlideTable } from '../../components/HeroSlideTable'
 import { HeroSlideForm, HeroSlideFormData } from '../../components/HeroSlideForm'
+import { logger } from '@quelyos/logger';
 
 const DEFAULT_FORM_DATA: HeroSlideFormData = {
   name: '',
@@ -82,6 +83,7 @@ export default function HeroSlides() {
       }
       handleCancel()
     } catch (error) {
+      logger.error("Erreur:", error);
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la sauvegarde'
       toast.error(errorMessage)
     }
@@ -94,6 +96,7 @@ export default function HeroSlides() {
       toast.success('Slide supprimé')
       if (editingSlide?.id === id) handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la suppression')
     }
   }

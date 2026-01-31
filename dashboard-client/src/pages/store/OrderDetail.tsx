@@ -22,6 +22,7 @@ import { OrderLineItems } from '../../components/orders/OrderLineItems'
 import { OrderSummary } from '../../components/orders/OrderSummary'
 import { OrderHistory } from '../../components/orders/OrderHistory'
 import { OrderActions } from '../../components/orders/OrderActions'
+import { logger } from '@quelyos/logger';
 
 export default function OrderDetail() {
   const { id } = useParams<{ id: string }>()
@@ -48,6 +49,7 @@ export default function OrderDetail() {
       toast.success('Statut mis à jour avec succès')
       setActionModal(null)
     } catch (err) {
+      logger.error("Erreur:", err);
       toast.error('Erreur lors de la mise à jour du statut')
     }
   }
@@ -72,6 +74,7 @@ export default function OrderDetail() {
       window.URL.revokeObjectURL(url)
       toast.success('Bon de livraison téléchargé avec succès')
     } catch (err) {
+      logger.error("Erreur:", err);
       toast.error('Erreur lors du téléchargement du bon de livraison')
     }
   }
@@ -87,6 +90,7 @@ export default function OrderDetail() {
       })
       toast.success('Numéro de suivi mis à jour avec succès')
     } catch (err) {
+      logger.error("Erreur:", err);
       toast.error('Erreur lors de la mise à jour du numéro de suivi')
     }
   }
@@ -98,6 +102,7 @@ export default function OrderDetail() {
       await sendQuotation.mutateAsync(orderId)
       toast.success('Devis envoyé par email avec succès')
     } catch (err) {
+      logger.error("Erreur:", err);
       toast.error("Erreur lors de l'envoi du devis")
     }
   }

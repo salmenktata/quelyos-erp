@@ -3,6 +3,7 @@ import { Breadcrumbs } from "@/components/common";
 import { Button } from "@/components/common/Button";
 import { useToast } from "@/contexts/ToastContext";
 import { Check, X, Settings, TestTube2, Loader2, Eye, EyeOff } from "lucide-react";
+import { logger } from '@quelyos/logger';
 import {
   usePaymentProviders,
   useUpdatePaymentProvider,
@@ -56,6 +57,7 @@ export default function PaymentMethodsPage() {
       });
       toast.success(`${provider.name} ${newState === 'enabled' ? 'activé' : 'désactivé'}`);
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error(`Erreur lors de la modification: ${error}`);
     }
   };
@@ -65,6 +67,7 @@ export default function PaymentMethodsPage() {
       const result = await testProviderMutation.mutateAsync(provider.id);
       toast.success(result.message || "Connexion réussie !");
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error(`Test échoué: ${error}`);
     }
   };
@@ -78,6 +81,7 @@ export default function PaymentMethodsPage() {
       toast.success(`Configuration de ${provider.name} enregistrée`);
       setEditingProvider(null);
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error(`Erreur lors de l'enregistrement: ${error}`);
     }
   };

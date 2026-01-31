@@ -3,6 +3,7 @@ import { Breadcrumbs } from "@/components/common";
 import { Button } from "@/components/common/Button";
 import { useToast } from "@/contexts/ToastContext";
 import { ToggleLeft, Save, Loader2, Heart, Star, Layers, Mail, Info, Moon, UserX } from "lucide-react";
+import { logger } from '@quelyos/logger';
 import { useSiteConfig, useUpdateSiteConfig } from "@/hooks/useSiteConfig";
 import { useMyTenant, useUpdateMyTenant } from "@/hooks/useMyTenant";
 
@@ -126,6 +127,7 @@ export default function FeaturesSettingsPage() {
       setHasChanges(false);
       refetch();
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error("Erreur lors de la mise à jour");
     }
   };

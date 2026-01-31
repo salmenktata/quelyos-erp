@@ -16,6 +16,7 @@ import { DeviceToggle } from '@/components/theme-builder/DeviceToggle';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/common';
 import type { BuilderState } from '@/components/theme-builder/BuilderContext';
+import { logger } from '@quelyos/logger';
 
 type Device = 'desktop' | 'tablet' | 'mobile';
 
@@ -154,6 +155,7 @@ export default function ThemeBuilderPreview() {
           const state = JSON.parse(stored) as BuilderState;
           setThemeState(state);
         } catch (_error) {
+      logger.error("Erreur:", _error);
           // Error parsing theme state - ignore
         }
       }
@@ -230,6 +232,7 @@ export default function ThemeBuilderPreview() {
         const state = JSON.parse(stored) as BuilderState;
         setThemeState(state);
       } catch (_error) {
+      logger.error("Erreur:", _error);
         // Error parsing theme state - ignore
       }
     }

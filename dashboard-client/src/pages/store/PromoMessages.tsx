@@ -15,6 +15,7 @@ import { usePromoMessages, useCreatePromoMessage, useUpdatePromoMessage, useDele
 import { Button, SkeletonTable, PageNotice, Breadcrumbs } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
 import { storeNotices } from '@/lib/notices'
+import { logger } from '@quelyos/logger';
 
 const ICON_OPTIONS = [
   { value: 'truck', label: 'Camion (Livraison)' },
@@ -78,6 +79,7 @@ export default function PromoMessages() {
       }
       handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la sauvegarde')
     }
   }
@@ -89,6 +91,7 @@ export default function PromoMessages() {
       toast.success('Message supprimé')
       if (editingMessage?.id === id) handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la suppression')
     }
   }

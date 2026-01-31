@@ -3,6 +3,7 @@ import { Breadcrumbs } from "@/components/common";
 import { Button } from "@/components/common/Button";
 import { useToast } from "@/contexts/ToastContext";
 import { Palette, Save, Loader2, Info, Sparkles, Image, Type, Check, RotateCcw } from "lucide-react";
+import { logger } from '@quelyos/logger';
 import { useSiteConfig, useUpdateSiteConfig } from "@/hooks/useSiteConfig";
 import { useMyTenant, useUpdateMyTenant } from "@/hooks/useMyTenant";
 import { FONT_OPTIONS, DEFAULT_COLORS } from "@/hooks/useTenants";
@@ -202,6 +203,7 @@ export default function BrandSettingsPage() {
       toast.success(`Thème "${preset.label}" appliqué`);
       refetch();
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error("Erreur lors de l'application du thème");
     }
   };
@@ -235,6 +237,7 @@ export default function BrandSettingsPage() {
       setHasChanges(false);
       refetch();
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error("Erreur lors de la mise à jour");
     }
   };

@@ -21,6 +21,7 @@ import { Badge, Button, Breadcrumbs, SkeletonTable, Modal, BackendImage, PageNot
 import { ecommerceNotices } from '@/lib/notices'
 import { useToast } from '../../hooks/useToast'
 import { ToastContainer } from '../../components/common/Toast'
+import { logger } from '@quelyos/logger';
 
 interface FeaturedProduct {
   id: number
@@ -74,6 +75,7 @@ export default function Featured() {
       await addMutation.mutateAsync(productId)
       toast.success('Produit ajoute aux vedettes')
     } catch {
+      logger.error("Erreur attrapée");
       toast.error("Erreur lors de l'ajout du produit")
     }
   }
@@ -83,6 +85,7 @@ export default function Featured() {
       await removeMutation.mutateAsync(productId)
       toast.success('Produit retire des vedettes')
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors du retrait du produit')
     }
   }
@@ -133,6 +136,7 @@ export default function Featured() {
         await reorderMutation.mutateAsync(newOrder)
         toast.success('Ordre mis a jour')
       } catch {
+      logger.error("Erreur attrapée");
         toast.error("Erreur lors de la mise a jour de l'ordre")
       }
     },

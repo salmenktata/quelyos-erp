@@ -14,6 +14,7 @@ import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button, PageNotice } from '@/components/common';
 import { Upload, Image, DollarSign, CheckCircle, AlertCircle, FileUp } from 'lucide-react';
 import type { ThemeCategory } from '@/types/theme';
+import { logger } from '@quelyos/logger';
 
 const CATEGORIES: { value: ThemeCategory; label: string }[] = [
   { value: 'fashion', label: 'Mode' },
@@ -52,6 +53,7 @@ export default function SubmitThemePage() {
           setFormData({ ...formData, config_json: JSON.stringify(config, null, 2) });
           setError(null);
         } catch {
+      logger.error("Erreur attrapée");
           setError('Fichier JSON invalide');
         }
       };
@@ -78,6 +80,7 @@ export default function SubmitThemePage() {
       try {
         JSON.parse(formData.config_json);
       } catch {
+      logger.error("Erreur attrapée");
         setError('Configuration JSON invalide');
         setSubmitting(false);
         return;
@@ -119,6 +122,7 @@ export default function SubmitThemePage() {
         setError(data.result?.error || 'Erreur lors de la soumission');
       }
     } catch (err) {
+      logger.error("Erreur:", err);
       setError('Erreur lors de la soumission. Réessayez.');
     } finally {
       setSubmitting(false);

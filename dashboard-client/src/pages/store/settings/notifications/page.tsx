@@ -10,6 +10,7 @@ import {
   Settings,
   ExternalLink,
 } from "lucide-react";
+import { logger } from '@quelyos/logger';
 import { Link } from "react-router-dom";
 import {
   useSMSPreferences,
@@ -60,6 +61,7 @@ export default function NotificationsPage() {
       await updatePreferencesMutation.mutateAsync({ [key]: value });
       toast.success("Préférence mise à jour");
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error(`Erreur: ${error}`);
     }
   };

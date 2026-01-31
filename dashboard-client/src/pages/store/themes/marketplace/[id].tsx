@@ -16,6 +16,7 @@ import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button } from '@/components/common';
 import { Star, Download, DollarSign, User, Check, ExternalLink, ShoppingCart, Sparkles } from 'lucide-react';
 import type { ThemeCategory } from '@/types/theme';
+import { logger } from '@quelyos/logger';
 
 interface ThemeDetail {
   id: string;
@@ -77,6 +78,7 @@ export default function MarketplaceThemeDetailPage() {
         setTheme(data.result.theme);
       }
     } catch (_error) {
+      logger.error("Erreur:", _error);
       // Error loading theme - silently fail
     } finally {
       setLoading(false);
@@ -124,6 +126,7 @@ export default function MarketplaceThemeDetailPage() {
         alert(data.result?.error || 'Erreur lors de l\'achat');
       }
     } catch (_error) {
+      logger.error("Erreur:", _error);
       // Error purchasing theme
       alert('Erreur lors de l\'achat. Réessayez.');
     } finally {

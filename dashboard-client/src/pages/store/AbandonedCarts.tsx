@@ -10,6 +10,7 @@ import { Button, Breadcrumbs, SkeletonTable, PageNotice } from '../../components
 import { ecommerceNotices } from '@/lib/notices'
 import { Mail as EnvelopeIcon, ShoppingCart as ShoppingCartIcon } from 'lucide-react'
 import type { AbandonedCart } from '@/types'
+import { logger } from '@quelyos/logger';
 
 export default function AbandonedCarts() {
   const [page, setPage] = useState(0)
@@ -73,6 +74,7 @@ export default function AbandonedCarts() {
         await sendReminderMutation.mutateAsync(cartId)
         alert('Email de relance envoyé avec succès !')
       } catch (error) {
+      logger.error("Erreur:", error);
         alert("Erreur lors de l'envoi de l'email : " + (error as Error).message)
       }
     }

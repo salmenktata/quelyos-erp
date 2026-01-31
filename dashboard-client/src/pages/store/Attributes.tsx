@@ -14,6 +14,7 @@ import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button, SkeletonTable, PageNotice } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { apiFetchJson } from '@/lib/apiFetch';
+import { logger } from '@quelyos/logger';
 
 interface AttributeValue {
   id: number;
@@ -55,6 +56,7 @@ export default function Attributes() {
         setError('Erreur lors du chargement des attributs');
       }
     } catch {
+      logger.error("Erreur attrapée");
       setError('Impossible de charger les attributs');
     } finally {
       setLoading(false);
@@ -78,6 +80,7 @@ export default function Attributes() {
         setError('Erreur lors de la sauvegarde');
       }
     } catch {
+      logger.error("Erreur attrapée");
       setError('Impossible de sauvegarder l\'attribut');
     }
   };

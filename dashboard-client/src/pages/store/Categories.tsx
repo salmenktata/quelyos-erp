@@ -36,6 +36,7 @@ import { useDebounce } from '../../hooks/useDebounce'
 import { ToastContainer } from '../../components/common/Toast'
 import { useImageUpload } from '../../hooks/useImageUpload'
 import { Category } from '@/types'
+import { logger } from '@quelyos/logger';
 
 interface CategoryFormData {
   name: string
@@ -172,6 +173,7 @@ export default function Categories() {
       setFormData({ name: '', parent_id: '' })
       setIsCreating(false)
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error('Erreur lors de la création de la catégorie')
     }
   }
@@ -192,6 +194,7 @@ export default function Categories() {
       setFormData({ name: '', parent_id: '' })
       setEditingCategory(null)
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error('Erreur lors de la modification de la catégorie')
     }
   }
@@ -204,6 +207,7 @@ export default function Categories() {
       toast.success(`La catégorie "${deleteModal.name}" a été supprimée avec succès`)
       setDeleteModal(null)
     } catch (error) {
+      logger.error("Erreur:", error);
       toast.error('Erreur lors de la suppression de la catégorie')
     }
   }
@@ -214,6 +218,7 @@ export default function Categories() {
         await moveCategoryMutation.mutateAsync({ id: categoryId, newParentId })
         toast.success('Catégorie déplacée avec succès')
       } catch (error) {
+      logger.error("Erreur:", error);
         toast.error('Erreur lors du déplacement de la catégorie')
       }
     },

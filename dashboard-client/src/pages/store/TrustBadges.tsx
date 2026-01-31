@@ -16,6 +16,7 @@ import { useTrustBadges, useCreateTrustBadge, useUpdateTrustBadge, useDeleteTrus
 import { Button, SkeletonTable, PageNotice, Breadcrumbs } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
 import { storeNotices } from '@/lib/notices'
+import { logger } from '@quelyos/logger';
 
 const ICON_OPTIONS = [
   { value: 'creditcard', label: 'Carte bancaire (Paiement sécurisé)' },
@@ -82,6 +83,7 @@ export default function TrustBadges() {
       }
       handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la sauvegarde')
     }
   }
@@ -93,6 +95,7 @@ export default function TrustBadges() {
       toast.success('Badge supprimé')
       if (editingBadge?.id === id) handleCancel()
     } catch {
+      logger.error("Erreur attrapée");
       toast.error('Erreur lors de la suppression')
     }
   }

@@ -14,6 +14,7 @@ import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { apiFetchJson } from '@/lib/apiFetch';
+import { logger } from '@quelyos/logger';
 
 interface BlogPost {
   id: number;
@@ -68,6 +69,7 @@ export default function Blog() {
         setCategories(data.result.categories);
       }
     } catch {
+      logger.error("Erreur attrapée");
       // Categories fetch error silenced
     }
   };
@@ -92,6 +94,7 @@ export default function Blog() {
         setError('Erreur lors du chargement des articles');
       }
     } catch {
+      logger.error("Erreur attrapée");
       setError('Erreur de connexion au serveur');
     } finally {
       setLoading(false);

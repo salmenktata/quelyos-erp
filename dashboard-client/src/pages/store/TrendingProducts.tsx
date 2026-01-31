@@ -31,6 +31,7 @@ import {
 } from '@/hooks/useTrendingProducts';
 import { useToast } from '@/hooks/useToast';
 import { formatPrice } from '@/lib/utils/formatters';
+import { logger } from '@quelyos/logger';
 
 export default function TrendingProducts() {
   const toast = useToast();
@@ -56,6 +57,7 @@ export default function TrendingProducts() {
       await toggleTrending.mutateAsync(productId);
       toast.success('Statut mis à jour');
     } catch (_err) {
+      logger.error("Erreur:", _err);
       toast.error('Erreur lors de la mise à jour');
     }
   };
@@ -77,6 +79,7 @@ export default function TrendingProducts() {
       setEditingProduct(null);
       toast.success('Données mises à jour');
     } catch (_err) {
+      logger.error("Erreur:", _err);
       toast.error('Erreur lors de la sauvegarde');
     }
   };
