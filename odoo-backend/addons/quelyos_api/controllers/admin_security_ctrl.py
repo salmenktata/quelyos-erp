@@ -15,6 +15,7 @@ class AdminSecurityController(SuperAdminController):
     @http.route('/api/super-admin/settings/cors', type='http', auth='public', methods=['GET', 'OPTIONS'], csrf=False)
     def list_cors_entries(self):
         """Liste les entrées CORS whitelist"""
+        from ..config import get_cors_headers
         origin = request.httprequest.headers.get('Origin', '')
         cors_headers = get_cors_headers(origin)
 
