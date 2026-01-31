@@ -11,7 +11,6 @@
 import { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import { Plus, Edit, Trash2, ChevronDown, ChevronRight, HelpCircle, AlertCircle } from 'lucide-react';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { apiFetchJson } from '@/lib/apiFetch';
@@ -156,16 +155,16 @@ export default function FAQPage() {
 
   if (loading && categories.length === 0) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <SkeletonTable rows={6} columns={4} />
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -456,6 +455,6 @@ export default function FAQPage() {
           </div>
         )}
       </div>
-    </Layout>
+    
   );
 }

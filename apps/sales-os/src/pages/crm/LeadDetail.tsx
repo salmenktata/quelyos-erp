@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Edit2, Save, X, DollarSign, Percent, Calendar } from 'lucide-react'
-import { Layout } from '@/components/Layout'
 import { useLead } from '@/hooks/useLead'
 import { useUpdateLead } from '@/hooks/useUpdateLead'
 import { toast } from 'sonner'
@@ -72,17 +71,17 @@ export default function LeadDetail() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
-      </Layout>
+      
     )
   }
 
   if (!lead) {
     return (
-      <Layout>
+      
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Opportunité introuvable
@@ -94,12 +93,12 @@ export default function LeadDetail() {
             Retour à la liste
           </Link>
         </div>
-      </Layout>
+      
     )
   }
 
   return (
-    <Layout>
+    
       <div className="space-y-6">
         {/* Breadcrumbs */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
@@ -358,6 +357,6 @@ export default function LeadDetail() {
           </div>
         </div>
       </div>
-    </Layout>
+    
   )
 }

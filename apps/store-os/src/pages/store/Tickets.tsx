@@ -11,7 +11,6 @@
 import { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import { MessageSquare, Clock, User, Send, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { apiFetchJson } from '@/lib/apiFetch';
@@ -190,16 +189,16 @@ export default function Tickets() {
 
   if (loading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <SkeletonTable rows={6} columns={4} />
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -432,6 +431,6 @@ export default function Tickets() {
           </div>
         </div>
       </div>
-    </Layout>
+    
   );
 }

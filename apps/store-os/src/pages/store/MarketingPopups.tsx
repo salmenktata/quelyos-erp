@@ -10,7 +10,6 @@
  */
 
 import { useState } from 'react'
-import { Layout } from '../../components/Layout'
 import { useMarketingPopups, useCreateMarketingPopup, useUpdateMarketingPopup, useDeleteMarketingPopup, MarketingPopup } from '../../hooks/useMarketingPopups'
 import { Button, SkeletonTable, PageNotice, Breadcrumbs } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
@@ -157,7 +156,7 @@ export default function MarketingPopupsPage() {
   const showForm = isCreating || editingPopup
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
@@ -405,6 +404,6 @@ export default function MarketingPopupsPage() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }

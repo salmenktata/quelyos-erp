@@ -11,7 +11,6 @@
 
 import { useState } from 'react'
 import { ClipboardList, Search, Filter, Download, RefreshCw, AlertCircle } from 'lucide-react'
-import { Layout } from '../../components/Layout'
 import { Breadcrumbs, Button, SkeletonTable, PageNotice } from '../../components/common'
 import { posNotices } from '../../lib/notices/pos-notices'
 import { usePOSOrders } from '../../hooks/pos/usePOSOrders'
@@ -22,7 +21,7 @@ export default function POSOrders() {
   const orders = data?.orders || []
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -137,6 +136,6 @@ export default function POSOrders() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }

@@ -11,7 +11,6 @@
  */
 
 import { useState } from "react";
-import { Layout } from "@/components/Layout";
 import { Breadcrumbs, PageNotice } from "@/components/common";
 import { financeNotices } from "@/lib/notices";
 import { Card } from "@/components/ui/card";
@@ -122,7 +121,7 @@ export default function SupplierForm({ initialData, supplierId, mode }: Supplier
   };
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -360,6 +359,6 @@ export default function SupplierForm({ initialData, supplierId, mode }: Supplier
         </div>
       </form>
       </div>
-    </Layout>
+    
   );
 }

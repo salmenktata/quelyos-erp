@@ -8,7 +8,6 @@
  * - Filtrage par année
  */
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeaveAllocations, useLeaveBalances, useLeaveTypes, useBulkCreateAllocations } from '@/hooks/hr'
@@ -40,7 +39,7 @@ export default function AllocationsPage() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -226,7 +225,7 @@ export default function AllocationsPage() {
           />
         )}
       </div>
-    </Layout>
+    
   )
 }
 

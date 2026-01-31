@@ -24,7 +24,6 @@ import {
   Image as ImageIcon,
   Package,
 } from 'lucide-react'
-import { Layout } from '../../components/Layout'
 import {
   useProducts,
   useDeleteProduct,
@@ -372,7 +371,7 @@ export default function Products() {
   }, [])
 
   return (
-    <Layout>
+    
       <div className="p-8">
         <Breadcrumbs
           items={[
@@ -663,6 +662,6 @@ export default function Products() {
 
         <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} position="top-right" />
       </div>
-    </Layout>
+    
   )
 }

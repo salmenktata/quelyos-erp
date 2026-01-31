@@ -14,7 +14,6 @@
  */
 
 import { useEffect, useState, useMemo, useCallback } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, SkeletonTable, PageNotice, Button } from '@/components/common'
 import { financeNotices } from '@/lib/notices'
 import { api } from '@/lib/finance/api'
@@ -295,9 +294,7 @@ export default function BudgetsPage() {
     setEditingBudget(null)
   }, [editingBudget, refetchBudgets])
 
-  return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
+  return (      <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
@@ -502,7 +499,5 @@ export default function BudgetsPage() {
             </Button>
           </div>
         )}
-      </div>
-    </Layout>
-  )
+      </div>  )
 }

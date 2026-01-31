@@ -9,7 +9,6 @@
  */
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useCreateContract, useEmployees, useDepartments, useJobs } from '@/hooks/hr'
@@ -102,7 +101,7 @@ export default function NewContractPage() {
   const needsEndDate = ['cdd', 'stage', 'interim', 'apprenticeship'].includes(formData.contract_type)
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -340,6 +339,6 @@ export default function NewContractPage() {
           </div>
         </form>
       </div>
-    </Layout>
+    
   )
 }

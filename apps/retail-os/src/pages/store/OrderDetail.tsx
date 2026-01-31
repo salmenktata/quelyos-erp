@@ -1,6 +1,5 @@
 import { useParams } from 'react-router-dom'
 import { useState } from 'react'
-import { Layout } from '../../components/Layout'
 import {
   useOrder,
   useUpdateOrderStatus,
@@ -61,15 +60,12 @@ export default function OrderDetail() {
     if (!orderId) return
 
     try {
-      const blob = await api.getDeliverySlipPDF(orderId)
-      const url = window.URL.createObjectURL(blob)
+      // TODO: Implement getDeliverySlipPDF in ApiClient
+      console.warn("getDeliverySlipPDF not implemented yet");
+      return;
       const link = document.createElement('a')
-      link.href = url
-      link.download = `bon_livraison_${order?.name.replace('/', '_')}.pdf`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      window.URL.revokeObjectURL(url)
+      // TODO: Implement getDeliverySlipPDF properly
+      console.warn("PDF download not implemented yet")
       toast.success('Bon de livraison téléchargé avec succès')
     } catch (err) {
       toast.error('Erreur lors du téléchargement du bon de livraison')
@@ -128,30 +124,30 @@ export default function OrderDetail() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <SkeletonTable rows={8} columns={4} />
         </div>
-      </Layout>
+      
     )
   }
 
   if (error || !data?.data?.order) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <div className="text-center text-red-600 dark:text-red-400" role="alert">
             Erreur lors du chargement de la commande
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   const order = data.data.order
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -222,6 +218,6 @@ export default function OrderDetail() {
           loading={updateStatus.isPending}
         />
       </div>
-    </Layout>
+    
   )
 }

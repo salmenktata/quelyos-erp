@@ -60,7 +60,7 @@ export function VariantStockTable({ productId, variants, onStockUpdated }: Props
     }
 
     try {
-      await updateStockMutation.mutateAsync({ productId, variantId, quantity })
+      await updateStockMutation.mutateAsync(variantId, quantity)
       success('Stock de la variante mis à jour avec succès')
       setEditingVariantId(null)
       setEditingQuantity('')

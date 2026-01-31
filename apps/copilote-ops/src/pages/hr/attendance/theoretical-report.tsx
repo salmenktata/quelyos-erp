@@ -12,7 +12,6 @@
  */
 
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { hrNotices } from '@/lib/notices'
 import { Download, TrendingUp, TrendingDown, Minus } from 'lucide-react'
@@ -49,7 +48,7 @@ export default function TheoreticalTimeReport() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
@@ -202,6 +201,6 @@ export default function TheoreticalTimeReport() {
           </table>
         </div>
       </div>
-    </Layout>
+    
   )
 }

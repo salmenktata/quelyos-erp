@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Badge, Skeleton } from '@/components/common';
 import { useMarketingCampaigns } from '@/hooks/useMarketingCampaigns';
 import { useSMSQuota } from '@/hooks/useSMSConfig';
@@ -42,7 +41,7 @@ export default function SMSCampaignsPage() {
   };
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -205,6 +204,6 @@ export default function SMSCampaignsPage() {
           </div>
         </div>
       </div>
-    </Layout>
+    
   );
 }

@@ -11,7 +11,6 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Layout } from "@/components/Layout";
 import { Breadcrumbs, PageNotice, SkeletonTable, Button } from "@/components/common";
 import { financeNotices } from "@/lib/notices/finance-notices";
 import { ROUTES } from "@/lib/finance/compat/routes";
@@ -130,9 +129,7 @@ export default function ArchivesPage() {
     }
   }
 
-  return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
+  return (      <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs items={[
           { label: "Finance", href: "/finance" },
           { label: "Archives" }
@@ -327,7 +324,5 @@ export default function ArchivesPage() {
           </div>
         )}
       </div>
-      </div>
-    </Layout>
-  );
+      </div>  );
 }

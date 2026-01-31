@@ -8,7 +8,6 @@
  * - Actions rapides (démarrer, voir)
  */
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useAppraisals, useCreateAppraisal, useAppraisalAction, useEmployees } from '@/hooks/hr'
@@ -64,7 +63,7 @@ export default function AppraisalsPage() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -267,7 +266,7 @@ export default function AppraisalsPage() {
           />
         )}
       </div>
-    </Layout>
+    
   )
 }
 

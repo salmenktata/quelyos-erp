@@ -8,6 +8,7 @@ import {
   Coins,
   FolderOpen,
   Users,
+  Mail,
   Bell,
   Calendar,
   Upload,
@@ -412,7 +413,7 @@ export const MODULES: Module[] = [
       {
         title: 'Audiences',
         items: [
-          { name: 'Listes de contacts', path: '/marketing/contacts', icon: Users },
+          { name: 'Listes de diffusion', path: '/marketing/lists', icon: Users },
         ],
       },
       {

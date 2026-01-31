@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, Badge, Skeleton } from '@/components/common'
 import { useDashboardStats, useDashboardRecentOrders } from '@/hooks/useDashboard'
 import { useProducts } from '@/hooks/useProducts'
@@ -121,7 +120,7 @@ export default function StoreDashboard() {
     : 0
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -426,6 +425,6 @@ export default function StoreDashboard() {
           </div>
         </div>
       </div>
-    </Layout>
+    
   )
 }

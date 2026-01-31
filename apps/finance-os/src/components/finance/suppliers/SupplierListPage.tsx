@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ModularLayout } from "@/components/ModularLayout";
 import { PageHeader } from "@/components/finance/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Building2, FileText, CreditCard } from "lucide-react";
@@ -91,7 +90,7 @@ export default function SupplierListPage() {
   };
 
   return (
-    <ModularLayout>
+    
       <div className="p-8 space-y-6">
         <PageHeader
           icon={Building2}
@@ -260,6 +259,6 @@ export default function SupplierListPage() {
           </div>
         )}
       </div>
-    </ModularLayout>
+    
   );
 }

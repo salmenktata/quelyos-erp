@@ -9,7 +9,6 @@
  */
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import {
@@ -118,20 +117,20 @@ export default function EmployeeDetailPage() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 space-y-6">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
             <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-xl" />
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   if (!employee) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 text-center">
           <AlertTriangle className="w-12 h-12 mx-auto text-amber-500 mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
@@ -141,12 +140,12 @@ export default function EmployeeDetailPage() {
             Retour à la liste
           </Link>
         </div>
-      </Layout>
+      
     )
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -527,7 +526,7 @@ export default function EmployeeDetailPage() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }
 

@@ -10,7 +10,6 @@
  */
 
 import { useState } from 'react'
-import { Layout } from '../../components/Layout'
 import { Breadcrumbs, Badge, PageNotice, SkeletonTable, Button } from '../../components/common'
 import { stockNotices } from '@/lib/notices'
 import { useReorderingRules, useDeleteReorderingRule, useToggleReorderingRule } from '../../hooks/finance/useReorderingRules'
@@ -83,7 +82,7 @@ export default function ReorderingRules() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
@@ -357,6 +356,6 @@ export default function ReorderingRules() {
           }}
         />
       </div>
-    </Layout>
+    
   )
 }

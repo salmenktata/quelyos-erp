@@ -8,7 +8,6 @@
  * - État actif/inactif
  */
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeaveTypes, type LeaveType } from '@/hooks/hr'
@@ -24,7 +23,7 @@ export default function LeaveTypesPage() {
   const { data: leaveTypes, isLoading } = useLeaveTypes(tenant?.id || null)
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -106,7 +105,7 @@ export default function LeaveTypesPage() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }
 

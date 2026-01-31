@@ -13,10 +13,15 @@ export default function Login() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError('')
+    console.log('[DEBUG Login] Calling login...')
     const result = await login(email, password)
+    console.log('[DEBUG Login] Login result:', result)
     if (result.success) {
+      console.log('[DEBUG Login] Success! Navigating to /')
       navigate('/', { replace: true })
+      console.log('[DEBUG Login] Navigate called')
     } else {
+      console.log('[DEBUG Login] Login failed:', result.error)
       setError(result.error || 'Identifiants invalides')
     }
   }
@@ -48,17 +53,17 @@ export default function Login() {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email
+              Email ou Login
             </label>
             <input
               id="email"
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              autoComplete="email"
+              autoComplete="username"
               className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              placeholder="email@example.com"
+              placeholder="admin ou email@example.com"
             />
           </div>
 

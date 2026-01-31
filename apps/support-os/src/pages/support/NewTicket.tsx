@@ -10,7 +10,6 @@
  */
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { supportNotices } from '@/lib/notices'
 import { useCreateTicket } from '@/hooks/useTickets'
@@ -111,7 +110,7 @@ export default function NewTicket() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -288,6 +287,6 @@ export default function NewTicket() {
           </div>
         </form>
       </div>
-    </Layout>
+    
   )
 }

@@ -1,6 +1,5 @@
 import { useParams } from 'react-router-dom'
 import { useState } from 'react'
-import { Layout } from '../../components/Layout'
 import {
   useOrder,
   useUpdateOrderStatus,
@@ -128,30 +127,30 @@ export default function OrderDetail() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <SkeletonTable rows={8} columns={4} />
         </div>
-      </Layout>
+      
     )
   }
 
   if (error || !data?.data?.order) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <div className="text-center text-red-600 dark:text-red-400" role="alert">
             Erreur lors du chargement de la commande
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   const order = data.data.order
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -222,6 +221,6 @@ export default function OrderDetail() {
           loading={updateStatus.isPending}
         />
       </div>
-    </Layout>
+    
   )
 }

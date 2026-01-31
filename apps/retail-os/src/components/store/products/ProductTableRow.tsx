@@ -91,7 +91,7 @@ export const ProductTableRow = memo(function ProductTableRow({
         {product.price?.toFixed(2)} €
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        {getStockBadge(product.stock_status ?? "out_of_stock", product.qty_available ?? 0)}
+        {getStockBadge(product.stock_status ?? "out_of_stock", product.stock_quantity ?? 0)}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <div className="flex items-center justify-end gap-2">

@@ -12,7 +12,6 @@
 import { useState } from 'react'
 import { Clock, Search, AlertCircle, RefreshCw, PlayCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Layout } from '../../components/Layout'
 import { Breadcrumbs, Button, SkeletonTable, PageNotice } from '../../components/common'
 import { usePOSSessions } from '../../hooks/pos/usePOSSessions'
 import { posNotices } from '../../lib/notices/pos-notices'
@@ -36,7 +35,7 @@ export default function POSSessions() {
   })
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -168,6 +167,6 @@ export default function POSSessions() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }

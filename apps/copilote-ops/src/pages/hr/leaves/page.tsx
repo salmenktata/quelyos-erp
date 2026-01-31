@@ -9,7 +9,6 @@
  * - Création de nouvelles demandes
  */
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeaves, useApproveLeave, useRefuseLeave, useLeaveTypes, type Leave } from '@/hooks/hr'
@@ -40,7 +39,8 @@ export default function LeavesPage() {
     limit: 100,
   })
 
-  const { data: leaveTypes } = useLeaveTypes(tenant?.id || null)
+  const { data: leaveTypesData } = useLeaveTypes(tenant?.id || 0)
+  const leaveTypes = leaveTypesData?.data || []
   const { mutate: approveLeave, isPending: isApproving } = useApproveLeave()
   const { mutate: refuseLeave, isPending: isRefusing } = useRefuseLeave()
 
@@ -51,7 +51,7 @@ export default function LeavesPage() {
   }
 
   const handleRefuse = (leave: Leave) => {
-    refuseLeave({ id: leave.id })
+    refuseLeave(leave.id)
   }
 
   const getStateColor = (state: string) => {
@@ -75,7 +75,7 @@ export default function LeavesPage() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 space-y-6">
           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse" />
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse" />
@@ -85,12 +85,12 @@ export default function LeavesPage() {
             ))}
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -203,7 +203,7 @@ export default function LeavesPage() {
                     </td>
                     <td className="px-4 py-3">
                       {(() => {
-                        const colorHex = colorIndexToHex((leave as { leave_type_color?: number | string }).leave_type_color)
+                        const colorHex = colorIndexToHex(Number((leave as any).leave_type_color) || 0)
                         return (
                           <span
                             className="px-2 py-1 text-xs rounded-full"
@@ -298,7 +298,7 @@ export default function LeavesPage() {
           />
         )}
       </div>
-    </Layout>
+    
   )
 }
 
@@ -313,7 +313,7 @@ function LeaveDetailModal({
   onApprove: () => void
   onRefuse: () => void
 }) {
-  const canAction = leave.state === 'confirm' || leave.state === 'validate1'
+  const canAction = leave.state === 'pending' || leave.state === 'approved'
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

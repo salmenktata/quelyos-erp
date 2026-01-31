@@ -11,7 +11,6 @@
  */
 
 import { useState } from "react"
-import { Layout } from "@/components/Layout"
 import { Breadcrumbs, Badge, PageNotice } from "@/components/common"
 import { stockNotices } from "@/lib/notices"
 import {
@@ -83,7 +82,7 @@ export default function StockTurnoverPage() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
@@ -359,6 +358,6 @@ export default function StockTurnoverPage() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }

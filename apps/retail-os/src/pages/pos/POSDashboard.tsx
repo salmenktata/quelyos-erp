@@ -23,7 +23,6 @@ import {
   AlertCircle,
   RefreshCw,
 } from 'lucide-react'
-import { Layout } from '../../components/Layout'
 import { Breadcrumbs, Button, PageNotice } from '../../components/common'
 import { posNotices } from '../../lib/notices/pos-notices'
 import { usePOSDashboard, usePOSActiveSessions } from '../../hooks/pos/usePOSDashboard'
@@ -48,7 +47,7 @@ export default function POSDashboard() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -301,7 +300,7 @@ export default function POSDashboard() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }
 

@@ -8,7 +8,6 @@
  * - Filtrage par année
  */
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeaveAllocations, useLeaveBalances, useLeaveTypes, useBulkCreateAllocations } from '@/hooks/hr'
@@ -25,22 +24,23 @@ export default function AllocationsPage() {
     tenant_id: tenant?.id || 0,
   })
 
-  const { data: balancesData } = useLeaveBalances(tenant?.id || null, null)
-  const { data: leaveTypes } = useLeaveTypes(tenant?.id || null)
+  const { data: balancesData } = useLeaveBalances({ tenantId: tenant?.id || 0 })
+  const { data: leaveTypesData } = useLeaveTypes(tenant?.id || 0)
+  const leaveTypes = leaveTypesData?.data || []
   const { mutate: bulkCreate, isPending: isBulkCreating } = useBulkCreateAllocations()
 
   const allocations = allocationsData?.allocations || []
-  const balances = balancesData || []
+  const balances = balancesData?.data || []
+
 
   const handleBulkCreate = (data: { leave_type_id: number; number_of_days: number }) => {
     if (tenant?.id) {
-      bulkCreate({ tenant_id: tenant.id, ...data })
+      bulkCreate({ tenant_id: tenant.id, allocations: [data as any] })
       setShowBulkModal(false)
     }
   }
-
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -226,7 +226,7 @@ export default function AllocationsPage() {
           />
         )}
       </div>
-    </Layout>
+    
   )
 }
 

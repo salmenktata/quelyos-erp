@@ -366,6 +366,87 @@ Alerter AVANT : schéma DB, modèles Odoo, endpoints API
 4. **Vérifier** que la page existe dans `dashboard-client` (source de vérité)
 5. **Ne jamais** ajouter de fonctionnalité à un SaaS qui n'existe pas dans le ERP complet
 
+
+## 🔄 CORRECTIONS CROSS-SAAS - PROPAGATION OBLIGATOIRE
+**RÈGLE ABSOLUE** : À chaque correction de bug dans un SaaS, TOUJOURS vérifier et corriger les 6 autres SaaS si applicable.
+
+**Principe** : Les 7 SaaS partagent une architecture commune. Un bug dans `store-os` existe probablement dans `finance-os`, `sales-os`, `retail-os`, `team-os`, `support-os`, `copilote-ops`.
+
+### Fichiers à vérifier systématiquement
+**Après correction dans `apps/[saas-name]/src/`, TOUJOURS vérifier** :
+
+| Fichier corrigé | SaaS à vérifier |
+|----------------|-----------------|
+| `lib/*/compat/auth.ts` | **TOUS les 7 SaaS** (authentification commune) |
+| `lib/api.ts` | **TOUS les 7 SaaS** (client API commun) |
+| `lib/tokenService.ts` | **TOUS les 7 SaaS** (gestion tokens JWT) |
+| `main.tsx` | **TOUS les 7 SaaS** (point d'entrée React) |
+| `pages/Login.tsx` | **TOUS les 7 SaaS** (page login commune) |
+| `vite.config.ts` | **TOUS les 7 SaaS** (config build) |
+| `hooks/use*.ts` | SaaS avec modules similaires |
+| `components/common/*` | SaaS avec modules similaires |
+
+### Processus obligatoire
+**À chaque correction de bug** :
+1. ✅ Corriger le bug dans le SaaS actuel
+2. ✅ Identifier le fichier/pattern corrigé
+3. ✅ **Utiliser Grep** : `grep -r "pattern_problématique" apps/*/src/` pour trouver occurrences
+4. ✅ **Corriger tous les SaaS** concernés en une seule passe
+5. ✅ Vérifier que la correction compile partout (`pnpm build --filter=@quelyos/*`)
+6. ✅ Mentionner dans le commit : "fix(cross-saas): [description] — 7 SaaS"
+
+### Exemples concrets
+
+#### Exemple 1 : Virgule mal placée dans auth.ts (bug actuel)
+```bash
+# ❌ MAUVAIS - Corriger uniquement store-os
+sed -i '' 's/!!user \/\//!!user, \/\//' apps/store-os/src/lib/store/compat/auth.ts
+
+# ✅ BON - Corriger TOUS les SaaS
+for saas in finance-os store-os copilote-ops sales-os retail-os team-os support-os; do
+  sed -i '' 's/!!user \/\//!!user, \/\//' apps/$saas/src/lib/*/compat/auth.ts
+done
+```
+
+#### Exemple 2 : useEffect avec deps manquantes
+```bash
+# Après correction dans retail-os, vérifier les autres
+grep -r "useEffect.*fetchData" apps/*/src/hooks/
+# Corriger toutes les occurrences trouvées
+```
+
+#### Exemple 3 : Import manquant
+```bash
+# Si ajout d'import dans sales-os
+grep -r "from '@/lib/api'" apps/*/src/pages/Login.tsx
+# Vérifier cohérence des imports partout
+```
+
+### Modules partagés entre SaaS
+| Module | SaaS concernés |
+|--------|---------------|
+| `store` | store-os, retail-os |
+| `marketing` | store-os, sales-os |
+| `crm` | sales-os, support-os |
+| `stock` | copilote-ops, retail-os |
+| `hr` | copilote-ops, team-os |
+| `pos` | retail-os |
+| `finance` | finance-os |
+| `support` | support-os |
+
+**Correction dans un hook de module** → Vérifier les SaaS qui partagent ce module.
+
+### Tolérance ZÉRO
+- ❌ Ne JAMAIS corriger un seul SaaS et ignorer les autres
+- ❌ Ne JAMAIS attendre qu'un utilisateur signale le même bug ailleurs
+- ✅ TOUJOURS penser "correction = propagation cross-SaaS"
+- ✅ TOUJOURS utiliser `grep` pour détecter patterns similaires
+
+**Cette règle évite** :
+- Bugs identiques dans plusieurs SaaS
+- Incohérences d'implémentation
+- Maintenance technique corrective répétitive
+- Expérience utilisateur dégradée sur certains SaaS
 ## Essentiels
 1. Lire [README.md](README.md), [ARCHITECTURE.md](ARCHITECTURE.md) et [LOGME.md](docs/LOGME.md) en début de session
 2. Lire [docs/QUELYOS_SUITE_7_SAAS_PLAN.md](docs/QUELYOS_SUITE_7_SAAS_PLAN.md) pour le contexte stratégique

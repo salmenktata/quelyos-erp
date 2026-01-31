@@ -1,19 +1,5 @@
 import { useState, useEffect } from 'react'
-
-interface AttributeValue {
-  id: number
-  name: string
-  html_color?: string | null
-  sequence: number
-}
-
-interface Attribute {
-  id: number
-  name: string
-  display_type: string
-  create_variant: string
-  values: AttributeValue[]
-}
+import type { Attribute, AttributeValue } from "@/types"
 
 interface AttributeFilterProps {
   attributes: Attribute[]

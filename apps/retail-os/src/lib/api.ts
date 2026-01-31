@@ -259,6 +259,94 @@ class ApiClient {
   async deleteAttribute(id: number) {
     return this.delete(`/api/store/attributes/${id}`)
   }
+  // Extended methods for Retail OS
+  
+  // Product variants
+  async getProductVariants(productId: number) {
+    return this.post(`/api/products/${productId}/variants`, {})
+  }
+  
+  async updateProductVariant(variantId: number, data: unknown) {
+    return this.post(`/api/products/variants/${variantId}/update`, data)
+  }
+  
+  async updateVariantStock(variantId: number, quantity: number) {
+    return this.post(`/api/products/variants/${variantId}/stock`, { quantity })
+  }
+  
+  async regenerateProductVariants(productId: number) {
+    return this.post(`/api/products/${productId}/variants/regenerate`, {})
+  }
+  
+  // Product attributes (extended)
+  async getAllAttributes() {
+    return this.getAttributes()
+  }
+  
+  async addProductAttribute(productId: number, data: unknown) {
+    return this.post(`/api/products/${productId}/attributes`, data)
+  }
+  
+  async updateProductAttribute(productId: number, attributeLineId: number, data: unknown) {
+    return this.post(`/api/products/${productId}/attributes/${attributeLineId}`, data)
+  }
+  
+  async deleteProductAttribute(productId: number, attributeLineId: number) {
+    return this.post(`/api/products/${productId}/attributes/${attributeLineId}/delete`, {})
+  }
+  
+  // Product images (extended)
+  async uploadProductImages(productId: number, files: File[]) {
+    const formData = new FormData()
+    files.forEach((file, i) => formData.append(`image_${i}`, file))
+    return this.post(`/api/products/${productId}/images`, formData)
+  }
+  
+  async getProductAttributeImages(productId: number) {
+    return this.post(`/api/products/${productId}/attribute-images`, {})
+  }
+  
+  // Attribute value images
+  async getAttributeValueImages(valueId: number) {
+    return this.post(`/api/attributes/values/${valueId}/images`, {})
+  }
+  
+  async uploadAttributeValueImages(valueId: number, files: File[]) {
+    const formData = new FormData()
+    files.forEach((file, i) => formData.append(`image_${i}`, file))
+    return this.post(`/api/attributes/values/${valueId}/images`, formData)
+  }
+  
+  async deleteAttributeValueImage(imageId: number) {
+    return this.post(`/api/attributes/values/images/${imageId}/delete`, {})
+  }
+  
+  async reorderAttributeValueImages(valueId: number, imageIds: number[]) {
+    return this.post(`/api/attributes/values/${valueId}/images/reorder`, { image_ids: imageIds })
+  }
+  
+  // Coupons (extended)
+  async getCoupon(couponId: number) {
+    return this.post(`/api/coupons/${couponId}`, {})
+  }
+  
+  // Ribbons
+  async getRibbons() {
+    return this.post('/api/ribbons', {})
+  }
+  
+  async updateProductRibbon(productId: number, ribbonId: number | null) {
+    return this.post(`/api/products/${productId}/ribbon`, { ribbon_id: ribbonId })
+  }
+  
+  // Orders (extended)
+  async getDeliverySlipPDF(orderId: number): Promise<Blob> {
+    const response = await this.request<Blob>(`/api/orders/${orderId}/delivery-slip`, { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    return response
+  }
 }
 
 export const api = new ApiClient(API_URL)

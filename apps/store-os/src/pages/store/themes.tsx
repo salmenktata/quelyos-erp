@@ -10,7 +10,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Layout } from '@/components/Layout';
 import { logger } from '@quelyos/logger';
 import { Breadcrumbs, Button, PageNotice, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
@@ -133,18 +132,18 @@ export default function ThemesPage() {
   // Loading State
   if (loading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 space-y-6">
           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse" />
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse" />
           <SkeletonTable rows={6} columns={3} />
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* 1. Breadcrumbs - TOUJOURS en premier */}
         <Breadcrumbs
@@ -301,6 +300,6 @@ export default function ThemesPage() {
           </div>
         )}
       </div>
-    </Layout>
+    
   );
 }

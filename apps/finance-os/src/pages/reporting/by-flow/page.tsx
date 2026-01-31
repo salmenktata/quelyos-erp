@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState } from "react";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
-import { ModularLayout } from "@/components/ModularLayout";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { reportingClient, type ByFlowResponse } from "@/lib/finance/reporting";
 import { useApiData } from "@/hooks/finance/useApiData";
@@ -131,7 +130,7 @@ export default function ReportingByFlowPage() {
   }, [data]);
 
   return (
-    <ModularLayout>
+    
     <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
@@ -400,6 +399,6 @@ export default function ReportingByFlowPage() {
         </div>
       </div>
     </div>
-    </ModularLayout>
+    
     );
 }

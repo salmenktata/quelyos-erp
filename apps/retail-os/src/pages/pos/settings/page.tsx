@@ -11,7 +11,6 @@
 
 import { Monitor, Banknote, Printer } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Layout } from '../../../components/Layout'
 import { Breadcrumbs, PageNotice } from '../../../components/common'
 import { posNotices } from '../../../lib/notices/pos-notices'
 
@@ -41,7 +40,7 @@ const settingsSections = [
 
 export default function POSSettings() {
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -92,6 +91,6 @@ export default function POSSettings() {
           })}
         </div>
       </div>
-    </Layout>
+    
   )
 }

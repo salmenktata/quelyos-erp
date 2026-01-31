@@ -34,14 +34,13 @@ export function useAuth(): AuthContextType {
   const initialized = useRef(false)
   const [isLoading, setIsLoading] = useState(!tokenService.isAuthenticated())
   const [user, setUser] = useState<User | null>(() => {
-    const storedUser = tokenService.getUser()
-    if (storedUser) {
-      return {
-        id: storedUser.id,
-        name: storedUser.name || '',
-        email: storedUser.email || '',
-        login: storedUser.login,
-        groups: storedUser.groups || [],
+    const storageKey = "quelyos_support_user"
+    const stored = localStorage.getItem(storageKey)
+    if (stored) {
+      try {
+        return JSON.parse(stored)
+      } catch {
+        return null
       }
     }
     return null
@@ -98,13 +97,18 @@ export function useAuth(): AuthContextType {
         const userData = result.user
 
         if (result.success && userData) {
-          setUser({
+          const userObj = {
             id: userData.id,
             name: userData.name,
             email: userData.email,
             login: userData.login,
             groups: userData.groups || [],
-          })
+          }
+          setUser(userObj)
+
+          // Stocker l'utilisateur dans localStorage pour persistance
+          localStorage.setItem('quelyos_support_user', JSON.stringify(userObj))
+
           setIsLoading(false)
           return { success: true }
         }
@@ -167,7 +171,7 @@ export function useAuth(): AuthContextType {
   return {
     user,
     isLoading,
-    isAuthenticated: !!user && tokenService.isAuthenticated(),
+    isAuthenticated: !!user, // Authentification par session (pas JWT)
     login,
     logout,
     checkAuth,

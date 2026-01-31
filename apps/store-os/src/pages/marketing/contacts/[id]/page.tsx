@@ -1,5 +1,4 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Badge, Skeleton, ConfirmModal } from '@/components/common';
 import { useContactList, useDeleteContactList } from '@/hooks/useContactLists';
 import { useToast } from '@/contexts/ToastContext';
@@ -46,17 +45,17 @@ export default function ContactListDetailPage() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <Skeleton height={400} />
         </div>
-      </Layout>
+      
     );
   }
 
   if (!list) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <div className="text-center py-12">
             <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -69,12 +68,12 @@ export default function ContactListDetailPage() {
             </Link>
           </div>
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -248,6 +247,6 @@ export default function ContactListDetailPage() {
           isLoading={deleteMutation.isPending}
         />
       </div>
-    </Layout>
+    
   );
 }

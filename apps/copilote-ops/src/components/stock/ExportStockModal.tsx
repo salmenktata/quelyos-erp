@@ -37,21 +37,16 @@ export function ExportStockModal({ isOpen, onClose }: ExportStockModalProps) {
   const onSubmit = async (data: ExportFilters) => {
     try {
       const response = await exportMutation.mutateAsync(data)
-
-      if (response.success && response.data) {
-        // Générer et télécharger le CSV
+      if (response?.success) {
+        const exportData = (response as any).data || []
         const filename = `stock_${new Date().toISOString().split('T')[0]}.csv`
-        exportToCSV(
-          response.data.data,
-          filename,
-          ['id', 'name', 'sku', 'qty_available', 'virtual_available', 'list_price', 'standard_price', 'valuation', 'category', 'create_date']
-        )
+        exportToCSV(exportData, filename)
 
-        success(`Export réussi : ${response.data.total} produits exportés`)
+        success(`Export réussi : ${Array.isArray(exportData) ? exportData.length : 0} produits exportés`)
         reset()
         onClose()
       } else {
-        showError(response.error || 'Erreur lors de l\'export')
+        showError((response as any).error || 'Erreur lors de l\'export')
       }
     } catch (error) {
       logger.error('Export stock error:', error)

@@ -12,7 +12,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Kanban, Plus } from 'lucide-react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, SkeletonTable, PageNotice, Button } from '@/components/common'
 import { crmNotices } from '@/lib/notices'
 import { LeadStats } from '@/components/leads/LeadStats'
@@ -53,7 +52,7 @@ export default function Leads() {
   const currentPage = Math.floor(offset / limit) + 1
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -147,6 +146,6 @@ export default function Leads() {
           <LeadEmpty />
         )}
       </div>
-    </Layout>
+    
   )
 }

@@ -8,7 +8,6 @@
  * - État actif/inactif
  */
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeaveTypes, type LeaveType } from '@/hooks/hr'
@@ -21,10 +20,11 @@ export default function LeaveTypesPage() {
   const [showModal, setShowModal] = useState(false)
   const [editingType, setEditingType] = useState<LeaveType | null>(null)
 
-  const { data: leaveTypes, isLoading } = useLeaveTypes(tenant?.id || null)
+  const { data: leaveTypesData, isLoading } = useLeaveTypes(tenant?.id || 0)
+  const leaveTypes = leaveTypesData?.data || []
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -106,7 +106,7 @@ export default function LeaveTypesPage() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }
 
@@ -136,7 +136,7 @@ function LeaveTypeCard({ leaveType, onEdit }: { leaveType: LeaveType; onEdit: ()
         <div className="flex items-center gap-3">
           <div
             className="w-4 h-4 rounded-full"
-            style={{ backgroundColor: colorIndexToHex(leaveType.color) }}
+            style={{ backgroundColor: leaveType.color.startsWith("#") ? leaveType.color : colorIndexToHex(parseInt(leaveType.color) || 0) }}
           />
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">

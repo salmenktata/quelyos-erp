@@ -3,7 +3,6 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ModularLayout } from "@/components/ModularLayout";
 import {
   PieChart,
   ChevronLeft,
@@ -182,7 +181,7 @@ export default function ByCategoryReportPage() {
   };
 
   return (
-    <ModularLayout>
+    
     <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
@@ -629,6 +628,6 @@ export default function ByCategoryReportPage() {
         )}
       </div>
     </div>
-    </ModularLayout>
+    
     );
 }

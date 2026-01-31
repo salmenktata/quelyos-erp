@@ -12,7 +12,6 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button } from '@/components/common';
 import { Star, Download, DollarSign, User, Check, ExternalLink, ShoppingCart, Sparkles } from 'lucide-react';
 import type { ThemeCategory } from '@/types/theme';
@@ -133,32 +132,32 @@ export default function MarketplaceThemeDetailPage() {
 
   if (loading) {
     return (
-      <Layout>
+      
         <div className="animate-pulse space-y-6">
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
           <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded"></div>
           <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
-      </Layout>
+      
     );
   }
 
   if (!theme) {
     return (
-      <Layout>
+      
         <div className="text-center py-12">
           <p className="text-gray-600 dark:text-gray-400">Thème introuvable</p>
           <Button variant="outline" onClick={() => navigate('/store/themes/marketplace')} className="mt-4">
             Retour au Marketplace
           </Button>
         </div>
-      </Layout>
+      
     );
   }
 
   if (purchased) {
     return (
-      <Layout>
+      
         <div className="max-w-2xl mx-auto text-center py-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full mb-6">
             <Check className="h-8 w-8 text-green-600 dark:text-green-400" />
@@ -178,12 +177,13 @@ export default function MarketplaceThemeDetailPage() {
             </Button>
           </div>
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
+    <>
       <Breadcrumbs
         items={[
           { label: 'Boutique', href: '/store' },
@@ -397,6 +397,7 @@ export default function MarketplaceThemeDetailPage() {
           </div>
         </div>
       </div>
-    </Layout>
+    
+    </>
   );
 }

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import DOMPurify from 'dompurify';
 import { useNavigate } from 'react-router-dom';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs } from '@/components/common';
 import { useCreateCampaign } from '@/hooks/useMarketingCampaigns';
 import { useContactLists } from '@/hooks/useContactLists';
@@ -108,7 +107,7 @@ export default function NewCampaignPage() {
   const selectedList = contactLists.find((l) => l.id === formData.contact_list_id);
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -599,6 +598,6 @@ export default function NewCampaignPage() {
           </div>
         </div>
       </div>
-    </Layout>
+    
   );
 }

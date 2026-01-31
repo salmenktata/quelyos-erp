@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Badge, Skeleton, ConfirmModal } from '@/components/common';
 import { useMarketingCampaigns, useDeleteCampaign, useDuplicateCampaign } from '@/hooks/useMarketingCampaigns';
 import { useToast } from '@/contexts/ToastContext';
@@ -87,7 +86,7 @@ export default function CampaignsPage() {
   };
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -296,6 +295,6 @@ export default function CampaignsPage() {
           isLoading={deleteMutation.isPending}
         />
       </div>
-    </Layout>
+    
   );
 }

@@ -58,7 +58,7 @@ export function useAttributeValueImages(
     queryKey: ['attributeValueImages', productId, ptavId],
     queryFn: async () => {
       if (!productId || !ptavId) throw new Error('Product ID and PTAV ID required')
-      const response = await api.getAttributeValueImages(productId, ptavId)
+      const response = await api.getAttributeValueImages(ptavId)
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to load images')
       }
@@ -84,7 +84,7 @@ export function useUploadAttributeValueImages(
   return useMutation({
     mutationFn: async (images: Array<{ name: string; image_1920: string }>) => {
       if (!productId || !ptavId) throw new Error('Product ID and PTAV ID required')
-      const response = await api.uploadAttributeValueImages(productId, ptavId, images)
+      const response = await api.uploadAttributeValueImages(ptavId, images as any)
       if (!response.success) {
         throw new Error(response.error || 'Failed to upload images')
       }
@@ -110,7 +110,7 @@ export function useDeleteAttributeValueImage(
   return useMutation({
     mutationFn: async (imageId: number) => {
       if (!productId || !ptavId) throw new Error('Product ID and PTAV ID required')
-      const response = await api.deleteAttributeValueImage(productId, ptavId, imageId)
+      const response = await api.deleteAttributeValueImage(imageId)
       if (!response.success) {
         throw new Error(response.error || 'Failed to delete image')
       }
@@ -136,7 +136,7 @@ export function useReorderAttributeValueImages(
   return useMutation({
     mutationFn: async (imageIds: number[]) => {
       if (!productId || !ptavId) throw new Error('Product ID and PTAV ID required')
-      const response = await api.reorderAttributeValueImages(productId, ptavId, imageIds)
+      const response = await api.reorderAttributeValueImages(ptavId, imageIds)
       if (!response.success) {
         throw new Error(response.error || 'Failed to reorder images')
       }

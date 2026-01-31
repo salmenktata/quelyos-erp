@@ -3,7 +3,6 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ModularLayout } from "@/components/ModularLayout";
 import {
   Briefcase,
   ChevronLeft,
@@ -109,7 +108,7 @@ export default function ByPortfolioReportPage() {
     : null;
 
   return (
-    <ModularLayout>
+    
     <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Navigation rapide entre rapports */}
@@ -395,6 +394,6 @@ export default function ByPortfolioReportPage() {
         )}
       </div>
     </div>
-    </ModularLayout>
+    
     );
 }

@@ -13,7 +13,6 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Layout } from "@/components/Layout";
 import { Breadcrumbs, PageNotice, SkeletonTable, Button } from "@/components/common";
 import { financeNotices } from "@/lib/notices";
 import { TrendingUp, TrendingDown, Target, Sparkles, BarChart3 } from "lucide-react";
@@ -74,9 +73,7 @@ export default function ForecastPage() {
       ]
     : [];
 
-  return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
+  return (      <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
@@ -204,7 +201,5 @@ export default function ForecastPage() {
         )}
 
         <AccountBreakdown accounts={forecast?.perAccount ?? []} currency={currency} />
-      </div>
-    </Layout>
-  );
+      </div>  );
 }

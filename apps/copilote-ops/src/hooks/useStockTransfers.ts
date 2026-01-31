@@ -1,32 +1,109 @@
-/**
- * Hook pour les transferts de stock
- */
-import { useState, useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { backendRpc } from '@/lib/backend-rpc'
+export { useStockLocations } from "./useStockLocations"
+import type { StockTransfer } from '@/types/stock'
+import { logger } from '@quelyos/logger'
 
-export interface StockTransfer {
-  id: number
-  reference: string
-  sourceWarehouse: string
-  destWarehouse: string
-  status: 'draft' | 'confirmed' | 'in_transit' | 'done' | 'cancelled'
-  scheduledDate: string
-  lines: Array<{ productName: string; quantity: number }>
+interface UseStockTransfersParams {
+  warehouse_id?: number
+  state?: string
+  limit?: number
+  offset?: number
 }
 
-export function useStockTransfers() {
-  const [isLoading] = useState(false)
-  const [data] = useState<StockTransfer[]>([])
-  const refresh = useCallback(() => { /* API */ }, [])
-  return { data, isLoading, error: null, refresh }
+export function useStockTransfers(params?: UseStockTransfersParams) {
+  const query = useQuery({
+    queryKey: ['stock', 'transfers', params],
+    queryFn: async () => {
+      const response = await backendRpc('/api/ecommerce/stock/transfers', params || {})
+      if (!response.success) {
+        logger.error('[useStockTransfers] API error:', response.error)
+        throw new Error(response.error || 'Échec du chargement des transferts')
+      }
+      return (response.data as any)?.transfers || response.data || []
+    },
+    staleTime: 2 * 60 * 1000,
+  })
+
+  return {
+    ...query,
+    data: query.data || [],
+    isPending: query.isPending,
+  }
 }
 
 export function useCreateTransfer() {
-  const mutateAsync = useCallback(async (_data: Partial<StockTransfer>) => { /* API */ }, [])
-  return { mutate: mutateAsync, mutateAsync, isLoading: false, isPending: false }
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationFn: async (params: Partial<StockTransfer>) => {
+      const response = await backendRpc('/api/ecommerce/stock/transfers/create', params)
+      if (!response.success) {
+        throw new Error(response.error || 'Échec de la création du transfert')
+      }
+      return response
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stock', 'transfers'] })
+      logger.info('[useCreateTransfer] Transfer created')
+    },
+  })
+
+  return {
+    mutate: (data: Partial<StockTransfer>) => mutation.mutate(data),
+    mutateAsync: async (data: Partial<StockTransfer>) => mutation.mutateAsync(data),
+    isPending: mutation.isPending,
+    isLoading: mutation.isPending,
+  }
 }
 
-export function useStockLocations() {
-  const [isLoading] = useState(false)
-  const [data] = useState<Array<{ id: number; name: string }>>([])
-  return { data, isLoading, error: null }
+export function useValidateTransfer() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationFn: async (transferId: number) => {
+      const response = await backendRpc(`/api/ecommerce/stock/transfers/${transferId}/validate`, {})
+      if (!response.success) {
+        throw new Error(response.error || 'Échec de la validation')
+      }
+      return response
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stock', 'transfers'] })
+    },
+  })
+
+  return {
+    mutate: mutation.mutate,
+    mutateAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    isLoading: mutation.isPending,
+  }
 }
+
+export function useCancelTransfer() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationFn: async (transferId: number) => {
+      const response = await backendRpc(`/api/ecommerce/stock/transfers/${transferId}/cancel`, {})
+      if (!response.success) {
+        throw new Error(response.error || 'Échec de l\'annulation')
+      }
+      return response
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stock', 'transfers'] })
+    },
+  })
+
+  return {
+    mutate: mutation.mutate,
+    mutateAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    isLoading: mutation.isPending,
+  }
+}
+
+// Export compatibility
+export { useStockTransfers as useStockTransfersList }

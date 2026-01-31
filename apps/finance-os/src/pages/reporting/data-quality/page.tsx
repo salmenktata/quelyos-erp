@@ -3,7 +3,6 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ModularLayout } from "@/components/ModularLayout";
 import { ShieldCheck, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
@@ -56,7 +55,7 @@ export default function DataQualityPage() {
     : 0;
 
   return (
-    <ModularLayout>
+    
     <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         <ReportingNav />
@@ -161,6 +160,6 @@ export default function DataQualityPage() {
         )}
       </div>
     </div>
-    </ModularLayout>
+    
     );
 }

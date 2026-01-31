@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Layout } from '../../components/Layout';
 import {
   useCustomerCategories,
   useCreateCustomerCategory,
@@ -202,7 +201,7 @@ export default function CustomerCategories() {
   // Loading state with skeleton
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="space-y-6 p-4 md:p-8">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
@@ -212,23 +211,23 @@ export default function CustomerCategories() {
           </div>
           <SkeletonGrid count={8} columns={4} />
         </div>
-      </Layout>
+      
     );
   }
 
   // Error state
   if (error) {
     return (
-      <Layout>
+      
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 m-4">
           <p className="text-red-800 dark:text-red-200">Erreur : {error.message}</p>
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
       <div className="space-y-6 p-4 md:p-8">
         {/* Skip link pour accessibilité */}
         <a
@@ -758,6 +757,6 @@ export default function CustomerCategories() {
           </div>
         )}
       </div>
-    </Layout>
+    
   );
 }

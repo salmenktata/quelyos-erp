@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom'
-import { Layout } from '../../components/Layout'
 import { Breadcrumbs } from '../../components/common'
 
 /**
@@ -9,7 +8,7 @@ export default function LeadDetail() {
   const { id } = useParams<{ id: string }>()
 
   return (
-    <Layout>
+    
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumbs
           items={[
@@ -31,6 +30,6 @@ export default function LeadDetail() {
           </p>
         </div>
       </div>
-    </Layout>
+    
   )
 }

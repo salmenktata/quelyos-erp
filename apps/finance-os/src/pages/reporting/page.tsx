@@ -3,7 +3,6 @@
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ModularLayout } from "@/components/ModularLayout";
 import {
   BarChart3,
   TrendingUp,
@@ -135,7 +134,7 @@ export default function ReportingHubPage() {
   useRequireAuth();
 
   return (
-    <ModularLayout>
+    
     <div className="p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
@@ -240,6 +239,6 @@ export default function ReportingHubPage() {
         </motion.div>
       </div>
     </div>
-    </ModularLayout>
+    
   );
 }

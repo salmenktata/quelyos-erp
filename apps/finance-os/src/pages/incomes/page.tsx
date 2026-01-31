@@ -11,7 +11,6 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, SkeletonTable, PageNotice, Button } from '@/components/common'
 import { financeNotices } from '@/lib/notices'
 import { ArrowUpCircle, Plus, Search, X } from 'lucide-react'
@@ -76,9 +75,7 @@ export default function IncomesPage() {
     return filteredTransactions.reduce((sum, tx) => sum + tx.amount, 0)
   }, [filteredTransactions])
 
-  return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
+  return (      <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
@@ -232,7 +229,5 @@ export default function IncomesPage() {
             </table>
           </div>
         )}
-      </div>
-    </Layout>
-  )
+      </div>  )
 }

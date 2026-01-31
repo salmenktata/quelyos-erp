@@ -22,7 +22,6 @@ import {
   CheckCircle,
   AlertCircle,
 } from 'lucide-react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common'
 import { storeNotices } from '@/lib/notices'
 import { useToast } from '@/hooks/useToast'
@@ -180,7 +179,7 @@ export default function LiveEvents() {
   const showForm = isCreating || editing
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -449,6 +448,6 @@ export default function LiveEvents() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }

@@ -11,7 +11,6 @@
 
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { Layout } from '../../components/Layout'
 import { useHeroSlides, useCreateHeroSlide, useUpdateHeroSlide, useDeleteHeroSlide, HeroSlide } from '../../hooks/useHeroSlides'
 import { Button, PageNotice, Breadcrumbs } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
@@ -101,7 +100,7 @@ export default function HeroSlides() {
   const showForm = isCreating || editingSlide
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -147,6 +146,6 @@ export default function HeroSlides() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }

@@ -9,7 +9,6 @@
  */
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useAppraisal, useUpdateAppraisal, useAppraisalAction, useCreateGoal, useGoalAction, type Goal, type Appraisal } from '@/hooks/hr'
 import { hrNotices } from '@/lib/notices'
@@ -47,20 +46,20 @@ export default function AppraisalDetailPage() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 space-y-6">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
             <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded" />
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   if (!appraisal) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 text-center">
           <ClipboardCheck className="w-12 h-12 mx-auto text-gray-400 mb-4" />
           <p className="text-gray-500 dark:text-gray-400">Évaluation introuvable</p>
@@ -68,7 +67,7 @@ export default function AppraisalDetailPage() {
             Retour aux évaluations
           </Link>
         </div>
-      </Layout>
+      
     )
   }
 
@@ -106,7 +105,7 @@ export default function AppraisalDetailPage() {
   const nextAction = getNextAction()
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -211,7 +210,7 @@ export default function AppraisalDetailPage() {
         {/* Modal ajout objectif */}
         {showGoalModal && <AddGoalModal employeeId={appraisal.employee_id} appraisalId={appraisal.id} onClose={() => setShowGoalModal(false)} />}
       </div>
-    </Layout>
+    
   )
 }
 

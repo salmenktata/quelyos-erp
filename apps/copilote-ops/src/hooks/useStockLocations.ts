@@ -5,43 +5,39 @@ import type { StockLocation, CreateLocationParams, UpdateLocationParams } from '
 import { logger } from '@quelyos/logger'
 import { useMemo } from 'react'
 
-// ══════════════════════════════════════════════════════════════════════
-// QUERIES
-// ══════════════════════════════════════════════════════════════════════
-
 interface UseLocationsTreeParams {
   warehouse_id?: number
+  warehouseId?: number
   usage?: 'internal' | 'view'
   active?: boolean
+  internal_only?: boolean
 }
 
-/**
- * Hook pour récupérer l'arbre des locations
- * Construit automatiquement la structure hiérarchique côté client
- */
 export function useLocationsTree(params?: UseLocationsTreeParams) {
+  const warehouse_id = params?.warehouse_id || params?.warehouseId
+
   const query = useQuery({
-    queryKey: ['stock', 'locations', 'tree', params],
+    queryKey: ['stock', 'locations', 'tree', warehouse_id, params],
     queryFn: async () => {
       try {
-        const response = await backendRpc('/api/ecommerce/stock/locations/tree', params || {})
-
+        const response = await backendRpc('/api/ecommerce/stock/locations/tree', { 
+          warehouse_id,
+          internal_only: params?.internal_only,
+        })
         if (!response.success) {
           logger.error('[useLocationsTree] API error:', response.error)
           throw new Error(response.error || 'Échec du chargement des emplacements')
         }
-
         return ((response.data as any)?.locations as StockLocation[]) || []
       } catch (error) {
         logger.error('[useLocationsTree] Fetch error:', error)
         throw error
       }
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   })
 
-  // Construire l'arbre côté client
   const tree = useMemo(() => {
     if (!query.data) return []
     return buildLocationTree(query.data)
@@ -49,29 +45,28 @@ export function useLocationsTree(params?: UseLocationsTreeParams) {
 
   return {
     ...query,
+    data: query.data || [],
     tree,
-    locations: query.data || []
+    locations: query.data || [],
+    isPending: query.isPending,
+    isLoading: query.isPending,
+    error: query.error,
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════
-// MUTATIONS
-// ══════════════════════════════════════════════════════════════════════
+export function useStockLocations(params?: UseLocationsTreeParams) {
+  return useLocationsTree(params)
+}
 
-/**
- * Hook pour créer une nouvelle location
- */
 export function useCreateLocation() {
   const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: async (params: CreateLocationParams) => {
+  const mutation = useMutation({
+    mutationFn: async (params: CreateLocationParams | Partial<StockLocation>) => {
       const response = await backendRpc('/api/ecommerce/stock/locations/create', params)
-
       if (!response.success) {
         throw new Error(response.error || 'Échec de la création de l\'emplacement')
       }
-
       return response.data
     },
     onSuccess: () => {
@@ -82,78 +77,52 @@ export function useCreateLocation() {
       logger.error('[useCreateLocation] Error:', error)
     },
   })
+
+  return {
+    mutate: (data: Partial<StockLocation>, options?: any) => mutation.mutate(data, options),
+    mutateAsync: async (data: Partial<StockLocation>) => mutation.mutateAsync(data),
+    isPending: mutation.isPending,
+    isLoading: mutation.isPending,
+  }
 }
 
-/**
- * Hook pour modifier une location
- */
 export function useUpdateLocation() {
   const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: async ({ id, ...params }: UpdateLocationParams & { id: number }) => {
-      const response = await backendRpc(`/api/ecommerce/stock/locations/${id}/update`, params)
-
+  const mutation = useMutation({
+    mutationFn: async (params: { id: number; data: Partial<StockLocation> }) => {
+      const response = await backendRpc(`/api/ecommerce/stock/locations/${params.id}/update`, params.data)
       if (!response.success) {
         throw new Error(response.error || 'Échec de la mise à jour de l\'emplacement')
       }
-
       return response.data
     },
-    // Optimistic update
-    onMutate: async (variables) => {
-      // Annuler queries en cours
-      await queryClient.cancelQueries({ queryKey: ['stock', 'locations'] })
-
-      // Snapshot previous value
-      const previousLocations = queryClient.getQueryData(['stock', 'locations', 'tree'])
-
-      // Optimistically update
-      queryClient.setQueryData(['stock', 'locations', 'tree'], (old: { data?: { locations: StockLocation[] } } | undefined) => {
-        if (!old?.data?.locations) return old
-
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            locations: old.data.locations.map((loc) =>
-              loc.id === variables.id ? { ...loc, ...variables } : loc
-            )
-          }
-        }
-      })
-
-      return { previousLocations }
-    },
-    // Rollback on error
-    onError: (error, _variables, context) => {
-      if (context?.previousLocations) {
-        queryClient.setQueryData(['stock', 'locations', 'tree'], context.previousLocations)
-      }
-      logger.error('[useUpdateLocation] Error:', error)
-    },
-    // Refetch on success
-    onSuccess: (data, _variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stock', 'locations'] })
       logger.info('[useUpdateLocation] Location updated successfully')
     },
+    onError: (error) => {
+      logger.error('[useUpdateLocation] Error:', error)
+    },
   })
+
+  return {
+    mutate: (id: number, data: Partial<StockLocation>, options?: any) => mutation.mutate({ id, data }, options),
+    mutateAsync: async (id: number, data: Partial<StockLocation>) => mutation.mutateAsync({ id, data }),
+    isPending: mutation.isPending,
+    isLoading: mutation.isPending,
+  }
 }
 
-/**
- * Hook pour archiver une location
- */
 export function useArchiveLocation() {
   const queryClient = useQueryClient()
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (locationId: number) => {
       const response = await backendRpc(`/api/ecommerce/stock/locations/${locationId}/archive`, {})
-
       if (!response.success) {
         throw new Error(response.error || 'Échec de l\'archivage de l\'emplacement')
       }
-
       return response
     },
     onSuccess: () => {
@@ -164,25 +133,25 @@ export function useArchiveLocation() {
       logger.error('[useArchiveLocation] Error:', error)
     },
   })
+
+  return {
+    mutate: mutation.mutate,
+    mutateAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    isLoading: mutation.isPending,
+  }
 }
 
-/**
- * Hook pour déplacer une location dans l'arbre
- */
 export function useMoveLocation() {
   const queryClient = useQueryClient()
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async ({ id, new_parent_id }: { id: number; new_parent_id: number }) => {
-      const response = await backendRpc(`/api/ecommerce/stock/locations/${id}/move`, {
-        new_parent_id
-      })
-
+      const response = await backendRpc(`/api/ecommerce/stock/locations/${id}/move`, { new_parent_id })
       if (!response.success) {
         throw new Error(response.error || 'Échec du déplacement de l\'emplacement')
       }
-
-      return response.data
+      return response
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stock', 'locations'] })
@@ -192,4 +161,11 @@ export function useMoveLocation() {
       logger.error('[useMoveLocation] Error:', error)
     },
   })
+
+  return {
+    mutate: mutation.mutate,
+    mutateAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    isLoading: mutation.isPending,
+  }
 }

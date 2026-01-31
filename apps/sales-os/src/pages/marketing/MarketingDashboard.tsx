@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Badge, Skeleton } from '@/components/common';
 import { useMarketingDashboard } from '@/hooks/useMarketingDashboard';
 import { useSMSQuota } from '@/hooks/useSMSConfig';
@@ -99,7 +98,7 @@ export default function MarketingDashboard() {
   const recentCampaigns = data?.recent_campaigns || [];
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -339,6 +338,6 @@ export default function MarketingDashboard() {
           </Link>
         </div>
       </div>
-    </Layout>
+    
   );
 }

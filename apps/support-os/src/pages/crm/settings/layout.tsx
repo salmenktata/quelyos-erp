@@ -1,10 +1,9 @@
 import { Outlet } from 'react-router-dom'
-import { Layout } from '../../../components/Layout'
 import { Breadcrumbs } from '../../../components/common'
 
 export default function SettingsLayout() {
   return (
-    <Layout>
+    
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumbs
           items={[
@@ -55,6 +54,6 @@ export default function SettingsLayout() {
           </div>
         </div>
       </div>
-    </Layout>
+    
   )
 }

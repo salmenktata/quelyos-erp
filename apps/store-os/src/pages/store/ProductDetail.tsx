@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { Layout } from '../../components/Layout'
 import { useProduct } from '../../hooks/useProducts'
 import { useProductImages } from '../../hooks/useProductImages'
 import { Button, Breadcrumbs, Badge, PageNotice, SkeletonTable } from '../../components/common'
@@ -34,17 +33,17 @@ export default function ProductDetail() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <SkeletonTable rows={8} columns={4} />
         </div>
-      </Layout>
+      
     )
   }
 
   if (!product) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <div className="text-center py-12">
             <CubeIcon className="mx-auto h-12 w-12 text-gray-400" />
@@ -61,7 +60,7 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
@@ -84,7 +83,7 @@ export default function ProductDetail() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
             items={[
@@ -488,6 +487,6 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
-    </Layout>
+    
   )
 }

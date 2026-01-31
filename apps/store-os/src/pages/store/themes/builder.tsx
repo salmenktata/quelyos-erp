@@ -24,7 +24,6 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button, PageNotice } from '@/components/common';
 import { BuilderProvider, useBuilder } from '@/components/theme-builder/BuilderContext';
 import { SectionsPalette } from '@/components/theme-builder/SectionsPalette';
@@ -466,7 +465,7 @@ function BuilderContent({ activeView }: { activeView: 'build' | 'style' }) {
  */
 export default function ThemeBuilderPage() {
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -504,6 +503,6 @@ export default function ThemeBuilderPage() {
           </div>
         </BuilderProvider>
       </div>
-    </Layout>
+    
   );
 }

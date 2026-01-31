@@ -5,7 +5,6 @@ import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { useApiData } from "@/hooks/finance/useApiData";
-import { ModularLayout } from "@/components/ModularLayout";
 import { GlassCard, GlassBadge, GlassListItem } from "@/components/ui/glass";
 import { Briefcase, Plus, Trash2, Edit } from "lucide-react";
 import type { CreatePortfolioRequest, UpdatePortfolioRequest } from "@/types/api";
@@ -195,7 +194,7 @@ export default function PortfoliosPage() {
   };
 
   return (
-    <ModularLayout>
+    
     <div className="p-4 md:p-8 space-y-6">
       <div className="relative space-y-6">
         <div className="flex items-center justify-between">
@@ -500,6 +499,6 @@ export default function PortfoliosPage() {
       </div>
       </div>
     </div>
-    </ModularLayout>
+    
   );
 }

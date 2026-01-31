@@ -156,7 +156,7 @@ export function useUpdateProductVariant(productId: number | undefined) {
     }) => {
       if (!productId) throw new Error('Product ID required')
       const { variant_id, ...updateData } = data
-      const response = await api.updateProductVariant(productId, variant_id, updateData)
+      const response = await api.updateProductVariant(variant_id, updateData)
       if (!response.success) {
         throw new Error(response.error || 'Failed to update variant')
       }
@@ -175,7 +175,7 @@ export function useUpdateVariantStock(productId: number | undefined) {
   return useMutation({
     mutationFn: async (data: { variant_id: number; quantity: number }) => {
       if (!productId) throw new Error('Product ID required')
-      const response = await api.updateVariantStock(productId, data.variant_id, data.quantity)
+      const response = await api.updateVariantStock(data.variant_id, data.quantity)
       if (!response.success) {
         throw new Error(response.error || 'Failed to update variant stock')
       }

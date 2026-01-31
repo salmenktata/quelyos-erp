@@ -1,4 +1,3 @@
-import { Layout } from '../../components/Layout'
 import { Breadcrumbs } from '../../components/common'
 import { Plus } from 'lucide-react'
 
@@ -7,7 +6,7 @@ import { Plus } from 'lucide-react'
  */
 export default function CustomerCategories() {
   return (
-    <Layout>
+    
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumbs
           items={[
@@ -38,6 +37,6 @@ export default function CustomerCategories() {
           </p>
         </div>
       </div>
-    </Layout>
+    
   )
 }

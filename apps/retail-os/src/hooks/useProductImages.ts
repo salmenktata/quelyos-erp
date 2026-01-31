@@ -22,7 +22,7 @@ export function useUploadProductImages(productId: number | undefined) {
   return useMutation({
     mutationFn: async (images: Array<{ name: string; image_1920: string }>) => {
       if (!productId) throw new Error('Product ID required')
-      const response = await api.uploadProductImages(productId, images)
+      const response = await api.uploadProductImages(productId, images as any)
       if (!response.success) {
         throw new Error(response.error || 'Failed to upload images')
       }

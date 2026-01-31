@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Layout } from '../../components/Layout'
 import { useProduct, useCreateProduct, useUpdateProduct, useTaxes, useUom, useProductTypes, useProductTags, useCreateProductTag } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
 import { useRibbons, useUpdateProductRibbon } from '../../hooks/useRibbons'
@@ -284,7 +283,7 @@ export default function ProductForm() {
 
   if (isEditing && isLoadingProduct) {
     return (
-      <Layout>
+      
         <div className="p-8">
           <Breadcrumbs
             items={[
@@ -297,12 +296,12 @@ export default function ProductForm() {
             <SkeletonTable rows={8} columns={2} />
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   return (
-    <Layout>
+    
       <div className="p-8">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -1130,6 +1129,6 @@ export default function ProductForm() {
 
         <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} position="top-right" />
       </div>
-    </Layout>
+    
   )
 }

@@ -384,3 +384,51 @@ export interface UpdateProductExpiryConfigParams {
   alert_time?: number
 }
 
+// ==================== STOCK TRANSFERS ====================
+
+export interface StockTransfer {
+  id?: number
+  name?: string
+  location_src_id?: number
+  location_src_name?: string
+  location_dest_id?: number
+  location_dest_name?: string
+  scheduled_date?: string
+  state?: 'draft' | 'waiting' | 'confirmed' | 'assigned' | 'done' | 'cancel'
+  state_label?: string
+  move_lines?: Array<{
+    id: number
+    product_id: number
+    product_name: string
+    product_sku: string
+    quantity: number
+    uom: string
+  }>
+  product_id?: number
+  quantity?: number
+  from_location_id?: number
+  to_location_id?: number
+  note?: string
+}
+
+// ==================== PRODUCTS ====================
+
+export interface Product {
+  id: number
+  name: string
+  sku: string
+  default_code: string
+  barcode?: string
+  stock_quantity: number
+  qty_available: number
+  virtual_available: number
+  uom: string
+  uom_id: number
+  category_id: number
+  category_name: string
+  price: number
+  list_price: number
+  standard_price: number
+  tracking: 'none' | 'lot' | 'serial'
+  active: boolean
+}

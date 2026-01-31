@@ -11,7 +11,6 @@
  */
 
 import { useState } from "react"
-import { Layout } from "@/components/Layout"
 import { Breadcrumbs, PageNotice } from "@/components/common"
 import { stockNotices } from "@/lib/notices"
 import {
@@ -74,7 +73,7 @@ export default function StockValuationPage() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
@@ -282,6 +281,6 @@ export default function StockValuationPage() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }

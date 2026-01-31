@@ -8,7 +8,6 @@
  * - Codes comptables normalisés
  */
 
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice } from '@/components/common'
 import { Button } from '@/components/common/Button'
 import { financeNotices } from '@/lib/notices'
@@ -57,9 +56,7 @@ export default function ChartsPage() {
     return matchesClass && matchesSearch
   })
 
-  return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
+  return (      <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
             { label: 'Finance', href: '/finance' },
@@ -250,7 +247,5 @@ export default function ChartsPage() {
             </div>
           </div>
         </div>
-      </div>
-    </Layout>
-  )
+      </div>  )
 }

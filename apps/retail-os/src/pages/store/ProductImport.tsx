@@ -10,7 +10,6 @@
  */
 import { useState } from 'react';
 import { Upload, Download, FileSpreadsheet, Check, AlertCircle, X } from 'lucide-react';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { apiFetchJson } from '@/lib/apiFetch';
@@ -142,7 +141,7 @@ export default function ProductImport() {
   };
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -311,6 +310,6 @@ export default function ProductImport() {
           </div>
         </div>
       </div>
-    </Layout>
+    
   );
 }

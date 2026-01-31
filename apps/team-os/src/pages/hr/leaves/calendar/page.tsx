@@ -8,7 +8,6 @@
  * - Légende dynamique des types de congés
  */
 import { useState, useMemo } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeavesCalendar, useDepartments } from '@/hooks/hr'
@@ -67,7 +66,7 @@ export default function LeavesCalendarPage() {
   const today = new Date().toISOString().split('T')[0]
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -218,6 +217,6 @@ export default function LeavesCalendarPage() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }

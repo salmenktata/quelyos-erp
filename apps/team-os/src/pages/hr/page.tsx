@@ -8,7 +8,6 @@
  * - Liste des demandes de congés récentes
  * - Tableau des contrats arrivant à échéance
  */
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useHRDashboard } from '@/hooks/hr'
@@ -40,7 +39,7 @@ export default function HRDashboard() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <div className="animate-pulse space-y-6">
             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48" />
@@ -52,12 +51,12 @@ export default function HRDashboard() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -314,7 +313,7 @@ export default function HRDashboard() {
         </div>
       )}
       </div>
-    </Layout>
+    
   )
 }
 

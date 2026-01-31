@@ -9,7 +9,6 @@
  * - Accès rapide aux fiches employés
  */
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useEmployees, useDepartments, type Employee } from '@/hooks/hr'
@@ -53,7 +52,7 @@ export default function EmployeesPage() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 space-y-6">
           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse" />
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse" />
@@ -63,12 +62,12 @@ export default function EmployeesPage() {
             ))}
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -296,7 +295,7 @@ export default function EmployeesPage() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }
 

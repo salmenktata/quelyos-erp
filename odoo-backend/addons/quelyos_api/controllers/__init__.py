@@ -68,3 +68,5 @@ from . import stock_oca
 from . import inventory_groups_ctrl
 from . import warehouse_calendar_ctrl
 from . import hr_oca
+from . import marketing_campaigns_ctrl
+from . import marketing_lists_ctrl

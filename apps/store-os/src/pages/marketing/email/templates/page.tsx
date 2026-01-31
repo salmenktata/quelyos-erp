@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import DOMPurify from 'dompurify';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Badge, Skeleton } from '@/components/common';
 import { useEmailTemplates, TEMPLATE_CATEGORIES, type TemplateCategory } from '@/hooks/useEmailTemplates';
 import { FileText, Eye, Search } from 'lucide-react';
@@ -23,7 +22,7 @@ export default function EmailTemplatesPage() {
     : null;
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -192,6 +191,6 @@ export default function EmailTemplatesPage() {
           </div>
         </div>
       </div>
-    </Layout>
+    
   );
 }

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { List, Plus } from 'lucide-react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, SkeletonCard, PageNotice, Button } from '@/components/common'
 import { PipelineKanban } from '@/components/PipelineKanban'
 import { LeadStats } from '@/components/leads/LeadStats'
@@ -35,7 +34,7 @@ export default function Pipeline() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: 'Tableau de bord', href: '/dashboard' }, { label: 'Pipeline CRM' }]} />
@@ -99,6 +98,6 @@ export default function Pipeline() {
           />
         )}
       </div>
-    </Layout>
+    
   )
 }

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { X, MapPin, Package, Folder, Barcode } from 'lucide-react'
-import { useCreateLocation, useUpdateLocation, useLocationsTree } from '@/hooks/finance/useStockLocations'
+import { useCreateLocation, useUpdateLocation, useLocationsTree } from '@/hooks/useStockLocations'
 import { useWarehouses } from '@/hooks/useWarehouses'
 import type { StockLocation, LocationTreeNode } from '@/types/stock'
 import { formatNodePath } from '@/lib/stock/tree-utils'
@@ -213,12 +213,11 @@ export function LocationFormModal({
       )
     } else if (location) {
       updateLocation(
+        location.id,
         {
-          id: location.id,
           name: data.name,
           parent_id: data.parent_id,
           barcode: data.barcode,
-          // usage et warehouse_id sont immutables en mode edit
         },
         {
           onSuccess: () => {
@@ -234,11 +233,7 @@ export function LocationFormModal({
       )
     }
   }
-
-  if (!isOpen) return null
-
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+  return (  <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4">
         {/* Backdrop */}
         <div className="fixed inset-0 bg-black/50" onClick={onClose} />

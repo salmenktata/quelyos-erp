@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/finance/compat/routes";
 import { useEffect, useReducer, useMemo, useCallback } from "react";
 import { transactionListReducer, initialTransactionListState } from "./transactionListReducer";
-import { ModularLayout } from "@/components/ModularLayout";
 import { api } from "@/lib/finance/api";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
@@ -253,7 +252,7 @@ export function TransactionListPage({ type }: TransactionListPageProps) {
   const _focusColor = config.color === "rose" ? "rose-400" : "emerald-400";
 
   return (
-    <ModularLayout>
+    
       <div className="p-8 space-y-6">
         <PageHeader
           icon={Icon}
@@ -590,6 +589,6 @@ export function TransactionListPage({ type }: TransactionListPageProps) {
           )}
         </div>
       </div>
-    </ModularLayout>
+    
   );
 }

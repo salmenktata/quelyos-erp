@@ -9,7 +9,6 @@
  * - Notifications et alertes RH
  */
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { hrNotices } from '@/lib/notices'
@@ -32,7 +31,7 @@ export default function HRSettingsPage() {
   ]
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -80,7 +79,7 @@ export default function HRSettingsPage() {
         {activeTab === 'leaves' && <LeavesSettings />}
         {activeTab === 'notifications' && <NotificationsSettings />}
       </div>
-    </Layout>
+    
   )
 }
 

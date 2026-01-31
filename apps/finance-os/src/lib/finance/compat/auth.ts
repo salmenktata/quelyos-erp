@@ -34,14 +34,13 @@ export function useAuth(): AuthContextType {
   const initialized = useRef(false)
   const [isLoading, setIsLoading] = useState(!tokenService.isAuthenticated())
   const [user, setUser] = useState<User | null>(() => {
-    const storedUser = tokenService.getUser()
-    if (storedUser) {
-      return {
-        id: storedUser.id,
-        name: storedUser.name || '',
-        email: storedUser.email || '',
-        login: storedUser.login,
-        groups: storedUser.groups || [],
+    // Charger depuis localStorage pour l'authentification par session
+    const stored = localStorage.getItem('quelyos_finance_user')
+    if (stored) {
+      try {
+        return JSON.parse(stored)
+      } catch {
+        return null
       }
     }
     return null
@@ -95,23 +94,35 @@ export function useAuth(): AuthContextType {
 
       try {
         const result = await api.login(email, password) as { success: boolean; error?: string; user?: { id: number; name: string; email: string; login?: string; groups?: string[] } }
+        console.log('[DEBUG useAuth] Login result:', result)
         const userData = result.user
+        console.log('[DEBUG useAuth] User data:', userData)
+        console.log('[DEBUG useAuth] Success check:', result.success, '&&', userData)
 
         if (result.success && userData) {
-          setUser({
+          console.log('[DEBUG useAuth] Setting user...')
+          const userObj = {
             id: userData.id,
             name: userData.name,
             email: userData.email,
             login: userData.login,
             groups: userData.groups || [],
-          })
+          }
+          setUser(userObj)
+
+          // Stocker l'utilisateur dans localStorage pour persistance
+          localStorage.setItem('quelyos_finance_user', JSON.stringify(userObj))
+
           setIsLoading(false)
+          console.log('[DEBUG useAuth] Returning success true')
           return { success: true }
         }
 
+        console.log('[DEBUG useAuth] Login failed, returning error')
         setIsLoading(false)
         return { success: false, error: result.error || 'Identifiants invalides' }
       } catch (error) {
+        console.error('[DEBUG useAuth] Login exception:', error)
         setIsLoading(false)
         return { success: false, error: error instanceof Error ? error.message : 'Erreur de connexion' }
       }
@@ -167,7 +178,7 @@ export function useAuth(): AuthContextType {
   return {
     user,
     isLoading,
-    isAuthenticated: !!user && tokenService.isAuthenticated(),
+    isAuthenticated: !!user, // Authentification par session (pas JWT)
     login,
     logout,
     checkAuth,

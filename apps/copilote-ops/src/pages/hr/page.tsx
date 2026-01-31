@@ -8,7 +8,6 @@
  * - Liste des demandes de congés récentes
  * - Tableau des contrats arrivant à échéance
  */
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useHRDashboard } from '@/hooks/hr'
@@ -29,18 +28,11 @@ import { Link, useNavigate } from 'react-router-dom'
 export default function HRDashboard() {
   const navigate = useNavigate()
   const { tenant } = useMyTenant()
-  const {
-    data: dashboardData,
-    isLoading,
-    isError,
-    todayAttendance,
-    pendingLeaves,
-    expiringContracts,
-  } = useHRDashboard(tenant?.id || null)
+  const { data: dashboardData, isLoading, isError } = useHRDashboard(tenant?.id || null)
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <div className="animate-pulse space-y-6">
             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48" />
@@ -52,12 +44,12 @@ export default function HRDashboard() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -221,9 +213,9 @@ export default function HRDashboard() {
               Voir tout
             </Link>
           </div>
-          {pendingLeaves && pendingLeaves.length > 0 ? (
+          {dashboardData?.recentLeaves && dashboardData.recentLeaves.length > 0 ? (
             <div className="space-y-3">
-              {pendingLeaves.slice(0, 5).map((leave) => (
+              {dashboardData?.recentLeaves?.slice(0, 5).map((leave) => (
                 <div
                   key={leave.id}
                   className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0"
@@ -254,67 +246,8 @@ export default function HRDashboard() {
         </div>
       </div>
 
-      {/* Contrats expirants */}
-      {expiringContracts && expiringContracts.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Contrats arrivant à échéance
-            </h3>
-            <Link
-              to="/hr/contracts"
-              className="text-cyan-600 hover:text-cyan-700 text-sm"
-            >
-              Voir tout
-            </Link>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                  <th className="pb-3 font-medium">Employé</th>
-                  <th className="pb-3 font-medium">Type</th>
-                  <th className="pb-3 font-medium">Date fin</th>
-                  <th className="pb-3 font-medium">Jours restants</th>
-                </tr>
-              </thead>
-              <tbody>
-                {expiringContracts.slice(0, 5).map((contract) => {
-                  const daysLeft = contract.date_end
-                    ? Math.ceil((new Date(contract.date_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-                    : 0
-                  return (
-                    <tr key={contract.id} className="border-b border-gray-100 dark:border-gray-700 last:border-0">
-                      <td className="py-3 text-gray-900 dark:text-white">
-                        {contract.employee_name}
-                      </td>
-                      <td className="py-3 text-gray-600 dark:text-gray-300">
-                        {contract.contract_type_label}
-                      </td>
-                      <td className="py-3 text-gray-600 dark:text-gray-300">
-                        {contract.date_end ? new Date(contract.date_end).toLocaleDateString('fr-FR') : '-'}
-                      </td>
-                      <td className="py-3">
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          daysLeft <= 7
-                            ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                            : daysLeft <= 14
-                            ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
-                            : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-                        }`}>
-                          {daysLeft} jours
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
       </div>
-    </Layout>
+    
   )
 }
 

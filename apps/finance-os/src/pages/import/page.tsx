@@ -15,7 +15,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Upload, FileSpreadsheet, CheckSquare, CheckCircle, RotateCcw } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Layout } from "@/components/Layout";
 import { Breadcrumbs, Button, PageNotice } from "@/components/common";
 import { ImportWizardSteps } from "@/components/finance/import/ImportWizardSteps";
 import { ImportSummary } from "@/components/finance/import/ImportSummary";
@@ -63,9 +62,7 @@ export default function ImportPage() {
     (field) => state.userMappings[field] !== undefined
   );
 
-  return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
+  return (      <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
           items={[
@@ -186,7 +183,5 @@ export default function ImportPage() {
           />
         )}
       </Card>
-      </div>
-    </Layout>
-  );
+      </div>  );
 }

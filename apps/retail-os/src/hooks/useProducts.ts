@@ -5,7 +5,7 @@ import type { ProductsQueryParams, ProductCreateData, ProductUpdateData } from '
 export function useProducts(params?: ProductsQueryParams) {
   return useQuery({
     queryKey: ['products', params],
-    queryFn: () => api.getProducts(params),
+    queryFn: () => api.getProducts(params as Record<string, unknown>),
   })
 }
 
@@ -134,7 +134,7 @@ export function useDuplicateProduct() {
 
   return useMutation({
     mutationFn: ({ id, name }: { id: number; name?: string }) =>
-      api.duplicateProduct(id, name),
+      api.duplicateProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
     },
@@ -203,7 +203,7 @@ export function useCreateProductTag() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ name, color }: { name: string; color?: number }) =>
-      api.createProductTag(name, color),
+      api.createProductTag({ name, color }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productTags'] })
     },

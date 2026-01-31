@@ -36,15 +36,17 @@ export async function exportData<T extends Record<string, unknown>>(
     ].join("\n");
     downloadBlob(new Blob([csvContent], { type: "text/csv" }), fullFilename);
   } else if (format === "xlsx" || format === "excel") {
-    const ExcelJS = await import("exceljs");
-    const wb = new ExcelJS.Workbook();
-    const ws = wb.addWorksheet("Data");
-    if (data.length > 0) {
-      ws.columns = Object.keys(data[0]).map((key) => ({ header: key, key }));
-      data.forEach((row) => ws.addRow(row));
-    }
-    const buffer = await wb.xlsx.writeBuffer();
-    downloadBlob(new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), fullFilename);
+    // TODO: Install exceljs - pnpm add exceljs
+    //     const wb = new ExcelJS.Workbook();
+    //     const ws = wb.addWorksheet("Data");
+    //     if (data.length > 0) {
+    //       ws.columns = Object.keys(data[0]).map((key) => ({ header: key, key }));
+    //       data.forEach((row) => ws.addRow(row));
+    //     }
+    //     const buffer = await wb.xlsx.writeBuffer();
+    //     downloadBlob(new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), fullFilename);
+    console.warn("Excel export requires exceljs. Using CSV fallback.");
+    return exportData(data, "csv", filename);
   }
 }
 

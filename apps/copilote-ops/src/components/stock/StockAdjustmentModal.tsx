@@ -123,10 +123,7 @@ export function StockAdjustmentModal({
     }
 
     try {
-      await updateStockMutation.mutateAsync({
-        productId: product.id,
-        quantity: parsedNewQty,
-      })
+      await updateStockMutation.mutateAsync(product.id, parsedNewQty)
 
       toast.success('Stock mis à jour avec succès')
 

@@ -9,15 +9,12 @@
  * - Gestion des destinataires (email, SMS, notifications in-app)
  * - Tableau de bord des alertes actives vs résolues
  */
-import { Layout } from "@/components/Layout";
 import { Breadcrumbs, PageNotice } from "@/components/common";
 import { financeNotices } from "@/lib/notices/finance-notices";
 import { Bell } from "lucide-react";
 
 export default function AlertsPage() {
-  return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
+  return (      <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs items={[
           { label: "Finance", href: "/finance" },
           { label: "Alertes" }
@@ -52,7 +49,5 @@ export default function AlertsPage() {
             La gestion des alertes sera bientôt disponible.
           </p>
         </div>
-      </div>
-    </Layout>
-  );
+      </div>  );
 }

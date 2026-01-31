@@ -338,7 +338,7 @@ class AuthController(http.Controller):
             response.status_code = 500
             return response
 
-    @http.route('/api/auth/login', type='jsonrpc', auth='none', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/auth/login', type='http', auth='none', methods=['POST'], csrf=False, cors='*')
     def login(self, **kwargs):
         """
         Authentification standard avec session_id retourné en JSON (pour compatibilité clients existants).
@@ -350,20 +350,30 @@ class AuthController(http.Controller):
         Returns:
             dict: {success: bool, session_id: str, user: {...}} ou {success: false, error: str}
         """
+        # Handle CORS preflight
+        origin = request.httprequest.headers.get('Origin', '')
+        cors_headers = get_cors_headers(origin)
+
+        if request.httprequest.method == 'OPTIONS':
+            response = request.make_response('', headers=list(cors_headers.items()))
+            response.status_code = 204
+            return response
+
         # Rate limiting - protection brute force
         rate_error = check_rate_limit(request, RateLimitConfig.LOGIN, 'login')
         if rate_error:
             _logger.warning(f"Rate limit exceeded for login attempt from {request.httprequest.remote_addr}")
-            return rate_error
+            return request.make_json_response(rate_error, headers=list(cors_headers.items()))
 
         try:
-            params = request.params if hasattr(request, 'params') and request.params else {}
-            login = params.get('login') or params.get('email', '').strip()
-            password = params.get('password', '')
-            db = params.get('db') or request.db
+            # Pour type='http', parser le JSON du body
+            data = json.loads(request.httprequest.data.decode('utf-8')) if request.httprequest.data else {}
+            login = (data.get('login') or data.get('email') or '').strip()
+            password = data.get('password', '')
+            db = data.get('db') or request.db
 
             if not login or not password:
-                return {'success': False, 'error': 'Login et mot de passe requis'}
+                return request.make_json_response({'success': False, 'error': 'Login et mot de passe requis'}, headers=list(cors_headers.items()))
 
             # Authenticate user
             auth_result = request.session.authenticate(request.env, {
@@ -378,7 +388,7 @@ class AuthController(http.Controller):
                 fail_key = rate_limit_key(request, 'login_failed')
                 limiter = get_rate_limiter()
                 limiter.is_allowed(fail_key, *RateLimitConfig.LOGIN_FAILED)
-                return {'success': False, 'error': 'Identifiants invalides'}
+                return request.make_json_response({'success': False, 'error': 'Identifiants invalides'}, headers=list(cors_headers.items()))
 
             # Extract uid from auth result (Odoo 19 returns dict with uid, auth_method, mfa)
             uid = auth_result.get('uid') if isinstance(auth_result, dict) else auth_result
@@ -391,7 +401,7 @@ class AuthController(http.Controller):
             # Get user info
             user = request.env['res.users'].sudo().browse(uid)
 
-            return {
+            return request.make_json_response({
                 'success': True,
                 'session_id': session_id,
                 'user': {
@@ -400,11 +410,11 @@ class AuthController(http.Controller):
                     'email': user.email or '',
                     'login': user.login,
                 }
-            }
+            }, headers=list(cors_headers.items()))
 
         except Exception as e:
             _logger.error(f"Login error: {e}")
-            return {'success': False, 'error': 'Erreur de connexion'}
+            return request.make_json_response({'success': False, 'error': 'Erreur de connexion'}, headers=list(cors_headers.items()))
 
     @http.route('/api/auth/test-session', type='http', auth='none', methods=['POST', 'OPTIONS'], csrf=False)
     def test_session(self, **kwargs):
@@ -579,7 +589,7 @@ class AuthController(http.Controller):
                 status=500
             )
 
-    @http.route('/api/auth/refresh', type='jsonrpc', auth='none', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/auth/refresh', type='http', auth='none', methods=['POST'], csrf=False, cors='*')
     def refresh_token(self, **kwargs):
         """
         Renouvelle les tokens en utilisant le refresh token (depuis cookie HttpOnly).
@@ -693,7 +703,7 @@ class AuthController(http.Controller):
             _logger.error(f"Token refresh error: {e}")
             return {'success': False, 'error': 'Erreur lors du rafraîchissement du token'}
 
-    @http.route('/api/auth/logout', type='jsonrpc', auth='public', methods=['POST'], csrf=False, cors='*')
+    @http.route('/api/auth/logout', type='http', auth='public', methods=['POST'], csrf=False, cors='*')
     def logout_session(self, **kwargs):
         """
         Déconnexion - révoque le refresh token et clear les cookies

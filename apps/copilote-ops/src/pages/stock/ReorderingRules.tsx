@@ -10,10 +10,9 @@
  */
 
 import { useState } from 'react'
-import { Layout } from '../../components/Layout'
 import { Breadcrumbs, Badge, PageNotice, SkeletonTable, Button } from '../../components/common'
 import { stockNotices } from '@/lib/notices'
-import { useReorderingRules, useDeleteReorderingRule, useToggleReorderingRule } from '../../hooks/finance/useReorderingRules'
+import { useReorderingRules, useDeleteReorderingRule, useToggleReorderingRule } from '../../hooks/useReorderingRules'
 import { useWarehouses } from '../../hooks/useWarehouses'
 import { ReorderingRuleFormModal } from '../../components/stock/ReorderingRuleFormModal'
 import { Plus, Filter, MoreVertical, Pencil, Power, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react'
@@ -26,8 +25,8 @@ export default function ReorderingRules() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingRule, setEditingRule] = useState<ReorderingRule | undefined>()
 
-  const { data, isLoading, error, refetch } = useReorderingRules({
-    warehouse_id: warehouseFilter,
+  const { data, isLoading, error, refresh } = useReorderingRules({
+    warehouseId: warehouseFilter,
     triggered: statusFilter === 'triggered' ? true : undefined,
     active: statusFilter === 'active' ? true : undefined
   })
@@ -37,7 +36,7 @@ export default function ReorderingRules() {
   const { mutate: toggleRule } = useToggleReorderingRule()
 
   const warehouses = warehousesData || []
-  const rules = data?.rules || []
+  const rules = data || []
   const triggeredCount = rules.filter(r => r.is_triggered).length
   const totalQtyToOrder = rules.reduce((sum, r) => sum + r.qty_to_order, 0)
 
@@ -56,7 +55,7 @@ export default function ReorderingRules() {
       { id: ruleId, active: newActiveState },
       {
         onSuccess: () => {
-          refetch()
+          refresh()
           logger.info('[ReorderingRules] Rule toggled')
         },
         onError: (error: Error) => {
@@ -73,7 +72,7 @@ export default function ReorderingRules() {
 
     deleteRule(ruleId, {
       onSuccess: () => {
-        refetch()
+        refresh()
         logger.info('[ReorderingRules] Rule deleted')
       },
       onError: (error: Error) => {
@@ -83,7 +82,7 @@ export default function ReorderingRules() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
@@ -186,7 +185,7 @@ export default function ReorderingRules() {
         ) : error ? (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6" role="alert">
             <p className="text-red-800 dark:text-red-200 mb-4">Erreur : {error.message}</p>
-            <Button variant="secondary" onClick={() => refetch()}>
+            <Button variant="secondary" onClick={() => refresh()}>
               Réessayer
             </Button>
           </div>
@@ -353,10 +352,10 @@ export default function ReorderingRules() {
           onSuccess={() => {
             setIsModalOpen(false)
             setEditingRule(undefined)
-            refetch()
+            refresh()
           }}
         />
       </div>
-    </Layout>
+    
   )
 }

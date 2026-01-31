@@ -10,7 +10,6 @@
  */
 
 import { Banknote, CreditCard, Wallet, Plus } from 'lucide-react'
-import { Layout } from '../../../../components/Layout'
 import { Breadcrumbs, Button, PageNotice } from '../../../../components/common'
 import { posNotices } from '../../../../lib/notices/pos-notices'
 
@@ -22,7 +21,7 @@ const defaultMethods = [
 
 export default function POSSettingsPayments() {
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -80,6 +79,6 @@ export default function POSSettingsPayments() {
           })}
         </div>
       </div>
-    </Layout>
+    
   )
 }

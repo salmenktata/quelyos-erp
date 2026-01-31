@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { X, Package, Warehouse, TrendingUp, Info } from 'lucide-react'
-import { useCreateReorderingRule, useUpdateReorderingRule } from '@/hooks/finance/useReorderingRules'
+import { useCreateReorderingRule, useUpdateReorderingRule } from '@/hooks/useReorderingRules'
 import { useWarehouses } from '@/hooks/useWarehouses'
 import { useProducts } from '@/hooks/useProducts'
 import type { ReorderingRule } from '@/types/stock'
@@ -52,10 +52,10 @@ export function ReorderingRuleFormModal({
   const { mutate: createRule, isPending: isCreating } = useCreateReorderingRule()
   const { mutate: updateRule, isPending: isUpdating } = useUpdateReorderingRule()
   const { data: warehousesData } = useWarehouses({ active_only: true })
-  const { data: productsData } = useProducts({ include_archived: false })
+  const { data: productsData } = useProducts()
 
   const warehouses = warehousesData || []
-  const products = (productsData?.data?.products as any[]) || []
+  const products = productsData || []
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -93,7 +93,7 @@ export function ReorderingRuleFormModal({
   }, [products, selectedProductId])
 
   // Simuler le stock actuel (dans une vraie implémentation, on ferait un appel API)
-  const currentStock = rule?.current_stock || selectedProduct?.qty_available || 0
+  const currentStock = rule?.current_stock || selectedProduct?.stockQuantity || 0
 
   // Calculer preview quantité à commander
   const willTrigger = currentStock < minQty
@@ -126,8 +126,8 @@ export function ReorderingRuleFormModal({
       updateRule(
         {
           id: rule.id,
-          product_min_qty: data.product_min_qty,
-          product_max_qty: data.product_max_qty,
+          min_qty: data.product_min_qty,
+          max_qty: data.product_max_qty,
           qty_multiple: data.qty_multiple,
         },
         {
@@ -148,220 +148,184 @@ export function ReorderingRuleFormModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex min-h-screen items-center justify-center p-4">
-        {/* Backdrop */}
-        <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            {mode === 'create' ? 'Nouvelle règle de réapprovisionnement' : 'Modifier la règle'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
 
-        {/* Modal */}
-        <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-2xl w-full">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white dark:text-gray-100">
-              {mode === 'create' ? 'Créer une règle de réapprovisionnement' : 'Modifier la règle'}
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-            >
-              <X className="h-5 w-5" />
-            </button>
+        {/* Form */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6">
+          {/* Product & Warehouse */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Product */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Package className="h-4 w-4 inline mr-1" />
+                Produit
+              </label>
+              <select
+                {...form.register('product_id', { valueAsNumber: true })}
+                disabled={mode === 'edit'}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
+              >
+                <option value="">Sélectionner...</option>
+                {products.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.sku})
+                  </option>
+                ))}
+              </select>
+              {form.formState.errors.product_id && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {form.formState.errors.product_id.message}
+                </p>
+              )}
+            </div>
+
+            {/* Warehouse */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Warehouse className="h-4 w-4 inline mr-1" />
+                Entrepôt
+              </label>
+              <select
+                {...form.register('warehouse_id', { valueAsNumber: true })}
+                disabled={mode === 'edit'}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed"
+              >
+                <option value="">Sélectionner...</option>
+                {warehouses.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name}
+                  </option>
+                ))}
+              </select>
+              {form.formState.errors.warehouse_id && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {form.formState.errors.warehouse_id.message}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Body */}
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="px-6 py-4 space-y-4">
-              {/* Produit */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
-                  <Package className="inline mr-2 h-4 w-4" />
-                  Produit *
-                </label>
-                <select
-                  {...form.register('product_id', { valueAsNumber: true })}
-                  disabled={mode === 'edit'}
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <option value="">-- Sélectionner un produit --</option>
-                  {products.map((product) => (
-                    <option key={product.id} value={product.id}>
-                      {product.name} {product.default_code ? `(${product.default_code})` : ''}
-                    </option>
-                  ))}
-                </select>
-                {form.formState.errors.product_id && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                    {form.formState.errors.product_id.message}
-                  </p>
-                )}
-                {mode === 'edit' && (
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Le produit ne peut pas être modifié après création
-                  </p>
-                )}
-              </div>
-
-              {/* Afficher stock actuel */}
-              {selectedProductId && (
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                  <p className="text-sm text-blue-900 dark:text-blue-100">
-                    Stock actuel : <strong className={currentStock < minQty ? 'text-orange-600 dark:text-orange-400' : ''}>
-                      {currentStock} unités
-                    </strong>
-                  </p>
-                </div>
-              )}
-
-              {/* Entrepôt */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
-                  <Warehouse className="inline mr-2 h-4 w-4" />
-                  Entrepôt *
-                </label>
-                <select
-                  {...form.register('warehouse_id', { valueAsNumber: true })}
-                  disabled={mode === 'edit'}
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <option value="">-- Sélectionner un entrepôt --</option>
-                  {warehouses.map((wh) => (
-                    <option key={wh.id} value={wh.id}>
-                      {wh.name} ({wh.code})
-                    </option>
-                  ))}
-                </select>
-                {form.formState.errors.warehouse_id && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                    {form.formState.errors.warehouse_id.message}
-                  </p>
-                )}
-                {mode === 'edit' && (
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    L'entrepôt ne peut pas être modifié après création
-                  </p>
-                )}
-              </div>
-
-              {/* Seuils */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
-                    <TrendingUp className="inline mr-2 h-4 w-4" />
-                    Seuil minimum *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...form.register('product_min_qty', { valueAsNumber: true })}
-                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    placeholder="10"
-                  />
-                  {form.formState.errors.product_min_qty && (
-                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                      {form.formState.errors.product_min_qty.message}
-                    </p>
-                  )}
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Déclenche la commande si stock &lt; seuil
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
-                    Seuil maximum *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...form.register('product_max_qty', { valueAsNumber: true })}
-                    className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    placeholder="50"
-                  />
-                  {form.formState.errors.product_max_qty && (
-                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                      {form.formState.errors.product_max_qty.message}
-                    </p>
-                  )}
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Quantité cible après réapprovisionnement
-                  </p>
-                </div>
-              </div>
-
-              {/* Quantité multiple */}
-              <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 mb-1">
-                  Quantité multiple (optionnel)
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  {...form.register('qty_multiple', { valueAsNumber: true })}
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  placeholder="1"
-                  defaultValue={1}
-                />
-                {form.formState.errors.qty_multiple && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                    {form.formState.errors.qty_multiple.message}
-                  </p>
-                )}
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Commander par lots de X unités (ex: 12 pour cartons de 12)
+          {/* Quantities */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Min Quantity */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Seuil minimum
+              </label>
+              <input
+                type="number"
+                step="1"
+                {...form.register('product_min_qty', { valueAsNumber: true })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+              {form.formState.errors.product_min_qty && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {form.formState.errors.product_min_qty.message}
                 </p>
-              </div>
+              )}
+            </div>
 
-              {/* Preview calcul */}
-              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Simulation</h4>
-                    <div className="space-y-1 text-sm text-blue-800 dark:text-blue-200">
-                      <p>Stock actuel : <strong>{currentStock}</strong> unités</p>
-                      <p>Seuil alerte : <strong>{minQty}</strong> unités</p>
-                      <p>Seuil maximum : <strong>{maxQty}</strong> unités</p>
-                      {multiple > 1 && <p>Multiple commande : <strong>{multiple}</strong></p>}
+            {/* Max Quantity */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Seuil maximum
+              </label>
+              <input
+                type="number"
+                step="1"
+                {...form.register('product_max_qty', { valueAsNumber: true })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+              {form.formState.errors.product_max_qty && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {form.formState.errors.product_max_qty.message}
+                </p>
+              )}
+            </div>
 
-                      <div className="mt-3 pt-3 border-t border-blue-300 dark:border-blue-700">
-                        {willTrigger ? (
-                          <p className="font-semibold text-orange-600 dark:text-orange-400">
-                            ⚠️ Une commande de <strong>{qtyToOrder} unités</strong> sera automatiquement déclenchée
-                          </p>
-                        ) : (
-                          <p className="text-green-700 dark:text-green-400">
-                            ✅ Stock suffisant, aucune commande nécessaire
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+            {/* Multiple */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Multiple de commande
+              </label>
+              <input
+                type="number"
+                step="1"
+                {...form.register('qty_multiple', { valueAsNumber: true })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+              {form.formState.errors.qty_multiple && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {form.formState.errors.qty_multiple.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Preview */}
+          {selectedProduct && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <div className="flex items-start gap-2">
+                <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 text-sm text-blue-800 dark:text-blue-300">
+                  <p className="font-medium mb-2">Aperçu de la règle :</p>
+                  <ul className="space-y-1 list-disc list-inside">
+                    <li>Stock actuel : <strong>{currentStock}</strong></li>
+                    <li>Seuil de déclenchement : <strong>{minQty}</strong></li>
+                    <li>Quantité cible : <strong>{maxQty}</strong></li>
+                    {willTrigger ? (
+                      <li className="text-orange-600 dark:text-orange-400">
+                        <TrendingUp className="h-4 w-4 inline mr-1" />
+                        Cette règle serait déclenchée (stock {`<`} seuil)
+                      </li>
+                    ) : (
+                      <li className="text-green-600 dark:text-green-400">
+                        Stock suffisant, règle non déclenchée
+                      </li>
+                    )}
+                    {willTrigger && (
+                      <li>
+                        Quantité à commander : <strong>{qtyToOrder}</strong>
+                        {multiple > 1 && <span className="text-xs"> (arrondi au multiple de {multiple})</span>}
+                      </li>
+                    )}
+                  </ul>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Footer */}
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-900 dark:text-white dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
-              >
-                Annuler
-              </button>
-              <button
-                type="submit"
-                disabled={isCreating || isUpdating}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isCreating || isUpdating
-                  ? 'Enregistrement...'
-                  : mode === 'create'
-                  ? 'Créer la règle'
-                  : 'Enregistrer'}
-              </button>
-            </div>
-          </form>
-        </div>
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={isCreating || isUpdating}
+              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isCreating || isUpdating ? 'Enregistrement...' : mode === 'create' ? 'Créer' : 'Modifier'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )

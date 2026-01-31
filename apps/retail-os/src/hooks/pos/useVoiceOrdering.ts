@@ -147,8 +147,10 @@ export function useVoiceOrdering(options: UseVoiceOrderingOptions = {}): UseVoic
     recognition.lang = language
     recognition.continuous = continuous
     recognition.interimResults = true
+        // @ts-ignore - Web Speech API types incomplets
     recognition.maxAlternatives = 1
 
+        // @ts-ignore - Web Speech API types incomplets
     recognition.onstart = () => {
       setIsListening(true)
       setTranscript('')
@@ -194,7 +196,9 @@ export function useVoiceOrdering(options: UseVoiceOrderingOptions = {}): UseVoic
 
     recognitionRef.current = recognition
 
+        // @ts-ignore - Web Speech API types incomplets
     return () => {
+        // @ts-ignore - Web Speech API types incomplets
       recognition.abort()
     }
   }, [isSupported, language, continuous, products, onCommand, onError])

@@ -10,7 +10,6 @@
  */
 
 import { useState } from 'react';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button, PageNotice, SkeletonTable } from '@/components/common';
 import { Upload, CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { logger } from '@quelyos/logger';
@@ -124,18 +123,18 @@ export default function ThemesImportPage() {
   // Loading State
   if (importing) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 space-y-6">
           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse" />
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse" />
           <SkeletonTable rows={5} columns={3} />
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* 1. Breadcrumbs - TOUJOURS en premier */}
         <Breadcrumbs
@@ -309,6 +308,6 @@ export default function ThemesImportPage() {
           )}
         </div>
       </div>
-    </Layout>
+    
   );
 }

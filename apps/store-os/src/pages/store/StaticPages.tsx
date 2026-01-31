@@ -12,7 +12,6 @@
 
 import { useState } from 'react'
 import { Plus, Trash2, X, Save } from 'lucide-react'
-import { Layout } from '../../components/Layout'
 import { useStaticPages, useCreateStaticPage, useUpdateStaticPage, useDeleteStaticPage, StaticPage } from '../../hooks/useStaticPages'
 import { Button, SkeletonTable, PageNotice, Breadcrumbs } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
@@ -134,7 +133,7 @@ export default function StaticPagesPage() {
   const showForm = isCreating || editingPage
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -434,6 +433,6 @@ export default function StaticPagesPage() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }

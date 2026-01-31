@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Layout } from '../../components/Layout'
 import { useOrders } from '../../hooks/useOrders'
 import { Badge, Button, Breadcrumbs, SkeletonTable, PageNotice } from '../../components/common'
 import { ecommerceNotices } from '@/lib/notices'
@@ -99,7 +98,7 @@ export default function Orders() {
   const total = (data?.data?.total || 0) as number
 
   return (
-    <Layout>
+    
       <div className="p-8">
         <Breadcrumbs
           items={[
@@ -585,6 +584,6 @@ export default function Orders() {
         )}
 
       </div>
-    </Layout>
+    
   )
 }

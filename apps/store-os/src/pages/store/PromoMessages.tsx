@@ -10,7 +10,6 @@
 
 import { useState } from 'react'
 import { Plus, Trash2, X, Save } from 'lucide-react'
-import { Layout } from '../../components/Layout'
 import { usePromoMessages, useCreatePromoMessage, useUpdatePromoMessage, useDeletePromoMessage, PromoMessage } from '../../hooks/usePromoMessages'
 import { Button, SkeletonTable, PageNotice, Breadcrumbs } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
@@ -96,7 +95,7 @@ export default function PromoMessages() {
   const showForm = isCreating || editingMessage
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -240,6 +239,6 @@ export default function PromoMessages() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }

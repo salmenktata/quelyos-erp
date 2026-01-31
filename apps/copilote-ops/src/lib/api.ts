@@ -29,25 +29,25 @@ class ApiClient {
     return res.json()
   }
 
-  async get(url: string) {
+  async get<T = unknown>(url: string): Promise<T> {
     return this.request(url)
   }
 
-  async post(url: string, data?: unknown) {
+  async post<T = unknown>(url: string, data?: unknown): Promise<T> {
     return this.request(url, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     })
   }
 
-  async put(url: string, data?: unknown) {
+  async put<T = unknown>(url: string, data?: unknown): Promise<T> {
     return this.request(url, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     })
   }
 
-  async delete(url: string) {
+  async delete<T = unknown>(url: string): Promise<T> {
     return this.request(url, { method: 'DELETE' })
   }
 

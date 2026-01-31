@@ -10,7 +10,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button, PageNotice } from '@/components/common';
 import {
   FileText,
@@ -149,7 +148,7 @@ export default function MySubmissionsPage() {
   };
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* 1. Breadcrumbs */}
         <Breadcrumbs
@@ -377,6 +376,6 @@ export default function MySubmissionsPage() {
         </div>
       )}
       </div>
-    </Layout>
+    
   );
 }

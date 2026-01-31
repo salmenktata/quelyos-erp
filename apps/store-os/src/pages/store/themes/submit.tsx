@@ -10,7 +10,6 @@
  */
 
 import { useState } from 'react';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button, PageNotice } from '@/components/common';
 import { Upload, Image, DollarSign, CheckCircle, AlertCircle, FileUp } from 'lucide-react';
 import type { ThemeCategory } from '@/types/theme';
@@ -127,7 +126,7 @@ export default function SubmitThemePage() {
 
   if (success) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 space-y-6">
           <Breadcrumbs
             items={[
@@ -166,12 +165,12 @@ export default function SubmitThemePage() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -395,6 +394,6 @@ export default function SubmitThemePage() {
         </form>
         </div>
       </div>
-    </Layout>
+    
   );
 }

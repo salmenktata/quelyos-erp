@@ -11,7 +11,6 @@
  */
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, Button, SkeletonTable } from '@/components/common'
 import { TicketStatusBadge, TicketPriorityBadge } from '@/components/support/TicketBadges'
 import { SLABadge } from '@/components/support/SLABadge'
@@ -124,17 +123,17 @@ export default function TicketDetail() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <SkeletonTable rows={5} columns={1} />
         </div>
-      </Layout>
+      
     )
   }
 
   if (error || !data?.ticket) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <div role="alert" className="text-red-600 dark:text-red-400">
             Ticket non trouvé
@@ -143,14 +142,14 @@ export default function TicketDetail() {
             Retour aux tickets
           </Button>
         </div>
-      </Layout>
+      
     )
   }
 
   const { ticket, messages } = data
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -376,7 +375,7 @@ export default function TicketDetail() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }
 

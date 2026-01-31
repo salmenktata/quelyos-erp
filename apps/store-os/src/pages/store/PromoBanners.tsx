@@ -11,7 +11,6 @@
 
 import { useState } from 'react'
 import { Plus, X, Save } from 'lucide-react'
-import { Layout } from '../../components/Layout'
 import { usePromoBanners, useCreatePromoBanner, useUpdatePromoBanner, useDeletePromoBanner, PromoBanner } from '../../hooks/usePromoBanners'
 import { Button, SkeletonTable, PageNotice, Breadcrumbs } from '../../components/common'
 import { storeNotices } from '@/lib/notices'
@@ -98,7 +97,7 @@ export default function PromoBanners() {
   const showForm = isCreating || editingBanner
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -192,6 +191,6 @@ export default function PromoBanners() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }

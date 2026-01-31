@@ -9,7 +9,6 @@
  */
 
 import { useState, useCallback } from 'react'
-import { Layout } from '../../components/Layout'
 import {
   useFeaturedProducts,
   useAvailableProducts,
@@ -157,7 +156,7 @@ export default function Featured() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
@@ -453,6 +452,6 @@ export default function Featured() {
         {/* ToastContainer */}
         <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} position="top-right" />
       </div>
-    </Layout>
+    
   )
 }

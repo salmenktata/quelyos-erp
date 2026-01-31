@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState, Suspense } from "react";
-import { ModularLayout } from "@/components/ModularLayout";
 import { useAuth } from "@/lib/finance/compat/auth";
 import { useCurrency } from "@/lib/finance/CurrencyContext";
 import { FadeInUp } from "@/lib/finance/compat/animated";
@@ -104,7 +103,7 @@ export default function DashboardPage() {
   const loading = isDashboardLoading || !dashboardData;
 
   return (
-    <ModularLayout>
+    
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-4 md:p-8">
         {/* Dashboard Header with Time Range Selector & Comparison Toggle */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -209,6 +208,6 @@ export default function DashboardPage() {
           onOpenChange={setIsQuickAddOpen}
         />
       </div>
-    </ModularLayout>
+    
   );
 }

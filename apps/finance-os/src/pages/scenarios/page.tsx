@@ -12,7 +12,6 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Layout } from "@/components/Layout"
 import { Breadcrumbs, Button, PageNotice, SkeletonTable } from "@/components/common"
 import { useRequireAuth } from "@/lib/finance/compat/auth"
 import { financeNotices } from "@/lib/notices/finance-notices"
@@ -276,9 +275,7 @@ export default function ScenariosPage() {
     link.click()
   }
 
-  return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
+  return (      <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
             { label: "Tableau de bord", href: "/dashboard" },
@@ -617,7 +614,5 @@ export default function ScenariosPage() {
             </div>
           </div>
         )}
-      </div>
-    </Layout>
-  )
+      </div>  )
 }

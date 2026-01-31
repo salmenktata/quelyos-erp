@@ -10,7 +10,6 @@
  */
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common'
 import { TicketStatusBadge, TicketPriorityBadge } from '@/components/support/TicketBadges'
 import { supportNotices } from '@/lib/notices'
@@ -49,7 +48,7 @@ export default function Tickets() {
   }, [data])
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -199,7 +198,7 @@ export default function Tickets() {
           />
         )}
       </div>
-    </Layout>
+    
   )
 }
 

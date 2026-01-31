@@ -29,7 +29,7 @@ export function TransferModal({ onClose, onSuccess }: TransferModalProps) {
   const createMutation = useCreateTransfer()
 
   // Données
-  const { data: productsData, isLoading: loadingProducts } = useStockProducts({
+  const { products: productsData, isLoading: loadingProducts } = useStockProducts({
     limit: 20,
     search: productSearch || undefined,
   })
@@ -46,9 +46,9 @@ export function TransferModal({ onClose, onSuccess }: TransferModalProps) {
     internal_only: true,
   })
 
-  const products = (productsData?.data?.products as StockProduct[]) || []
-  const fromLocations = fromLocationsData?.data?.locations || []
-  const toLocations = toLocationsData?.data?.locations || []
+  const products = (productsData as unknown as StockProduct[]) || []
+  const fromLocations = fromLocationsData || []
+  const toLocations = toLocationsData || []
 
   // Validation
   const quantityNum = parseFloat(quantity) || 0

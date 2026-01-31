@@ -8,7 +8,6 @@
  * - Légende dynamique des types de congés
  */
 import { useState, useMemo } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useLeavesCalendar, useDepartments } from '@/hooks/hr'
@@ -28,13 +27,15 @@ export default function LeavesCalendarPage() {
   const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0]
 
   const { data: calendarData, isLoading } = useLeavesCalendar(
-    tenant?.id || null,
-    startDate,
-    endDate,
-    departmentFilter
+    year,
+    month,
+    {
+      tenantId: tenant?.id || 0,
+      departmentId: departmentFilter,
+    }
   )
 
-  const { data: departmentsData } = useDepartments(tenant?.id || null)
+  const { data: departmentsData } = useDepartments(tenant?.id || 0)
   const departments = departmentsData?.departments || []
 
   const daysInMonth = new Date(year, month + 1, 0).getDate()
@@ -54,12 +55,8 @@ export default function LeavesCalendarPage() {
   }, [year, month, daysInMonth, adjustedFirstDay])
 
   const getLeavesForDay = (date: string | null) => {
-    if (!date || !calendarData) return []
-    return calendarData.filter(leave => {
-      const from = leave.date_from?.split('T')[0]
-      const to = leave.date_to?.split('T')[0]
-      return from && to && date >= from && date <= to
-    })
+    if (!date || !calendarData?.data) return []
+    return calendarData.data[date] || []
   }
 
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1))
@@ -67,7 +64,7 @@ export default function LeavesCalendarPage() {
   const today = new Date().toISOString().split('T')[0]
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -164,7 +161,7 @@ export default function LeavesCalendarPage() {
                         </div>
                         <div className="space-y-1">
                           {leaves.slice(0, 3).map((leave, i) => {
-                            const colorHex = colorIndexToHex((leave as { leave_type_color?: number | string }).leave_type_color)
+                            const colorHex = colorIndexToHex(Number((leave as any).leave_type_color) || 0)
                             return (
                               <div
                                 key={i}
@@ -195,29 +192,33 @@ export default function LeavesCalendarPage() {
         </div>
 
         {/* Légende */}
-        {calendarData && calendarData.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Légende
-            </h3>
-            <div className="flex flex-wrap gap-3">
-              {Array.from(new Set(calendarData.map(l => l.leave_type_name || l.leave_type))).map(typeName => {
-                const leave = calendarData.find(l => (l.leave_type_name || l.leave_type) === typeName)
-                const colorHex = colorIndexToHex((leave as { leave_type_color?: number | string } | undefined)?.leave_type_color)
-                return (
-                  <div key={typeName} className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: colorHex }}
-                    />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">{typeName}</span>
-                  </div>
-                )
-              })}
+        {calendarData?.data && Object.keys(calendarData.data).length > 0 && (() => {
+          const allLeaves = Object.values(calendarData.data).flat()
+          const uniqueTypes = Array.from(new Set(allLeaves.map((l: any) => l.leave_type_name || l.leave_type)))
+          return (
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Légende
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {uniqueTypes.map((typeName: any) => {
+                  const leave = allLeaves.find((l: any) => (l.leave_type_name || l.leave_type) === typeName)
+                  const colorHex = colorIndexToHex(Number((leave as any)?.leave_type_color) || 0)
+                  return (
+                    <div key={String(typeName)} className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: colorHex }}
+                      />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{String(typeName)}</span>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
       </div>
-    </Layout>
+    
   )
 }

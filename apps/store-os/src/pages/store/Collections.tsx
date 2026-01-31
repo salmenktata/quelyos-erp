@@ -10,7 +10,6 @@
  */
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, EyeOff, Image, Package, AlertCircle, Search } from 'lucide-react';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { logger } from '@/lib/logger';
@@ -110,16 +109,16 @@ export default function Collections() {
 
   if (loading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <SkeletonTable rows={6} columns={4} />
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -361,7 +360,7 @@ export default function Collections() {
           </div>
         )}
       </div>
-    </Layout>
+    
   );
 }
 

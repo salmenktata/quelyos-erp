@@ -11,7 +11,6 @@
  */
 
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { hrNotices } from '@/lib/notices'
 import { Plus, Clock, AlertCircle } from 'lucide-react'
@@ -29,7 +28,7 @@ export default function AttendanceReasons() {
   ]
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
@@ -143,6 +142,6 @@ export default function AttendanceReasons() {
           </table>
         </div>
       </div>
-    </Layout>
+    
   )
 }

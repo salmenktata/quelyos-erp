@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
-import { Layout } from '../../components/Layout'
 import { useCustomers } from '../../hooks/useCustomers'
 import { useExportCustomers } from '../../hooks/useExportCustomers'
 import type { CustomerListItem } from '@/types'
@@ -140,7 +139,7 @@ export default function Customers() {
   }, [error, toast])
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: 'Tableau de bord', href: '/dashboard' }, { label: 'Clients' }]} />
@@ -232,6 +231,6 @@ export default function Customers() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }

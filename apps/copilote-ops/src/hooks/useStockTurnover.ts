@@ -3,6 +3,7 @@ import { financeApi } from '@/lib/finance/api'
 import type { StockTurnoverResponse, TurnoverStatus } from '@/types/stock'
 
 interface UseStockTurnoverParams {
+  days?: number
   start_date?: string
   end_date?: string
   category_id?: number
@@ -18,7 +19,7 @@ interface UseStockTurnoverParams {
 export function useStockTurnover(params?: UseStockTurnoverParams) {
   return useQuery({
     queryKey: ['stock', 'turnover', params],
-    queryFn: () => financeApi.getStockTurnover(params) as Promise<StockTurnoverResponse>,
+    queryFn: () => financeApi.getStockTurnover({ days: params?.days }) as Promise<StockTurnoverResponse>,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (anciennement cacheTime)
   })

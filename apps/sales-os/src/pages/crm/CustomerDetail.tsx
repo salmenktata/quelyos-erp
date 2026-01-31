@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Layout } from '../../components/Layout'
 import { useCustomer, useUpdateCustomer } from '../../hooks/useCustomerDetail'
 import { Badge, Button, Breadcrumbs, Skeleton, Modal } from '../../components/common'
 import { useToast } from '../../hooks/useToast'
@@ -115,7 +114,7 @@ export default function CustomerDetail() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-8">
           <Skeleton height={32} className="mb-6 max-w-xs" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -127,13 +126,13 @@ export default function CustomerDetail() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   if (error || !customer) {
     return (
-      <Layout>
+      
         <div className="p-8">
           <Breadcrumbs
             items={[
@@ -167,12 +166,12 @@ export default function CustomerDetail() {
             </Link>
           </div>
         </div>
-      </Layout>
+      
     )
   }
 
   return (
-    <Layout>
+    
       <div className="p-8">
         <Breadcrumbs
           items={[
@@ -503,6 +502,6 @@ export default function CustomerDetail() {
           </form>
         </Modal>
       </div>
-    </Layout>
+    
   )
 }

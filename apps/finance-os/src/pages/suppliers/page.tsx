@@ -12,7 +12,6 @@
 
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, SkeletonTable, PageNotice, Button } from '@/components/common'
 import { financeNotices } from '@/lib/notices'
 import { Users, Plus, Search, CreditCard, Building2, FileText } from 'lucide-react'
@@ -101,9 +100,7 @@ export default function SuppliersPage() {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
 
-  return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
+  return (      <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
             { label: 'Tableau de bord', href: '/dashboard' },
@@ -275,7 +272,5 @@ export default function SuppliersPage() {
             ))}
           </div>
         )}
-      </div>
-    </Layout>
-  )
+      </div>  )
 }

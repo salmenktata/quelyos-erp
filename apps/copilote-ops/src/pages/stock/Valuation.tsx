@@ -12,7 +12,6 @@
  */
 
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common'
 import { stockNotices } from '@/lib/notices'
 import { Download, DollarSign, Package, TrendingUp } from 'lucide-react'
@@ -23,7 +22,7 @@ export default function StockValuation() {
 
   // TODO: Créer hook useStockCostReport
   const isLoading = false
-  const error = null
+  const error: Error | null = null
   const data = {
     total_value: 125430.50,
     currency: 'EUR',
@@ -49,7 +48,7 @@ export default function StockValuation() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8">
         <Breadcrumbs
           items={[
@@ -153,7 +152,7 @@ export default function StockValuation() {
           <SkeletonTable rows={10} columns={6} />
         ) : error ? (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6" role="alert">
-            <p className="text-red-800 dark:text-red-200">Erreur : {error.message}</p>
+            <p className="text-red-800 dark:text-red-200">Erreur : {(error as any)?.message || "Erreur inconnue"}</p>
           </div>
         ) : (
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
@@ -208,6 +207,6 @@ export default function StockValuation() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }

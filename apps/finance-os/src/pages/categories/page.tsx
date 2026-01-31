@@ -11,7 +11,6 @@
  */
 
 import { useEffect, useState } from "react";
-import { Layout } from "@/components/Layout";
 import { Breadcrumbs, PageNotice, SkeletonTable } from "@/components/common";
 import { api } from "@/lib/finance/api";
 import type { CreateCategoryRequest } from "@/types/api";
@@ -82,9 +81,7 @@ export default function CategoriesPage() {
   const incomeCategories = categories.filter((c) => c.kind === "INCOME");
   const expenseCategories = categories.filter((c) => c.kind === "EXPENSE");
 
-  return (
-    <Layout>
-      <div className="p-4 md:p-8 space-y-6">
+  return (      <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
             { label: "Finance", href: "/finance" },
@@ -267,7 +264,5 @@ export default function CategoriesPage() {
           </div>
         </div>
         )}
-      </div>
-    </Layout>
-  );
+      </div>  );
 }

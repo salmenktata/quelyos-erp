@@ -10,7 +10,6 @@
  */
 import { useState, useEffect } from 'react';
 import { Edit, Trash2, Zap, Clock, TrendingUp, AlertCircle } from 'lucide-react';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, Button, SkeletonTable } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { apiFetchJson } from '@/lib/apiFetch';
@@ -117,16 +116,16 @@ export default function FlashSales() {
 
   if (loading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <SkeletonTable rows={6} columns={4} />
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -353,6 +352,6 @@ export default function FlashSales() {
           </div>
         )}
       </div>
-    </Layout>
+    
   );
 }

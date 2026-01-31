@@ -9,7 +9,6 @@
  */
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs, PageNotice, Button } from '@/components/common'
 import { useMyTenant } from '@/hooks/useMyTenant'
 import { useCreateEmployee, useDepartments, useJobs } from '@/hooks/hr'
@@ -89,7 +88,7 @@ export default function NewEmployeePage() {
   ]
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -412,6 +411,6 @@ export default function NewEmployeePage() {
           </div>
         </form>
       </div>
-    </Layout>
+    
   )
 }

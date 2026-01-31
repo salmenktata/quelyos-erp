@@ -1,6 +1,5 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Badge, Skeleton, ConfirmModal } from '@/components/common';
 import { useCampaign, useSendCampaign, useDeleteCampaign } from '@/hooks/useMarketingCampaigns';
 import { useToast } from '@/contexts/ToastContext';
@@ -75,17 +74,17 @@ export default function CampaignDetailPage() {
 
   if (isLoading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <Skeleton height={400} />
         </div>
-      </Layout>
+      
     );
   }
 
   if (!campaign) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8">
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">Campagne introuvable</p>
@@ -94,14 +93,14 @@ export default function CampaignDetailPage() {
             </Link>
           </div>
         </div>
-      </Layout>
+      
     );
   }
 
   const canSend = campaign.status === 'draft' || campaign.status === 'scheduled';
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -331,6 +330,6 @@ export default function CampaignDetailPage() {
           isLoading={deleteMutation.isPending}
         />
       </div>
-    </Layout>
+    
   );
 }

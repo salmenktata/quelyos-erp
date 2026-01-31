@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Layout } from '../../components/Layout'
 import { useCreateCoupon } from '../../hooks/useCoupons'
 import type { CouponCreate } from '@/types'
 import { Button, Input, Breadcrumbs, PageNotice } from '../../components/common'
@@ -113,7 +112,7 @@ export default function CouponForm() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-8">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -285,6 +284,6 @@ export default function CouponForm() {
         {/* ToastContainer */}
         <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} position="top-right" />
       </div>
-    </Layout>
+    
   )
 }

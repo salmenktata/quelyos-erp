@@ -10,7 +10,6 @@
  */
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Palette, Tag } from 'lucide-react';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Button, SkeletonTable, PageNotice } from '@/components/common';
 import { storeNotices } from '@/lib/notices';
 import { apiFetchJson } from '@/lib/apiFetch';
@@ -124,18 +123,18 @@ export default function Attributes() {
 
   if (loading) {
     return (
-      <Layout>
+      <>
         <Breadcrumbs items={breadcrumbItems} />
         <div className="flex items-center justify-center h-64">
           <SkeletonTable rows={3} columns={3} />
         </div>
-      </Layout>
+      </>
     );
   }
 
   if (error) {
     return (
-      <Layout>
+      <>
         <Breadcrumbs items={breadcrumbItems} />
         <div role="alert" className="mt-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 rounded-lg">
           <p className="text-red-800 dark:text-red-200">{error}</p>
@@ -143,12 +142,12 @@ export default function Attributes() {
             Réessayer
           </Button>
         </div>
-      </Layout>
+      </>
     );
   }
 
   return (
-    <Layout>
+    <>
       <Breadcrumbs items={breadcrumbItems} />
 
       <div className="space-y-6 mt-6">
@@ -337,6 +336,6 @@ export default function Attributes() {
         </div>
       )}
       </div>
-    </Layout>
+    </>
   );
 }

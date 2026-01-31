@@ -14,7 +14,7 @@ import {
   getNoticeFeedback,
 } from "@/lib/notices/analytics";
 
-interface PageNoticeProps {
+export interface PageNoticeProps {
   config: PageNoticeConfig;
   className?: string;
   enableFeedback?: boolean; // Activer le système de feedback (default: true)

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Layout } from '../../components/Layout'
 import { useCoupons, useUpdateCoupon, useDeleteCoupon } from '../../hooks/useCoupons'
 import { Button, Badge, Breadcrumbs, SkeletonTable, Modal, PageNotice } from '../../components/common'
 import { ecommerceNotices } from '@/lib/notices'
@@ -145,7 +144,7 @@ export default function Coupons() {
   }
 
   return (
-    <Layout>
+    
       <div className="p-8">
         <Breadcrumbs
           items={[
@@ -494,6 +493,6 @@ export default function Coupons() {
           </div>
         </Modal>
       </div>
-    </Layout>
+    
   )
 }

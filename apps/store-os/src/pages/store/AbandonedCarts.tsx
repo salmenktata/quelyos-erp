@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Layout } from '../../components/Layout'
 import {
   useAbandonedCarts,
   useSendCartReminder,
@@ -86,7 +85,7 @@ export default function AbandonedCarts() {
   const stats = statsData?.data
 
   return (
-    <Layout>
+    
       <div className="p-8">
         <Breadcrumbs
           items={[
@@ -393,6 +392,6 @@ export default function AbandonedCarts() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }

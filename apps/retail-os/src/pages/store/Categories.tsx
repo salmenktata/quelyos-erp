@@ -10,7 +10,6 @@
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { Layout } from '../../components/Layout'
 import {
   useCategoriesTree,
   useCategories,
@@ -267,7 +266,7 @@ export default function Categories() {
   }, [isCreating, editingCategory])
 
   return (
-    <Layout>
+    
       <main role="main" className="p-4 md:p-8">
         {/* Breadcrumbs */}
         <Breadcrumbs
@@ -626,6 +625,6 @@ export default function Categories() {
         {/* ToastContainer */}
         <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} position="top-right" />
       </main>
-    </Layout>
+    
   )
 }

@@ -12,7 +12,6 @@
 
 import { useState, useCallback } from 'react'
 import { Plus, Trash2, X, Save, GripVertical } from 'lucide-react'
-import { Layout } from '../../components/Layout'
 import {
   useMenus,
   useCreateMenu,
@@ -162,7 +161,7 @@ export default function Menus() {
   const showForm = isCreating || editingMenu
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         <Breadcrumbs
           items={[
@@ -387,6 +386,6 @@ export default function Menus() {
           )}
         </div>
       </div>
-    </Layout>
+    
   )
 }

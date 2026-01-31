@@ -11,7 +11,6 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice, SkeletonTable } from '@/components/common';
 import { logger } from '@quelyos/logger';
 import {
@@ -173,19 +172,19 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 space-y-6">
           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse" />
           <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse" />
           <SkeletonTable rows={8} columns={4} />
         </div>
-      </Layout>
+      
     );
   }
 
   if (error) {
     return (
-      <Layout>
+      
         <div className="p-4 md:p-8 space-y-6">
           <Breadcrumbs
             items={[
@@ -217,12 +216,12 @@ export default function AnalyticsPage() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     );
   }
 
   return (
-    <Layout>
+    
       <div className="p-4 md:p-8 space-y-6">
         {/* 1. Breadcrumbs */}
         <Breadcrumbs
@@ -528,6 +527,6 @@ export default function AnalyticsPage() {
         </div>
       )}
       </div>
-    </Layout>
+    
   );
 }
