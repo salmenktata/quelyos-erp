@@ -283,3 +283,37 @@ docker exec -it postgres psql -U odoo -d quelyos_db -c "\d product_product" | gr
 | 2026-01-31 | product.template | qty_available_unreserved → x_qty_available_unreserved | 19.0.1.42.0 | 2772ee3 | ✅ Terminé |
 
 **Résultat Phase 1** : 7 champs migrés, 551 champs restants
+
+---
+
+## 📊 Batch 1 : maintenance.equipment (2026-01-31)
+
+| Date | Modèle | Champs migrés | Version | Status |
+|------|--------|---------------|---------|--------|
+| 2026-01-31 | maintenance.equipment | mtbf_hours → x_mtbf_hours | 19.0.1.1.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | mttr_hours → x_mttr_hours | 19.0.1.1.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | uptime_percentage → x_uptime_percentage | 19.0.1.1.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | is_critical → x_is_critical | 19.0.1.1.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | serial_number → x_serial_number | 19.0.1.1.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | purchase_date → x_purchase_date | 19.0.1.1.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | warranty_end_date → x_warranty_end_date | 19.0.1.1.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | next_preventive_date → x_next_preventive_date | 19.0.1.1.0 | ✅ Terminé |
+
+**Résultat Batch 1** : 8 champs migrés, 12 champs restants
+
+## 📊 Batch 1 COMPLET : maintenance.equipment (2026-01-31)
+
+| Date | Modèle | Champs migrés | Version | Status |
+|------|--------|---------------|---------|--------|
+| 2026-01-31 | maintenance.equipment | mtbf_hours → x_mtbf_hours | 19.0.1.2.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | mttr_hours → x_mttr_hours | 19.0.1.2.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | uptime_percentage → x_uptime_percentage | 19.0.1.2.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | is_critical → x_is_critical | 19.0.1.2.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | serial_number → x_serial_number | 19.0.1.2.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | purchase_date → x_purchase_date | 19.0.1.2.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | warranty_end_date → x_warranty_end_date | 19.0.1.2.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | next_preventive_date → x_next_preventive_date | 19.0.1.2.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | failure_count → x_failure_count | 19.0.1.2.0 | ✅ Terminé |
+| 2026-01-31 | maintenance.equipment | last_failure_date → x_last_failure_date | 19.0.1.2.0 | ✅ Terminé |
+
+**Résultat Batch 1 COMPLET** : 10 champs migrés, 10 champs restants (maintenance.request + mailing.trace)

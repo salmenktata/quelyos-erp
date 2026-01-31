@@ -10,7 +10,6 @@ def migrate(cr, version):
     
     migrations = {
         'payment_provider': [
-            ('code', 'x_code'),
             ('flouci_app_token', 'x_flouci_app_token'),
             ('flouci_app_secret', 'x_flouci_app_secret'),
             ('flouci_timeout', 'x_flouci_timeout'),

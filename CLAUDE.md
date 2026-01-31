@@ -554,3 +554,72 @@ class ProductTemplate(models.Model):
 - Champs Odoo core : `name`, `active`, `sequence`, `company_id`, `state`
 - Computed fields non-stockés
 - Modèles `_name = 'quelyos.*'`
+
+## 🐳 CONTENEURS DOCKER - NOMS FIXES
+**NE JAMAIS SE TROMPER** : Documenter les noms exacts des conteneurs
+
+### Conteneurs Backend/Infrastructure
+- **quelyos-odoo** : Serveur Odoo 19 (port 8069)
+- **quelyos-postgres** : Base de données PostgreSQL (port 5432)
+- **quelyos-redis** : Cache Redis (port 6379)
+
+### Utilisateurs/DB PostgreSQL
+- **User** : `quelyos` (PAS "odoo")
+- **Database** : `quelyos`
+- **Password** : Voir `.env` ou docker-compose.yml
+
+### Commandes Courantes
+```bash
+# Upgrade module Odoo
+docker exec quelyos-postgres psql -U quelyos -d quelyos -c "UPDATE ir_module_module SET state = 'to upgrade' WHERE name = 'quelyos_api';"
+docker restart quelyos-odoo
+
+# Vérifier version module
+docker exec quelyos-postgres psql -U quelyos -d quelyos -c "SELECT name, latest_version FROM ir_module_module WHERE name = 'quelyos_api';"
+
+# Logs Odoo
+docker logs quelyos-odoo --tail 100 -f
+```
+
+**ATTENTION** : Le script `upgrade.sh` utilise docker-compose mais les conteneurs tournent en standalone. Adapter si nécessaire.
+
+## 🏷️ RÈGLES NOMMAGE CHAMPS ODOO - VÉRIFIER AVANT ÉCRITURE
+**RÉFLEXE ABSOLU** : Vérifier `_name` vs `_inherit` AVANT de créer un champ
+
+### Décision automatique
+1. **Modèle `_name = 'quelyos.*'`** → Champs SANS préfixe `x_` (OK)
+2. **Modèle `_inherit = 'odoo.core'`** → Champs AVEC préfixe `x_` (OBLIGATOIRE)
+3. **Exception** : `tenant_id`, override champs Odoo existants
+
+### Exemples
+```python
+# ✅ BON - Modèle Quelyos pur
+class QuelyosTenant(models.Model):
+    _name = 'quelyos.tenant'
+    name = fields.Char()  # Pas de x_
+
+# ✅ BON - Héritage Odoo avec x_
+class MaintenanceEquipment(models.Model):
+    _inherit = 'maintenance.equipment'
+    x_mtbf_hours = fields.Float()  # x_ obligatoire
+
+# ❌ MAUVAIS - Héritage Odoo sans x_
+class MaintenanceEquipment(models.Model):
+    _inherit = 'maintenance.equipment'
+    mtbf_hours = fields.Float()  # RISQUE COLLISION !
+```
+
+**Voir** : `.claude/FIELD_NAMING_RULES.md` pour détails complets et checklist.
+
+### Exception selection_add
+**NE PAS préfixer x_** si vous étendez un champ Selection Odoo avec `selection_add`
+```python
+# ✅ CORRECT - Extension champ Odoo existant
+code = fields.Selection(
+    selection_add=[('new_val', 'Nouvelle valeur')]
+)
+
+# ❌ INCORRECT - Ajouter x_ sur extension
+x_code = fields.Selection(selection_add=...)  # ERREUR !
+```
+**Règle** : Modification/extension champ Odoo existant = garder nom original (sans x_)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Quelyos Maintenance (GMAO)',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.2.0',
     'category': 'Maintenance',
     'summary': 'Gestion Maintenance Assistée par Ordinateur',
     'author': 'Quelyos',

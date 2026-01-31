@@ -10,7 +10,7 @@ from odoo.exceptions import UserError, ValidationError
 class PaymentProvider(models.Model):
     _inherit = 'payment.provider'
 
-    x_code = fields.Selection(
+    code = fields.Selection(
         selection_add=[
             ('flouci', 'Flouci'),
             ('konnect', 'Konnect')
