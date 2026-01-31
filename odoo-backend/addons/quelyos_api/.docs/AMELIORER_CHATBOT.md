@@ -322,7 +322,7 @@ SYSTEM_PROMPT_STRICT = """Vous êtes l'assistant Quelyos..."""
 SYSTEM_PROMPT_EXPERT = """Vous êtes l'assistant expert Quelyos, spécialiste de l'ERP français.
 
 🎯 VOTRE EXPERTISE :
-- 8 modules intégrés (Finance, CRM, Stock, E-commerce, RH, POS, Marketing)
+- 9 modules intégrés (Finance, CRM, Stock, E-commerce, RH, POS, Marketing, Support, Home)
 - Architecture SaaS moderne (Next.js, React, Odoo 19)
 - Hébergement souverain France
 - Conformité RGPD & ISO 27001

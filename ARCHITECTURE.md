@@ -241,7 +241,7 @@ quelyosSuite/
 │
 ├── dashboard-client/          # ERP Complet / Full Suite (React + Vite, :5175)
 │   └── src/
-│       ├── pages/             # 209 pages (8 modules)
+│       ├── pages/             # 209 pages (9 modules)
 │       ├── components/common/ # 30+ composants (source @quelyos/ui-kit)
 │       └── config/modules.ts  # Configuration modules
 │

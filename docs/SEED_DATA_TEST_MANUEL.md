@@ -222,7 +222,7 @@ docker restart quelyos-odoo
 - [ ] Page `/seed-data` accessible
 - [ ] Dropdown tenant affiche "Admin Quelyos"
 - [ ] 3 boutons volumétrie (Minimale, Standard, Large)
-- [ ] 8 modules affichés et toggleables
+- [ ] 9 modules affichés et toggleables
 - [ ] Bouton "Générer" actif après sélection tenant
 - [ ] Progress bar fonctionne (0% → 100%)
 - [ ] Logs s'affichent en temps réel

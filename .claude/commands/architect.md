@@ -5,7 +5,7 @@ Analyse l'architecture technique de Quelyos Suite (7 SaaS + ERP complet + backen
 
 ## Contexte Architecture
 - **Backend unique** : Odoo 19 (101 modèles, 764 endpoints, multi-tenant)
-- **ERP Complet** : dashboard-client (port 5175) = Full Suite (8 modules)
+- **ERP Complet** : dashboard-client (port 5175) = Full Suite (9 modules)
 - **7 SaaS** : Quelyos Finance (3010), Quelyos Store (3011), Quelyos Copilote (3012), Quelyos Sales (3013), Quelyos Retail (3014), Quelyos Team (3015), Quelyos Support (3016)
 - **Monorepo** : Turborepo + @quelyos/ui-kit + @quelyos/api-client + @quelyos/utils
 - **Plan détaillé** : `docs/QUELYOS_SUITE_7_SAAS_PLAN.md`
