@@ -179,10 +179,22 @@ export function useAuth(): AuthContextType {
 }
 
 export function useRequireAuth() {
-  const auth = useAuth()
-  return {
-    user: auth.user,
-    isLoading: auth.isLoading,
-    isAuthenticated: auth.isAuthenticated,
+  const navigate = useNavigate()
+  const { user, isLoading, isAuthenticated } = useAuth()
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate('/login', { replace: true })
+    }
+  }, [isLoading, isAuthenticated, navigate])
+
+  if (isLoading) {
+    return null
   }
+
+  if (!isAuthenticated) {
+    return null
+  }
+
+  return { user, isLoading, isAuthenticated }
 }
