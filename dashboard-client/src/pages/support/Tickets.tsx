@@ -288,7 +288,7 @@ function TicketsTable({ tickets, onSelectTicket }: TicketsTableProps) {
                 {ticket.messageCount}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {new Date(ticket.createdAt).toLocaleDateString('fr-FR')}
+                {ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString('fr-FR') : '-'}
               </td>
             </tr>
           ))}

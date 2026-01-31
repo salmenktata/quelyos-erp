@@ -207,13 +207,15 @@ export default function TicketDetail() {
           </div>
 
           <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              Créé le {new Date(ticket.createdAt).toLocaleDateString('fr-FR')}
-            </div>
+            {ticket.createdAt && (
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Créé le {new Date(ticket.createdAt).toLocaleDateString('fr-FR')}
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
-              {ticket.messageCount} message{ticket.messageCount > 1 ? 's' : ''}
+              {ticket.messageCount ?? 0} message{(ticket.messageCount ?? 0) > 1 ? 's' : ''}
             </div>
           </div>
 
@@ -395,7 +397,7 @@ function MessageBubble({ message }: MessageBubbleProps) {
             {message.authorName}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {new Date(message.createdAt).toLocaleString('fr-FR')}
+            {message.createdAt ? new Date(message.createdAt).toLocaleString('fr-FR') : 'Date inconnue'}
           </span>
         </div>
         <div

@@ -3,7 +3,7 @@
  */
 
 interface SLABadgeProps {
-  status: 'ok' | 'warning' | 'breached' | null
+  status: 'ok' | 'warning' | 'breached' | 'on_track' | null
   deadline?: string | null
   label: string
 }
@@ -17,6 +17,12 @@ export function SLABadge({ status, deadline, label }: SLABadgeProps) {
       border: 'border-green-500 dark:border-green-400',
       text: 'text-green-700 dark:text-green-400',
       icon: '✓',
+    },
+    on_track: {
+      bg: 'bg-blue-100 dark:bg-blue-900/20',
+      border: 'border-blue-500 dark:border-blue-400',
+      text: 'text-blue-700 dark:text-blue-400',
+      icon: '→',
     },
     warning: {
       bg: 'bg-orange-100 dark:bg-orange-900/20',

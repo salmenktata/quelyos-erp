@@ -13,6 +13,7 @@ export function TicketStatusBadge({ state }: TicketStatusBadgeProps) {
     pending: 'warning',
     resolved: 'success',
     closed: 'neutral',
+    cancelled: 'neutral',
   }
 
   const labels: Record<TicketState, string> = {
@@ -21,6 +22,7 @@ export function TicketStatusBadge({ state }: TicketStatusBadgeProps) {
     pending: 'En attente',
     resolved: 'Résolu',
     closed: 'Fermé',
+    cancelled: 'Annulé',
   }
 
   return <Badge variant={variants[state]}>{labels[state]}</Badge>
