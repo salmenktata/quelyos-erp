@@ -1,270 +1,161 @@
-# Phase 1 : Combler Gaps P0 - Rapport d'Avancement
+# Phase 1 - Avancement Implémentation
 
-**Date** : 2026-01-31  
-**Durée estimée totale** : 4-6 semaines  
-**Statut global** : ⏳ EN COURS (Tâches 1-2 complétées, 3-6 en cours)
-
----
-
-## ✅ Tâche #1 : Marketing Email Complet (P0 #6) - COMPLÉTÉ
-
-**Durée estimée** : 2 semaines  
-**Statut** : ✅ 100% implémenté
-
-### Réalisations
-
-#### Backend (odoo-backend/addons/quelyos_api/)
-- ✅ `controllers/marketing_campaigns_ctrl.py` : 8 endpoints
-  - `POST /api/ecommerce/marketing/campaigns` - Liste campagnes
-  - `POST /api/ecommerce/marketing/campaigns/create` - Créer campagne
-  - `POST /api/ecommerce/marketing/campaigns/:id` - Détail campagne
-  - `POST /api/ecommerce/marketing/campaigns/:id/send` - Envoyer campagne
-  - `POST /api/ecommerce/marketing/campaigns/:id/stats` - Statistiques
-  - `POST /api/ecommerce/marketing/campaigns/:id/duplicate` - Dupliquer
-  - `POST /api/ecommerce/marketing/campaigns/:id/delete` - Supprimer
-  - `POST /api/ecommerce/marketing/campaigns/:id/test` - Envoi test
-
-#### Frontend (dashboard-client/)
-- ✅ `src/hooks/useMarketingCampaigns.ts` - Hook react-query complet
-- ✅ `src/pages/marketing/email/page.tsx` - Liste campagnes avec stats
-- ✅ `src/pages/marketing/email/new/page.tsx` - Création campagne
-- ✅ `src/pages/marketing/email/[id]/page.tsx` - Détail campagne avec stats détaillées
-
-### Fonctionnalités Opérationnelles
-- ✅ Création campagnes email
-- ✅ Envoi campagnes (action_send_mail Odoo natif)
-- ✅ Statistiques détaillées (envoyés, ouverts, clics, rebonds, échecs)
-- ✅ Duplication campagnes
-- ✅ Suppression campagnes
-- ✅ États campagne (draft, in_queue, sending, done)
-
-### Reste à Faire (Optional)
-- ⏳ Intégration Email Builder drag & drop (modèle `quelyos.email.builder` existe)
-- ⏳ Envoi test vraiment fonctionnel (endpoint existe mais `action_test()` à configurer)
-- ⏳ Planification envoi différé (schedule_date)
-- ⏳ A/B testing emails
-- ⏳ Templates email prédéfinis
-
-**Impact** : Gap P0 #6 résolu → Les utilisateurs peuvent créer et envoyer des campagnes email marketing.
+**Date début** : 2026-01-31
+**Durée estimée** : 8 semaines
+**Parité cible** : 18% → 45%
 
 ---
 
-## ✅ Tâche #2 : Marketing Listes - CRUD Complet (P0 #7) - COMPLÉTÉ
+## 📊 État Global
 
-**Durée estimée** : 1 semaine  
-**Statut** : ✅ 80% implémenté
-
-### Réalisations
-
-#### Backend (odoo-backend/addons/quelyos_api/)
-- ✅ `controllers/marketing_lists_ctrl.py` : 6 endpoints
-  - `POST /api/ecommerce/marketing/lists` - Liste listes
-  - `POST /api/ecommerce/marketing/lists/create` - Créer liste
-  - `POST /api/ecommerce/marketing/lists/:id` - Détail liste + contacts
-  - `POST /api/ecommerce/marketing/lists/:id/contacts` - Ajouter contacts
-  - `POST /api/ecommerce/marketing/lists/:id/contacts/:contact_id` - Retirer contact
-  - `POST /api/ecommerce/marketing/lists/:id/delete` - Supprimer liste
-
-#### Frontend (dashboard-client/)
-- ✅ `src/hooks/useMarketingLists.ts` - Hook react-query complet
-- ✅ `src/pages/marketing/lists/page.tsx` - Liste listes + création
-
-### Fonctionnalités Opérationnelles
-- ✅ Création listes de diffusion
-- ✅ Ajout contacts via res.partner
-- ✅ Retrait contacts
-- ✅ Suppression listes
-- ✅ Comptage contacts par liste
-
-### Reste à Faire
-- ⏳ Page détail liste (`/marketing/lists/[id]`) avec tableau contacts
-- ⏳ Listes dynamiques (filtres auto-update)
-- ⏳ Import CSV contacts
-- ⏳ Export contacts
-- ⏳ Intégration addon OCA `mass_mailing_partner` (sync auto res.partner)
-
-**Impact** : Gap P0 #7 partiellement résolu → Les utilisateurs peuvent créer des listes et ajouter des contacts manuellement.
+| Livrable | Statut | Backend | Frontend | Tests | Complétion |
+|----------|--------|---------|----------|-------|------------|
+| **1. Factures Clients** | 🟡 En cours | ✅ 80% | ✅ 70% | ❌ 0% | **50%** |
+| **2. Factures Fournisseurs** | ⚪ À faire | ❌ 0% | ❌ 0% | ❌ 0% | **0%** |
+| **3. Plan Comptable** | ⚪ À faire | ❌ 0% | ❌ 0% | ❌ 0% | **0%** |
+| **4. Paiements** | ⚪ À faire | ❌ 0% | ❌ 0% | ❌ 0% | **0%** |
+| **5. Exercices Fiscaux** | ⚪ À faire | ❌ 0% | ❌ 0% | ❌ 0% | **0%** |
+| **6. Journaux Comptables** | ⚪ À faire | ❌ 0% | ❌ 0% | ❌ 0% | **0%** |
+| **TOTAL Phase 1** | 🟡 En cours | - | - | - | **8%** |
 
 ---
 
-## ⏳ Tâche #3 : Marketing Automation - Workflows Basiques (P0 #8) - NON DÉMARRÉ
+## Livrable 1 : Factures Clients
 
-**Durée estimée** : 2-3 semaines  
-**Statut** : ❌ 0% implémenté
+### ✅ Terminé
 
-### À Implémenter
+**Backend** :
+- ✅ Contrôleur `invoices_ctrl.py` créé (9 endpoints)
+  - ✅ `GET /api/finance/invoices` - Liste factures
+  - ✅ `GET /api/finance/invoices/<id>` - Détail facture
+  - ✅ `POST /api/finance/invoices/create` - Créer facture
+  - ✅ `PUT /api/finance/invoices/<id>/update` - Modifier facture
+  - ✅ `POST /api/finance/invoices/<id>/validate` - Valider facture
+  - ✅ `POST /api/finance/invoices/<id>/duplicate` - Dupliquer facture
+  - ⚠️ `POST /api/finance/invoices/<id>/send-email` - Envoyer email (non testé)
+  - ⚠️ `GET /api/finance/invoices/<id>/pdf` - Télécharger PDF (non testé)
+  - ⚠️ `POST /api/finance/invoices/<id>/credit-note` - Créer avoir (non testé)
+- ✅ Enregistré dans `controllers/__init__.py`
+- ✅ Utilise modèle Odoo `account.move` existant (multi-tenant ready)
 
-#### Backend
-- ❌ `models/marketing_automation.py` - Modèle workflows
-- ❌ `models/marketing_activity.py` - Modèle activités (actions)
-- ❌ `models/marketing_trigger.py` - Modèle triggers
-- ❌ `controllers/marketing_automation_ctrl.py` - API workflows
-- ❌ Engine d'exécution workflows (cron job)
+**Frontend** :
+- ✅ Hook `useInvoices.ts` créé
+- ✅ Page `pages/finance/invoices/page.tsx` créée
+  - ✅ Liste factures avec filtres
+  - ✅ Statistiques (Total Facturé, Payé, En Attente, En Retard)
+  - ✅ Actions : Valider, Envoyer Email, Télécharger PDF
+  - ✅ Dark/Light mode compatible
 
-#### Frontend
-- ❌ Builder visuel workflows (react-flow)
-- ❌ Configurateur triggers (inscription, achat, abandon panier)
-- ❌ Configurateur actions (email, SMS, wait, condition)
-- ❌ Statistiques performance workflows
+### ⚠️ En cours
 
-### Fonctionnalités Cibles
-- ❌ Création workflows drag & drop
-- ❌ Triggers événementiels
-- ❌ Actions automatisées (email, SMS, délai, conditions)
-- ❌ Exécution asynchrone (queue)
-- ❌ Statistiques conversion
+**Frontend** :
+- ⚠️ Ajouter route dans `src/config/modules.ts`
+- ⚠️ Ajouter notices dans `lib/notices.ts`
+- ⚠️ Page création facture `pages/finance/invoices/new/page.tsx`
+- ⚠️ Page détail facture `pages/finance/invoices/[id]/page.tsx`
 
-**Impact** : Gap P0 #8 non résolu → BLOQUANT pour marketing automation.
+**Backend** :
+- ⚠️ Tester endpoints avec Postman
+- ⚠️ Vérifier génération PDF (template Odoo)
+- ⚠️ Vérifier envoi email (configuration SMTP)
 
-**Priorité** : P0 - À développer en priorité après Phase 1
+### ❌ À faire
 
----
+**Tests** :
+- ❌ Tests unitaires backend `tests/test_invoices_ctrl.py`
+- ❌ Tests frontend `__tests__/pages/finance/invoices/page.test.tsx`
+- ❌ Tests E2E Playwright
 
-## ⏳ Tâche #4 : Pricelists - CRUD Complet (P0 #3, #4, #5) - NON DÉMARRÉ
-
-**Durée estimée** : 1 semaine  
-**Statut** : ❌ 0% implémenté (API lecture seule existe)
-
-### À Implémenter
-
-#### Backend
-- ❌ `POST /api/ecommerce/pricelists/create` - Créer pricelist
-- ❌ `PATCH /api/ecommerce/pricelists/:id` - Éditer pricelist
-- ❌ `POST /api/ecommerce/pricelists/:id/items` - Ajouter règle prix
-- ❌ `PATCH /api/ecommerce/pricelists/:id/items/:item_id` - Éditer règle
-- ❌ `DELETE /api/ecommerce/pricelists/:id/items/:item_id` - Supprimer règle
-- ❌ `PATCH /api/ecommerce/customers/:id` - Assignation pricelist client
-
-#### Frontend
-- ❌ `src/hooks/usePricelists.ts` - Hook mutations
-- ❌ `src/pages/pricelists/new/page.tsx` - Création pricelist
-- ❌ Formulaire règles prix (product.pricelist.item)
-- ❌ Tableau éditable règles
-- ❌ Assignation pricelists aux clients (dropdown)
-
-### Fonctionnalités Cibles
-- ❌ Création pricelists (tarif public, B2B, promotionnel, etc.)
-- ❌ Règles de prix par produit/catégorie
-- ❌ Formules calcul (% remise, montant fixe, etc.)
-- ❌ Assignation pricelists aux clients
-- ❌ Tarifs multi-devises
-- ❌ Dates validité pricelists
-
-**Impact** : Gap P0 #3, #4, #5 non résolus → BLOQUANT pour vente B2B multi-tarifs.
-
-**Priorité** : P0 - Critique pour commerce B2B
+**Documentation** :
+- ❌ Documenter API dans Postman collection
+- ❌ Ajouter exemples dans README-DEV.md
 
 ---
 
-## ⏳ Tâche #5 : Stock - Validation Inventaire (P0 #1) - NON DÉMARRÉ
+## 🚀 Prochaines Actions Immédiates
 
-**Durée estimée** : 2 jours  
-**Statut** : ❌ 0% implémenté
+### Semaine 1 (en cours)
 
-### À Implémenter
+1. **Backend** :
+   - [ ] Tester endpoint `GET /api/finance/invoices` avec Postman
+   - [ ] Créer 3 factures de test via API
+   - [ ] Vérifier génération numéro facture automatique
 
-#### Backend
-- ❌ `POST /api/ecommerce/inventory/:id/validate` - Valider inventaire physique
-- ❌ Logique validation :
-  - Calculer écarts (qty comptée - qty théorique)
-  - Créer `stock.move` pour ajustements
-  - Mettre à jour `stock.quant` avec qtés réelles
-  - Marquer inventaire comme validé
+2. **Frontend** :
+   - [ ] Ajouter route dans `modules.ts` (section Finance)
+   - [ ] Créer notices dans `financeNotices.invoices`
+   - [ ] Tester page en mode light + dark
+   - [ ] Vérifier responsive (mobile, tablet, desktop)
 
-#### Frontend
-- ❌ Bouton "Valider inventaire" dans `src/pages/stock/InventoryPage.tsx`
-- ❌ Modal confirmation avec résumé écarts
-- ❌ Affichage écarts par produit/emplacement
-- ❌ Toast success/error
+3. **Tests** :
+   - [ ] Créer fichier `test_invoices_ctrl.py`
+   - [ ] Test 1 : Créer facture brouillon
+   - [ ] Test 2 : Valider facture
+   - [ ] Test 3 : Dupliquer facture
 
-### Fonctionnalités Cibles
-- ❌ Validation inventaire physique
-- ❌ Enregistrement écarts en DB
-- ❌ Ajustement automatique quantités stock
-- ❌ Traçabilité ajustements (audit log)
+### Semaine 2
 
-**Impact** : Gap P0 #1 non résolu → BLOQUANT pour gestion stock quotidienne (inventaires jamais finalisés).
+1. **Frontend** :
+   - [ ] Page création facture (`/finance/invoices/new`)
+   - [ ] Page détail facture (`/finance/invoices/[id]`)
+   - [ ] Formulaire multi-lignes avec ajout/suppression lignes
 
-**Priorité** : P0 - Critique pour stock
-
----
-
-## ⏳ Tâche #6 : Stock - Gestion Bons Transfert (P0 #2) - NON DÉMARRÉ
-
-**Durée estimée** : 4 jours  
-**Statut** : ❌ 0% implémenté
-
-### À Implémenter
-
-#### Backend
-- ❌ `controllers/stock_picking_ctrl.py` - CRUD stock.picking
-  - `POST /api/ecommerce/stock/pickings` - Liste transferts
-  - `POST /api/ecommerce/stock/pickings/create` - Créer transfert
-  - `POST /api/ecommerce/stock/pickings/:id` - Détail transfert
-  - `POST /api/ecommerce/stock/pickings/:id/validate` - Valider transfert
-  - `POST /api/ecommerce/stock/pickings/:id/cancel` - Annuler transfert
-
-#### Frontend
-- ❌ `src/hooks/useStockPickings.ts` - Hook react-query
-- ❌ `src/pages/stock/pickings/page.tsx` - Liste transferts
-- ❌ `src/pages/stock/pickings/new/page.tsx` - Création transfert
-- ❌ `src/pages/stock/pickings/[id]/page.tsx` - Détail transfert
-
-### Fonctionnalités Cibles
-- ❌ Création bons de transfert inter-entrepôts
-- ❌ Workflow validation/annulation
-- ❌ Traçabilité mouvements (origine → destination)
-- ❌ États transfert (draft, waiting, done, cancel)
-- ❌ Liens avec commandes (livraisons)
-
-**Impact** : Gap P0 #2 non résolu → BLOQUANT pour traçabilité logistique multi-entrepôts.
-
-**Priorité** : P0 - Critique pour stock
+2. **Backend** :
+   - [ ] Endpoint envoi email (configurer SMTP Odoo)
+   - [ ] Endpoint génération PDF (template customisé)
+   - [ ] Endpoint avoir (credit note)
 
 ---
 
-## 📊 Bilan Phase 1
+## 📝 Notes Techniques
 
-### Tâches Complétées (2/6)
-- ✅ #1 : Marketing Email Complet (100%)
-- ✅ #2 : Marketing Listes CRUD (80%)
+### Modèle Odoo Utilisé
 
-### Tâches En Attente (4/6)
-- ❌ #3 : Marketing Automation (0%) - 2-3 semaines
-- ❌ #4 : Pricelists CRUD (0%) - 1 semaine
-- ❌ #5 : Stock Validation Inventaire (0%) - 2 jours
-- ❌ #6 : Stock Bons Transfert (0%) - 4 jours
+**account.move** (extension existante avec `tenant_id`) :
+- ✅ Champ `tenant_id` déjà présent
+- ✅ Multi-tenant ready
+- ✅ États : draft, posted, cancel
+- ✅ Paiement : not_paid, in_payment, paid, partial
 
-### Temps Restant Estimé
-- **Tâches 3-6** : ~4 semaines de développement
-- **Phase 1 complète** : ~6 semaines total (2 sem faites, 4 sem restantes)
+**account.move.line** :
+- ✅ Lignes de facture avec produits, quantités, prix unitaires
+- ✅ Taxes via `tax_ids` (Many2many)
 
-### Score de Parité Estimé Après Phase 1
-- **Actuel** : ~72%
-- **Après Phase 1 complète** : ~78% (gain +6%)
+### Conventions Respectées
 
-### Gaps P0 Résolus / Total
-- **Résolus** : 2/8 (Marketing Email, Listes partielles)
-- **Restants** : 6/8 (Automation, Pricelists x3, Stock x2)
+- ✅ Réponses API en camelCase (format frontend)
+- ✅ Requêtes acceptent camelCase + snake_case
+- ✅ Wrapper `{ success, data/error }` systématique
+- ✅ Authentification via `X-Session-Id` header
+- ✅ Isolation tenant via `tenant_id` dans tous les domains
+- ✅ Logger avec `_logger.info()` et `_logger.error()`
+- ✅ Dark mode CSS : `bg-white dark:bg-gray-800`
+- ✅ TypeScript strict (pas de `any`)
+- ✅ ESLint compliant (underscore prefixe pour vars non utilisées)
 
----
+### Problèmes Connus
 
-## 🚀 Prochaines Étapes
+1. **PDF Template** : Template Odoo par défaut (`account.account_invoices`) utilisé. Pourrait nécessiter customisation pour branding Quelyos.
 
-### Priorité 1 (Semaine prochaine)
-1. **Marketing Automation** (2-3 sem) - Gap P0 #8 critique
-2. **Pricelists CRUD** (1 sem) - Gap P0 #3, #4, #5 bloquant B2B
+2. **Email SMTP** : Configuration SMTP Odoo requise dans `odoo.conf` ou via UI Odoo.
 
-### Priorité 2 (Semaines suivantes)
-3. **Stock Validation Inventaire** (2j) - Gap P0 #1
-4. **Stock Bons Transfert** (4j) - Gap P0 #2
+3. **Tests** : Aucun test créé pour l'instant. Priorité P1.
 
-### Après Phase 1
-- **Phase 2** : Intégration addons OCA prioritaires (2-3 semaines)
-- **Phase 3** : Fonctionnalités Premium Enterprise (4-6 semaines)
-- **Phase 4** : Enrichissement E-commerce & Backoffice (8-12 semaines)
-- **Phase 5** : Innovation & Différenciation (12+ semaines)
+4. **Route manquante** : Page non accessible dans le menu Finance tant que route non ajoutée dans `modules.ts`.
 
 ---
 
-**Conclusion** : Phase 1 bien avancée (2 tâches P0 complètes) mais nécessite encore ~4 semaines pour résoudre tous les gaps P0. Compilation réussie, code fonctionnel pour Marketing Email & Listes.
+## 🎯 KPIs Livrable 1
+
+| Métrique | Objectif | Actuel | Statut |
+|----------|----------|--------|--------|
+| **Endpoints API** | 9 | 9 | ✅ |
+| **Pages UI** | 3 | 1 | 🟡 33% |
+| **Tests backend** | 25 | 0 | ❌ 0% |
+| **Tests frontend** | 15 | 0 | ❌ 0% |
+| **Complétion** | 100% | 50% | 🟡 |
+
+---
+
+**Prochaine mise à jour** : 2026-02-02
+**Responsable** : Claude Code
