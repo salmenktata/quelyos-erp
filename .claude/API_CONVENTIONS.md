@@ -5,14 +5,14 @@
 
 ## Architecture API Suite
 
-**Backend unique** : Odoo 19 (port 8069) partagé par ERP Complet + 7 SaaS
+**Backend unique** : Odoo 19 (port 8069) partagé par tous les frontends
 **Client partagé** : `@quelyos/api-client` (package monorepo) utilisé par toutes les apps
 **Authentification** : JWT + tenant isolation via `company_id`
 
 | Consommateur | Package | Base URL |
 |---|---|---|
 | ERP Complet (dashboard-client) | `@quelyos/api-client` ou local `lib/api.ts` | `http://localhost:8069/api` |
-| 7 SaaS (apps/*) | `@quelyos/api-client` | `http://localhost:8069/api` |
+| Super Admin (super-admin-client) | `@quelyos/api-client` | `http://localhost:8069/api` |
 | Site Vitrine (vitrine-quelyos) | fetch direct | `/api/` (proxy Next.js) |
 | E-commerce (vitrine-client) | fetch direct | `/api/` (proxy Next.js) |
 

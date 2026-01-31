@@ -7,14 +7,11 @@ Public visé : informaticien non‑expert qui souhaite comprendre l'outil et l'u
 
 ## 1) Vue d'ensemble (simplifiée)
 
-Le backoffice est une application **React + Vite** qui consomme l'API d'Odoo. Il constitue le **ERP Complet (Full Suite)** regroupant les 8 modules : Finance, Store, Stock, CRM, Marketing, HR, POS, Support.
-
-Les **7 SaaS Quelyos** (Quelyos Finance, Store, Copilote, Sales, Retail, Team, Support) sont des frontends dédiés qui exposent 1 à 3 modules chacun, tandis que le dashboard-client offre l'ensemble.
+Le backoffice est une application **React + Vite** qui consomme l'API d'Odoo. Il constitue le **ERP Complet (Full Suite)** regroupant les 9 modules : Finance, Store, Stock, CRM, Marketing, HR, POS, Support, Home.
 
 ```
 Navigateur ──> dashboard-client (5175) ──> /api/* ──> odoo-backend (8069) ──> PostgreSQL/Redis
-                                                          ↑
-7 SaaS (ports 3010-3016) ──> /api/* ─────────────────────┘
+Navigateur ──> super-admin-client (9000) ──> /api/* ──────────────────────┘
 ```
 
 ---

@@ -38,24 +38,14 @@
 ## Architecture Routing Suite
 
 ### ERP Complet (dashboard-client, port 5175)
-Routes : `/finance/*`, `/store/*`, `/stock/*`, `/crm/*`, `/marketing/*`, `/hr/*`, `/pos/*`, `/support/*`
-
-### 7 SaaS (apps/, ports 3010-3016)
-Chaque SaaS a ses propres routes internes mais ne couvre que ses modules :
-- **Quelyos Finance** (3010) : `/dashboard`, `/budgets`, `/reports`, `/scenarios`, `/alerts`
-- **Quelyos Store** (3011) : `/products`, `/orders`, `/collections`, `/promotions`, `/marketing`
-- **Quelyos Copilote** (3012) : `/equipment`, `/interventions`, `/stock`, `/planning`
-- **Quelyos Sales** (3013) : `/pipeline`, `/leads`, `/customers`, `/campaigns`
-- **Quelyos Retail** (3014) : `/pos`, `/sessions`, `/store`, `/stock`
-- **Quelyos Team** (3015) : `/employees`, `/leaves`, `/attendance`, `/contracts`
-- **Quelyos Support** (3016) : `/tickets`, `/knowledge-base`, `/sla`
+Routes : `/home/*`, `/finance/*`, `/store/*`, `/stock/*`, `/crm/*`, `/marketing/*`, `/hr/*`, `/pos/*`, `/support/*`
 
 ### Super Admin (super-admin-client, port 9000)
 Routes : `/tenants`, `/subscriptions`, `/billing`, `/analytics`
 
 ## Modules ERP Complet
 
-### Liste des 8 Modules
+### Liste des 9 Modules
 
 | Module ID | Route Base | Nom Affiché | Description |
 |-----------|------------|-------------|-------------|
@@ -66,6 +56,8 @@ Routes : `/tenants`, `/subscriptions`, `/billing`, `/analytics`
 | `crm` | `/crm` | CRM | Clients & Ventes |
 | `marketing` | `/marketing` | Marketing | Campagnes & Analytics |
 | `hr` | `/hr` | RH | Employés & Paie |
+| `support` | `/support` | Support | Helpdesk |
+| `pos` | `/pos` | Point de Vente | Caisse |
 
 ### Exemples de Routes par Module
 
