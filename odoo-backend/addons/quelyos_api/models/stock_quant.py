@@ -43,7 +43,7 @@ class StockQuant(models.Model):
             total_qty = data['total_qty']
 
             # Utiliser le seuil défini sur le produit s'il existe, sinon le seuil par défaut
-            threshold = getattr(product, 'low_stock_threshold', self.LOW_STOCK_THRESHOLD)
+            threshold = getattr(product, 'x_low_stock_threshold', self.LOW_STOCK_THRESHOLD)
 
             if total_qty < threshold:
                 low_stock_products.append({
@@ -149,7 +149,7 @@ class StockQuant(models.Model):
         readonly=True,
     )
 
-    adjustment_cost = fields.Monetary(
+    x_adjustment_cost = fields.Monetary(
         string='Coût Ajustement',
         compute='_compute_adjustment_cost',
         store=True,
@@ -168,16 +168,16 @@ class StockQuant(models.Model):
         """
         for quant in self:
             if quant.inventory_diff_quantity:
-                quant.adjustment_cost = quant.inventory_diff_quantity * quant.product_id.standard_price
+                quant.x_adjustment_cost = quant.inventory_diff_quantity * quant.product_id.standard_price
             else:
-                quant.adjustment_cost = 0.0
+                quant.x_adjustment_cost = 0.0
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     # Champ pour définir un seuil personnalisé par produit
-    low_stock_threshold = fields.Float(
+    x_low_stock_threshold = fields.Float(
         string='Seuil stock bas',
         default=10.0,
         help='Seuil en dessous duquel une alerte de stock bas sera déclenchée'

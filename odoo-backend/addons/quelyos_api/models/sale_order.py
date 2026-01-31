@@ -22,43 +22,89 @@ class SaleOrder(models.Model):
         help='Tenant propriétaire de cette commande',
     )
 
-    # Token de récupération sécurisé pour le lien email
+    # ═══════════════════════════════════════════════════════════════════════════
+    # PANIER ABANDONNÉ - Alias DEPRECATED (Q4 2026)
+    # ═══════════════════════════════════════════════════════════════════════════
+
     recovery_token = fields.Char(
+        related='x_recovery_token',
+        readonly=False,
+        store=False,
+        help='[DEPRECATED] Utiliser x_recovery_token'
+    )
+
+    recovery_email_sent_date = fields.Datetime(
+        related='x_recovery_email_sent_date',
+        readonly=False,
+        store=False,
+        help='[DEPRECATED] Utiliser x_recovery_email_sent_date'
+    )
+
+    can_fulfill_now = fields.Boolean(
+        related='x_can_fulfill_now',
+        readonly=True,
+        store=False,
+        help='[DEPRECATED] Utiliser x_can_fulfill_now'
+    )
+
+    expected_fulfillment_date = fields.Date(
+        related='x_expected_fulfillment_date',
+        readonly=True,
+        store=False,
+        help='[DEPRECATED] Utiliser x_expected_fulfillment_date'
+    )
+
+    missing_stock_details = fields.Text(
+        related='x_missing_stock_details',
+        readonly=True,
+        store=False,
+        help='[DEPRECATED] Utiliser x_missing_stock_details'
+    )
+
+    fulfillment_priority = fields.Selection(
+        related='x_fulfillment_priority',
+        readonly=True,
+        store=False,
+        help='[DEPRECATED] Utiliser x_fulfillment_priority'
+    )
+
+    # Token de récupération sécurisé pour le lien email
+    x_recovery_token = fields.Char(
         string='Token de récupération',
         copy=False,
         help='Token sécurisé pour récupérer le panier abandonné via email'
     )
 
     # Date d'envoi email de relance
-    recovery_email_sent_date = fields.Datetime(
+    x_recovery_email_sent_date = fields.Datetime(
         string='Email relance envoyé le',
         copy=False,
         help='Date d\'envoi de l\'email de récupération de panier abandonné'
     )
 
     # Late Availability (disponibilité future du stock)
-    can_fulfill_now = fields.Boolean(
+    x_can_fulfill_now = fields.Boolean(
         string='Peut être honorée maintenant',
         compute='_compute_fulfillment_status',
         store=True,
         help='Tous les produits sont disponibles en stock'
     )
 
-    expected_fulfillment_date = fields.Date(
+    x_expected_fulfillment_date = fields.Date(
         string='Date de disponibilité estimée',
         compute='_compute_fulfillment_status',
         store=True,
         help='Date à laquelle tous les produits seront disponibles'
     )
 
-    missing_stock_details = fields.Text(
+    x_missing_stock_details = fields.Text(
         string='Détails stock manquant',
         compute='_compute_fulfillment_status',
         store=True,
         help='JSON avec détails des produits en rupture et dates de réapprovisionnement'
     )
 
-    fulfillment_priority = fields.Selection([
+    x_fulfillment_priority = fields.Selection([
         ('immediate', 'Immédiat (stock complet)'),
         ('short', 'Court terme (< 7 jours)'),
         ('medium', 'Moyen terme (7-30 jours)'),
@@ -83,10 +129,10 @@ class SaleOrder(models.Model):
         for order in self:
             # Ne calculer que pour les commandes confirmées ou en draft
             if order.state in ['cancel', 'done']:
-                order.can_fulfill_now = False
-                order.expected_fulfillment_date = False
-                order.missing_stock_details = '{}'
-                order.fulfillment_priority = 'backorder'
+                order.x_can_fulfill_now = False
+                order.x_expected_fulfillment_date = False
+                order.x_missing_stock_details = '{}'
+                order.x_fulfillment_priority = 'backorder'
                 continue
 
             missing_products = []
@@ -125,23 +171,23 @@ class SaleOrder(models.Model):
                     })
 
             # Définir résultats
-            order.can_fulfill_now = all_available
-            order.expected_fulfillment_date = latest_availability_date
-            order.missing_stock_details = json.dumps(missing_products, ensure_ascii=False)
+            order.x_can_fulfill_now = all_available
+            order.x_expected_fulfillment_date = latest_availability_date
+            order.x_missing_stock_details = json.dumps(missing_products, ensure_ascii=False)
 
             # Déterminer priorité
             if all_available:
-                order.fulfillment_priority = 'immediate'
+                order.x_fulfillment_priority = 'immediate'
             elif latest_availability_date:
                 days_until = (latest_availability_date - date.today()).days
                 if days_until <= 7:
-                    order.fulfillment_priority = 'short'
+                    order.x_fulfillment_priority = 'short'
                 elif days_until <= 30:
-                    order.fulfillment_priority = 'medium'
+                    order.x_fulfillment_priority = 'medium'
                 else:
-                    order.fulfillment_priority = 'long'
+                    order.x_fulfillment_priority = 'long'
             else:
-                order.fulfillment_priority = 'backorder'
+                order.x_fulfillment_priority = 'backorder'
 
     def _estimate_restock_days(self, product):
         """
