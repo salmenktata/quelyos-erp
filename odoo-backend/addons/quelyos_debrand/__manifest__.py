@@ -1,12 +1,12 @@
 {
     'name': 'Quelyos Debrand',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.0.2',
     'category': 'Quelyos/Branding',
     'summary': 'Anonymisation complète Odoo - Branding Quelyos',
     'description': '''
         Module de debranding pour remplacer toutes les références Odoo par Quelyos.
         - Suppression des mentions "Odoo" dans l'interface
-        - Remplacement des couleurs par la charte Quelyos
+        - Modification couleur navbar uniquement (pas de modification thème global)
         - Logo et favicon personnalisés
         - OdooBot → QuelyosBot
     ''',

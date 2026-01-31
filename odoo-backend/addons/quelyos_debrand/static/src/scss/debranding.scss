@@ -1,9 +1,8 @@
 // =============================================================================
-// Quelyos Debrand - Navbar & Sidebar Only
+// Quelyos Debrand - Navbar Color Only
 // =============================================================================
 
 $quelyos-fuchsia: #d946ef;
-$quelyos-orange: #f97316;
 $quelyos-dark: #030712;
 
 // =============================================================================
@@ -49,7 +48,7 @@ footer.o_footer,
 }
 
 // =============================================================================
-// Main Navbar (top bar)
+// Main Navbar (top bar) - Color Only
 // =============================================================================
 
 .o_main_navbar {
@@ -59,7 +58,6 @@ footer.o_footer,
     // Logo/Brand
     .o_menu_brand {
         color: white !important;
-        font-weight: 600 !important;
     }
 
     // App menu button
@@ -87,177 +85,4 @@ footer.o_footer,
     .o_user_menu .dropdown-toggle {
         color: white !important;
     }
-}
-
-// =============================================================================
-// Home Menu (App Launcher)
-// =============================================================================
-
-.o_home_menu_background {
-    background: radial-gradient(ellipse at top right, rgba($quelyos-fuchsia, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom left, rgba($quelyos-orange, 0.1) 0%, transparent 50%),
-                $quelyos-dark !important;
-}
-
-.o_home_menu {
-    .o_app {
-        .o_app_icon {
-            background: linear-gradient(135deg, $quelyos-fuchsia 0%, $quelyos-orange 100%) !important;
-            border-radius: 16px !important;
-            box-shadow: 0 8px 20px rgba($quelyos-fuchsia, 0.3) !important;
-        }
-
-        .o_caption {
-            color: white !important;
-        }
-
-        &:hover .o_app_icon {
-            transform: scale(1.05);
-            box-shadow: 0 12px 30px rgba($quelyos-orange, 0.4) !important;
-        }
-    }
-
-    // Search bar in home menu
-    .o_home_menu_search input {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid rgba($quelyos-fuchsia, 0.3) !important;
-        color: white !important;
-
-        &::placeholder {
-            color: rgba(255, 255, 255, 0.5) !important;
-        }
-
-        &:focus {
-            border-color: $quelyos-fuchsia !important;
-            box-shadow: 0 0 0 3px rgba($quelyos-fuchsia, 0.2) !important;
-        }
-    }
-}
-
-// =============================================================================
-// Sidebar / Menu Latéral
-// =============================================================================
-
-.o_main_navbar .o_menu_sections {
-    .dropdown-menu {
-        background: $quelyos-dark !important;
-        border: 1px solid rgba($quelyos-fuchsia, 0.2) !important;
-        border-radius: 12px !important;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
-
-        .dropdown-item {
-            color: rgba(255, 255, 255, 0.8) !important;
-
-            &:hover {
-                background: rgba($quelyos-fuchsia, 0.2) !important;
-                color: white !important;
-            }
-
-            &.active {
-                background: linear-gradient(135deg, $quelyos-fuchsia 0%, $quelyos-orange 100%) !important;
-                color: white !important;
-            }
-        }
-
-        .dropdown-divider {
-            border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-    }
-}
-
-// User menu dropdown
-.o_user_menu .dropdown-menu,
-.o_navbar_systray .dropdown-menu {
-    background: $quelyos-dark !important;
-    border: 1px solid rgba($quelyos-fuchsia, 0.2) !important;
-    border-radius: 12px !important;
-
-    .dropdown-item {
-        color: rgba(255, 255, 255, 0.8) !important;
-
-        &:hover {
-            background: rgba($quelyos-fuchsia, 0.2) !important;
-            color: white !important;
-        }
-    }
-}
-
-// =============================================================================
-// Settings Menu - Quelyos Icon
-// =============================================================================
-
-// Icon for Quelyos settings menu (sidebar)
-.o_base_settings [data-key="quelyos_debrand"]::before,
-.settings_tab [data-key="quelyos_debrand"] .o_setting_tab::before,
-[data-key="quelyos_debrand"] .o_setting_app_icon,
-.o_settings_container .app_settings_block[data-key="quelyos_debrand"]::before {
-    content: '';
-    display: inline-block;
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, $quelyos-fuchsia 0%, $quelyos-orange 100%);
-    border-radius: 8px;
-    margin-right: 8px;
-    vertical-align: middle;
-    -webkit-mask: url('/quelyos_debrand/static/img/quelyos_icon.svg') center/contain no-repeat;
-    mask: url('/quelyos_debrand/static/img/quelyos_icon.svg') center/contain no-repeat;
-}
-
-// Fallback: direct background
-.o_base_settings .o_setting_container [data-key="quelyos_debrand"] {
-    .o_setting_app_icon {
-        background: url('/quelyos_debrand/static/img/quelyos_icon.svg') center/contain no-repeat !important;
-        width: 48px !important;
-        height: 48px !important;
-    }
-}
-
-// Settings sidebar item with Quelyos branding
-.o_base_settings .settings_tab [data-key="quelyos_debrand"],
-.o_settings_panel .o_setting_container [data-key="quelyos_debrand"] {
-    .app-settings-sidebar-item,
-    .o_setting_tab {
-        position: relative;
-        padding-left: 44px !important;
-
-        &::before {
-            content: '';
-            position: absolute;
-            left: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, $quelyos-fuchsia 0%, $quelyos-orange 100%);
-            border-radius: 6px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none'%3E%3Ccircle cx='24' cy='22' r='11' stroke='white' stroke-width='3' fill='none'/%3E%3Cline x1='30' y1='28' x2='37' y2='37' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-size: 18px;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-    }
-}
-
-// =============================================================================
-// Login Page Customization
-// =============================================================================
-
-.o_login_form,
-.oe_login_form {
-    // Custom logo
-    .card-body > .text-center.pb-3.border-bottom img,
-    .o_login_logo {
-        content: url('/quelyos_debrand/static/img/quelyos_logo.svg') !important;
-        max-height: 60px !important;
-        width: auto !important;
-    }
-}
-
-// Login page background with subtle branding
-body.o_home_menu_background,
-.o_web_client.o_login,
-.o_login_background {
-    background: radial-gradient(ellipse at top right, rgba($quelyos-fuchsia, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom left, rgba($quelyos-orange, 0.05) 0%, transparent 50%),
-                #f8fafc !important;
 }
