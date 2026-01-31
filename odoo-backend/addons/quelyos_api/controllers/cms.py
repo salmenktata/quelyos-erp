@@ -1220,8 +1220,13 @@ class QuelyCMS(BaseController):
             if error:
                 return request.make_json_response(error)
 
-            slide = request.env['quelyos.hero.slide'].sudo().browse(slide_id)
-            if not slide.exists():
+            # Vérifier que le slide appartient au tenant
+            slide = request.env['quelyos.hero.slide'].search([
+                ('id', '=', slide_id),
+                ('company_id', '=', request.env.company.id)
+            ], limit=1)
+
+            if not slide:
                 return request.make_json_response({'success': False, 'error': 'Slide non trouvé'})
 
             image_file = request.httprequest.files.get('image')
@@ -1250,8 +1255,15 @@ class QuelyCMS(BaseController):
                 return request.make_json_response(error)
 
 
-            tenant = request.env['quelyos.tenant'].sudo().browse(tenant_id)
-            if not tenant.exists():
+            # Vérifier que l'utilisateur appartient au tenant
+            user_company_id = request.env.user.company_id.id
+
+            tenant = request.env['quelyos.tenant'].search([
+                ('id', '=', tenant_id),
+                ('company_id', '=', user_company_id)
+            ], limit=1)
+
+            if not tenant:
                 return request.make_json_response({'success': False, 'error': 'Tenant non trouvé'})
 
             image_file = request.httprequest.files.get('image')
@@ -1277,8 +1289,15 @@ class QuelyCMS(BaseController):
                 return request.make_json_response(error)
 
 
-            tenant = request.env['quelyos.tenant'].sudo().browse(tenant_id)
-            if not tenant.exists():
+            # Vérifier que l'utilisateur appartient au tenant
+            user_company_id = request.env.user.company_id.id
+
+            tenant = request.env['quelyos.tenant'].search([
+                ('id', '=', tenant_id),
+                ('company_id', '=', user_company_id)
+            ], limit=1)
+
+            if not tenant:
                 return request.make_json_response({'success': False, 'error': 'Tenant non trouvé'})
 
             image_file = request.httprequest.files.get('image')

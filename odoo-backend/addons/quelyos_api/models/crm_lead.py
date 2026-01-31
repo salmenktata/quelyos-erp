@@ -25,7 +25,7 @@ class CrmStage(models.Model):
         help='Tenant propriétaire de cette étape. Si vide, étape globale.',
     )
 
-    is_global = fields.Boolean(
+    x_is_global = fields.Boolean(
         string='Étape Globale',
         compute='_compute_is_global',
         store=True,
@@ -35,7 +35,7 @@ class CrmStage(models.Model):
     @api.depends('tenant_id')
     def _compute_is_global(self):
         for stage in self:
-            stage.is_global = not stage.tenant_id
+            stage.x_is_global = not stage.tenant_id
 
 
 class CrmLead(models.Model):

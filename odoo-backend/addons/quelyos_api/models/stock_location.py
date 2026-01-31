@@ -18,18 +18,18 @@ class StockLocation(models.Model):
         help='Tenant propriétaire de cet emplacement',
     )
 
-    is_locked = fields.Boolean(
+    x_is_locked = fields.Boolean(
         string='Verrouillée',
         default=False,
         help='Bloquer tous les mouvements stock dans cet emplacement (utilisé durant inventaire)',
     )
 
-    lock_reason = fields.Char(
+    x_lock_reason = fields.Char(
         string='Raison Verrouillage',
         help='Pourquoi cette location est verrouillée',
     )
 
-    locked_by_id = fields.Many2one(
+    x_locked_by_id = fields.Many2one(
         'res.users',
         string='Verrouillée par',
         readonly=True,
@@ -44,7 +44,7 @@ class StockLocation(models.Model):
         """Verrouiller la location"""
         for location in self:
             location.write({
-                'is_locked': True,
+                'x_is_locked': True,
                 'lock_reason': reason or 'Inventaire en cours',
                 'locked_by_id': self.env.user.id,
                 'locked_date': fields.Datetime.now(),
@@ -54,7 +54,7 @@ class StockLocation(models.Model):
         """Déverrouiller la location"""
         for location in self:
             location.write({
-                'is_locked': False,
+                'x_is_locked': False,
                 'lock_reason': False,
                 'locked_by_id': False,
                 'locked_date': False,

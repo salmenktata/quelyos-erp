@@ -346,6 +346,7 @@ class TicketController(BaseController):
                 'res_model': 'quelyos.ticket',
                 'res_id': ticket.id,
                 'mimetype': uploaded_file.content_type,
+                'company_id': ticket.company_id.id,  # CRITIQUE SÉCURITÉ : Isolation tenant
             })
 
             return request.make_json_response({
