@@ -17,21 +17,45 @@ export default defineConfig({
       },
     },
     sourcemap: false,
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
         manualChunks(id) {
+          // React core
           if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
             return 'vendor-react'
           }
+          
+          // Router
           if (id.includes('react-router')) return 'vendor-router'
+          
+          // State management & data fetching
           if (id.includes('@tanstack')) return 'vendor-tanstack'
+          if (id.includes('zustand')) return 'vendor-state'
+          
+          // UI libraries
           if (id.includes('lucide-react')) return 'vendor-icons'
-          if (id.includes('zod')) return 'vendor-validation'
           if (id.includes('framer-motion')) return 'vendor-motion'
+          if (id.includes('recharts')) return 'vendor-charts'
+          
+          // Form & validation
+          if (id.includes('zod')) return 'vendor-validation'
+          if (id.includes('react-hook-form')) return 'vendor-forms'
+          
+          // Utilities
+          if (id.includes('date-fns')) return 'vendor-dates'
+          if (id.includes('clsx') || id.includes('tailwind-merge')) return 'vendor-utils'
+          
+          // Excel export
+          if (id.includes('exceljs') || id.includes('file-saver')) return 'vendor-export'
+          
+          // Stripe
+          if (id.includes('@stripe')) return 'vendor-stripe'
+          
+          // Other vendor code
           if (id.includes('node_modules')) return 'vendor-common'
         },
       },

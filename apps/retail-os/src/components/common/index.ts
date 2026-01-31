@@ -33,4 +33,4 @@ export * from './DataTable'
 
 // Types
 export type { Attribute, AttributeValue } from '../../types'
-export { SearchSuggestion } from './SearchAutocomplete'
+export type { SearchSuggestion } from './SearchAutocomplete'

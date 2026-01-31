@@ -113,6 +113,7 @@ export interface Coupon {
 export interface Attribute {
   id: number
   name: string
+  create_variant?: boolean
   display_type?: string
   values?: AttributeValue[]
 }
