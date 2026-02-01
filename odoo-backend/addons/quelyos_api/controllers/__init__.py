@@ -94,3 +94,6 @@ from . import marketing_lists_ctrl
 # Planification Paiements Fournisseurs
 from . import supplier_invoices_ctrl
 from . import payment_planning_ctrl
+# User Settings & Billing
+from . import user_settings_ctrl
+from . import user_billing_ctrl

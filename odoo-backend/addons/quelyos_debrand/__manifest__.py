@@ -1,6 +1,6 @@
 {
     'name': 'Quelyos Debrand',
-    'version': '19.0.1.0.2',
+    'version': '19.0.1.0.3',
     'category': 'Quelyos/Branding',
     'summary': 'Anonymisation complète Odoo - Branding Quelyos',
     'description': '''

@@ -15,7 +15,7 @@
         
         <record id="quelyos_suite_install_date" model="ir.config_parameter">
             <field name="key">quelyos.suite_install_date</field>
-            <field name="value" eval="datetime.datetime.now().isoformat()"/>
+            <field name="value" eval="datetime.now().isoformat()"/>
         </record>
         
     </data>
