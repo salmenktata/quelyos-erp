@@ -340,6 +340,7 @@ export default function FeaturesSettingsPage() {
           </span>
         </div>
       </div>
+      </div>
     </Layout>
   );
 }

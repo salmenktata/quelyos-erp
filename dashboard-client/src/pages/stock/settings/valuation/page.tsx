@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Layout } from '@/components/Layout'
 import { Breadcrumbs } from "@/components/common";
 import { Button } from "@/components/common/Button";
 import { useToast } from "@/contexts/ToastContext";
@@ -38,7 +37,7 @@ export default function ValuationSettingsPage() {
   };
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         <Breadcrumbs
         items={[
@@ -186,6 +185,7 @@ export default function ValuationSettingsPage() {
           </div>
         </div>
       </div>
-    </Layout>
+      </div>
+    </>
   );
 }

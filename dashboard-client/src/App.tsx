@@ -160,12 +160,10 @@ const FinanceReportingDataQuality = lazy(() => import('./pages/finance/reporting
 
 // Lazy loaded pages - Finance Settings
 const SettingsLayoutWrapper = lazy(() => import('./pages/finance/settings/SettingsLayoutWrapper'))
-const FinanceSettings = lazy(() => import('./pages/finance/settings/page'))
 const FinanceSettingsCategories = lazy(() => import('./pages/finance/settings/categories/page'))
 const FinanceSettingsDevise = lazy(() => import('./pages/finance/settings/devise/page'))
 const FinanceSettingsFlux = lazy(() => import('./pages/finance/settings/flux/page'))
 const FinanceSettingsTva = lazy(() => import('./pages/finance/settings/tva/page'))
-const FinanceSettingsBilling = lazy(() => import('./pages/finance/settings/billing/page'))
 const FinanceSettingsNotifications = lazy(() => import('./pages/finance/settings/notifications/page'))
 const FinanceSettingsIntegrations = lazy(() => import('./pages/finance/settings/integrations/page'))
 const FinanceSettingsSecurity = lazy(() => import('./pages/finance/settings/security/page'))
@@ -1280,7 +1278,6 @@ export default function App() {
                   </ProtectedRoute>
                 }
               >
-                <Route index element={<FinanceSettings />} />
                 <Route path="devise" element={<FinanceSettingsDevise />} />
                 <Route path="tva" element={<FinanceSettingsTva />} />
                 <Route path="categories" element={<FinanceSettingsCategories />} />

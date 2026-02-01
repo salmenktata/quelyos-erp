@@ -217,7 +217,8 @@ export default function PaymentMethodsPage() {
           isSaving={updateProviderMutation.isPending}
         />
       )}
-    </div>
+      </div>
+    </Layout>
   );
 }
 
@@ -452,6 +453,7 @@ function ConfigModal({
             </Button>
           </div>
         </form>
+      </div>
       </div>
     </Layout>
   );

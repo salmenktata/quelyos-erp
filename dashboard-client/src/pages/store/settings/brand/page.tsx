@@ -731,6 +731,7 @@ export default function BrandSettingsPage() {
           </div>
         )}
       </div>
+      </div>
     </Layout>
   );
 }

@@ -183,6 +183,7 @@ export default function ReturnsSettingsPage() {
           </div>
         </div>
       </div>
+      </div>
     </Layout>
   );
 }

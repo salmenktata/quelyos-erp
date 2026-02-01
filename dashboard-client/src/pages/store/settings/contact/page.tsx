@@ -206,6 +206,7 @@ export default function ContactSettingsPage() {
           </div>
         </div>
       </div>
+      </div>
     </Layout>
   );
 }
