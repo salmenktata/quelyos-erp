@@ -73,8 +73,6 @@ export default function MarketingSettingsPage() {
           );
         })}
       </div>
-
-        </div>
       </div>
     </Layout>
   );
