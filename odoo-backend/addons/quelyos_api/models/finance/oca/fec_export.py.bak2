@@ -24,7 +24,7 @@ class QuelyosFECExport(models.TransientModel):
     _description = 'Export FEC Quelyos'
     
     tenant_id = fields.Many2one('quelyos.tenant', string='Tenant', required=True)
-    date_from = fields.Date(string='Date début', required=True)
+#     date_from = fields.Date(string='Date début', required=True)
     date_to = fields.Date(string='Date fin', required=True)
     export_type = fields.Selection([
         ('official', 'FEC Officiel (DGFiP)'),
@@ -34,7 +34,7 @@ class QuelyosFECExport(models.TransientModel):
     # Résultat export
     fec_data = fields.Binary(string='Fichier FEC', readonly=True, attachment=True)
     fec_filename = fields.Char(string='Nom fichier', readonly=True)
-
+    
     def _get_fec_columns_official(self):
         """
         Colonnes FEC officielles (18 colonnes obligatoires)
