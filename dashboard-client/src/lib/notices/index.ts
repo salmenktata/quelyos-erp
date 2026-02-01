@@ -6,5 +6,7 @@ export * from './marketing-notices';
 export * from './crm-notices';
 export * from './finance-notices';
 export * from './hr-notices';
+export * from './pos-notices';
+export * from './admin-notices';
 export * from './analytics';
 export * from './support-notices';
