@@ -19,6 +19,7 @@ import { fr } from "date-fns/locale";
 import PaymentPlanChart from "./PaymentPlanChart";
 import { logger } from '@quelyos/logger';
 import { fetchApi } from "@/lib/api-base";
+import { tokenService } from "@/lib/tokenService";
 
 interface OptimizationResult {
   plan: PaymentPlanItem[];
@@ -132,9 +133,14 @@ export default function OptimizationPanel() {
     if (!result) return;
 
     try {
+      const token = tokenService.getAccessToken();
       const response = await fetch("/api/ecommerce/payment-planning/export-excel", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        credentials: "include",
         body: JSON.stringify({
           plan: result.plan,
           metrics: result.metrics,
@@ -183,9 +189,14 @@ export default function OptimizationPanel() {
     if (!result) return;
 
     try {
+      const token = tokenService.getAccessToken();
       const response = await fetch("/api/ecommerce/payment-planning/export-pdf", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        credentials: "include",
         body: JSON.stringify({
           plan: result.plan,
           metrics: result.metrics,

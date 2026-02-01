@@ -9,6 +9,7 @@ import { Calendar as CalendarIcon, AlertTriangle, Building2, FileText } from "lu
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
 import { fr } from "date-fns/locale";
 import { logger } from '@quelyos/logger';
+import { fetchApi } from '@/lib/api-base';
 
 interface Invoice {
   id: number;
@@ -36,20 +37,13 @@ export default function PaymentScheduleCalendar() {
   const fetchInvoices = async () => {
     setIsLoading(true);
     try {
-      const [upcomingRes, overdueRes] = await Promise.all([
-        fetch("/api/finance/supplier-invoices/upcoming?days=60"),
-        fetch("/api/finance/supplier-invoices/overdue"),
+      const [upcomingData, overdueData] = await Promise.all([
+        fetchApi<{ invoices: Invoice[] }>("/api/finance/supplier-invoices/upcoming?days=60"),
+        fetchApi<{ invoices: Invoice[] }>("/api/finance/supplier-invoices/overdue"),
       ]);
 
-      if (upcomingRes.ok) {
-        const data = await upcomingRes.json();
-        setUpcomingInvoices((data.invoices || []).map((inv: Invoice) => ({ ...inv, isOverdue: false })));
-      }
-
-      if (overdueRes.ok) {
-        const data = await overdueRes.json();
-        setOverdueInvoices((data.invoices || []).map((inv: Invoice) => ({ ...inv, isOverdue: true })));
-      }
+      setUpcomingInvoices((upcomingData.invoices || []).map((inv: Invoice) => ({ ...inv, isOverdue: false })));
+      setOverdueInvoices((overdueData.invoices || []).map((inv: Invoice) => ({ ...inv, isOverdue: true })));
     } catch (error) {
       logger.error("Erreur lors du chargement des factures:", error);
     } finally {

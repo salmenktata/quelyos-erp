@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { ToastProvider } from './contexts/ToastContext'
 import { useSessionManager } from './hooks/useSessionManager'
@@ -11,6 +11,8 @@ import { FinanceErrorBoundary } from './components/finance/FinanceErrorBoundary'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
 import { ModuleErrorBoundary } from './components/common/ModuleErrorBoundary'
 import { Loader2 } from 'lucide-react'
+import { tokenService } from './lib/tokenService'
+import { api } from './lib/api'
 
 // Pages essentielles (chargées immédiatement)
 import Login from './pages/Login'
@@ -160,7 +162,6 @@ const FinanceReportingDataQuality = lazy(() => import('./pages/finance/reporting
 
 // Lazy loaded pages - Finance Settings
 const SettingsLayoutWrapper = lazy(() => import('./pages/finance/settings/SettingsLayoutWrapper'))
-const FinanceSettings = lazy(() => import('./pages/finance/settings/page'))
 const FinanceSettingsCategories = lazy(() => import('./pages/finance/settings/categories/page'))
 const FinanceSettingsFlux = lazy(() => import('./pages/finance/settings/flux/page'))
 const FinanceSettingsNotifications = lazy(() => import('./pages/finance/settings/notifications/page'))
@@ -320,6 +321,14 @@ function PosModule({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   useBranding() // Appliquer branding dynamique selon édition
+
+  // Configure JWT auto-refresh
+  useEffect(() => {
+    tokenService.setRefreshFunction(async () => {
+      return await api.refreshToken()
+    })
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
