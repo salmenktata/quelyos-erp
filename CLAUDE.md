@@ -74,6 +74,47 @@
 ## Langue
 Français pour communications. Code en anglais.
 
+## 🛠️ UTILISATION TOOLS - RÈGLES STRICTES
+**PRINCIPE** : Utiliser les tools spécialisés au lieu de commandes Bash pour manipulation fichiers
+
+### Tools obligatoires (JAMAIS Bash)
+| Opération | ✅ Utiliser | ❌ Ne PAS utiliser |
+|-----------|-------------|-------------------|
+| Créer/écraser fichier | **Write** tool | `cat > file`, `echo > file`, heredoc |
+| Modifier fichier | **Edit** tool | `sed`, `awk`, `perl` |
+| Lire fichier | **Read** tool | `cat`, `head`, `tail`, `less` |
+| Chercher contenu | **Grep** tool | `grep`, `rg`, `ag` |
+| Trouver fichiers | **Glob** tool | `find`, `ls` |
+
+### ❌ Interdiction heredoc
+**JAMAIS utiliser heredoc** dans Bash tool :
+```bash
+# ❌ INTERDIT - Risque "Bad substitution"
+cat > /tmp/file.tsx << 'EOF'
+const Component = () => { ... }
+EOF
+```
+
+**Problèmes heredoc** :
+- Variables `${}` interprétées par le shell
+- Backticks `` ` `` exécutés comme commandes
+- `$(...)` évalués avant le heredoc
+- Parsing fragile et imprévisible
+
+**✅ Solution** : Utiliser Write tool directement
+```typescript
+Write tool: content = "const Component = () => { ... }"
+```
+
+### Cas d'usage Bash légitime
+Utiliser Bash **UNIQUEMENT** pour :
+- Commandes système : `docker`, `npm`, `git`, `pnpm`
+- Scripts : `./scripts/dev-start.sh`
+- Pipelines : `ps aux | grep node`
+- Gestion processus : `lsof -ti:PORT | xargs kill -9`
+
+**Jamais pour** : Lecture, écriture, édition, recherche de fichiers
+
 ## 🔧 ESLINT - GÉNÉRATION CODE CONFORME
 **RÉFLEXE ABSOLU** : Toujours générer du code ESLint-compliant
 
