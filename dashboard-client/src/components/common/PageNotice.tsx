@@ -16,7 +16,7 @@ import {
 } from "@/lib/notices/analytics";
 
 interface PageNoticeProps {
-  config?: PageNoticeConfig;
+  config?: PageNoticeConfig | Notice[];
   className?: string;
   enableFeedback?: boolean; // Activer le système de feedback (default: true)
 }
@@ -33,9 +33,20 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
     return null;
   }
 
-  const Icon = config.icon || Info;
-  const colorConfig = MODULE_COLOR_CONFIGS[config.moduleColor || 'gray' as keyof typeof MODULE_COLOR_CONFIGS];
-  const storageKey = `quelyos_page_notice_collapsed_${config.pageId}`;
+  // Support ancien format Notice[] : convertir en PageNoticeConfig
+  const normalizedConfig: PageNoticeConfigType = Array.isArray(config)
+    ? {
+        pageId: 'legacy-notice',
+        title: config[0]?.title || 'Information',
+        purpose: config[0]?.message || '',
+        sections: [],
+        moduleColor: 'gray',
+      }
+    : config;
+
+  const Icon = normalizedConfig.icon || Info;
+  const colorConfig = MODULE_COLOR_CONFIGS[normalizedConfig.moduleColor || 'gray' as keyof typeof MODULE_COLOR_CONFIGS];
+  const storageKey = `quelyos_page_notice_collapsed_${normalizedConfig.pageId}`;
 
   // Hydration-safe initialization
   useEffect(() => {
@@ -49,7 +60,7 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
 
       // Charger feedback existant
       if (enableFeedback) {
-        const existingFeedback = getNoticeFeedback(config.pageId);
+        const existingFeedback = getNoticeFeedback(normalizedConfig.pageId);
         if (existingFeedback) {
           setFeedbackGiven(true);
           setFeedbackValue(existingFeedback.isHelpful);
@@ -57,13 +68,13 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
       }
 
       // Tracker la vue
-      trackNoticeView(config.pageId);
+      trackNoticeView(normalizedConfig.pageId);
     } catch (error) {
       logger.error("Failed to load notice preference:", error);
     }
 
     setMounted(true);
-  }, [storageKey, config.pageId, enableFeedback]);
+  }, [storageKey, normalizedConfig.pageId, enableFeedback]);
 
   // Toggle handler with persistence + analytics
   const handleToggle = () => {
@@ -75,9 +86,9 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
 
       // Tracker l'action
       if (newState) {
-        trackNoticeCollapse(config.pageId);
+        trackNoticeCollapse(normalizedConfig.pageId);
       } else {
-        trackNoticeExpansion(config.pageId);
+        trackNoticeExpansion(normalizedConfig.pageId);
       }
     } catch (error) {
       logger.error("Failed to save notice preference:", error);
@@ -87,10 +98,10 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
   // Handler feedback utilisateur
   const handleFeedback = (isHelpful: boolean) => {
     try {
-      trackNoticeFeedback(config.pageId, isHelpful);
+      trackNoticeFeedback(normalizedConfig.pageId, isHelpful);
       setFeedbackGiven(true);
       setFeedbackValue(isHelpful);
-      logger.info(`Notice feedback: ${config.pageId} - ${isHelpful ? 'helpful' : 'not helpful'}`);
+      logger.info(`Notice feedback: ${normalizedConfig.pageId} - ${isHelpful ? 'helpful' : 'not helpful'}`);
     } catch (error) {
       logger.error("Failed to submit feedback:", error);
     }
@@ -116,7 +127,7 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
             <div className={`border ${colorConfig.border} ${colorConfig.bg} rounded-xl backdrop-blur-sm p-0`}>
               <button
                 onClick={handleToggle}
-                aria-label={`Développer les informations - ${config.title}`}
+                aria-label={`Développer les informations - ${normalizedConfig.title}`}
                 aria-expanded={false}
                 className="w-full px-5 py-3 flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-left"
               >
@@ -124,7 +135,7 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
                   <Icon className={`h-4 w-4 ${colorConfig.iconText}`} />
                 </div>
                 <span className={`flex-1 text-sm font-medium ${colorConfig.textPrimary}`}>
-                  À propos - {config.title}
+                  À propos - {normalizedConfig.title}
                 </span>
                 <ChevronDown className={`h-4 w-4 ${colorConfig.iconText} flex-shrink-0`} />
               </button>
@@ -147,11 +158,11 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className={`text-base font-semibold ${colorConfig.textPrimary}`}>
-                      {config.title}
+                      {normalizedConfig.title}
                     </h3>
                     <button
                       onClick={handleToggle}
-                      aria-label={`Masquer les informations - ${config.title}`}
+                      aria-label={`Masquer les informations - ${normalizedConfig.title}`}
                       aria-expanded={true}
                       className="rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                     >
@@ -162,12 +173,12 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
                   {/* Purpose */}
                   <div className="mb-3">
                     <p className={`text-sm ${colorConfig.textSecondary} leading-relaxed`}>
-                      {config.purpose}
+                      {normalizedConfig.purpose}
                     </p>
                   </div>
 
                   {/* Sections */}
-                  {config.sections?.map((section: NoticeSection, sectionIndex: number) => {
+                  {normalizedConfig.sections?.map((section: NoticeSection, sectionIndex: number) => {
                     const SectionIcon = section.icon;
                     return (
                       <div key={sectionIndex} className={sectionIndex > 0 ? "mt-3" : ""}>
@@ -259,14 +270,14 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
               </div>
               <div className="flex-1">
                 <h3 className={`mb-2 text-base font-semibold ${colorConfig.textPrimary}`}>
-                  {config.title}
+                  {normalizedConfig.title}
                 </h3>
                 <div className="mb-3">
                   <p className={`text-sm ${colorConfig.textSecondary} leading-relaxed`}>
-                    {config.purpose}
+                    {normalizedConfig.purpose}
                   </p>
                 </div>
-                {config.sections?.map((section: NoticeSection, sectionIndex: number) => {
+                {normalizedConfig.sections?.map((section: NoticeSection, sectionIndex: number) => {
                   const SectionIcon = section.icon;
                   return (
                     <div key={sectionIndex} className={sectionIndex > 0 ? "mt-3" : ""}>
@@ -294,7 +305,7 @@ export function PageNotice({ config, className = "", enableFeedback = true }: Pa
                 })}
 
                 {/* Fallback for old format with features/actions */}
-                {!config.sections && (config as unknown as { features?: Array<{ text: string }> }).features && (
+                {!normalizedConfig.sections && (config as unknown as { features?: Array<{ text: string }> }).features && (
                   <div className="mt-3">
                     <ul className="space-y-1.5">
                       {(config as unknown as { features: Array<{ text: string }> }).features.map((feature: { text: string }, idx: number) => (
