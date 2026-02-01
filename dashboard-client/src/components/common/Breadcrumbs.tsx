@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 export interface BreadcrumbItem {
+  path?: string // Alias for href
   label: string
   href?: string
 }
@@ -40,9 +41,9 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
                 >
                   {item.label}
                 </span>
-              ) : item.href ? (
+              ) : (item.href || item.path) ? (
                 <Link
-                  to={item.href}
+                  to={item.href || item.path || ""}
                   className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   {item.label}

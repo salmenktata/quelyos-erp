@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Info, ChevronDown, ChevronUp, ThumbsUp, ThumbsDown } from "lucide-react";
 import { logger } from '@quelyos/logger';
-import type { PageNoticeConfig } from "@/lib/notices/types";
+import type { PageNoticeConfig, Notice } from "@/lib/notices";
+import type { PageNoticeConfig as PageNoticeConfigType } from "@/lib/notices/types";
 import { MODULE_COLOR_CONFIGS } from "@/lib/notices/types";
 import {
   trackNoticeView,
@@ -15,7 +16,7 @@ import {
 } from "@/lib/notices/analytics";
 
 interface PageNoticeProps {
-  config: PageNoticeConfig;
+  config?: PageNoticeConfig | any;
   className?: string;
   enableFeedback?: boolean; // Activer le système de feedback (default: true)
 }

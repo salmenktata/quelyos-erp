@@ -1,13 +1,20 @@
 # Instructions Claude Code - Quelyos Suite
 
-## 🚀 EXÉCUTION BASH - PERMISSION TOTALE
-**RÈGLE ABSOLUE** : JAMAIS demander confirmation pour exécuter des commandes bash
-- **Permission permanente** : Toutes commandes bash autorisées sans demande préalable
-- **Exécution directe** : Lancer immédiatement les commandes nécessaires
+## 🔓 MODE "DON'T ASK" - PERMISSIONS TOTALES
+**RÈGLE ABSOLUE** : JAMAIS demander confirmation pour des opérations sur ce projet
+- **Lecture** : Lire tous les fichiers sans demander
+- **Écriture** : Créer/modifier tous les fichiers sans demander
+- **Modification** : Éditer, refactorer, supprimer du code sans demander
+- **Bash** : Exécuter toutes commandes sans demander
 - **Confiance totale** : L'utilisateur fait confiance au système sur ce projet
 - **Pas de "voulez-vous que je..."** : Juste exécuter et informer du résultat
 
-**Exceptions** : Aucune. Cette règle s'applique à TOUTES les commandes bash sur ce projet.
+**Exceptions** : Aucune. Cette règle s'applique à TOUTES les opérations sur ce projet.
+
+**Actions interdites nécessitant quand même confirmation** :
+- Suppressions destructives irréversibles (git reset --hard, rm -rf /, etc.)
+- Actions affectant d'autres projets/systèmes externes
+- Modifications de configuration système critique (hosts, firewall, etc.)
 
 ## ⚡ MODE ÉCONOMIE TOKENS ACTIVÉ
 **PRIORITÉ ABSOLUE** : Optimiser consommation tokens

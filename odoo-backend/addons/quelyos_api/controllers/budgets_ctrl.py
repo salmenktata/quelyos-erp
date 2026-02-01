@@ -23,9 +23,9 @@ class BudgetsController(BaseController):
         - status: draft|validated|closed
         """
         try:
-            user = self._authenticate_from_header()
-            if not user:
-                return self._error_response("Session expirée", "UNAUTHORIZED", 401)
+            auth_error = self._authenticate_from_header()
+            if auth_error:
+                return auth_error
 
             tenant_id = self._get_tenant_id(user)
             
@@ -64,9 +64,9 @@ class BudgetsController(BaseController):
     def get_budget(self, budget_id, **params):
         """Détail budget avec lignes"""
         try:
-            user = self._authenticate_from_header()
-            if not user:
-                return self._error_response("Session expirée", "UNAUTHORIZED", 401)
+            auth_error = self._authenticate_from_header()
+            if auth_error:
+                return auth_error
 
             tenant_id = self._get_tenant_id(user)
             
@@ -118,9 +118,9 @@ class BudgetsController(BaseController):
         - account_id: int (filtrer par compte)
         """
         try:
-            user = self._authenticate_from_header()
-            if not user:
-                return self._error_response("Session expirée", "UNAUTHORIZED", 401)
+            auth_error = self._authenticate_from_header()
+            if auth_error:
+                return auth_error
 
             tenant_id = self._get_tenant_id(user)
             
@@ -149,9 +149,9 @@ class BudgetsController(BaseController):
         - threshold: int (default: 80, alerte si consommé > threshold%)
         """
         try:
-            user = self._authenticate_from_header()
-            if not user:
-                return self._error_response("Session expirée", "UNAUTHORIZED", 401)
+            auth_error = self._authenticate_from_header()
+            if auth_error:
+                return auth_error
 
             tenant_id = self._get_tenant_id(user)
             threshold = params.get('threshold', 80)
@@ -194,9 +194,9 @@ class BudgetsController(BaseController):
         - budget_id: int
         """
         try:
-            user = self._authenticate_from_header()
-            if not user:
-                return self._error_response("Session expirée", "UNAUTHORIZED", 401)
+            auth_error = self._authenticate_from_header()
+            if auth_error:
+                return auth_error
 
             tenant_id = self._get_tenant_id(user)
             

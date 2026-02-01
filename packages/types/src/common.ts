@@ -144,6 +144,11 @@ export interface Product {
  * Detailed product with full information
  */
 export interface ProductDetail extends Product {
+  taxes?: any; // TODO: typer correctement
+  technical_description?: string;
+  uom_id?: any; // TODO: typer correctement
+  is_featured?: boolean;
+  offer_end_date?: string | null;
   long_description?: string
   specifications?: Record<string, string>
   shipping_info?: string
