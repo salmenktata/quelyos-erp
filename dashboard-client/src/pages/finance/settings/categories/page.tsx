@@ -10,7 +10,6 @@
  */
 
 import { useEffect, useState } from "react";
-import { Layout } from '@/components/Layout';
 import { api } from "@/lib/finance/api";
 import { Loader2, Plus, Trash2, Edit2, Tag, TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
 import { Breadcrumbs, PageNotice, Button } from '@/components/common';
@@ -160,7 +159,7 @@ export default function CategoriesPage() {
   const incomeCategories = categories.filter((c) => c.kind === "INCOME");
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         <Breadcrumbs
           items={[
@@ -404,6 +403,6 @@ export default function CategoriesPage() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

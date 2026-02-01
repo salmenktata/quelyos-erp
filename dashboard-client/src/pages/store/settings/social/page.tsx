@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Layout } from '@/components/Layout';
 import { storeNotices } from '@/lib/notices/store-notices';
 import { Breadcrumbs, PageNotice } from "@/components/common";
 import { Button } from "@/components/common/Button";
@@ -81,7 +80,7 @@ export default function SocialSettingsPage() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
       <Breadcrumbs
         items={[
@@ -160,6 +159,6 @@ export default function SocialSettingsPage() {
         </p>
       </div>
       </div>
-    </Layout>
+    </>
   );
 }

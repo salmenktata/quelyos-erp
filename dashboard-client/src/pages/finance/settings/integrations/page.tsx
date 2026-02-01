@@ -1,7 +1,6 @@
 
 
 import { useEffect, useState } from "react";
-import { Layout } from '@/components/Layout';
 import { Loader2, Zap, Check, AlertCircle } from "lucide-react";
 import { logger } from '@quelyos/logger';
 
@@ -139,7 +138,7 @@ export default function IntegrationsPage() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
 
         <div className="space-y-1">
@@ -219,6 +218,6 @@ export default function IntegrationsPage() {
         </p>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

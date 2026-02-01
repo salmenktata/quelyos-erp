@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs } from "@/components/common";
 import { Button } from "@/components/common/Button";
 import { useToast } from "@/contexts/ToastContext";
@@ -100,16 +99,16 @@ export default function MarketingEmailSettingsPage() {
 
   if (isLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex justify-center items-center min-h-[40vh]">
           <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
         </div>
-      </Layout>
+      </>
     );
   }
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6 max-w-4xl">
         <Breadcrumbs
         items={[
@@ -346,6 +345,6 @@ export default function MarketingEmailSettingsPage() {
         </Button>
       </div>
       </div>
-    </Layout>
+    </>
   );
 }

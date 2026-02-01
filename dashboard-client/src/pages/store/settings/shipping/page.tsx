@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, Badge, Button, Modal, SkeletonTable, PageNotice } from "@/components/common";
 import { useToast } from "@/contexts/ToastContext";
 import { Truck, Save, Loader2, Clock, Gift, Info, Plus, Package } from "lucide-react";
@@ -183,7 +182,7 @@ export default function ShippingSettingsPage() {
   ];
 
   return (
-    <Layout>
+    <>
       <div className="p-4 md:p-8 space-y-6">
       <Breadcrumbs
         items={[
@@ -599,6 +598,6 @@ export default function ShippingSettingsPage() {
         </div>
       </Modal>
       </div>
-    </Layout>
+    </>
   );
 }

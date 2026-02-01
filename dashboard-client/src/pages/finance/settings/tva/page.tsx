@@ -10,7 +10,6 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
-import { Layout } from '@/components/Layout';
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Check, Loader2, Shield, WalletCards } from "lucide-react";
 import { logger } from '@quelyos/logger';
@@ -91,7 +90,7 @@ export default function TvaPage() {
   };
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         <Breadcrumbs
           items={[
@@ -259,6 +258,6 @@ export default function TvaPage() {
           </section>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

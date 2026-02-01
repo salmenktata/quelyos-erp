@@ -12,7 +12,6 @@
 
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Layout } from "@/components/Layout";
 import { Breadcrumbs, PageNotice, SkeletonTable } from "@/components/common";
 import { Button } from "@/components/common/Button";
 import { useRequireAuth } from "@/lib/finance/compat/auth";
@@ -144,7 +143,7 @@ export default function SettingsOverviewPage() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="p-4 md:p-8 space-y-6">
       <Breadcrumbs
           items={[
@@ -326,6 +325,6 @@ export default function SettingsOverviewPage() {
         cancelText="Annuler"
       />
     </div>
-  </Layout>
+  </>
 );
 }

@@ -1,7 +1,6 @@
 
 
 import { useEffect, useState, useCallback } from "react";
-import { Layout } from '@/components/Layout';
 import { Switch } from "@/components/ui/Switch";
 import { Plus, Trash2, CreditCard, Banknote, FileText, ArrowLeftRight, Landmark, Receipt, Briefcase, AlertCircle, MoreHorizontal, Check, X } from "lucide-react";
 import type { FlowType } from "@/types/paymentFlow";
@@ -207,7 +206,7 @@ export default function FluxSettingsPage() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         {/* Messages */}
       {error && (
@@ -420,6 +419,6 @@ export default function FluxSettingsPage() {
         </div>
       )}
       </div>
-    </Layout>
+    </>
   );
 }

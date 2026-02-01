@@ -1,5 +1,4 @@
 import { Breadcrumbs, PageNotice } from "@/components/common";
-import { Layout } from '@/components/Layout';
 import { storeNotices } from '@/lib/notices/store-notices';
 import { useToast } from "@/contexts/ToastContext";
 import {
@@ -69,7 +68,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <Layout>
+    <>
       <div className="p-4 md:p-8 space-y-6">
       <Breadcrumbs
         items={[
@@ -223,6 +222,6 @@ export default function NotificationsPage() {
       </div>
     </div>
 
-    </Layout>
+    </>
   );
 }

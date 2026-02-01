@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs } from '@/components/common';
 import {
   Mail,
@@ -27,7 +26,7 @@ export default function MarketingSettingsPage() {
   ];
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         <Breadcrumbs
         items={[
@@ -74,6 +73,6 @@ export default function MarketingSettingsPage() {
         })}
       </div>
       </div>
-    </Layout>
+    </>
   );
 }

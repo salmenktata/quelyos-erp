@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Layout } from '@/components/Layout';
 import { storeNotices } from '@/lib/notices/store-notices';
 import { Breadcrumbs, SkeletonTable } from "@/components/common";
 import { Button } from "@/components/common/Button";
@@ -184,7 +183,7 @@ export default function SeoSettingsPage() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         <Breadcrumbs
           items={[
@@ -741,6 +740,6 @@ export default function SeoSettingsPage() {
         </div>
       )}
       </div>
-    </Layout>
+    </>
   );
 }

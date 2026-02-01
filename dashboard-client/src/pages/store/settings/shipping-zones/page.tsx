@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Layout } from '@/components/Layout';
 import { storeNotices } from '@/lib/notices/store-notices';
 import { Breadcrumbs, PageNotice } from "@/components/common";
 import { Button } from "@/components/common/Button";
@@ -132,7 +131,7 @@ export default function ShippingZonesPage() {
   const zones = data?.zones || [];
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
       <Breadcrumbs
         items={[
@@ -296,6 +295,6 @@ export default function ShippingZonesPage() {
         )}
       </div>
       </div>
-    </Layout>
+    </>
   );
 }

@@ -10,7 +10,6 @@
  * - Exécution directe des paiements validés depuis l'interface
  */
 
-import { Layout } from '@/components/Layout';
 import { Breadcrumbs, PageNotice } from '@/components/common';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Sparkles, FileText, GitCompare } from "lucide-react";
@@ -22,7 +21,7 @@ import { financeNotices } from '@/lib/notices/finance-notices';
 
 export default function PaymentPlanningPage() {
   return (
-    <Layout>
+    <>
       <div className="p-4 md:p-8">
         <div className="space-y-6">
           <Breadcrumbs
@@ -85,6 +84,6 @@ export default function PaymentPlanningPage() {
           </Tabs>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
